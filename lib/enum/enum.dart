@@ -361,6 +361,8 @@ enum PageLabel {
   resources,
   script,
   connections,
+  store,
+  account,
 }
 
 extension PageLabelExtension on PageLabel {
@@ -384,6 +386,10 @@ extension PageLabelExtension on PageLabel {
         return appLocalizations.script;
       case PageLabel.connections:
         return appLocalizations.navConnections;
+      case PageLabel.store:
+        return appLocalizations.xbStore;
+      case PageLabel.account:
+        return appLocalizations.xbAccount;
     }
   }
 }

@@ -1233,6 +1233,61 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "Requires administrator privileges",
     ),
+    "xbAccount": MessageLookupByLibrary.simpleMessage("Account"),
+    "xbAccountRequired": MessageLookupByLibrary.simpleMessage(
+      "Please sign in first",
+    ),
+    "xbBalance": MessageLookupByLibrary.simpleMessage("Balance"),
+    "xbBuyNow": MessageLookupByLibrary.simpleMessage("Get started"),
+    "xbBuyPendingTip": MessageLookupByLibrary.simpleMessage(
+      "Online payment is coming soon",
+    ),
+    "xbEmail": MessageLookupByLibrary.simpleMessage("Email"),
+    "xbEmailCode": MessageLookupByLibrary.simpleMessage("Email code"),
+    "xbExpireAt": MessageLookupByLibrary.simpleMessage("Expires"),
+    "xbForgetPassword": MessageLookupByLibrary.simpleMessage("Forgot password"),
+    "xbHasAccount": MessageLookupByLibrary.simpleMessage(
+      "Have an account? Sign in",
+    ),
+    "xbInviteCodeOptional": MessageLookupByLibrary.simpleMessage(
+      "Invite code (optional)",
+    ),
+    "xbLogin": MessageLookupByLibrary.simpleMessage("Sign in"),
+    "xbLoginTip": MessageLookupByLibrary.simpleMessage(
+      "Sign in to sync your subscription",
+    ),
+    "xbLogout": MessageLookupByLibrary.simpleMessage("Sign out"),
+    "xbManagedSubscription": MessageLookupByLibrary.simpleMessage(
+      "Managed subscription",
+    ),
+    "xbNewPassword": MessageLookupByLibrary.simpleMessage("New password"),
+    "xbNoAccount": MessageLookupByLibrary.simpleMessage("No account? Sign up"),
+    "xbNoPlanTip": MessageLookupByLibrary.simpleMessage(
+      "Your subscription syncs automatically after you get a plan",
+    ),
+    "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage("No active plan"),
+    "xbPassword": MessageLookupByLibrary.simpleMessage("Password"),
+    "xbPlanCurrent": MessageLookupByLibrary.simpleMessage("Current plan"),
+    "xbRegister": MessageLookupByLibrary.simpleMessage("Sign up"),
+    "xbRenew": MessageLookupByLibrary.simpleMessage("Renew"),
+    "xbResetPassword": MessageLookupByLibrary.simpleMessage("Reset password"),
+    "xbResetSubscription": MessageLookupByLibrary.simpleMessage(
+      "Reset subscription",
+    ),
+    "xbResetSubscriptionConfirm": MessageLookupByLibrary.simpleMessage(
+      "The old subscription URL will be invalidated immediately. Continue?",
+    ),
+    "xbSendCode": MessageLookupByLibrary.simpleMessage("Send code"),
+    "xbSendCodeCooldown": MessageLookupByLibrary.simpleMessage("Resend"),
+    "xbStatusCongested": MessageLookupByLibrary.simpleMessage("Congested"),
+    "xbStatusFluent": MessageLookupByLibrary.simpleMessage("Fluent"),
+    "xbStatusNormal": MessageLookupByLibrary.simpleMessage("Normal"),
+    "xbStore": MessageLookupByLibrary.simpleMessage("Store"),
+    "xbStoreEmpty": MessageLookupByLibrary.simpleMessage("No plans available"),
+    "xbSubscriptionExpired": MessageLookupByLibrary.simpleMessage(
+      "Your plan may have expired. Please renew and try again.",
+    ),
+    "xbTrafficUsed": MessageLookupByLibrary.simpleMessage("Traffic used"),
     "years": m14,
   };
 }

@@ -36,6 +36,8 @@ class Navigation {
         label: PageLabel.profiles,
         builder: (_) =>
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
+        // 商业版：订阅由账号受管（F-SUB-1），手动订阅管理入口撤出移动端底栏。
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
         icon: Icon(Icons.view_timeline),
@@ -80,6 +82,19 @@ class Navigation {
         icon: Icon(Icons.construction),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
+        modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.storefront_rounded),
+        label: PageLabel.store,
+        builder: (_) => StoreView(key: const GlobalObjectKey(PageLabel.store)),
+        modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.person_rounded),
+        label: PageLabel.account,
+        builder: (_) =>
+            AccountView(key: const GlobalObjectKey(PageLabel.account)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
       ),
     ];

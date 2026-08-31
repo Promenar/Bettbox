@@ -1,0 +1,11 @@
+{
+  "_note": "Bettbox 商业版（网穿云/CloudBreach）引导配置源雏形。schema 定义见 docs/PRD.md §6.3。域名就绪前 api_domains 留空（客户端应容忍空池并进入救援模式 UI）。部署位置：待运营侧部署到 CF Workers / 备用域名 / DNS TXT（PRD §6.5-1）。region_catalog 通道②降级字段，通道①（Xboard 插件 guest 地域目录端点）优先。",
+  "version": 1,
+  "updated_at": 1788093000,
+  "api_domains": [],
+  "bootstrap_sources": [],
+  "dns_txt_hint": "",
+  "min_app_version": 1000000,
+  "announcement_url": "",
+  "region_catalog": []
+}

@@ -5,7 +5,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <application
-        android:icon="@mipmap/ic_launcher"
         android:label="Bettbox Debug"
         tools:replace="android:label">
         <service

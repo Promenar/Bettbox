@@ -5498,6 +5498,281 @@ class AppLocalizations {
   String get closeAll {
     return Intl.message('Close All', name: 'closeAll', desc: '', args: []);
   }
+
+  /// `Store`
+  String get xbStore {
+    return Intl.message('Store', name: 'xbStore', desc: '', args: []);
+  }
+
+  /// `Account`
+  String get xbAccount {
+    return Intl.message('Account', name: 'xbAccount', desc: '', args: []);
+  }
+
+  /// `Sign in`
+  String get xbLogin {
+    return Intl.message('Sign in', name: 'xbLogin', desc: '', args: []);
+  }
+
+  /// `Sign up`
+  String get xbRegister {
+    return Intl.message('Sign up', name: 'xbRegister', desc: '', args: []);
+  }
+
+  /// `Sign out`
+  String get xbLogout {
+    return Intl.message('Sign out', name: 'xbLogout', desc: '', args: []);
+  }
+
+  /// `Email`
+  String get xbEmail {
+    return Intl.message('Email', name: 'xbEmail', desc: '', args: []);
+  }
+
+  /// `Password`
+  String get xbPassword {
+    return Intl.message('Password', name: 'xbPassword', desc: '', args: []);
+  }
+
+  /// `Email code`
+  String get xbEmailCode {
+    return Intl.message('Email code', name: 'xbEmailCode', desc: '', args: []);
+  }
+
+  /// `Invite code (optional)`
+  String get xbInviteCodeOptional {
+    return Intl.message(
+      'Invite code (optional)',
+      name: 'xbInviteCodeOptional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send code`
+  String get xbSendCode {
+    return Intl.message('Send code', name: 'xbSendCode', desc: '', args: []);
+  }
+
+  /// `Forgot password`
+  String get xbForgetPassword {
+    return Intl.message(
+      'Forgot password',
+      name: 'xbForgetPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New password`
+  String get xbNewPassword {
+    return Intl.message(
+      'New password',
+      name: 'xbNewPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset password`
+  String get xbResetPassword {
+    return Intl.message(
+      'Reset password',
+      name: 'xbResetPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sign in to sync your subscription`
+  String get xbLoginTip {
+    return Intl.message(
+      'Sign in to sync your subscription',
+      name: 'xbLoginTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No account? Sign up`
+  String get xbNoAccount {
+    return Intl.message(
+      'No account? Sign up',
+      name: 'xbNoAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Have an account? Sign in`
+  String get xbHasAccount {
+    return Intl.message(
+      'Have an account? Sign in',
+      name: 'xbHasAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current plan`
+  String get xbPlanCurrent {
+    return Intl.message(
+      'Current plan',
+      name: 'xbPlanCurrent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expires`
+  String get xbExpireAt {
+    return Intl.message('Expires', name: 'xbExpireAt', desc: '', args: []);
+  }
+
+  /// `Traffic used`
+  String get xbTrafficUsed {
+    return Intl.message(
+      'Traffic used',
+      name: 'xbTrafficUsed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Balance`
+  String get xbBalance {
+    return Intl.message('Balance', name: 'xbBalance', desc: '', args: []);
+  }
+
+  /// `Reset subscription`
+  String get xbResetSubscription {
+    return Intl.message(
+      'Reset subscription',
+      name: 'xbResetSubscription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The old subscription URL will be invalidated immediately. Continue?`
+  String get xbResetSubscriptionConfirm {
+    return Intl.message(
+      'The old subscription URL will be invalidated immediately. Continue?',
+      name: 'xbResetSubscriptionConfirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No active plan`
+  String get xbNoPlanTitle {
+    return Intl.message(
+      'No active plan',
+      name: 'xbNoPlanTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your subscription syncs automatically after you get a plan`
+  String get xbNoPlanTip {
+    return Intl.message(
+      'Your subscription syncs automatically after you get a plan',
+      name: 'xbNoPlanTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Get started`
+  String get xbBuyNow {
+    return Intl.message('Get started', name: 'xbBuyNow', desc: '', args: []);
+  }
+
+  /// `Please sign in first`
+  String get xbAccountRequired {
+    return Intl.message(
+      'Please sign in first',
+      name: 'xbAccountRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No plans available`
+  String get xbStoreEmpty {
+    return Intl.message(
+      'No plans available',
+      name: 'xbStoreEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Online payment is coming soon`
+  String get xbBuyPendingTip {
+    return Intl.message(
+      'Online payment is coming soon',
+      name: 'xbBuyPendingTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Resend`
+  String get xbSendCodeCooldown {
+    return Intl.message(
+      'Resend',
+      name: 'xbSendCodeCooldown',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Managed subscription`
+  String get xbManagedSubscription {
+    return Intl.message(
+      'Managed subscription',
+      name: 'xbManagedSubscription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fluent`
+  String get xbStatusFluent {
+    return Intl.message('Fluent', name: 'xbStatusFluent', desc: '', args: []);
+  }
+
+  /// `Normal`
+  String get xbStatusNormal {
+    return Intl.message('Normal', name: 'xbStatusNormal', desc: '', args: []);
+  }
+
+  /// `Congested`
+  String get xbStatusCongested {
+    return Intl.message(
+      'Congested',
+      name: 'xbStatusCongested',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your plan may have expired. Please renew and try again.`
+  String get xbSubscriptionExpired {
+    return Intl.message(
+      'Your plan may have expired. Please renew and try again.',
+      name: 'xbSubscriptionExpired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Renew`
+  String get xbRenew {
+    return Intl.message('Renew', name: 'xbRenew', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

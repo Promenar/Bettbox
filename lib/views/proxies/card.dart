@@ -3,6 +3,7 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/xboard/node_packager.dart';
 import 'package:bett_box/views/proxies/common.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:emoji_regex/emoji_regex.dart';
@@ -117,10 +118,22 @@ class ProxyCard extends StatelessWidget {
             );
           }
 
+          final isManagedProfile = ref.watch(
+            currentProfileProvider.select((p) => p?.managed == true),
+          );
           return GestureDetector(
             onTap: _handleTestCurrentDelay,
             child: Text(
-              delay > 0 ? '$delay ms' : 'Timeout',
+              isManagedProfile
+                  ? switch (regionStatusForDelay(delay)) {
+                      XboardRegionStatus.fluent => appLocalizations.xbStatusFluent,
+                      XboardRegionStatus.normal => appLocalizations.xbStatusNormal,
+                      XboardRegionStatus.congested =>
+                        appLocalizations.xbStatusCongested,
+                    }
+                  : delay > 0
+                  ? '$delay ms'
+                  : 'Timeout',
               style: context.textTheme.labelSmall?.copyWith(
                 overflow: TextOverflow.ellipsis,
                 color: utils.getDelayColor(delay),

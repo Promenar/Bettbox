@@ -12,6 +12,8 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
+import 'package:bett_box/xboard/node_packager.dart'
+    as xboard_node_packager;
 
 import 'package:bett_box/widgets/dialog.dart';
 import 'package:flutter/material.dart';
@@ -1006,6 +1008,10 @@ class GlobalState {
     };
     configMap['rules'] = configMap['rule'];
     configMap.remove('rule');
+    // 受管 Profile（账号订阅）：应用期做地域包装与悬空引用清理（F-NODE-3/5）
+    if (profile?.managed == true) {
+      return xboard_node_packager.applyManagedPackaging(configMap);
+    }
     return configMap;
   }
 
