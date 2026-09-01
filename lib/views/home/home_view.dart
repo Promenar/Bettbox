@@ -5,7 +5,6 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/views/dashboard/widgets/network_speed.dart';
 import 'package:bett_box/views/dashboard/widgets/outbound_mode.dart';
 import 'package:bett_box/views/dashboard/widgets/start_button.dart';
-import 'package:bett_box/views/dashboard/widgets/traffic_usage.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:bett_box/xboard/node_packager.dart';
 import 'package:flutter/material.dart';
@@ -26,15 +25,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return CommonScaffold(
       title: appLocalizations.home,
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        // 底部留白避开浮动导航栏
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
           _buildRegionList(),
           const SizedBox(height: 12),
           const NetworkSpeed(),
           const SizedBox(height: 12),
-          const TrafficUsage(),
-          const SizedBox(height: 12),
-          const OutboundMode(),
+          const OutboundModeV2(),
           const SizedBox(height: 12),
           const StartButton(),
         ],
