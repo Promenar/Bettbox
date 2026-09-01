@@ -12,6 +12,7 @@ export 'about.dart';
 export 'backup_and_recovery.dart';
 export 'resources.dart';
 export 'store/store.dart';
+export 'store/checkout_page.dart';
 export 'connection/requests.dart';
 export 'connection/connections.dart';
 export 'developer.dart';

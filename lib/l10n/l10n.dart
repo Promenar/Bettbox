@@ -5773,6 +5773,116 @@ class AppLocalizations {
   String get xbRenew {
     return Intl.message('Renew', name: 'xbRenew', desc: '', args: []);
   }
+
+  /// `Checkout`
+  String get xbCheckout {
+    return Intl.message('Checkout', name: 'xbCheckout', desc: '', args: []);
+  }
+
+  /// `Scan to pay`
+  String get xbScanToPay {
+    return Intl.message('Scan to pay', name: 'xbScanToPay', desc: '', args: []);
+  }
+
+  /// `This page confirms automatically after payment`
+  String get xbPayPollingTip {
+    return Intl.message(
+      'This page confirms automatically after payment',
+      name: 'xbPayPollingTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open payment page`
+  String get xbOpenCashier {
+    return Intl.message(
+      'Open payment page',
+      name: 'xbOpenCashier',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Payment successful`
+  String get xbPaySuccess {
+    return Intl.message(
+      'Payment successful',
+      name: 'xbPaySuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Back to account`
+  String get xbBackToAccount {
+    return Intl.message(
+      'Back to account',
+      name: 'xbBackToAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Payment not completed`
+  String get xbPayFailed {
+    return Intl.message(
+      'Payment not completed',
+      name: 'xbPayFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Waiting for payment result…`
+  String get xbPayPendingTip {
+    return Intl.message(
+      'Waiting for payment result…',
+      name: 'xbPayPendingTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This will cancel the unpaid order. Continue?`
+  String get xbCancelOrderConfirm {
+    return Intl.message(
+      'This will cancel the unpaid order. Continue?',
+      name: 'xbCancelOrderConfirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select period`
+  String get xbSelectPeriod {
+    return Intl.message(
+      'Select period',
+      name: 'xbSelectPeriod',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select payment method`
+  String get xbSelectPayment {
+    return Intl.message(
+      'Select payment method',
+      name: 'xbSelectPayment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No payment method available yet`
+  String get xbNoPaymentMethod {
+    return Intl.message(
+      'No payment method available yet',
+      name: 'xbNoPaymentMethod',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

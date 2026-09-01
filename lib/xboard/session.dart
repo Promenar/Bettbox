@@ -64,7 +64,10 @@ final xboardApiClientProvider = Provider<XboardApiClient>((ref) {
     domainManager: ref.watch(xboardDomainManagerProvider),
     authDataProvider: () => ref.read(xboardAuthDataProvider),
     onError: (error) {
-      if (error.isAuth) {
+      // 仅 401 判定凭据失效；Xboard 用 403 表达订阅域业务拒绝（如套餐过期），
+      // 不应触发静默登出。
+      if (error.type == XboardErrorType.auth &&
+          error.statusCode == 401) {
         ref.read(xboardAuthDataProvider.notifier).state = null;
         ref.read(xboardSessionProvider.notifier).onAuthRejected();
       }
@@ -82,6 +85,10 @@ final xboardUserRepositoryProvider = Provider<XboardUserRepository>(
 
 final xboardGuestRepositoryProvider = Provider<XboardGuestRepository>(
   (ref) => XboardGuestRepository(ref.watch(xboardApiClientProvider)),
+);
+
+final xboardOrderRepositoryProvider = Provider<XboardOrderRepository>(
+  (ref) => XboardOrderRepository(ref.watch(xboardApiClientProvider)),
 );
 
 class XboardSessionNotifier extends Notifier<XboardSessionState> {

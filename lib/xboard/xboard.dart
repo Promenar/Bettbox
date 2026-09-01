@@ -9,6 +9,7 @@ export 'binding.dart';
 export 'domain_manager.dart';
 export 'endpoints.dart';
 export 'models.dart';
+export 'order_models.dart';
 export 'repositories.dart';
 export 'secure_store.dart';
 export 'session.dart';

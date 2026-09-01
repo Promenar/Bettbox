@@ -11,6 +11,7 @@ import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/xboard/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -54,6 +55,8 @@ class ApplicationState extends ConsumerState<Application>
     globalState.backgroundMode.addListener(_syncAutoUpdateTasks);
     _syncAutoUpdateTasks();
     globalState.appController = AppController(context, ref);
+    // 启动即恢复 Xboard 会话（安全存储凭据 → checkLogin），供商店/我的等页使用。
+    ref.read(xboardSessionProvider.notifier).restore();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_initApp());
     });

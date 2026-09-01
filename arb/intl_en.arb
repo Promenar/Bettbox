@@ -709,5 +709,17 @@
   "xbStatusNormal": "Normal",
   "xbStatusCongested": "Congested",
   "xbSubscriptionExpired": "Your plan may have expired. Please renew and try again.",
-  "xbRenew": "Renew"
+  "xbRenew": "Renew",
+  "xbCheckout": "Checkout",
+  "xbScanToPay": "Scan to pay",
+  "xbPayPollingTip": "This page confirms automatically after payment",
+  "xbOpenCashier": "Open payment page",
+  "xbPaySuccess": "Payment successful",
+  "xbBackToAccount": "Back to account",
+  "xbPayFailed": "Payment not completed",
+  "xbPayPendingTip": "Waiting for payment result…",
+  "xbCancelOrderConfirm": "This will cancel the unpaid order. Continue?",
+  "xbSelectPeriod": "Select period",
+  "xbSelectPayment": "Select payment method",
+  "xbNoPaymentMethod": "No payment method available yet"
 }

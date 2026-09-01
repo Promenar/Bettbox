@@ -710,5 +710,17 @@
   "xbStatusNormal": "正常",
   "xbStatusCongested": "擁擠",
   "xbSubscriptionExpired": "套餐可能已過期，請續費後重試",
-  "xbRenew": "續費"
+  "xbRenew": "續費",
+  "xbCheckout": "收銀台",
+  "xbScanToPay": "掃碼支付",
+  "xbPayPollingTip": "支付完成後本頁將自動確認並同步訂閱",
+  "xbOpenCashier": "打開支付頁面",
+  "xbPaySuccess": "支付成功，套餐已生效",
+  "xbBackToAccount": "返回我的",
+  "xbPayFailed": "支付未完成",
+  "xbPayPendingTip": "等待支付結果…",
+  "xbCancelOrderConfirm": "取消後將關閉未支付訂單，確定？",
+  "xbSelectPeriod": "選擇週期",
+  "xbSelectPayment": "選擇支付方式",
+  "xbNoPaymentMethod": "支付方式暫未配置，請聯繫客服或稍後再試"
 }

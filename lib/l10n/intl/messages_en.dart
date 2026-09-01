@@ -1237,11 +1237,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbAccountRequired": MessageLookupByLibrary.simpleMessage(
       "Please sign in first",
     ),
+    "xbBackToAccount": MessageLookupByLibrary.simpleMessage("Back to account"),
     "xbBalance": MessageLookupByLibrary.simpleMessage("Balance"),
     "xbBuyNow": MessageLookupByLibrary.simpleMessage("Get started"),
     "xbBuyPendingTip": MessageLookupByLibrary.simpleMessage(
       "Online payment is coming soon",
     ),
+    "xbCancelOrderConfirm": MessageLookupByLibrary.simpleMessage(
+      "This will cancel the unpaid order. Continue?",
+    ),
+    "xbCheckout": MessageLookupByLibrary.simpleMessage("Checkout"),
     "xbEmail": MessageLookupByLibrary.simpleMessage("Email"),
     "xbEmailCode": MessageLookupByLibrary.simpleMessage("Email code"),
     "xbExpireAt": MessageLookupByLibrary.simpleMessage("Expires"),
@@ -1262,11 +1267,25 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "xbNewPassword": MessageLookupByLibrary.simpleMessage("New password"),
     "xbNoAccount": MessageLookupByLibrary.simpleMessage("No account? Sign up"),
+    "xbNoPaymentMethod": MessageLookupByLibrary.simpleMessage(
+      "No payment method available yet",
+    ),
     "xbNoPlanTip": MessageLookupByLibrary.simpleMessage(
       "Your subscription syncs automatically after you get a plan",
     ),
     "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage("No active plan"),
+    "xbOpenCashier": MessageLookupByLibrary.simpleMessage("Open payment page"),
     "xbPassword": MessageLookupByLibrary.simpleMessage("Password"),
+    "xbPayFailed": MessageLookupByLibrary.simpleMessage(
+      "Payment not completed",
+    ),
+    "xbPayPendingTip": MessageLookupByLibrary.simpleMessage(
+      "Waiting for payment result…",
+    ),
+    "xbPayPollingTip": MessageLookupByLibrary.simpleMessage(
+      "This page confirms automatically after payment",
+    ),
+    "xbPaySuccess": MessageLookupByLibrary.simpleMessage("Payment successful"),
     "xbPlanCurrent": MessageLookupByLibrary.simpleMessage("Current plan"),
     "xbRegister": MessageLookupByLibrary.simpleMessage("Sign up"),
     "xbRenew": MessageLookupByLibrary.simpleMessage("Renew"),
@@ -1277,6 +1296,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbResetSubscriptionConfirm": MessageLookupByLibrary.simpleMessage(
       "The old subscription URL will be invalidated immediately. Continue?",
     ),
+    "xbScanToPay": MessageLookupByLibrary.simpleMessage("Scan to pay"),
+    "xbSelectPayment": MessageLookupByLibrary.simpleMessage(
+      "Select payment method",
+    ),
+    "xbSelectPeriod": MessageLookupByLibrary.simpleMessage("Select period"),
     "xbSendCode": MessageLookupByLibrary.simpleMessage("Send code"),
     "xbSendCodeCooldown": MessageLookupByLibrary.simpleMessage("Resend"),
     "xbStatusCongested": MessageLookupByLibrary.simpleMessage("Congested"),

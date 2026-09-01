@@ -49,6 +49,37 @@ void main() {
     });
   });
 
+  group('XboardPlan', () {
+    test('guest 端点旧版扁平价格字段兼容（实测形态）', () {
+      final plan = XboardPlan.fromJson({
+        'id': 2,
+        'name': '轻量月付',
+        'show': 1,
+        'sell': 1,
+        'renew': 1,
+        'transfer_enable': 100,
+        'month_price': 1000,
+        'year_price': 8800,
+        'quarter_price': null,
+      });
+      expect(plan.prices['month_price'], 1000);
+      expect(plan.prices['year_price'], 8800);
+      expect(plan.prices.containsKey('quarter_price'), isFalse);
+      expect(plan.sell, isTrue);
+    });
+
+    test('登录态嵌套 prices 字典形态', () {
+      final plan = XboardPlan.fromJson({
+        'id': 1,
+        'name': '体验套餐',
+        'prices': {'monthly': 0},
+        'sell': 0,
+      });
+      expect(plan.prices['monthly'], 0);
+      expect(plan.sell, isFalse);
+    });
+  });
+
   group('XboardUserInfo / XboardSubscribeInfo', () {
     test('user/info 实测字段', () {
       final info = XboardUserInfo.fromJson({

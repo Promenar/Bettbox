@@ -81,13 +81,34 @@ class XboardPlan {
   final int? deviceLimit;
 
   factory XboardPlan.fromJson(Map<String, dynamic> json) {
-    final prices = json['prices'];
+    final prices = <String, num>{};
+    final pricesField = json['prices'];
+    if (pricesField is Map) {
+      pricesField.forEach((k, v) {
+        if (v is num) prices[k.toString()] = v;
+      });
+    } else {
+      // guest/plan/fetch 旧版扁平字段形态（实测）：month_price/year_price/...
+      // 键保留原字段名（下单 period 原样回传，匹配 v1 服务端白名单）。
+      const legacyFields = [
+        'month_price',
+        'quarter_price',
+        'half_year_price',
+        'year_price',
+        'two_year_price',
+        'three_year_price',
+        'onetime_price',
+        'reset_price',
+      ];
+      for (final field in legacyFields) {
+        final v = json[field];
+        if (v is num) prices[field] = v;
+      }
+    }
     return XboardPlan(
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: json['name'] as String? ?? '',
-      prices: prices is Map
-          ? prices.map((k, v) => MapEntry(k.toString(), v is num ? v : 0))
-          : const {},
+      prices: prices,
       show: json['show'] == true || json['show'] == 1,
       sell: json['sell'] == true || json['sell'] == 1,
       renew: json['renew'] == true || json['renew'] == 1,

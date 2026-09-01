@@ -3,6 +3,7 @@ library;
 
 import 'api_client.dart';
 import 'endpoints.dart';
+import 'order_models.dart';
 import 'models.dart';
 
 class XboardGuestRepository {
@@ -25,6 +26,89 @@ class XboardGuestRepository {
   /// 面板公共配置（域名健康探测也复用此端点）。
   Future<void> commConfig() async {
     await _client.get<dynamic>(XboardEndpoints.guestCommConfig);
+  }
+}
+
+class XboardOrderRepository {
+  XboardOrderRepository(this._client);
+
+  final XboardApiClient _client;
+
+  Future<List<XboardPaymentMethod>> getPaymentMethods() async {
+    final data = await _client.get<List<dynamic>>(
+      XboardEndpoints.orderGetPaymentMethod,
+      parse: (data) => data as List<dynamic>,
+    );
+    return (data ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(XboardPaymentMethod.fromJson)
+        .toList();
+  }
+
+  /// 下单，返回 trade_no。
+  ///
+  /// 响应 data 形态随部署版本而异：新版为对象 `{trade_no}`，
+  /// 部分发布版直接为字符串 trade_no（实测）——两种都兼容。
+  Future<String> saveOrder({
+    required int planId,
+    required String period,
+    String? couponCode,
+  }) async {
+    final data = await _client.post<Map<String, dynamic>>(
+      XboardEndpoints.orderSave,
+      body: {
+        'plan_id': planId,
+        'period': period,
+        if (couponCode != null && couponCode.isNotEmpty) 'coupon_code': couponCode,
+      },
+      parse: (data) {
+        if (data is Map<String, dynamic>) {
+          return data;
+        }
+        return {'trade_no': data?.toString() ?? ''};
+      },
+    );
+    return data!['trade_no'] as String;
+  }
+
+  /// 收银：0=二维码内容 / 1=跳转URL / -1=免费单已支付。
+  Future<XboardCheckoutResult> checkout({
+    required String tradeNo,
+    required int method,
+  }) async {
+    final data = await _client.post<Map<String, dynamic>>(
+      XboardEndpoints.orderCheckout,
+      body: {'trade_no': tradeNo, 'method': method},
+      parse: (data) => Map<String, dynamic>.from(data as Map),
+    );
+    return XboardCheckoutResult.fromJson(data!);
+  }
+
+  Future<XboardOrderCheckResult> checkOrder(String tradeNo) async {
+    final data = await _client.get<dynamic>(
+      XboardEndpoints.orderCheck,
+      query: {'trade_no': tradeNo},
+      parse: (data) => data,
+    );
+    return XboardOrderCheckResult.fromJson(data);
+  }
+
+  Future<List<XboardOrder>> fetchOrders() async {
+    final data = await _client.get<List<dynamic>>(
+      XboardEndpoints.orderFetch,
+      parse: (data) => data as List<dynamic>,
+    );
+    return (data ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(XboardOrder.fromJson)
+        .toList();
+  }
+
+  Future<void> cancelOrder(String tradeNo) async {
+    await _client.post<void>(
+      XboardEndpoints.orderCancel,
+      body: {'trade_no': tradeNo},
+    );
   }
 }
 
