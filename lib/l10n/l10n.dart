@@ -5888,6 +5888,21 @@ class AppLocalizations {
   String get store {
     return Intl.message('Store', name: 'store', desc: '', args: []);
   }
+
+  /// `Auto (best region)`
+  String get xbAutoRegion {
+    return Intl.message(
+      'Auto (best region)',
+      name: 'xbAutoRegion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Home`
+  String get home {
+    return Intl.message('Home', name: 'home', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -13,12 +13,22 @@ class Navigation {
     bool hasProxies = false,
   }) {
     return [
+      // 商业版首页：服务启停 / 分流模式 / 区域节点（写死布局）。
+      NavigationItem(
+        keep: false,
+        icon: const Icon(Icons.home_rounded),
+        label: PageLabel.home,
+        builder: (_) => HomeView(key: const GlobalObjectKey(PageLabel.home)),
+        modes: [NavigationItemMode.mobile, NavigationItemMode.desktop],
+      ),
+      // 原 Dashboard/Proxies 对商业版移动端隐藏（桌面侧栏保留入口，代码可回退）。
       NavigationItem(
         keep: false,
         icon: Icon(Icons.space_dashboard),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
         icon: const Icon(Icons.article),
@@ -27,9 +37,7 @@ class Navigation {
           overrides: [queryProvider.overrideWith(() => Query())],
           child: ProxiesView(key: const GlobalObjectKey(PageLabel.proxies)),
         ),
-        modes: hasProxies
-            ? [NavigationItemMode.mobile, NavigationItemMode.desktop]
-            : [],
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
         icon: Icon(Icons.folder),

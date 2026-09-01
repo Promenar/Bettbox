@@ -401,6 +401,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(
       "啟用裝置最高重新整理率支援",
     ),
+    "home": MessageLookupByLibrary.simpleMessage("首頁"),
     "host": MessageLookupByLibrary.simpleMessage("主機"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("追加目前設定 Hosts"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("快捷鍵衝突"),
@@ -899,6 +900,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("需要管理員權限"),
     "xbAccount": MessageLookupByLibrary.simpleMessage("我的"),
     "xbAccountRequired": MessageLookupByLibrary.simpleMessage("請先登入"),
+    "xbAutoRegion": MessageLookupByLibrary.simpleMessage("自動（最優地域）"),
     "xbBackToAccount": MessageLookupByLibrary.simpleMessage("返回我的"),
     "xbBalance": MessageLookupByLibrary.simpleMessage("餘額"),
     "xbBuyNow": MessageLookupByLibrary.simpleMessage("立即開通"),

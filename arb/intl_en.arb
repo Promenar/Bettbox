@@ -722,5 +722,7 @@
   "xbSelectPeriod": "Select period",
   "xbSelectPayment": "Select payment method",
   "xbNoPaymentMethod": "No payment method available yet",
-  "store": "Store"
+  "store": "Store",
+  "xbAutoRegion": "Auto (best region)",
+  "home": "Home"
 }

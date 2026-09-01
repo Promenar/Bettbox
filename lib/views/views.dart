@@ -1,3 +1,4 @@
+export 'home/home_view.dart';
 export 'proxies/proxies.dart';
 export 'dashboard/dashboard.dart';
 export 'tools.dart';

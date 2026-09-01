@@ -554,6 +554,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(
       "Enable highest refresh rate support",
     ),
+    "home": MessageLookupByLibrary.simpleMessage("Home"),
     "host": MessageLookupByLibrary.simpleMessage("Host"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage(
       "Append hosts to current config",
@@ -1238,6 +1239,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbAccountRequired": MessageLookupByLibrary.simpleMessage(
       "Please sign in first",
     ),
+    "xbAutoRegion": MessageLookupByLibrary.simpleMessage("Auto (best region)"),
     "xbBackToAccount": MessageLookupByLibrary.simpleMessage("Back to account"),
     "xbBalance": MessageLookupByLibrary.simpleMessage("Balance"),
     "xbBuyNow": MessageLookupByLibrary.simpleMessage("Get started"),

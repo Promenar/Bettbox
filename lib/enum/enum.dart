@@ -352,6 +352,7 @@ enum DashboardWidget {
 enum GeodataLoader { standard, memconservative }
 
 enum PageLabel {
+  home,
   dashboard,
   proxies,
   profiles,
@@ -368,6 +369,8 @@ enum PageLabel {
 extension PageLabelExtension on PageLabel {
   String get localizedName {
     switch (this) {
+      case PageLabel.home:
+        return appLocalizations.home;
       case PageLabel.dashboard:
         return appLocalizations.dashboard;
       case PageLabel.proxies:

@@ -723,5 +723,7 @@
   "xbSelectPeriod": "选择周期",
   "xbSelectPayment": "选择支付方式",
   "xbNoPaymentMethod": "支付方式暂未配置，请联系客服或稍后再试",
-  "store": "商店"
+  "store": "商店",
+  "xbAutoRegion": "自动（最优地域）",
+  "home": "首页"
 }
