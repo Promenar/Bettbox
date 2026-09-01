@@ -724,5 +724,6 @@
   "xbNoPaymentMethod": "No payment method available yet",
   "store": "Store",
   "xbAutoRegion": "Auto (best region)",
-  "home": "Home"
+  "home": "Home",
+  "xbDirectModeTip": "All traffic bypasses the proxy in direct mode"
 }

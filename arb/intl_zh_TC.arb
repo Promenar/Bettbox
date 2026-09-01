@@ -725,5 +725,6 @@
   "xbNoPaymentMethod": "支付方式暫未配置，請聯繫客服或稍後再試",
   "store": "商店",
   "xbAutoRegion": "自動（最優地域）",
-  "home": "首頁"
+  "home": "首頁",
+  "xbDirectModeTip": "直連模式下所有流量不經代理，不使用節點"
 }

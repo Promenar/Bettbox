@@ -5903,6 +5903,16 @@ class AppLocalizations {
   String get home {
     return Intl.message('Home', name: 'home', desc: '', args: []);
   }
+
+  /// `All traffic bypasses the proxy in direct mode`
+  String get xbDirectModeTip {
+    return Intl.message(
+      'All traffic bypasses the proxy in direct mode',
+      name: 'xbDirectModeTip',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

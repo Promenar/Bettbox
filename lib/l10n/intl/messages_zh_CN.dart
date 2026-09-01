@@ -895,6 +895,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "取消后将关闭未支付订单，确定？",
     ),
     "xbCheckout": MessageLookupByLibrary.simpleMessage("收银台"),
+    "xbDirectModeTip": MessageLookupByLibrary.simpleMessage(
+      "直连模式下所有流量不经代理，不使用节点",
+    ),
     "xbEmail": MessageLookupByLibrary.simpleMessage("邮箱"),
     "xbEmailCode": MessageLookupByLibrary.simpleMessage("邮箱验证码"),
     "xbExpireAt": MessageLookupByLibrary.simpleMessage("到期时间"),

@@ -1,4 +1,5 @@
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -19,16 +20,50 @@ class HomeView extends ConsumerStatefulWidget {
   ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
+/// mihomo 内置组名（全局模式伪节点等），区域列表不展示。
+const _builtinGroupNames = {'GLOBAL', 'COMPATIBLE', 'REJECT'};
+const kMihomoGlobalGroupName = 'GLOBAL';
+
 class _HomeViewState extends ConsumerState<HomeView> {
   @override
+  void initState() {
+    super.initState();
+    // 全局模式：GLOBAL 出口自动跟随"节点选择"（即用户在区域列表选的地域）。
+    ref.listenManual(
+      patchClashConfigProvider.select((state) => state.mode),
+      (previous, next) {
+        if (next == Mode.global) {
+          _bindGlobalToSelector();
+        }
+      },
+      fireImmediately: true,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final mode = ref.watch(
+      patchClashConfigProvider.select((state) => state.mode),
+    );
     return CommonScaffold(
       title: appLocalizations.home,
       body: ListView(
         // 底部留白避开浮动导航栏
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
-          _buildRegionList(),
+          if (mode == Mode.direct)
+            CommonCard(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  appLocalizations.xbDirectModeTip,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          else
+            _buildRegionList(),
           const SizedBox(height: 12),
           const NetworkSpeed(),
           const SizedBox(height: 12),
@@ -38,6 +73,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
         ],
       ),
     );
+  }
+
+  /// 全局模式下 GLOBAL 组默认走"节点选择"，避免出现独立的 GLOBAL 伪节点。
+  void _bindGlobalToSelector() {
+    try {
+      final appController = globalState.appController;
+      appController.updateCurrentSelectedMap(
+        kMihomoGlobalGroupName,
+        kSelectorGroupName,
+      );
+      appController.changeProxyDebounce(
+        kMihomoGlobalGroupName,
+        kSelectorGroupName,
+      );
+    } catch (error) {
+      debugPrint('[XBOARD_HOME] bind global error: $error');
+    }
   }
 
   /// 区域节点列表（F-NODE-3）：展示包装配置生成的地域组，
@@ -52,6 +104,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final regionEntries = <(Group, bool)>[];
     for (final group in groups) {
       if (group.name == selectorName) continue;
+      // 内置伪节点组不作为地域展示（全局模式出口已自动绑定节点选择）
+      if (_builtinGroupNames.contains(group.name)) continue;
       final isAuto = group.name == kAutoRegionGroupName;
       regionEntries.add((group, isAuto));
     }

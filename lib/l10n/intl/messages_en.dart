@@ -1250,6 +1250,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "This will cancel the unpaid order. Continue?",
     ),
     "xbCheckout": MessageLookupByLibrary.simpleMessage("Checkout"),
+    "xbDirectModeTip": MessageLookupByLibrary.simpleMessage(
+      "All traffic bypasses the proxy in direct mode",
+    ),
     "xbEmail": MessageLookupByLibrary.simpleMessage("Email"),
     "xbEmailCode": MessageLookupByLibrary.simpleMessage("Email code"),
     "xbExpireAt": MessageLookupByLibrary.simpleMessage("Expires"),
