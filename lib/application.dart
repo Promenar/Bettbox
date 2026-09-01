@@ -11,6 +11,7 @@ import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/xboard/binding.dart';
 import 'package:bett_box/xboard/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -57,6 +58,15 @@ class ApplicationState extends ConsumerState<Application>
     globalState.appController = AppController(context, ref);
     // 启动即恢复 Xboard 会话（安全存储凭据 → checkLogin），供商店/我的等页使用。
     ref.read(xboardSessionProvider.notifier).restore();
+    // 受管订阅内容更新（面板节点变更自愈：订阅损坏/过期场景下重新拉取并重应用）
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await Future.delayed(const Duration(seconds: 2));
+        if (ref.read(xboardSessionProvider).isAuthenticated) {
+          await refreshManagedSubscription();
+        }
+      } catch (_) {}
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_initApp());
     });

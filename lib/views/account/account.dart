@@ -38,12 +38,14 @@ class _AccountViewState extends ConsumerState<AccountView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final session = ref.read(xboardSessionProvider);
-      if (session.status == SessionStatus.restoring) {
-        ref.read(xboardSessionProvider.notifier).restore();
-      } else if (session.isAuthenticated && session.subscribeInfo == null) {
-        _refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final notifier = ref.read(xboardSessionProvider.notifier);
+      if (ref.read(xboardSessionProvider).status == SessionStatus.restoring) {
+        await notifier.restore();
+      }
+      // 恢复/登录后完整刷新（含受管订阅内容更新与面板节点同步）
+      if (ref.read(xboardSessionProvider).isAuthenticated) {
+        await _refresh();
       }
     });
   }
