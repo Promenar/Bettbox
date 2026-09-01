@@ -38,7 +38,7 @@ void main() {
       expect(groupNames, contains('香港 HK'));
       expect(groupNames, contains('日本 JP'));
       expect(groupNames, contains('美国 US'));
-      expect(groupNames, contains('其他 XX'));
+      expect(groupNames, contains('优选'));
     });
 
     test('节点名脱敏为地域代号-序号，且保留原始名映射', () {

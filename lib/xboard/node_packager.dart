@@ -135,7 +135,7 @@ XboardPackagedConfig? packageNodes(
   }
   // 未识别地域兜底组
   byRegion.forEach((code, nodes) {
-    final groupName = '其他 XX';
+    final groupName = '优选';
     regionGroupNames.add(groupName);
     groups.add({
       'name': groupName,
