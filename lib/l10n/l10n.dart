@@ -5883,6 +5883,11 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Store`
+  String get store {
+    return Intl.message('Store', name: 'store', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

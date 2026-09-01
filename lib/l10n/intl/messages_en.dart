@@ -1086,6 +1086,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "stop": MessageLookupByLibrary.simpleMessage("Stop"),
     "stopVpn": MessageLookupByLibrary.simpleMessage("Stopping..."),
+    "store": MessageLookupByLibrary.simpleMessage("Store"),
     "storeFix": MessageLookupByLibrary.simpleMessage("Store Fix"),
     "storeFixDesc": MessageLookupByLibrary.simpleMessage(
       "Fix Play Store download issues",

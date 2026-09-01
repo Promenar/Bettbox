@@ -777,6 +777,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "statusDesc": MessageLookupByLibrary.simpleMessage("關閉後將使用系統 DNS"),
     "stop": MessageLookupByLibrary.simpleMessage("停止"),
     "stopVpn": MessageLookupByLibrary.simpleMessage("正在停止"),
+    "store": MessageLookupByLibrary.simpleMessage("商店"),
     "storeFix": MessageLookupByLibrary.simpleMessage("商店修復"),
     "storeFixDesc": MessageLookupByLibrary.simpleMessage(
       "修復 Google Play 商店下載異常",

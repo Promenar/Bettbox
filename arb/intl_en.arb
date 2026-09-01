@@ -721,5 +721,6 @@
   "xbCancelOrderConfirm": "This will cancel the unpaid order. Continue?",
   "xbSelectPeriod": "Select period",
   "xbSelectPayment": "Select payment method",
-  "xbNoPaymentMethod": "No payment method available yet"
+  "xbNoPaymentMethod": "No payment method available yet",
+  "store": "Store"
 }

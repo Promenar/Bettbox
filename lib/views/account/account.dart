@@ -4,6 +4,7 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/views/tools.dart';
 import 'package:bett_box/views/account/login_page.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:bett_box/xboard/xboard.dart';
@@ -154,7 +155,7 @@ class _AccountViewState extends ConsumerState<AccountView> {
   Widget build(BuildContext context) {
     final session = ref.watch(xboardSessionProvider);
     return CommonScaffold(
-      title: appLocalizations.xbAccount,
+      title: appLocalizations.account,
       body: switch (session.status) {
         SessionStatus.restoring =>
           const Center(child: CircularProgressIndicator()),
@@ -210,6 +211,12 @@ class _AccountViewState extends ConsumerState<AccountView> {
           CommonCard(
             child: Column(
               children: [
+                ListItem(
+                  leading: const Icon(Icons.construction),
+                  title: Text(appLocalizations.tools),
+                  onTap: () =>
+                      BaseNavigator.push(context, const ToolsView()),
+                ),
                 ListItem(
                   leading: const Icon(Icons.refresh_rounded),
                   title: Text(appLocalizations.xbResetSubscription),

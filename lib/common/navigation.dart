@@ -82,7 +82,8 @@ class Navigation {
         icon: Icon(Icons.construction),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
-        modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
+        // 商业版：工具/设置入口移至"我的"页二级页面，不占移动端底栏。
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
         icon: const Icon(Icons.storefront_rounded),

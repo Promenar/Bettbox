@@ -722,5 +722,6 @@
   "xbCancelOrderConfirm": "取消后将关闭未支付订单，确定？",
   "xbSelectPeriod": "选择周期",
   "xbSelectPayment": "选择支付方式",
-  "xbNoPaymentMethod": "支付方式暂未配置，请联系客服或稍后再试"
+  "xbNoPaymentMethod": "支付方式暂未配置，请联系客服或稍后再试",
+  "store": "商店"
 }
