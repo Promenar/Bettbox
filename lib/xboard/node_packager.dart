@@ -34,6 +34,15 @@ final List<XboardRegionRule> kRegionRules = [
   XboardRegionRule('BR', '巴西', RegExp(r'🇧🇷|巴西|(?<![A-Za-z])BR(?![A-Za-z])|Brazil', caseSensitive: false)),
   XboardRegionRule('AR', '阿根廷', RegExp(r'🇦🇷|阿根廷|(?<![A-Za-z])AR(?![A-Za-z])|Argentina', caseSensitive: false)),
   XboardRegionRule('IN', '印度', RegExp(r'🇮🇳|印度|(?<![A-Za-z])IN(?![A-Za-z])|India|Mumbai', caseSensitive: false)),
+  XboardRegionRule('RU', '俄罗斯', RegExp(r'🇷🇺|俄罗斯|俄|(?<![A-Za-z])RU(?![A-Za-z])|Russia|Moscow', caseSensitive: false)),
+  XboardRegionRule('UA', '乌克兰', RegExp(r'🇺🇦|乌克兰|(?<![A-Za-z])UA(?![A-Za-z])|Ukraine|Kyiv', caseSensitive: false)),
+  XboardRegionRule('CH', '瑞士', RegExp(r'🇨🇭|瑞士|(?<![A-Za-z])CH(?![A-Za-z])|Switzerland|Zurich', caseSensitive: false)),
+  XboardRegionRule('AE', '阿联酋', RegExp(r'🇦🇪|阿联酋|迪拜|(?<![A-Za-z])AE(?![A-Za-z])|Dubai|UAE', caseSensitive: false)),
+  XboardRegionRule('NG', '尼日利亚', RegExp(r'🇳🇬|尼日利亚|(?<![A-Za-z])NG(?![A-Za-z])|Nigeria', caseSensitive: false)),
+  XboardRegionRule('ZA', '南非', RegExp(r'🇿🇦|南非|(?<![A-Za-z])ZA(?![A-Za-z])|Africa', caseSensitive: false)),
+  XboardRegionRule('CA', '加拿大', RegExp(r'🇨🇦|加拿大|(?<![A-Za-z])CA(?![A-Za-z])|Canada', caseSensitive: false)),
+  XboardRegionRule('NL', '荷兰', RegExp(r'🇳🇱|荷兰|(?<![A-Za-z])NL(?![A-Za-z])|Netherlands|Amsterdam', caseSensitive: false)),
+  XboardRegionRule('FR', '法国', RegExp(r'🇫🇷|法国|法國|(?<![A-Za-z])FR(?![A-Za-z])|France|Paris', caseSensitive: false)),
 ];
 
 /// 地域解析结果。
@@ -100,6 +109,7 @@ XboardPackagedConfig? packageNodes(
   final byRegion = <String, List<Map<String, dynamic>>>{};
   final nameMapping = <String, String>{};
   final counters = <String, int>{};
+  final usedNames = <String>{};
 
   for (final entry in proxies) {
     if (entry is! Map<String, dynamic>) continue;
@@ -108,7 +118,14 @@ XboardPackagedConfig? packageNodes(
     final code = region?.regionCode ?? 'XX';
     final index = (counters[code] ?? 0) + 1;
     counters[code] = index;
-    final sanitized = region == null ? 'XX-${_pad(index)}' : '$code-${_pad(index)}';
+    var sanitized = region == null ? 'XX-${_pad(index)}' : '$code-${_pad(index)}';
+    // 确保全局唯一（防止上游重复名或跨区计数器冲突）
+    var suffix = 0;
+    while (usedNames.contains(sanitized)) {
+      suffix++;
+      sanitized = '${sanitized}_$suffix';
+    }
+    usedNames.add(sanitized);
     final patched = Map<String, dynamic>.from(entry);
     patched['name'] = sanitized;
     byRegion.putIfAbsent(code, () => []).add(patched);

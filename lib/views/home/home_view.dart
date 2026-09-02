@@ -131,16 +131,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   ],
                 ),
               )
-            : Column(
-                children: [
-                  for (final (group, isAuto) in regionEntries)
-                    _RegionTile(
-                      group: group,
-                      isAuto: isAuto,
-                      isSelected: selectedName == group.name,
-                      selectorName: selectorName,
-                    ),
-                ],
+            : ConstrainedBox(
+                // 固定最大高度，地域多时列表内部滚动，不把其他组件顶出屏幕
+                constraints: const BoxConstraints(maxHeight: 320),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (final (group, isAuto) in regionEntries)
+                        _RegionTile(
+                          group: group,
+                          isAuto: isAuto,
+                          isSelected: selectedName == group.name,
+                          selectorName: selectorName,
+                        ),
+                    ],
+                  ),
+                ),
               ),
       ),
     );
