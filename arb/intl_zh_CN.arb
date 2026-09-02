@@ -726,5 +726,13 @@
   "store": "商店",
   "xbAutoRegion": "自动（最优地域）",
   "home": "首页",
+  "xbDomainChangedTitle": "服务入口已变更",
+  "xbDomainChangedTip": "面板主域名当前不可达，可一键重试或手动输入新的入口域名。",
+  "xbDomainRetry": "一键重试",
+  "xbDomainManual": "输入新域名",
+  "xbDomainManualTitle": "输入新入口域名",
+  "xbDomainManualHint": "https://example.com",
+  "xbDomainInvalid": "地址无效，仅支持 http(s) 地址",
+  "xbDomainUpdated": "域名已更新，正在重新探测",
   "xbDirectModeTip": "直连模式下所有流量不经代理，不使用节点"
 }

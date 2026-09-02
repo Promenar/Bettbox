@@ -6,7 +6,10 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'api_client.dart';
+import 'binding.dart';
+import 'bootstrap.dart';
 import 'domain_manager.dart';
+import 'domain_scheduler.dart';
 import 'models.dart';
 import 'repositories.dart';
 import 'secure_store.dart';
@@ -73,6 +76,36 @@ final xboardApiClientProvider = Provider<XboardApiClient>((ref) {
       }
     },
   );
+});
+
+final xboardBootstrapClientProvider = Provider<XboardBootstrapClient>(
+  (ref) => XboardBootstrapClient(),
+);
+
+final xboardDomainSchedulerProvider = Provider<XboardDomainScheduler>((ref) {
+  final manager = ref.watch(xboardDomainManagerProvider);
+  final scheduler = XboardDomainScheduler(
+    domainManager: manager,
+    secureStore: ref.read(xboardSecureStoreProvider),
+    bootstrapClient: ref.read(xboardBootstrapClientProvider),
+    apiClient: ref.read(xboardApiClientProvider),
+    callbacks: XboardDomainCallbacks(
+      onPoolChanged: (domains) {
+        ref.read(xboardDomainStateProvider.notifier).state = XboardDomainState.of(
+          manager,
+        );
+      },
+      onActiveChanged: (baseUrl) async {
+        ref.read(xboardDomainStateProvider.notifier).state = XboardDomainState.of(
+          manager,
+        );
+        // F-DOMAIN-5：订阅 URL host 热替换 + 刷新（失败保留原订阅，下次触发再试）
+        await applyManagedDomainHost(baseUrl);
+        await refreshManagedSubscription();
+      },
+    ),
+  );
+  return scheduler;
 });
 
 final xboardAuthRepositoryProvider = Provider<XboardAuthRepository>(

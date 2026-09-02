@@ -7,7 +7,9 @@ import 'package:bett_box/views/dashboard/widgets/network_speed.dart';
 import 'package:bett_box/views/dashboard/widgets/outbound_mode.dart';
 import 'package:bett_box/views/dashboard/widgets/start_button.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:bett_box/xboard/domain_scheduler.dart';
 import 'package:bett_box/xboard/node_packager.dart';
+import 'package:bett_box/xboard/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,12 +47,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final mode = ref.watch(
       patchClashConfigProvider.select((state) => state.mode),
     );
+    final domainState = ref.watch(xboardDomainStateProvider);
+    final rescue = domainState?.rescue ?? false;
     return CommonScaffold(
       title: appLocalizations.home,
       body: ListView(
         // 底部留白避开浮动导航栏
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
+          if (rescue) ...[
+            _buildRescueBanner(context),
+            const SizedBox(height: 12),
+          ],
           if (mode == Mode.direct)
             CommonCard(
               child: Padding(
@@ -73,6 +81,91 @@ class _HomeViewState extends ConsumerState<HomeView> {
         ],
       ),
     );
+  }
+
+  /// 救援模式横幅（F-DOMAIN-4）：全池失败时明确提示入口已变更，
+  /// 提供一键重试与手动输入新域名，不接受静默断连。
+  Widget _buildRescueBanner(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return CommonCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.wifi_off_rounded, color: colors.error, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    appLocalizations.xbDomainChangedTitle,
+                    style: theme.textTheme.titleSmall?.copyWith(color: colors.error),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              appLocalizations.xbDomainChangedTip,
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                FilledButton.tonal(
+                  onPressed: () => ref.read(xboardDomainSchedulerProvider).retry(),
+                  child: Text(appLocalizations.xbDomainRetry),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: () => _promptManualDomain(context),
+                  child: Text(appLocalizations.xbDomainManual),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _promptManualDomain(BuildContext context) async {
+    final controller = TextEditingController();
+    final input = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(appLocalizations.xbDomainManualTitle),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.url,
+            decoration: InputDecoration(
+              hintText: appLocalizations.xbDomainManualHint,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(appLocalizations.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+              child: Text(appLocalizations.submit),
+            ),
+          ],
+        );
+      },
+    );
+    if (input == null || input.isEmpty || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await ref.read(xboardDomainSchedulerProvider).useManualDomain(input);
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(content: Text(appLocalizations.xbDomainInvalid)));
+    } else {
+      messenger.showSnackBar(SnackBar(content: Text(appLocalizations.xbDomainUpdated)));
+    }
   }
 
   /// 全局模式下 GLOBAL 组默认走"节点选择"，避免出现独立的 GLOBAL 伪节点。

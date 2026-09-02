@@ -3,6 +3,8 @@
 /// Windows DPAPI / Linux libsecret 由 flutter_secure_storage 平台实现承担。
 library;
 
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class XboardSecureStore {
@@ -11,6 +13,7 @@ class XboardSecureStore {
 
   static const _keyAuthData = 'xboard_auth_data';
   static const _keyEmail = 'xboard_email';
+  static const _keyDomainPool = 'xboard_domain_pool';
 
   final FlutterSecureStorage _storage;
 
@@ -29,5 +32,44 @@ class XboardSecureStore {
   Future<void> clearSession() async {
     await _storage.delete(key: _keyAuthData);
     await _storage.delete(key: _keyEmail);
+  }
+
+  /// 域名池持久化（F-DOMAIN-3：引导源下发后冷启动直接使用新域名）。
+  Future<void> saveDomainPool({
+    required List<String> domains,
+    required List<String> sources,
+  }) async {
+    await _storage.write(
+      key: _keyDomainPool,
+      value: jsonEncode({'domains': domains, 'sources': sources}),
+    );
+  }
+
+  Future<({List<String> domains, List<String> sources})?> readDomainPool() async {
+    final raw = await _storage.read(key: _keyDomainPool);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final json = jsonDecode(raw);
+      if (json is Map<String, dynamic>) {
+        final domains = _stringList(json['domains']);
+        if (domains.isEmpty) return null;
+        return (domains: domains, sources: _stringList(json['sources']));
+      }
+      // 兼容早期仅存列表的格式
+      if (json is List) {
+        final domains = _stringList(json);
+        if (domains.isEmpty) return null;
+        return (domains: domains, sources: <String>[]);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  static List<String> _stringList(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw
+        .map((e) => e?.toString() ?? '')
+        .where((s) => s.isNotEmpty)
+        .toList();
   }
 }

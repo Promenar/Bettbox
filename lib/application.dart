@@ -58,6 +58,8 @@ class ApplicationState extends ConsumerState<Application>
     globalState.appController = AppController(context, ref);
     // 启动即恢复 Xboard 会话（安全存储凭据 → checkLogin），供商店/我的等页使用。
     ref.read(xboardSessionProvider.notifier).restore();
+    // F-DOMAIN：加载域名池 → 引导源刷新 + 健康探测（异步，不阻塞 UI）。
+    ref.read(xboardDomainSchedulerProvider).start();
     // 受管订阅内容更新（面板节点变更自愈：订阅损坏/过期场景下重新拉取并重应用）
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {

@@ -725,5 +725,13 @@
   "store": "Store",
   "xbAutoRegion": "Auto (best region)",
   "home": "Home",
+  "xbDomainChangedTitle": "Service endpoint changed",
+  "xbDomainChangedTip": "The panel domain is unreachable. Retry or enter a new endpoint manually.",
+  "xbDomainRetry": "Retry",
+  "xbDomainManual": "Enter new domain",
+  "xbDomainManualTitle": "Enter new endpoint",
+  "xbDomainManualHint": "https://example.com",
+  "xbDomainInvalid": "Invalid address, only http(s) URLs are accepted",
+  "xbDomainUpdated": "Domain updated, re-probing",
   "xbDirectModeTip": "All traffic bypasses the proxy in direct mode"
 }

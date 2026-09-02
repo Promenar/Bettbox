@@ -58,3 +58,30 @@ Future<void> refreshManagedSubscription() async {
   await globalState.appController.updateProfile(updated);
   debugPrint('[XBOARD_BINDING] refreshed profile ${updated.id}');
 }
+
+/// F-DOMAIN-5：把受管订阅 URL 的 host/scheme/port 替换为新入口域名
+/// （path/query/fragment 保持原样），host 未变时原样返回。
+Uri rewriteHost(Uri url, Uri base) {
+  if (url.host == base.host && url.port == base.port && url.scheme == base.scheme) {
+    return url;
+  }
+  return url.replace(
+    scheme: base.scheme,
+    host: base.host,
+    port: base.port,
+  );
+}
+
+/// 域名切换生效时改写受管 Profile URL 并刷新订阅；返回是否发生改写。
+Future<bool> applyManagedDomainHost(String baseUrl) async {
+  final managed = findManagedProfile();
+  if (managed == null) return false;
+  final base = Uri.parse(baseUrl);
+  final rewritten = rewriteHost(Uri.parse(managed.url), base);
+  if (rewritten.toString() == managed.url) return false;
+  final changed = managed.copyWith(url: rewritten.toString());
+  final updated = await changed.update(validate: false);
+  await globalState.appController.updateProfile(updated);
+  debugPrint('[XBOARD_BINDING] domain host rewritten for profile ${updated.id}');
+  return true;
+}

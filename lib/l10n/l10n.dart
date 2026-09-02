@@ -5904,6 +5904,81 @@ class AppLocalizations {
     return Intl.message('Home', name: 'home', desc: '', args: []);
   }
 
+  /// `Service endpoint changed`
+  String get xbDomainChangedTitle {
+    return Intl.message(
+      'Service endpoint changed',
+      name: 'xbDomainChangedTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The panel domain is unreachable. Retry or enter a new endpoint manually.`
+  String get xbDomainChangedTip {
+    return Intl.message(
+      'The panel domain is unreachable. Retry or enter a new endpoint manually.',
+      name: 'xbDomainChangedTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Retry`
+  String get xbDomainRetry {
+    return Intl.message('Retry', name: 'xbDomainRetry', desc: '', args: []);
+  }
+
+  /// `Enter new domain`
+  String get xbDomainManual {
+    return Intl.message(
+      'Enter new domain',
+      name: 'xbDomainManual',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter new endpoint`
+  String get xbDomainManualTitle {
+    return Intl.message(
+      'Enter new endpoint',
+      name: 'xbDomainManualTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `https://example.com`
+  String get xbDomainManualHint {
+    return Intl.message(
+      'https://example.com',
+      name: 'xbDomainManualHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid address, only http(s) URLs are accepted`
+  String get xbDomainInvalid {
+    return Intl.message(
+      'Invalid address, only http(s) URLs are accepted',
+      name: 'xbDomainInvalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Domain updated, re-probing`
+  String get xbDomainUpdated {
+    return Intl.message(
+      'Domain updated, re-probing',
+      name: 'xbDomainUpdated',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `All traffic bypasses the proxy in direct mode`
   String get xbDirectModeTip {
     return Intl.message(

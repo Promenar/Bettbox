@@ -1253,6 +1253,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbDirectModeTip": MessageLookupByLibrary.simpleMessage(
       "All traffic bypasses the proxy in direct mode",
     ),
+    "xbDomainChangedTip": MessageLookupByLibrary.simpleMessage(
+      "The panel domain is unreachable. Retry or enter a new endpoint manually.",
+    ),
+    "xbDomainChangedTitle": MessageLookupByLibrary.simpleMessage(
+      "Service endpoint changed",
+    ),
+    "xbDomainInvalid": MessageLookupByLibrary.simpleMessage(
+      "Invalid address, only http(s) URLs are accepted",
+    ),
+    "xbDomainManual": MessageLookupByLibrary.simpleMessage("Enter new domain"),
+    "xbDomainManualHint": MessageLookupByLibrary.simpleMessage(
+      "https://example.com",
+    ),
+    "xbDomainManualTitle": MessageLookupByLibrary.simpleMessage(
+      "Enter new endpoint",
+    ),
+    "xbDomainRetry": MessageLookupByLibrary.simpleMessage("Retry"),
+    "xbDomainUpdated": MessageLookupByLibrary.simpleMessage(
+      "Domain updated, re-probing",
+    ),
     "xbEmail": MessageLookupByLibrary.simpleMessage("Email"),
     "xbEmailCode": MessageLookupByLibrary.simpleMessage("Email code"),
     "xbExpireAt": MessageLookupByLibrary.simpleMessage("Expires"),

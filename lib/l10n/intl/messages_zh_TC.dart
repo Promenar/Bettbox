@@ -912,6 +912,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbDirectModeTip": MessageLookupByLibrary.simpleMessage(
       "直連模式下所有流量不經代理，不使用節點",
     ),
+    "xbDomainChangedTip": MessageLookupByLibrary.simpleMessage(
+      "面板主域名當前不可達，可一鍵重試或手動輸入新的入口域名。",
+    ),
+    "xbDomainChangedTitle": MessageLookupByLibrary.simpleMessage("服務入口已變更"),
+    "xbDomainInvalid": MessageLookupByLibrary.simpleMessage(
+      "地址無效，僅支持 http(s) 地址",
+    ),
+    "xbDomainManual": MessageLookupByLibrary.simpleMessage("輸入新域名"),
+    "xbDomainManualHint": MessageLookupByLibrary.simpleMessage(
+      "https://example.com",
+    ),
+    "xbDomainManualTitle": MessageLookupByLibrary.simpleMessage("輸入新入口域名"),
+    "xbDomainRetry": MessageLookupByLibrary.simpleMessage("一鍵重試"),
+    "xbDomainUpdated": MessageLookupByLibrary.simpleMessage("域名已更新，正在重新探測"),
     "xbEmail": MessageLookupByLibrary.simpleMessage("郵箱"),
     "xbEmailCode": MessageLookupByLibrary.simpleMessage("郵箱驗證碼"),
     "xbExpireAt": MessageLookupByLibrary.simpleMessage("到期時間"),
