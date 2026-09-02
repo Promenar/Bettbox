@@ -93,7 +93,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   /// 区域节点列表（F-NODE-3）：展示包装配置生成的地域组，
-  /// 点击切换顶层选择器；状态词替代延迟数字（F-NODE-2）。
+  /// 双列紧凑网格，点击切换顶层选择器；状态词替代延迟数字（F-NODE-2）。
   Widget _buildRegionList() {
     final groups = ref.watch(currentGroupsStateProvider).value;
     final selectorName = kSelectorGroupName;
@@ -137,12 +137,35 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      for (final (group, isAuto) in regionEntries)
-                        _RegionTile(
-                          group: group,
-                          isAuto: isAuto,
-                          isSelected: selectedName == group.name,
-                          selectorName: selectorName,
+                      for (var i = 0; i < regionEntries.length; i += 2)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: _RegionGridTile(
+                                  group: regionEntries[i].$1,
+                                  isAuto: regionEntries[i].$2,
+                                  isSelected:
+                                      selectedName == regionEntries[i].$1.name,
+                                  selectorName: selectorName,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: i + 1 < regionEntries.length
+                                    ? _RegionGridTile(
+                                        group: regionEntries[i + 1].$1,
+                                        isAuto: regionEntries[i + 1].$2,
+                                        isSelected: selectedName ==
+                                            regionEntries[i + 1].$1.name,
+                                        selectorName: selectorName,
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            ],
+                          ),
                         ),
                     ],
                   ),
@@ -153,13 +176,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 }
 
-class _RegionTile extends ConsumerWidget {
+class _RegionGridTile extends ConsumerWidget {
   final Group group;
   final bool isAuto;
   final bool isSelected;
   final String selectorName;
 
-  const _RegionTile({
+  const _RegionGridTile({
     required this.group,
     required this.isAuto,
     required this.isSelected,
@@ -185,16 +208,28 @@ class _RegionTile extends ConsumerWidget {
       XboardRegionStatus.normal => appLocalizations.xbStatusNormal,
       XboardRegionStatus.congested => appLocalizations.xbStatusCongested,
     };
+    // 组名形如 "🇭🇰 香港 HK"，瓦片内拆分：前导国旗 + 地区名（紧凑布局省略代号）
+    final parts = group.name.split(' ');
+    final flag = isAuto ? null : parts.first;
+    final label = isAuto
+        ? appLocalizations.xbAutoRegion
+        : (parts.length > 1 ? parts[1] : group.name);
     return ListItem(
+      dense: true,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      leading: Icon(
-        isAuto ? Icons.auto_awesome_rounded : Icons.place_rounded,
-        color: isSelected
-            ? context.colorScheme.primary
-            : context.colorScheme.onSurfaceVariant,
-      ),
+      leading: flag == null
+          ? Icon(
+              Icons.auto_awesome_rounded,
+              size: 18,
+              color: isSelected
+                  ? context.colorScheme.primary
+                  : context.colorScheme.onSurfaceVariant,
+            )
+          : Text(flag, style: const TextStyle(fontSize: 16, height: 1)),
       title: Text(
-        isAuto ? appLocalizations.xbAutoRegion : group.name,
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: isSelected
                   ? context.colorScheme.primary
