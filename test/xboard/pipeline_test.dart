@@ -62,8 +62,8 @@ void main() {
       final groupNames = groups.map((g) => g['name']).toList();
       expect(groupNames[0], kAutoRegionGroupName);
       expect(groupNames, contains('节点选择'));
-      expect(groupNames, contains('香港 HK'));
-      expect(groupNames, contains('日本 JP'));
+      expect(groupNames, contains('🇭🇰 香港 HK'));
+      expect(groupNames, contains('🇯🇵 日本 JP'));
       // 旧组名 XBoard 已不存在
       expect(groupNames.contains('XBoard'), isFalse);
 

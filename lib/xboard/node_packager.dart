@@ -5,10 +5,13 @@
 library;
 
 class XboardRegionRule {
-  const XboardRegionRule(this.code, this.name, this.pattern);
+  const XboardRegionRule(this.code, this.name, this.flag, this.pattern);
 
   final String code;
   final String name;
+
+  /// 国旗 emoji，用于地域组名展示（F-NODE-3 首页地区列表）。
+  final String flag;
   final RegExp pattern;
 }
 
@@ -16,33 +19,34 @@ class XboardRegionRule {
 ///
 /// 覆盖 emoji 旗帜 / 中文 / 英文全称与常见缩写；支持随版本与远端配置扩展。
 final List<XboardRegionRule> kRegionRules = [
-  XboardRegionRule('HK', '香港', RegExp(r'🇭🇰|香港|港|(?<![A-Za-z])HK(?![A-Za-z])|HKG|Hong ?Kong', caseSensitive: false)),
-  XboardRegionRule('TW', '台湾', RegExp(r'🇹🇼|台湾|臺灣|台|(?<![A-Za-z])TW(?![A-Za-z])|TPE|Taiwan', caseSensitive: false)),
-  XboardRegionRule('SG', '新加坡', RegExp(r'🇸🇬|新加坡|獅城|狮城|(?<![A-Za-z])SG(?![A-Za-z])|SIN|Singapore', caseSensitive: false)),
-  XboardRegionRule('JP', '日本', RegExp(r'🇯🇵|日本|日|(?<![A-Za-z])JP(?![A-Za-z])|JPN|Japan', caseSensitive: false)),
-  XboardRegionRule('KR', '韩国', RegExp(r'🇰🇷|韩国|韓國|韩|(?<![A-Za-z])KR(?![A-Za-z])|KOR|Korea', caseSensitive: false)),
-  XboardRegionRule('US', '美国', RegExp(r'🇺🇸|美国|美國|美|(?<![A-Za-z])US(?![A-Za-z])|USA|America|Los ?Angeles|San ?Jose|Seattle|Silicon', caseSensitive: false)),
-  XboardRegionRule('MY', '马来西亚', RegExp(r'🇲🇾|马来西亚|馬來西亞|(?<![A-Za-z])MY(?![A-Za-z])|Malaysia', caseSensitive: false)),
-  XboardRegionRule('TH', '泰国', RegExp(r'🇹🇭|泰国|泰國|(?<![A-Za-z])TH(?![A-Za-z])|Thailand', caseSensitive: false)),
-  XboardRegionRule('VN', '越南', RegExp(r'🇻🇳|越南|(?<![A-Za-z])VN(?![A-Za-z])|Vietnam', caseSensitive: false)),
-  XboardRegionRule('PH', '菲律宾', RegExp(r'🇵🇭|菲律宾|菲律賓|(?<![A-Za-z])PH(?![A-Za-z])|Philippines', caseSensitive: false)),
-  XboardRegionRule('ID', '印尼', RegExp(r'🇮🇩|印尼|印度尼西亚|(?<![A-Za-z])ID(?![A-Za-z])|Jakarta|Indonesia', caseSensitive: false)),
-  XboardRegionRule('UK', '英国', RegExp(r'🇬🇧|英国|英國|(?<![A-Za-z])UK(?![A-Za-z])|(?<![A-Za-z])GB(?![A-Za-z])|London|Britain', caseSensitive: false)),
-  XboardRegionRule('DE', '德国', RegExp(r'🇩🇪|德国|德國|德|(?<![A-Za-z])DE(?![A-Za-z])|Germany|Frankfurt', caseSensitive: false)),
-  XboardRegionRule('AU', '澳大利亚', RegExp(r'🇦🇺|澳大利亚|澳洲|(?<![A-Za-z])AU(?![A-Za-z])|Australia|Sydney', caseSensitive: false)),
-  XboardRegionRule('TR', '土耳其', RegExp(r'🇹🇷|土耳其|(?<![A-Za-z])TR(?![A-Za-z])|Turkey|Istanbul', caseSensitive: false)),
-  XboardRegionRule('BR', '巴西', RegExp(r'🇧🇷|巴西|(?<![A-Za-z])BR(?![A-Za-z])|Brazil', caseSensitive: false)),
-  XboardRegionRule('AR', '阿根廷', RegExp(r'🇦🇷|阿根廷|(?<![A-Za-z])AR(?![A-Za-z])|Argentina', caseSensitive: false)),
-  XboardRegionRule('IN', '印度', RegExp(r'🇮🇳|印度|(?<![A-Za-z])IN(?![A-Za-z])|India|Mumbai', caseSensitive: false)),
-  XboardRegionRule('RU', '俄罗斯', RegExp(r'🇷🇺|俄罗斯|俄|(?<![A-Za-z])RU(?![A-Za-z])|Russia|Moscow', caseSensitive: false)),
-  XboardRegionRule('UA', '乌克兰', RegExp(r'🇺🇦|乌克兰|(?<![A-Za-z])UA(?![A-Za-z])|Ukraine|Kyiv', caseSensitive: false)),
-  XboardRegionRule('CH', '瑞士', RegExp(r'🇨🇭|瑞士|(?<![A-Za-z])CH(?![A-Za-z])|Switzerland|Zurich', caseSensitive: false)),
-  XboardRegionRule('AE', '阿联酋', RegExp(r'🇦🇪|阿联酋|迪拜|(?<![A-Za-z])AE(?![A-Za-z])|Dubai|UAE', caseSensitive: false)),
-  XboardRegionRule('NG', '尼日利亚', RegExp(r'🇳🇬|尼日利亚|(?<![A-Za-z])NG(?![A-Za-z])|Nigeria', caseSensitive: false)),
-  XboardRegionRule('ZA', '南非', RegExp(r'🇿🇦|南非|(?<![A-Za-z])ZA(?![A-Za-z])|Africa', caseSensitive: false)),
-  XboardRegionRule('CA', '加拿大', RegExp(r'🇨🇦|加拿大|(?<![A-Za-z])CA(?![A-Za-z])|Canada', caseSensitive: false)),
-  XboardRegionRule('NL', '荷兰', RegExp(r'🇳🇱|荷兰|(?<![A-Za-z])NL(?![A-Za-z])|Netherlands|Amsterdam', caseSensitive: false)),
-  XboardRegionRule('FR', '法国', RegExp(r'🇫🇷|法国|法國|(?<![A-Za-z])FR(?![A-Za-z])|France|Paris', caseSensitive: false)),
+  XboardRegionRule('HK', '香港', '🇭🇰', RegExp(r'🇭🇰|香港|港|(?<![A-Za-z])HK(?![A-Za-z])|HKG|Hong ?Kong', caseSensitive: false)),
+  XboardRegionRule('TW', '台湾', '🇹🇼', RegExp(r'🇹🇼|台湾|臺灣|台|(?<![A-Za-z])TW(?![A-Za-z])|TPE|Taiwan', caseSensitive: false)),
+  XboardRegionRule('SG', '新加坡', '🇸🇬', RegExp(r'🇸🇬|新加坡|獅城|狮城|(?<![A-Za-z])SG(?![A-Za-z])|SIN|Singapore', caseSensitive: false)),
+  XboardRegionRule('JP', '日本', '🇯🇵', RegExp(r'🇯🇵|日本|(?<!尼)日(?!利亚|内瓦)|(?<![A-Za-z])JP(?![A-Za-z])|JPN|Japan', caseSensitive: false)),
+  XboardRegionRule('KR', '韩国', '🇰🇷', RegExp(r'🇰🇷|韩国|韓國|韩|(?<![A-Za-z])KR(?![A-Za-z])|KOR|Korea', caseSensitive: false)),
+  XboardRegionRule('US', '美国', '🇺🇸', RegExp(r'🇺🇸|美国|美國|美|(?<![A-Za-z])US(?![A-Za-z])|USA|America|Los ?Angeles|San ?Jose|Seattle|Silicon', caseSensitive: false)),
+  XboardRegionRule('MY', '马来西亚', '🇲🇾', RegExp(r'🇲🇾|马来西亚|馬來西亞|(?<![A-Za-z])MY(?![A-Za-z])|Malaysia', caseSensitive: false)),
+  XboardRegionRule('TH', '泰国', '🇹🇭', RegExp(r'🇹🇭|泰国|泰國|(?<![A-Za-z])TH(?![A-Za-z])|Thailand', caseSensitive: false)),
+  XboardRegionRule('VN', '越南', '🇻🇳', RegExp(r'🇻🇳|越南|(?<![A-Za-z])VN(?![A-Za-z])|Vietnam', caseSensitive: false)),
+  XboardRegionRule('PH', '菲律宾', '🇵🇭', RegExp(r'🇵🇭|菲律宾|菲律賓|(?<![A-Za-z])PH(?![A-Za-z])|Philippines', caseSensitive: false)),
+  XboardRegionRule('ID', '印尼', '🇮🇩', RegExp(r'🇮🇩|印尼|印度尼西亚|(?<![A-Za-z])ID(?![A-Za-z])|Jakarta|Indonesia', caseSensitive: false)),
+  XboardRegionRule('UK', '英国', '🇬🇧', RegExp(r'🇬🇧|英国|英國|(?<![A-Za-z])UK(?![A-Za-z])|(?<![A-Za-z])GB(?![A-Za-z])|London|Britain', caseSensitive: false)),
+  XboardRegionRule('DE', '德国', '🇩🇪', RegExp(r'🇩🇪|德国|德國|德|(?<![A-Za-z])DE(?![A-Za-z])|Germany|Frankfurt', caseSensitive: false)),
+  XboardRegionRule('AU', '澳大利亚', '🇦🇺', RegExp(r'🇦🇺|澳大利亚|澳洲|(?<![A-Za-z])AU(?![A-Za-z])|Australia|Sydney', caseSensitive: false)),
+  XboardRegionRule('TR', '土耳其', '🇹🇷', RegExp(r'🇹🇷|土耳其|(?<![A-Za-z])TR(?![A-Za-z])|Turkey|Istanbul', caseSensitive: false)),
+  XboardRegionRule('BR', '巴西', '🇧🇷', RegExp(r'🇧🇷|巴西|(?<![A-Za-z])BR(?![A-Za-z])|Brazil', caseSensitive: false)),
+  XboardRegionRule('AR', '阿根廷', '🇦🇷', RegExp(r'🇦🇷|阿根廷|(?<![A-Za-z])AR(?![A-Za-z])|Argentina', caseSensitive: false)),
+  XboardRegionRule('IN', '印度', '🇮🇳', RegExp(r'🇮🇳|印度|(?<![A-Za-z])IN(?![A-Za-z])|India|Mumbai', caseSensitive: false)),
+  XboardRegionRule('RU', '俄罗斯', '🇷🇺', RegExp(r'🇷🇺|俄罗斯|俄|(?<![A-Za-z])RU(?![A-Za-z])|Russia|Moscow', caseSensitive: false)),
+  XboardRegionRule('UA', '乌克兰', '🇺🇦', RegExp(r'🇺🇦|乌克兰|(?<![A-Za-z])UA(?![A-Za-z])|Ukraine|Kyiv', caseSensitive: false)),
+  XboardRegionRule('CH', '瑞士', '🇨🇭', RegExp(r'🇨🇭|瑞士|(?<![A-Za-z])CH(?![A-Za-z])|Switzerland|Zurich', caseSensitive: false)),
+  XboardRegionRule('AE', '阿联酋', '🇦🇪', RegExp(r'🇦🇪|阿联酋|迪拜|(?<![A-Za-z])AE(?![A-Za-z])|Dubai|UAE', caseSensitive: false)),
+  XboardRegionRule('NG', '尼日利亚', '🇳🇬', RegExp(r'🇳🇬|尼日利亚|(?<![A-Za-z])NG(?![A-Za-z])|Nigeria', caseSensitive: false)),
+  XboardRegionRule('ZA', '南非', '🇿🇦', RegExp(r'🇿🇦|南非|(?<![A-Za-z])ZA(?![A-Za-z])|Africa', caseSensitive: false)),
+  XboardRegionRule('CA', '加拿大', '🇨🇦', RegExp(r'🇨🇦|加拿大|(?<![A-Za-z])CA(?![A-Za-z])|Canada', caseSensitive: false)),
+  XboardRegionRule('NL', '荷兰', '🇳🇱', RegExp(r'🇳🇱|荷兰|(?<![A-Za-z])NL(?![A-Za-z])|Netherlands|Amsterdam', caseSensitive: false)),
+  XboardRegionRule('FR', '法国', '🇫🇷', RegExp(r'🇫🇷|法国|法國|(?<![A-Za-z])FR(?![A-Za-z])|France|Paris', caseSensitive: false)),
+  XboardRegionRule('IQ', '伊拉克', '🇮🇶', RegExp(r'🇮🇶|伊拉克|(?<![A-Za-z])IQ(?![A-Za-z])|Iraq|Baghdad', caseSensitive: false)),
 ];
 
 /// 地域解析结果。
@@ -139,7 +143,7 @@ XboardPackagedConfig? packageNodes(
   for (final rule in kRegionRules) {
     final nodes = byRegion.remove(rule.code);
     if (nodes == null || nodes.isEmpty) continue;
-    final groupName = '${rule.name} ${rule.code}';
+    final groupName = '${rule.flag} ${rule.name} ${rule.code}';
     regionGroupNames.add(groupName);
     groups.add({
       'name': groupName,
@@ -150,9 +154,9 @@ XboardPackagedConfig? packageNodes(
       'proxies': nodes.map((n) => n['name']).toList(),
     });
   }
-  // 未识别地域兜底组
+  // 未识别地域兜底组（上游自命名无法归类时归入此处）
   byRegion.forEach((code, nodes) {
-    final groupName = '优选';
+    const groupName = '🌐 优选';
     regionGroupNames.add(groupName);
     groups.add({
       'name': groupName,

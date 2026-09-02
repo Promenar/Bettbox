@@ -14,6 +14,21 @@ void main() {
       expect(resolveRegion('Korea Seoul')?.regionCode, 'KR');
     });
 
+    test('长尾地区（含上游常见单节点国家）可识别', () {
+      expect(resolveRegion('🇵🇭 菲律宾 01')?.regionCode, 'PH');
+      expect(resolveRegion('🇹🇷 土耳其 01')?.regionCode, 'TR');
+      expect(resolveRegion('🇷🇺 俄罗斯 01')?.regionCode, 'RU');
+      expect(resolveRegion('🇺🇦 乌克兰 01')?.regionCode, 'UA');
+      expect(resolveRegion('🇨🇭 瑞士 01')?.regionCode, 'CH');
+      expect(resolveRegion('🇦🇪 阿联酋 01')?.regionCode, 'AE');
+      expect(resolveRegion('🇳🇬 尼日利亚 01')?.regionCode, 'NG');
+      expect(resolveRegion('🇿🇦 南非 01')?.regionCode, 'ZA');
+      expect(resolveRegion('🇮🇶 伊拉克 01')?.regionCode, 'IQ');
+      expect(resolveRegion('🇨🇦 加拿大 01')?.regionCode, 'CA');
+      // 无地区语义的节点名归入兜底
+      expect(resolveRegion('🦥 懒人 01A'), isNull);
+    });
+
     test('缩写不误伤普通单词', () {
       // "SHOULD"/"HOUSE" 这类含 US/HK 字母串不应命中
       expect(resolveRegion('House Node')?.regionCode, isNot('US'));
@@ -35,10 +50,10 @@ void main() {
       final groupNames = result.proxyGroups.map((g) => g['name']).toList();
       expect(groupNames[0], kAutoRegionGroupName);
       expect(groupNames[1], kSelectorGroupName);
-      expect(groupNames, contains('香港 HK'));
-      expect(groupNames, contains('日本 JP'));
-      expect(groupNames, contains('美国 US'));
-      expect(groupNames, contains('优选'));
+      expect(groupNames, contains('🇭🇰 香港 HK'));
+      expect(groupNames, contains('🇯🇵 日本 JP'));
+      expect(groupNames, contains('🇺🇸 美国 US'));
+      expect(groupNames, contains('🌐 优选'));
     });
 
     test('节点名脱敏为地域代号-序号，且保留原始名映射', () {
