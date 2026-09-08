@@ -42,3 +42,34 @@ bootstrap applied: true（create registry/handover/index 三项）；.agents/ �
 
 ### HLG
 HLG bootstrap 完成；本记录为 .agents/handover.md 事实链第一条（迁移审计）。
+
+## 2026-09-09T01:45:22+08:00 · HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b）
+
+type: maintenance
+scope: ["project"]
+status: done
+tags: ["governance", "git", "hlg-bootstrap"]
+continuity: resume
+continuity-key: hlg-governance
+record-fingerprint: 64cde8a8a246668a9967a25f37f226f0691c989a4f762d371efc27264def769a
+
+### Summary
+按用户要求「HLG 必须完整跟随 Git 同步」：原 .gitignore 的 `*.md` 全局忽略使 .agents/ 治理文件与 AGENTS.md 无法入库。已在 .gitignore 末尾追加白名单（!AGENTS.md、!.agents/、!.agents/*.md、!.agents/**/*.md），恢复跟踪后提交 commit 96ffc4b（5 文件，144 insertions）：.agents/handover.md、.agents/handover-index.md、.agents/registry.md、AGENTS.md（v2.0）、.gitignore。
+
+### Changed
+.gitignore 增加 HLG 白名单；AGENTS.md 与 .agents/ 治理文件纳入 git 跟踪；治理体系可随 clone/checkout 完整恢复。
+
+### Validation
+git check-ignore 确认 AGENTS.md 与 .agents/*.md 最后匹配白名单规则；git status 显示为未跟踪可提交状态；暂存区核对仅本任务 5 文件（无并行会话源码混入）；commit 96ffc4b 成功。
+
+### Next
+远端同步（push）未执行，是否推送由用户决定；后续治理记录经 HLG append 后需随同提交（handover-index 为派生文件会随 append 变化）。
+
+### Risks
+提交未推送远端；.agents/**/*.md 白名单同时覆盖未来 handover-archive/、tmp-agent-reports/、plans/ 下的 md（符合完整同步意图）；空目录不入库属 git 正常行为。
+
+### DIA
+.gitignore 白名单变更与 AGENTS.md v2.0 入库已同步；registry.md 记录在 .agents/registry.md 中。
+
+### HLG
+本记录为 .agents/handover.md 事实链第二条（git 同步审计），append 后需一并提交。
