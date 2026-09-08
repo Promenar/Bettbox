@@ -78,3 +78,9 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 .fvmrc
+
+# HLG 治理记录（handover-lifecycle-governance）与项目规则必须随 Git 同步
+!AGENTS.md
+!.agents/
+!.agents/*.md
+!.agents/**/*.md
