@@ -1453,23 +1453,28 @@ class _LocaleItem extends ConsumerWidget {
     );
     final currentLocale =
         utils.getLocaleForString(locale) ?? utils.getSystemLocale();
-    return ListItem<Locale>.options(
+    return ListItem<Locale?>.options(
       leading: const Icon(Icons.language_outlined),
       title: Text(appLocalizations.language),
-      subtitle: Text(_getLocaleString(currentLocale)),
+      subtitle: Text(
+        locale == null
+            ? '${appLocalizations.xbFollowSystem} · ${_getLocaleString(currentLocale)}'
+            : _getLocaleString(currentLocale),
+      ),
       delegate: OptionsDelegate(
         title: appLocalizations.language,
-        options: _localeOptions,
-        onChanged: (Locale? locale) {
-          if (locale == null) return;
+        options: [null, ..._localeOptions],
+        onChanged: (Locale? value) {
           ref
               .read(appSettingProvider.notifier)
               .updateState(
-                (state) => state.copyWith(locale: locale.toString()),
+                (state) => state.copyWith(locale: value?.toString()),
               );
         },
-        textBuilder: (locale) => _getLocaleString(locale),
-        value: currentLocale,
+        textBuilder: (value) => value == null
+            ? appLocalizations.xbFollowSystem
+            : _getLocaleString(value),
+        value: utils.getLocaleForString(locale),
       ),
     );
   }

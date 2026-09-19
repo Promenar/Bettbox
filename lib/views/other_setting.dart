@@ -7,6 +7,8 @@ import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:bett_box/xboard/node_packager.dart';
+import 'package:bett_box/xboard/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -699,12 +701,46 @@ class _TrayClickBehaviorDialogState extends State<_TrayClickBehaviorDialog> {
   }
 }
 
+/// 分流均衡（F-NODE-4）：同地域组内节点间负载均衡，默认开启。
+/// 关闭后回退为 url-test（自动选组内最优单节点）。
+class XboardLoadBalanceItem extends ConsumerWidget {
+  const XboardLoadBalanceItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enabled = ref.watch(xboardLoadBalanceProvider);
+    return ListItem.switchItem(
+      title: Text(appLocalizations.xbLoadBalance),
+      subtitle: Text(appLocalizations.xbLoadBalanceDesc),
+      delegate: SwitchDelegate(
+        value: enabled,
+        onChanged: (bool value) async {
+          ref.read(xboardLoadBalanceProvider.notifier).state = value;
+          setXboardLoadBalanceEnabled(value);
+          await ref.read(xboardSecureStoreProvider).saveLoadBalance(value);
+          try {
+            await globalState.appController.applyProfile(silence: true);
+          } catch (_) {}
+          if (context.mounted) {
+            context.showSnackBar(
+              value
+                  ? appLocalizations.xbLoadBalanceOn
+                  : appLocalizations.xbLoadBalanceOff,
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
 class OtherSettingView extends ConsumerWidget {
   const OtherSettingView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     List<Widget> items = [
+      const XboardLoadBalanceItem(),
       const SmartAutoStopSection(),
       if (system.isAndroid) const DozeSuspendItem(),
       if (system.isAndroid) const QuickResponseItem(),

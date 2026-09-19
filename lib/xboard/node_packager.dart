@@ -15,6 +15,12 @@ class XboardRegionRule {
   final RegExp pattern;
 }
 
+/// 全局负载均衡开关（F-NODE-4）：由 UI 层通过 [setXboardLoadBalanceEnabled] 切换，
+/// 持久化由 `XboardSecureStore` 承担，启动时从存储恢复后注入。默认开启。
+bool _xboardLoadBalanceEnabled = true;
+void setXboardLoadBalanceEnabled(bool v) => _xboardLoadBalanceEnabled = v;
+bool get isXboardLoadBalanceEnabled => _xboardLoadBalanceEnabled;
+
 /// 地域识别规则表（顺序即优先级）。
 ///
 /// 覆盖 emoji 旗帜 / 中文 / 英文全称与常见缩写；支持随版本与远端配置扩展。
@@ -114,6 +120,7 @@ XboardPackagedConfig? packageNodes(
   final nameMapping = <String, String>{};
   final counters = <String, int>{};
   final usedNames = <String>{};
+  final allPatched = <Map<String, dynamic>>[];
 
   for (final entry in proxies) {
     if (entry is! Map<String, dynamic>) continue;
@@ -123,17 +130,20 @@ XboardPackagedConfig? packageNodes(
     final index = (counters[code] ?? 0) + 1;
     counters[code] = index;
     var sanitized = region == null ? 'XX-${_pad(index)}' : '$code-${_pad(index)}';
-    // 确保全局唯一（防止上游重复名或跨区计数器冲突）
     var suffix = 0;
-    while (usedNames.contains(sanitized)) {
+    var candidate = sanitized;
+    while (usedNames.contains(candidate)) {
       suffix++;
-      sanitized = '${sanitized}_$suffix';
+      candidate = '${sanitized}_$suffix';
     }
+    sanitized = candidate;
     usedNames.add(sanitized);
     final patched = Map<String, dynamic>.from(entry);
     patched['name'] = sanitized;
     byRegion.putIfAbsent(code, () => []).add(patched);
-    nameMapping[original] = sanitized;
+    allPatched.add(patched);
+    // 保留首个映射（避免重复原名覆盖导致 flatProxies 重复）
+    nameMapping.putIfAbsent(original, () => sanitized);
   }
 
   final groups = <Map<String, dynamic>>[];
@@ -145,27 +155,49 @@ XboardPackagedConfig? packageNodes(
     if (nodes == null || nodes.isEmpty) continue;
     final groupName = '${rule.flag} ${rule.name} ${rule.code}';
     regionGroupNames.add(groupName);
-    groups.add({
-      'name': groupName,
-      'type': 'url-test',
-      'url': defaultTestUrl,
-      'interval': 300,
-      'tolerance': 50,
-      'proxies': nodes.map((n) => n['name']).toList(),
-    });
+    if (_xboardLoadBalanceEnabled) {
+      groups.add({
+        'name': groupName,
+        'type': 'load-balance',
+        'strategy': 'sticky-sessions',
+        'url': defaultTestUrl,
+        'interval': 300,
+        'proxies': nodes.map((n) => n['name']).toList(),
+      });
+    } else {
+      groups.add({
+        'name': groupName,
+        'type': 'url-test',
+        'url': defaultTestUrl,
+        'interval': 300,
+        'tolerance': 50,
+        'proxies': nodes.map((n) => n['name']).toList(),
+      });
+    }
   }
   // 未识别地域兜底组（上游自命名无法归类时归入此处）
   byRegion.forEach((code, nodes) {
-    const groupName = '🌐 优选';
+    const groupName = kFallbackRegionGroupName;
     regionGroupNames.add(groupName);
-    groups.add({
-      'name': groupName,
-      'type': 'url-test',
-      'url': defaultTestUrl,
-      'interval': 300,
-      'tolerance': 50,
-      'proxies': nodes.map((n) => n['name']).toList(),
-    });
+    if (_xboardLoadBalanceEnabled) {
+      groups.add({
+        'name': groupName,
+        'type': 'load-balance',
+        'strategy': 'sticky-sessions',
+        'url': defaultTestUrl,
+        'interval': 300,
+        'proxies': nodes.map((n) => n['name']).toList(),
+      });
+    } else {
+      groups.add({
+        'name': groupName,
+        'type': 'url-test',
+        'url': defaultTestUrl,
+        'interval': 300,
+        'tolerance': 50,
+        'proxies': nodes.map((n) => n['name']).toList(),
+      });
+    }
   });
 
   groups.insert(0, {
@@ -182,15 +214,7 @@ XboardPackagedConfig? packageNodes(
     'proxies': [kAutoRegionGroupName, ...regionGroupNames],
   });
 
-  final flatProxies = <Map<String, dynamic>>[];
-  for (final entry in proxies) {
-    if (entry is! Map<String, dynamic>) continue;
-    final sanitized = nameMapping[entry['name']?.toString() ?? ''];
-    if (sanitized == null) continue;
-    final patched = Map<String, dynamic>.from(entry);
-    patched['name'] = sanitized;
-    flatProxies.add(patched);
-  }
+  final flatProxies = List<Map<String, dynamic>>.unmodifiable(allPatched);
 
   return XboardPackagedConfig(
     proxies: flatProxies,
@@ -204,6 +228,9 @@ String _pad(int index) => index.toString().padLeft(2, '0');
 const kDefaultTestUrl = 'http://connect.rom.miui.com/generate_204';
 const kAutoRegionGroupName = '自动（最优地域）';
 const kSelectorGroupName = '节点选择';
+
+/// 未识别地域兜底组名（mihomo 配置内标识，非展示文案：展示时取“优选”后缀判定）。
+const kFallbackRegionGroupName = '🌐 优选';
 
 const _passthroughTargets = {
   'DIRECT',
@@ -342,11 +369,12 @@ Map<String, dynamic> sanitizeDanglingRefs(Map<String, dynamic> config) {
 /// F-NODE-2 地域状态词档位（流畅/正常/拥挤）。
 enum XboardRegionStatus { fluent, normal, congested }
 
-/// 按探测时延映射状态词档位（PRD §3.6 F-NODE-2）：
-/// <150ms 流畅；<400ms 正常；其余（含超时/未连通）拥挤。
+/// 按探测时延映射状态词档位（PRD §3.6 F-NODE-2，阈值可配置）：
+/// <200ms 流畅；<500ms 正常；其余（含超时/未连通）拥挤。
+/// 远洋地区（美/欧）200ms+ 属常态，不应判拥挤。
 XboardRegionStatus regionStatusForDelay(int? delay) {
   if (delay == null || delay <= 0) return XboardRegionStatus.congested;
-  if (delay < 150) return XboardRegionStatus.fluent;
-  if (delay < 400) return XboardRegionStatus.normal;
+  if (delay < 200) return XboardRegionStatus.fluent;
+  if (delay < 500) return XboardRegionStatus.normal;
   return XboardRegionStatus.congested;
 }

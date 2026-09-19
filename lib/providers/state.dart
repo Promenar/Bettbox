@@ -452,6 +452,8 @@ MoreToolsSelectorState moreToolsSelectorState(Ref ref) {
   final navigationItems = ref.watch(
     navigationItemsStateProvider.select((state) {
       return state.value.where((element) {
+        // 更多页自身不再列入更多列表，避免 ToolsView 无限嵌套
+        if (element.label == PageLabel.tools) return false;
         final isMore = element.modes.contains(NavigationItemMode.more);
 
         if (globalState.isAndroidTV) {

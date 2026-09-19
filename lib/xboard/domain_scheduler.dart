@@ -19,6 +19,7 @@ import 'api_client.dart';
 import 'bootstrap.dart';
 import 'domain_manager.dart';
 import 'models.dart';
+import 'region_catalog.dart';
 import 'secure_store.dart';
 
 /// 域名池快照（供 UI 订阅：救援横幅/手动输入入口的展示依据）。
@@ -47,6 +48,8 @@ class XboardDomainCallbacks {
   const XboardDomainCallbacks({
     required this.onPoolChanged,
     required this.onActiveChanged,
+    this.onCatalogChanged,
+    this.onAnnouncementChanged,
   });
 
   /// 域名池变化（冷启动加载/引导源合并/手动添加）→ 推送 UI 快照。
@@ -54,6 +57,12 @@ class XboardDomainCallbacks {
 
   /// 活跃域名实际切换 → 订阅 URL host 热替换 + 刷新（F-DOMAIN-5）。
   final Future<void> Function(String baseUrl) onActiveChanged;
+
+  /// 地域目录更新（F-NODE-7 通道②）。
+  final void Function(XboardRegionCatalog catalog)? onCatalogChanged;
+
+  /// 公告链接更新（F-DOMAIN-3）。
+  final void Function(String? url)? onAnnouncementChanged;
 }
 
 class XboardDomainScheduler {
@@ -94,6 +103,17 @@ class XboardDomainScheduler {
       _callbacks.onPoolChanged(domains);
     };
     _callbacks.onPoolChanged(_manager.domains);
+    // 恢复已持久化的地域目录（F-NODE-7 通道②）
+    final savedCatalog = await _store.readRegionCatalog();
+    if (savedCatalog != null) {
+      final catalog = XboardRegionCatalog.tryParse(savedCatalog);
+      _callbacks.onCatalogChanged?.call(catalog);
+      debugPrint('[XBOARD_CATALOG] restored ${catalog.entries.length} entries');
+    }
+    final savedAnnouncement = await _store.readAnnouncementUrl();
+    if (savedAnnouncement != null && savedAnnouncement.isNotEmpty) {
+      _callbacks.onAnnouncementChanged?.call(savedAnnouncement);
+    }
     // 应用生命周期级定时探测（F-DOMAIN-2 触发时机③）
     Timer.periodic(probeInterval, (_) => refresh());
     await refresh();
@@ -144,6 +164,17 @@ class XboardDomainScheduler {
     if (doc == null) return null;
     _manager.updatePool(doc.apiDomains);
     debugPrint('[XBOARD_DOMAIN] bootstrap ok: ${doc.apiDomains}');
+    // F-NODE-7 通道②：引导源静态地域目录（若存在则持久化）
+    if (doc.regionCatalogRaw.isNotEmpty) {
+      await _store.saveRegionCatalog(doc.regionCatalogRaw);
+      final catalog = XboardRegionCatalog.tryParse(doc.regionCatalogRaw);
+      _callbacks.onCatalogChanged?.call(catalog);
+      debugPrint('[XBOARD_CATALOG] updated ${catalog.entries.length} entries');
+    }
+    if (doc.announcementUrl.isNotEmpty) {
+      await _store.saveAnnouncementUrl(doc.announcementUrl);
+      _callbacks.onAnnouncementChanged?.call(doc.announcementUrl);
+    }
     return doc;
   }
 

@@ -14,6 +14,9 @@ class XboardSecureStore {
   static const _keyAuthData = 'xboard_auth_data';
   static const _keyEmail = 'xboard_email';
   static const _keyDomainPool = 'xboard_domain_pool';
+  static const _keyRegionCatalog = 'xboard_region_catalog';
+  static const _keyAnnouncementUrl = 'xboard_announcement_url';
+  static const _keyLoadBalance = 'xboard_load_balance';
 
   final FlutterSecureStorage _storage;
 
@@ -71,5 +74,37 @@ class XboardSecureStore {
         .map((e) => e?.toString() ?? '')
         .where((s) => s.isNotEmpty)
         .toList();
+  }
+
+  Future<void> saveRegionCatalog(List<dynamic> raw) async {
+    await _storage.write(key: _keyRegionCatalog, value: jsonEncode(raw));
+  }
+
+  Future<List<dynamic>?> readRegionCatalog() async {
+    final raw = await _storage.read(key: _keyRegionCatalog);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) return decoded;
+    } catch (_) {}
+    return null;
+  }
+
+  Future<void> saveAnnouncementUrl(String url) async {
+    await _storage.write(key: _keyAnnouncementUrl, value: url);
+  }
+
+  Future<String?> readAnnouncementUrl() async {
+    return _storage.read(key: _keyAnnouncementUrl);
+  }
+
+  Future<void> saveLoadBalance(bool enabled) async {
+    await _storage.write(key: _keyLoadBalance, value: enabled ? '1' : '0');
+  }
+
+  Future<bool?> readLoadBalance() async {
+    final v = await _storage.read(key: _keyLoadBalance);
+    if (v == null) return null;
+    return v == '1' || v == 'true';
   }
 }

@@ -15,6 +15,7 @@ class XboardBootstrapDoc {
     this.dnsTxtHint = '',
     this.minAppVersion = 0,
     this.announcementUrl = '',
+    this.regionCatalogRaw = const [],
   });
 
   /// 当前有效 API 域名列表（https/http 绝对地址，去重保序）。
@@ -23,6 +24,7 @@ class XboardBootstrapDoc {
   final String dnsTxtHint;
   final int minAppVersion;
   final String announcementUrl;
+  final List<dynamic> regionCatalogRaw;
 
   /// 解析失败或不可用时返回 null（供上层回退下一源）。
   static XboardBootstrapDoc? tryParse(dynamic json) {
@@ -49,6 +51,7 @@ class XboardBootstrapDoc {
       }
     }
 
+    final catalogRaw = json['region_catalog'];
     return XboardBootstrapDoc(
       apiDomains: domains,
       bootstrapSources: sources,
@@ -57,6 +60,7 @@ class XboardBootstrapDoc {
           ? (json['min_app_version'] as num).toInt()
           : 0,
       announcementUrl: json['announcement_url']?.toString() ?? '',
+      regionCatalogRaw: catalogRaw is List ? catalogRaw : const [],
     );
   }
 

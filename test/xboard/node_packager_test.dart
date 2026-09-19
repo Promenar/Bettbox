@@ -77,19 +77,45 @@ void main() {
       expect(packageNodes({'proxies': []}), isNull);
       expect(packageNodes({}), isNull);
     });
+
+    test('默认开启分流均衡：地域组为 load-balance sticky-sessions', () {
+      setXboardLoadBalanceEnabled(true);
+      final result = packageNodes({'proxies': proxies})!;
+      final hk = result.proxyGroups.firstWhere(
+        (g) => g['name'] == '🇭🇰 香港 HK',
+      );
+      expect(hk['type'], 'load-balance');
+      expect(hk['strategy'], 'sticky-sessions');
+      expect((hk['proxies'] as List), containsAll(['HK-01', 'HK-02']));
+    });
+
+    test('关闭分流均衡后回退为 url-test', () {
+      setXboardLoadBalanceEnabled(false);
+      try {
+        final result = packageNodes({'proxies': proxies})!;
+        final hk = result.proxyGroups.firstWhere(
+          (g) => g['name'] == '🇭🇰 香港 HK',
+        );
+        expect(hk['type'], 'url-test');
+        expect(hk.containsKey('strategy'), isFalse);
+      } finally {
+        setXboardLoadBalanceEnabled(true);
+      }
+    });
   });
 
 group('regionStatusForDelay', () {
-  test('F-NODE-2 档位映射', () {
-    expect(regionStatusForDelay(null), XboardRegionStatus.congested);
-    expect(regionStatusForDelay(0), XboardRegionStatus.congested);
-    expect(regionStatusForDelay(-1), XboardRegionStatus.congested);
-    expect(regionStatusForDelay(45), XboardRegionStatus.fluent);
-    expect(regionStatusForDelay(149), XboardRegionStatus.fluent);
-    expect(regionStatusForDelay(150), XboardRegionStatus.normal);
-    expect(regionStatusForDelay(399), XboardRegionStatus.normal);
-    expect(regionStatusForDelay(400), XboardRegionStatus.congested);
-    expect(regionStatusForDelay(1200), XboardRegionStatus.congested);
-  });
+    test('F-NODE-2 档位映射', () {
+      expect(regionStatusForDelay(null), XboardRegionStatus.congested);
+      expect(regionStatusForDelay(0), XboardRegionStatus.congested);
+      expect(regionStatusForDelay(-1), XboardRegionStatus.congested);
+      expect(regionStatusForDelay(45), XboardRegionStatus.fluent);
+      expect(regionStatusForDelay(199), XboardRegionStatus.fluent);
+      // 远洋 200ms+ 属常态：判正常而非拥挤
+      expect(regionStatusForDelay(200), XboardRegionStatus.normal);
+      expect(regionStatusForDelay(499), XboardRegionStatus.normal);
+      expect(regionStatusForDelay(500), XboardRegionStatus.congested);
+      expect(regionStatusForDelay(1200), XboardRegionStatus.congested);
+    });
 });
 }

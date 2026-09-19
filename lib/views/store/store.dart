@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../account/login_page.dart';
 import 'checkout_page.dart';
+import 'orders_page.dart';
+import 'period_names.dart';
 
 class StoreView extends ConsumerStatefulWidget {
   const StoreView({super.key});
@@ -18,27 +20,6 @@ class StoreView extends ConsumerStatefulWidget {
 class _StoreViewState extends ConsumerState<StoreView> {
   List<XboardPlan>? _plans;
   String? _error;
-
-  /// 周期展示名。键以 plan.prices 实际下发为准（不同 Xboard 版本可能是
-  /// 新枚举 monthly 或旧字段 month_price，下单时原样回传，服务端自适应）。
-  static const _periodNames = {
-    'monthly': '月',
-    'month_price': '月',
-    'quarterly': '季',
-    'quarter_price': '季',
-    'half_yearly': '半年',
-    'half_year_price': '半年',
-    'yearly': '年',
-    'year_price': '年',
-    'two_yearly': '两年',
-    'two_year_price': '两年',
-    'three_yearly': '三年',
-    'three_year_price': '三年',
-    'onetime': '一次性',
-    'onetime_price': '一次性',
-    'reset_traffic': '重置流量',
-    'reset_price': '重置流量',
-  };
 
   @override
   void initState() {
@@ -86,7 +67,20 @@ String _priceText(num cents) => '¥${(cents / 100).toStringAsFixed(2)}';
       debugPrint('[XBOARD_ORDER] saved: $tradeNo');
     } on XboardException catch (error) {
       debugPrint('[XBOARD_ORDER] save xboard error: $error');
-      if (mounted) context.showSnackBar(error.message);
+      if (mounted) {
+        context.showSnackBar(error.message);
+        // 下单失败后若存在待支付订单，引导至订单页处理旧单
+        //（以订单列表为准，不依赖服务端报错文案措辞）。
+        try {
+          final orders = await ref
+              .read(xboardOrderRepositoryProvider)
+              .fetchOrders();
+          if (orders.any((o) => o.isPending) && mounted && context.mounted) {
+            await BaseNavigator.push(context, const OrdersPage());
+            await _load();
+          }
+        } catch (_) {}
+      }
       return;
     } catch (error) {
       debugPrint('[XBOARD_ORDER] save error: $error');
@@ -131,7 +125,7 @@ String _priceText(num cents) => '¥${(cents / 100).toStringAsFixed(2)}';
               onPressed: () => Navigator.of(context).pop(e.key),
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(_periodNames[e.key] ?? e.key),
+                title: Text(xboardPeriodName(e.key)),
                 trailing: Text(_priceText(e.value)),
               ),
             ),
@@ -179,6 +173,13 @@ String _priceText(num cents) => '¥${(cents / 100).toStringAsFixed(2)}';
     final plans = _plans;
     return CommonScaffold(
       title: appLocalizations.xbStore,
+      actions: [
+        IconButton(
+          tooltip: appLocalizations.xbMyOrders,
+          icon: const Icon(Icons.receipt_long_rounded),
+          onPressed: () => BaseNavigator.push(context, const OrdersPage()),
+        ),
+      ],
       body: plans == null && _error == null
           ? const Center(child: CircularProgressIndicator())
           : (plans == null || plans.isEmpty)
@@ -206,7 +207,7 @@ String _priceText(num cents) => '¥${(cents / 100).toStringAsFixed(2)}';
                           ? ''
                           : plan.prices.entries
                               .map((e) =>
-                                  '${_periodNames[e.key] ?? e.key}: ${_priceText(e.value)}')
+                                  '${xboardPeriodName(e.key)}: ${_priceText(e.value)}')
                               .join('　');
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),

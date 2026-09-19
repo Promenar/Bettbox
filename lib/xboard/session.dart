@@ -3,6 +3,7 @@
 /// 启动时从安全存储恢复凭据并经 `user/checkLogin` 校验；401 触发静默登出（F-AUTH-4）。
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'api_client.dart';
@@ -11,6 +12,7 @@ import 'bootstrap.dart';
 import 'domain_manager.dart';
 import 'domain_scheduler.dart';
 import 'models.dart';
+import 'region_catalog.dart';
 import 'repositories.dart';
 import 'secure_store.dart';
 
@@ -23,6 +25,7 @@ class XboardSessionState {
     this.email,
     this.userInfo,
     this.subscribeInfo,
+    this.refreshedAt,
   });
 
   final SessionStatus status;
@@ -31,12 +34,16 @@ class XboardSessionState {
   final XboardUserInfo? userInfo;
   final XboardSubscribeInfo? subscribeInfo;
 
+  /// 面板数据最近成功刷新时间（订阅卡“数据更新于”展示依据）。
+  final DateTime? refreshedAt;
+
   XboardSessionState copyWith({
     SessionStatus? status,
     String? authData,
     String? email,
     XboardUserInfo? userInfo,
     XboardSubscribeInfo? subscribeInfo,
+    DateTime? refreshedAt,
     bool clearSubscribe = false,
   }) {
     return XboardSessionState(
@@ -45,6 +52,7 @@ class XboardSessionState {
       email: email ?? this.email,
       userInfo: userInfo ?? this.userInfo,
       subscribeInfo: clearSubscribe ? null : (subscribeInfo ?? this.subscribeInfo),
+      refreshedAt: refreshedAt ?? this.refreshedAt,
     );
   }
 
@@ -99,9 +107,22 @@ final xboardDomainSchedulerProvider = Provider<XboardDomainScheduler>((ref) {
         ref.read(xboardDomainStateProvider.notifier).state = XboardDomainState.of(
           manager,
         );
-        // F-DOMAIN-5：订阅 URL host 热替换 + 刷新（失败保留原订阅，下次触发再试）
-        await applyManagedDomainHost(baseUrl);
-        await refreshManagedSubscription();
+        // 未登录态冻结订阅更新（登出后仅保活不断连，重登后全量同步）
+        if (!ref.read(xboardSessionProvider).isAuthenticated) return;
+        // F-DOMAIN-5：订阅 URL host 热替换 + 刷新（失败保留原订阅，下次触发再试；
+        // 异常仅日志，不向 UI 抛，避免无订阅账号刷屏）。
+        try {
+          await applyManagedDomainHost(baseUrl);
+          await refreshManagedSubscription();
+        } catch (error) {
+          debugPrint('[XBOARD_DOMAIN] post-switch sync skipped: $error');
+        }
+      },
+      onCatalogChanged: (catalog) {
+        ref.read(xboardRegionCatalogProvider.notifier).state = catalog;
+      },
+      onAnnouncementChanged: (url) {
+        ref.read(xboardAnnouncementUrlProvider.notifier).state = url;
       },
     ),
   );
@@ -123,6 +144,16 @@ final xboardGuestRepositoryProvider = Provider<XboardGuestRepository>(
 final xboardOrderRepositoryProvider = Provider<XboardOrderRepository>(
   (ref) => XboardOrderRepository(ref.watch(xboardApiClientProvider)),
 );
+
+/// 地域目录（F-NODE-7 通道② 引导源静态字段；通道①就绪后同模型复用）。
+final xboardRegionCatalogProvider = StateProvider<XboardRegionCatalog>(
+  (ref) => const XboardRegionCatalog([]),
+);
+
+final xboardAnnouncementUrlProvider = StateProvider<String?>((ref) => null);
+
+/// 分流均衡开关（F-NODE-4）：默认开启，持久化值在启动时覆盖。
+final xboardLoadBalanceProvider = StateProvider<bool>((ref) => true);
 
 class XboardSessionNotifier extends Notifier<XboardSessionState> {
   @override
@@ -147,6 +178,8 @@ class XboardSessionNotifier extends Notifier<XboardSessionState> {
     try {
       await _userRepo.checkLogin();
       await refreshUserInfo();
+      // 登录态恢复自更新能力（登出期间被冻结的受管 Profile）
+      await setManagedAutoUpdate(true);
     } on XboardException catch (error) {
       if (error.isAuth) {
         await _logoutLocal();
@@ -185,7 +218,7 @@ class XboardSessionNotifier extends Notifier<XboardSessionState> {
 
   Future<void> refreshUserInfo() async {
     final info = await _userRepo.info();
-    state = state.copyWith(userInfo: info);
+    state = state.copyWith(userInfo: info, refreshedAt: DateTime.now());
     try {
       final subscribe = await _userRepo.getSubscribe();
       state = state.copyWith(subscribeInfo: subscribe);
@@ -197,6 +230,25 @@ class XboardSessionNotifier extends Notifier<XboardSessionState> {
         rethrow;
       }
     }
+  }
+
+  DateTime? _lastCycle;
+
+  /// SaaS 级订阅自更新：面板数据（流量/套餐/更新时间）+ 订阅内容（节点）一次拉齐。
+  ///
+  /// 未登录直接返回（登出态冻结）；默认 2 分钟节流，前台 6h 定时器可用
+  /// force 绕过。离线等异常由调用方决定是否提示，订阅卡场景静默保底。
+  Future<void> refreshSubscriptionCycle({bool force = false}) async {
+    if (!state.isAuthenticated) return;
+    final now = DateTime.now();
+    if (!force &&
+        _lastCycle != null &&
+        now.difference(_lastCycle!) < const Duration(minutes: 2)) {
+      return;
+    }
+    _lastCycle = now;
+    await refreshUserInfo();
+    await refreshManagedSubscription();
   }
 
   Future<void> logout() async {
@@ -218,12 +270,15 @@ class XboardSessionNotifier extends Notifier<XboardSessionState> {
       email: email,
     );
     await refreshUserInfo();
+    await setManagedAutoUpdate(true);
   }
 
   Future<void> _logoutLocal() async {
     ref.read(xboardAuthDataProvider.notifier).state = null;
     await _store.clearSession();
     state = XboardSessionState(status: SessionStatus.unauthenticated);
+    // 登出冻结：配置保留可用，但不再自更新订阅内容与面板数据
+    await setManagedAutoUpdate(false);
   }
 }
 

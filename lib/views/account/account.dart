@@ -10,22 +10,9 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:bett_box/xboard/xboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
+import '../store/orders_page.dart';
 import 'register_page.dart';
-
-String _formatBytes(num bytes) {
-  if (bytes <= 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  var value = bytes.toDouble();
-  var unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit++;
-  }
-  final text = value >= 100 ? value.toStringAsFixed(0) : value.toStringAsFixed(2);
-  return '${text.endsWith('.00') ? text.substring(0, text.length - 3) : text} ${units[unit]}';
-}
 
 class AccountView extends ConsumerStatefulWidget {
   const AccountView({super.key});
@@ -50,55 +37,66 @@ class _AccountViewState extends ConsumerState<AccountView> {
     });
   }
 
-  Future<void> _refresh() async {
+  /// 原始异常 → 人话：服务端中文直透，订阅 403 映射开通引导，
+  /// 其余不再透出原文（曾出现 Dio 整页英文刷屏）。
+  /// 无订阅判定见 [isNoPlanError]（`lib/xboard/error_map.dart`）。
+  String _friendlyError(Object error) {
+    if (error is XboardException) return error.message;
+    if (error is DioException && error.response?.statusCode == 403) {
+      return appLocalizations.xbSubscriptionInactive;
+    }
+    return appLocalizations.xbNetworkError;
+  }
+
+  void _notifyError(Object error, {required bool manual}) {
+    debugPrint('[XBOARD_ACCOUNT] error: $error');
+    if (!manual || !mounted) return;
+    context.showSnackBar(_friendlyError(error));
+  }
+
+  Future<void> _refresh({bool manual = false}) async {
     try {
       await ref.read(xboardSessionProvider.notifier).refreshUserInfo();
       final session = ref.read(xboardSessionProvider);
       if (session.isAuthenticated && session.subscribeInfo != null) {
         if (findManagedProfile() == null) {
-          final profile = await _syncSubscription();
+          final profile = await _syncSubscription(silent: !manual);
           if (profile != null) await refreshManagedSubscription();
         } else {
           await refreshManagedSubscription();
         }
       }
     } on XboardException catch (error) {
-      debugPrint('[XBOARD_ACCOUNT] refresh error: $error');
-      if (mounted) {
-        context.showSnackBar(
-          error.statusCode == 403
-              ? appLocalizations.xbSubscriptionExpired
-              : error.message,
-        );
+      if (isNoPlanError(error)) {
+        debugPrint('[XBOARD_ACCOUNT] no-plan state: $error');
+        return;
       }
+      _notifyError(error, manual: manual);
     } on Exception catch (error) {
-      debugPrint('[XBOARD_ACCOUNT] refresh error: $error');
-      if (mounted) {
-        final isExpired = error is DioException &&
-            error.response?.statusCode == 403;
-        context.showSnackBar(
-          isExpired ? appLocalizations.xbSubscriptionExpired : '$error',
-        );
+      if (isNoPlanError(error)) {
+        debugPrint('[XBOARD_ACCOUNT] no-plan state: $error');
+        return;
       }
+      _notifyError(error, manual: manual);
     }
   }
 
   Future<void> _toLogin() async {
     await BaseNavigator.push(context, const LoginPage());
     if (ref.read(xboardSessionProvider).isAuthenticated) {
-      _syncSubscription();
+      _syncSubscription(silent: false);
     }
   }
 
   Future<void> _toRegister() async {
     await BaseNavigator.push(context, const RegisterPage());
     if (ref.read(xboardSessionProvider).isAuthenticated) {
-      _syncSubscription();
+      _syncSubscription(silent: false);
     }
   }
 
   /// F-SUB-1：登录后自动创建/更新受管 Profile 并选中。
-  Future<Profile?> _syncSubscription() async {
+  Future<Profile?> _syncSubscription({bool silent = false}) async {
     final session = ref.read(xboardSessionProvider);
     final subscribe = session.subscribeInfo;
     if (subscribe == null || subscribe.subscribeUrl.isEmpty) return null;
@@ -112,11 +110,17 @@ class _AccountViewState extends ConsumerState<AccountView> {
       await globalState.appController.handleChangeProfile();
       return profile;
     } on XboardException catch (error) {
-      debugPrint('[XBOARD_ACCOUNT] sync xboard error: $error');
-      if (mounted) context.showSnackBar(error.message);
+      if (isNoPlanError(error)) {
+        debugPrint('[XBOARD_ACCOUNT] no-plan state: $error');
+        return null;
+      }
+      _notifyError(error, manual: !silent);
     } catch (error) {
-      debugPrint('[XBOARD_ACCOUNT] sync error: $error');
-      if (mounted) context.showSnackBar(error.toString());
+      if (isNoPlanError(error)) {
+        debugPrint('[XBOARD_ACCOUNT] no-plan state: $error');
+        return null;
+      }
+      _notifyError(error, manual: !silent);
     }
     return null;
   }
@@ -193,26 +197,22 @@ class _AccountViewState extends ConsumerState<AccountView> {
     );
   }
 
+  // 订阅及用量信息卡已移至首页顶部展示，本页仅保留账号操作入口。
   Widget _buildAuthenticated(XboardSessionState session) {
-    final subscribe = session.subscribeInfo;
     final userInfo = session.userInfo;
     return RefreshIndicator(
-      onRefresh: _refresh,
+      onRefresh: () => _refresh(manual: true),
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           CommonCard(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: subscribe == null
-                  ? _buildNoPlan()
-                  : _buildPlanCard(subscribe),
-            ),
-          ),
-          const SizedBox(height: 12),
-          CommonCard(
             child: Column(
               children: [
+                ListItem(
+                  leading: const Icon(Icons.receipt_long_rounded),
+                  title: Text(appLocalizations.xbMyOrders),
+                  onTap: () => BaseNavigator.push(context, const OrdersPage()),
+                ),
                 ListItem(
                   leading: const Icon(Icons.construction),
                   title: Text(appLocalizations.tools),
@@ -246,67 +246,6 @@ class _AccountViewState extends ConsumerState<AccountView> {
           ],
         ],
       ),
-    );
-  }
-
-  Widget _buildNoPlan() {
-    return Column(
-      children: [
-        Text(
-          appLocalizations.xbNoPlanTitle,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          appLocalizations.xbNoPlanTip,
-          style: Theme.of(context).textTheme.bodySmall,
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPlanCard(XboardSubscribeInfo subscribe) {
-    final plan = subscribe.plan;
-    final total = subscribe.transferEnable;
-    final used = subscribe.u + subscribe.d;
-    final percent = total > 0 ? (used / total).clamp(0.0, 1.0) : 0.0;
-    final expireText = subscribe.expiredAt > 0
-        ? DateFormat('yyyy-MM-dd HH:mm').format(
-            DateTime.fromMillisecondsSinceEpoch(subscribe.expiredAt * 1000),
-          )
-        : appLocalizations.unknown;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.workspace_premium_rounded,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                plan?.name ?? appLocalizations.xbManagedSubscription,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        LinearProgressIndicator(value: percent, minHeight: 6, borderRadius: BorderRadius.circular(3)),
-        const SizedBox(height: 8),
-        Text(
-          '${appLocalizations.xbTrafficUsed}: ${_formatBytes(used)} / ${_formatBytes(total)}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '${appLocalizations.xbExpireAt}: $expireText',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
     );
   }
 }

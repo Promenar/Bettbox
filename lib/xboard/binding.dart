@@ -46,7 +46,7 @@ Future<Profile> syncManagedSubscription({
   final changed = managed.copyWith(url: subscribeUrl, label: planName);
   final updated = await changed.update(validate: false);
   debugPrint('[XBOARD_BINDING] updated profile ${updated.id}');
-  await globalState.appController.updateProfile(updated);
+  await globalState.appController.updateProfile(updated, validate: false);
   return updated;
 }
 
@@ -55,8 +55,20 @@ Future<void> refreshManagedSubscription() async {
   final managed = findManagedProfile();
   if (managed == null) return;
   final updated = await managed.update(validate: false);
-  await globalState.appController.updateProfile(updated);
+  await globalState.appController.updateProfile(updated, validate: false);
   debugPrint('[XBOARD_BINDING] refreshed profile ${updated.id}');
+}
+
+/// 登出冻结 / 登录恢复受管订阅的定时更新能力（SaaS 自动更新策略）。
+///
+/// 仅翻转 autoUpdate 开关：登出后配置保留可用但不再自更新（订阅内容、
+//  面板数据全冻结）；登录后恢复 6h 节奏。持久化走配置落盘。
+Future<void> setManagedAutoUpdate(bool enabled) async {
+  final managed = findManagedProfile();
+  if (managed == null || managed.autoUpdate == enabled) return;
+  globalState.appController.setProfile(managed.copyWith(autoUpdate: enabled));
+  globalState.appController.savePreferencesDebounce();
+  debugPrint('[XBOARD_BINDING] managed autoUpdate=$enabled');
 }
 
 /// F-DOMAIN-5：把受管订阅 URL 的 host/scheme/port 替换为新入口域名
@@ -81,7 +93,7 @@ Future<bool> applyManagedDomainHost(String baseUrl) async {
   if (rewritten.toString() == managed.url) return false;
   final changed = managed.copyWith(url: rewritten.toString());
   final updated = await changed.update(validate: false);
-  await globalState.appController.updateProfile(updated);
+  await globalState.appController.updateProfile(updated, validate: false);
   debugPrint('[XBOARD_BINDING] domain host rewritten for profile ${updated.id}');
   return true;
 }

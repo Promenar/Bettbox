@@ -1239,7 +1239,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbAccountRequired": MessageLookupByLibrary.simpleMessage(
       "Please sign in first",
     ),
+    "xbAnnouncement": MessageLookupByLibrary.simpleMessage("Announcement"),
     "xbAutoRegion": MessageLookupByLibrary.simpleMessage("Auto (best region)"),
+    "xbAutoShort": MessageLookupByLibrary.simpleMessage("Auto"),
     "xbBackToAccount": MessageLookupByLibrary.simpleMessage("Back to account"),
     "xbBalance": MessageLookupByLibrary.simpleMessage("Balance"),
     "xbBuyNow": MessageLookupByLibrary.simpleMessage("Get started"),
@@ -1249,7 +1251,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbCancelOrderConfirm": MessageLookupByLibrary.simpleMessage(
       "This will cancel the unpaid order. Continue?",
     ),
+    "xbCancelOrderTitle": MessageLookupByLibrary.simpleMessage("Cancel order"),
     "xbCheckout": MessageLookupByLibrary.simpleMessage("Checkout"),
+    "xbConfirmCancel": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to cancel?",
+    ),
+    "xbContinuePay": MessageLookupByLibrary.simpleMessage("Continue payment"),
+    "xbDataUpdated": MessageLookupByLibrary.simpleMessage("Data updated"),
     "xbDirectModeTip": MessageLookupByLibrary.simpleMessage(
       "All traffic bypasses the proxy in direct mode",
     ),
@@ -1276,6 +1284,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbEmail": MessageLookupByLibrary.simpleMessage("Email"),
     "xbEmailCode": MessageLookupByLibrary.simpleMessage("Email code"),
     "xbExpireAt": MessageLookupByLibrary.simpleMessage("Expires"),
+    "xbFollowSystem": MessageLookupByLibrary.simpleMessage("Follow system"),
     "xbForgetPassword": MessageLookupByLibrary.simpleMessage("Forgot password"),
     "xbHasAccount": MessageLookupByLibrary.simpleMessage(
       "Have an account? Sign in",
@@ -1283,7 +1292,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbInviteCodeOptional": MessageLookupByLibrary.simpleMessage(
       "Invite code (optional)",
     ),
+    "xbLoadBalance": MessageLookupByLibrary.simpleMessage("Load balancing"),
+    "xbLoadBalanceDesc": MessageLookupByLibrary.simpleMessage(
+      "Sticky-session balancing across nodes in the same region",
+    ),
+    "xbLoadBalanceOff": MessageLookupByLibrary.simpleMessage(
+      "Load balancing off",
+    ),
+    "xbLoadBalanceOn": MessageLookupByLibrary.simpleMessage(
+      "Load balancing on",
+    ),
     "xbLogin": MessageLookupByLibrary.simpleMessage("Sign in"),
+    "xbLoginSyncTip": MessageLookupByLibrary.simpleMessage(
+      "Sign in to sync subscription info",
+    ),
     "xbLoginTip": MessageLookupByLibrary.simpleMessage(
       "Sign in to sync your subscription",
     ),
@@ -1291,16 +1313,29 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbManagedSubscription": MessageLookupByLibrary.simpleMessage(
       "Managed subscription",
     ),
+    "xbMyOrders": MessageLookupByLibrary.simpleMessage("My orders"),
+    "xbNetworkError": MessageLookupByLibrary.simpleMessage(
+      "Network error, please try again later",
+    ),
     "xbNewPassword": MessageLookupByLibrary.simpleMessage("New password"),
     "xbNoAccount": MessageLookupByLibrary.simpleMessage("No account? Sign up"),
+    "xbNoOrders": MessageLookupByLibrary.simpleMessage("No orders yet"),
     "xbNoPaymentMethod": MessageLookupByLibrary.simpleMessage(
       "No payment method available yet",
     ),
     "xbNoPlanTip": MessageLookupByLibrary.simpleMessage(
-      "Your subscription syncs automatically after you get a plan",
+      "Get a plan and your nodes and traffic sync automatically — one tap to connect",
     ),
-    "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage("No active plan"),
+    "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage(
+      "No active subscription yet",
+    ),
     "xbOpenCashier": MessageLookupByLibrary.simpleMessage("Open payment page"),
+    "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("Cancelled"),
+    "xbOrderCredited": MessageLookupByLibrary.simpleMessage("Credited"),
+    "xbOrderDone": MessageLookupByLibrary.simpleMessage("Completed"),
+    "xbOrderPending": MessageLookupByLibrary.simpleMessage("Pending payment"),
+    "xbOrderProcessing": MessageLookupByLibrary.simpleMessage("Activating"),
+    "xbOrderUnknown": MessageLookupByLibrary.simpleMessage("Unknown"),
     "xbPassword": MessageLookupByLibrary.simpleMessage("Password"),
     "xbPayFailed": MessageLookupByLibrary.simpleMessage(
       "Payment not completed",
@@ -1312,7 +1347,44 @@ class MessageLookup extends MessageLookupByLibrary {
       "This page confirms automatically after payment",
     ),
     "xbPaySuccess": MessageLookupByLibrary.simpleMessage("Payment successful"),
+    "xbPeriodHalfYearly": MessageLookupByLibrary.simpleMessage("Semi-annual"),
+    "xbPeriodMonthly": MessageLookupByLibrary.simpleMessage("Monthly"),
+    "xbPeriodOnetime": MessageLookupByLibrary.simpleMessage("One-time"),
+    "xbPeriodQuarterly": MessageLookupByLibrary.simpleMessage("Quarterly"),
+    "xbPeriodReset": MessageLookupByLibrary.simpleMessage("Reset traffic"),
+    "xbPeriodThreeYearly": MessageLookupByLibrary.simpleMessage("3-year"),
+    "xbPeriodTwoYearly": MessageLookupByLibrary.simpleMessage("2-year"),
+    "xbPeriodYearly": MessageLookupByLibrary.simpleMessage("Yearly"),
     "xbPlanCurrent": MessageLookupByLibrary.simpleMessage("Current plan"),
+    "xbRegionAE": MessageLookupByLibrary.simpleMessage("UAE"),
+    "xbRegionAR": MessageLookupByLibrary.simpleMessage("Argentina"),
+    "xbRegionAU": MessageLookupByLibrary.simpleMessage("Australia"),
+    "xbRegionBR": MessageLookupByLibrary.simpleMessage("Brazil"),
+    "xbRegionCA": MessageLookupByLibrary.simpleMessage("Canada"),
+    "xbRegionCH": MessageLookupByLibrary.simpleMessage("Switzerland"),
+    "xbRegionDE": MessageLookupByLibrary.simpleMessage("Germany"),
+    "xbRegionFR": MessageLookupByLibrary.simpleMessage("France"),
+    "xbRegionHK": MessageLookupByLibrary.simpleMessage("Hong Kong"),
+    "xbRegionID": MessageLookupByLibrary.simpleMessage("Indonesia"),
+    "xbRegionIN": MessageLookupByLibrary.simpleMessage("India"),
+    "xbRegionIQ": MessageLookupByLibrary.simpleMessage("Iraq"),
+    "xbRegionJP": MessageLookupByLibrary.simpleMessage("Japan"),
+    "xbRegionKR": MessageLookupByLibrary.simpleMessage("South Korea"),
+    "xbRegionMY": MessageLookupByLibrary.simpleMessage("Malaysia"),
+    "xbRegionNG": MessageLookupByLibrary.simpleMessage("Nigeria"),
+    "xbRegionNL": MessageLookupByLibrary.simpleMessage("Netherlands"),
+    "xbRegionPH": MessageLookupByLibrary.simpleMessage("Philippines"),
+    "xbRegionPreferred": MessageLookupByLibrary.simpleMessage("Preferred"),
+    "xbRegionRU": MessageLookupByLibrary.simpleMessage("Russia"),
+    "xbRegionSG": MessageLookupByLibrary.simpleMessage("Singapore"),
+    "xbRegionTH": MessageLookupByLibrary.simpleMessage("Thailand"),
+    "xbRegionTR": MessageLookupByLibrary.simpleMessage("Turkey"),
+    "xbRegionTW": MessageLookupByLibrary.simpleMessage("Taiwan"),
+    "xbRegionUA": MessageLookupByLibrary.simpleMessage("Ukraine"),
+    "xbRegionUK": MessageLookupByLibrary.simpleMessage("United Kingdom"),
+    "xbRegionUS": MessageLookupByLibrary.simpleMessage("United States"),
+    "xbRegionVN": MessageLookupByLibrary.simpleMessage("Vietnam"),
+    "xbRegionZA": MessageLookupByLibrary.simpleMessage("South Africa"),
     "xbRegister": MessageLookupByLibrary.simpleMessage("Sign up"),
     "xbRenew": MessageLookupByLibrary.simpleMessage("Renew"),
     "xbResetPassword": MessageLookupByLibrary.simpleMessage("Reset password"),
@@ -1322,6 +1394,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbResetSubscriptionConfirm": MessageLookupByLibrary.simpleMessage(
       "The old subscription URL will be invalidated immediately. Continue?",
     ),
+    "xbRestricted": MessageLookupByLibrary.simpleMessage("Restricted"),
+    "xbRestrictedPlans": MessageLookupByLibrary.simpleMessage(
+      "Available plans",
+    ),
+    "xbRestrictedTip": MessageLookupByLibrary.simpleMessage(
+      "This region requires a higher plan — see the Store",
+    ),
+    "xbScan": MessageLookupByLibrary.simpleMessage("Scan"),
     "xbScanToPay": MessageLookupByLibrary.simpleMessage("Scan to pay"),
     "xbSelectPayment": MessageLookupByLibrary.simpleMessage(
       "Select payment method",
@@ -1337,7 +1417,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbSubscriptionExpired": MessageLookupByLibrary.simpleMessage(
       "Your plan may have expired. Please renew and try again.",
     ),
+    "xbSubscriptionInactive": MessageLookupByLibrary.simpleMessage(
+      "Subscription not active yet — get a plan to enable it",
+    ),
     "xbTrafficUsed": MessageLookupByLibrary.simpleMessage("Traffic used"),
+    "xbUnloggedIn": MessageLookupByLibrary.simpleMessage("Not signed in"),
     "years": m14,
   };
 }

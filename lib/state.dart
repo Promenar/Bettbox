@@ -535,14 +535,8 @@ class GlobalState {
       preferences.saveConfig(config);
     }
 
-    if (config.appSetting.locale == null) {
-      final systemLocale = utils.getSystemLocale();
-      config = config.copyWith(
-        appSetting: config.appSetting.copyWith(locale: systemLocale.toString()),
-      );
-      preferences.saveConfig(config);
-      this.config = config;
-    }
+    // 商业版：语言默认跟随系统（locale 保持 null），仅用户在语言设置中
+    // 显式选择后才持久化；旧版本已钉死的值保持不变。
   }
 
   CoreState getCoreState() {

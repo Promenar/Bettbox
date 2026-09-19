@@ -2402,6 +2402,9 @@ class AppController {
       return appLocalizations.profileImportFailed(statusCode);
     }
 
-    return error.formatError;
+    // error 为 dynamic 时扩展方法无法动态分发，先收窄为 Object
+    //（实机抓到 fresh-install 缺 GeoIP 库时此处抛 NoSuchMethodError）。
+    if (error is Object) return error.formatError;
+    return errorStr;
   }
 }

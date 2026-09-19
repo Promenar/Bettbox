@@ -5664,20 +5664,20 @@ class AppLocalizations {
     );
   }
 
-  /// `No active plan`
+  /// `No active subscription yet`
   String get xbNoPlanTitle {
     return Intl.message(
-      'No active plan',
+      'No active subscription yet',
       name: 'xbNoPlanTitle',
       desc: '',
       args: [],
     );
   }
 
-  /// `Your subscription syncs automatically after you get a plan`
+  /// `Get a plan and your nodes and traffic sync automatically — one tap to connect`
   String get xbNoPlanTip {
     return Intl.message(
-      'Your subscription syncs automatically after you get a plan',
+      'Get a plan and your nodes and traffic sync automatically — one tap to connect',
       name: 'xbNoPlanTip',
       desc: '',
       args: [],
@@ -5987,6 +5987,476 @@ class AppLocalizations {
       desc: '',
       args: [],
     );
+  }
+
+  /// `My orders`
+  String get xbMyOrders {
+    return Intl.message('My orders', name: 'xbMyOrders', desc: '', args: []);
+  }
+
+  /// `Pending payment`
+  String get xbOrderPending {
+    return Intl.message(
+      'Pending payment',
+      name: 'xbOrderPending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Activating`
+  String get xbOrderProcessing {
+    return Intl.message(
+      'Activating',
+      name: 'xbOrderProcessing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancelled`
+  String get xbOrderCancelled {
+    return Intl.message(
+      'Cancelled',
+      name: 'xbOrderCancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Completed`
+  String get xbOrderDone {
+    return Intl.message('Completed', name: 'xbOrderDone', desc: '', args: []);
+  }
+
+  /// `Credited`
+  String get xbOrderCredited {
+    return Intl.message(
+      'Credited',
+      name: 'xbOrderCredited',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unknown`
+  String get xbOrderUnknown {
+    return Intl.message('Unknown', name: 'xbOrderUnknown', desc: '', args: []);
+  }
+
+  /// `No orders yet`
+  String get xbNoOrders {
+    return Intl.message(
+      'No orders yet',
+      name: 'xbNoOrders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue payment`
+  String get xbContinuePay {
+    return Intl.message(
+      'Continue payment',
+      name: 'xbContinuePay',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel order`
+  String get xbCancelOrderTitle {
+    return Intl.message(
+      'Cancel order',
+      name: 'xbCancelOrderTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to cancel?`
+  String get xbConfirmCancel {
+    return Intl.message(
+      'Are you sure you want to cancel?',
+      name: 'xbConfirmCancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Monthly`
+  String get xbPeriodMonthly {
+    return Intl.message('Monthly', name: 'xbPeriodMonthly', desc: '', args: []);
+  }
+
+  /// `Quarterly`
+  String get xbPeriodQuarterly {
+    return Intl.message(
+      'Quarterly',
+      name: 'xbPeriodQuarterly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Semi-annual`
+  String get xbPeriodHalfYearly {
+    return Intl.message(
+      'Semi-annual',
+      name: 'xbPeriodHalfYearly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yearly`
+  String get xbPeriodYearly {
+    return Intl.message('Yearly', name: 'xbPeriodYearly', desc: '', args: []);
+  }
+
+  /// `2-year`
+  String get xbPeriodTwoYearly {
+    return Intl.message(
+      '2-year',
+      name: 'xbPeriodTwoYearly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `3-year`
+  String get xbPeriodThreeYearly {
+    return Intl.message(
+      '3-year',
+      name: 'xbPeriodThreeYearly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `One-time`
+  String get xbPeriodOnetime {
+    return Intl.message(
+      'One-time',
+      name: 'xbPeriodOnetime',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset traffic`
+  String get xbPeriodReset {
+    return Intl.message(
+      'Reset traffic',
+      name: 'xbPeriodReset',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not signed in`
+  String get xbUnloggedIn {
+    return Intl.message(
+      'Not signed in',
+      name: 'xbUnloggedIn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sign in to sync subscription info`
+  String get xbLoginSyncTip {
+    return Intl.message(
+      'Sign in to sync subscription info',
+      name: 'xbLoginSyncTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Data updated`
+  String get xbDataUpdated {
+    return Intl.message(
+      'Data updated',
+      name: 'xbDataUpdated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan`
+  String get xbScan {
+    return Intl.message('Scan', name: 'xbScan', desc: '', args: []);
+  }
+
+  /// `Announcement`
+  String get xbAnnouncement {
+    return Intl.message(
+      'Announcement',
+      name: 'xbAnnouncement',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auto`
+  String get xbAutoShort {
+    return Intl.message('Auto', name: 'xbAutoShort', desc: '', args: []);
+  }
+
+  /// `Restricted`
+  String get xbRestricted {
+    return Intl.message('Restricted', name: 'xbRestricted', desc: '', args: []);
+  }
+
+  /// `This region requires a higher plan — see the Store`
+  String get xbRestrictedTip {
+    return Intl.message(
+      'This region requires a higher plan — see the Store',
+      name: 'xbRestrictedTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Available plans`
+  String get xbRestrictedPlans {
+    return Intl.message(
+      'Available plans',
+      name: 'xbRestrictedPlans',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Load balancing`
+  String get xbLoadBalance {
+    return Intl.message(
+      'Load balancing',
+      name: 'xbLoadBalance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sticky-session balancing across nodes in the same region`
+  String get xbLoadBalanceDesc {
+    return Intl.message(
+      'Sticky-session balancing across nodes in the same region',
+      name: 'xbLoadBalanceDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Load balancing on`
+  String get xbLoadBalanceOn {
+    return Intl.message(
+      'Load balancing on',
+      name: 'xbLoadBalanceOn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Load balancing off`
+  String get xbLoadBalanceOff {
+    return Intl.message(
+      'Load balancing off',
+      name: 'xbLoadBalanceOff',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Subscription not active yet — get a plan to enable it`
+  String get xbSubscriptionInactive {
+    return Intl.message(
+      'Subscription not active yet — get a plan to enable it',
+      name: 'xbSubscriptionInactive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Network error, please try again later`
+  String get xbNetworkError {
+    return Intl.message(
+      'Network error, please try again later',
+      name: 'xbNetworkError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Follow system`
+  String get xbFollowSystem {
+    return Intl.message(
+      'Follow system',
+      name: 'xbFollowSystem',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Preferred`
+  String get xbRegionPreferred {
+    return Intl.message(
+      'Preferred',
+      name: 'xbRegionPreferred',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hong Kong`
+  String get xbRegionHK {
+    return Intl.message('Hong Kong', name: 'xbRegionHK', desc: '', args: []);
+  }
+
+  /// `Taiwan`
+  String get xbRegionTW {
+    return Intl.message('Taiwan', name: 'xbRegionTW', desc: '', args: []);
+  }
+
+  /// `Singapore`
+  String get xbRegionSG {
+    return Intl.message('Singapore', name: 'xbRegionSG', desc: '', args: []);
+  }
+
+  /// `Japan`
+  String get xbRegionJP {
+    return Intl.message('Japan', name: 'xbRegionJP', desc: '', args: []);
+  }
+
+  /// `South Korea`
+  String get xbRegionKR {
+    return Intl.message('South Korea', name: 'xbRegionKR', desc: '', args: []);
+  }
+
+  /// `United States`
+  String get xbRegionUS {
+    return Intl.message(
+      'United States',
+      name: 'xbRegionUS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Malaysia`
+  String get xbRegionMY {
+    return Intl.message('Malaysia', name: 'xbRegionMY', desc: '', args: []);
+  }
+
+  /// `Thailand`
+  String get xbRegionTH {
+    return Intl.message('Thailand', name: 'xbRegionTH', desc: '', args: []);
+  }
+
+  /// `Vietnam`
+  String get xbRegionVN {
+    return Intl.message('Vietnam', name: 'xbRegionVN', desc: '', args: []);
+  }
+
+  /// `Philippines`
+  String get xbRegionPH {
+    return Intl.message('Philippines', name: 'xbRegionPH', desc: '', args: []);
+  }
+
+  /// `Indonesia`
+  String get xbRegionID {
+    return Intl.message('Indonesia', name: 'xbRegionID', desc: '', args: []);
+  }
+
+  /// `United Kingdom`
+  String get xbRegionUK {
+    return Intl.message(
+      'United Kingdom',
+      name: 'xbRegionUK',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Germany`
+  String get xbRegionDE {
+    return Intl.message('Germany', name: 'xbRegionDE', desc: '', args: []);
+  }
+
+  /// `Australia`
+  String get xbRegionAU {
+    return Intl.message('Australia', name: 'xbRegionAU', desc: '', args: []);
+  }
+
+  /// `Turkey`
+  String get xbRegionTR {
+    return Intl.message('Turkey', name: 'xbRegionTR', desc: '', args: []);
+  }
+
+  /// `Brazil`
+  String get xbRegionBR {
+    return Intl.message('Brazil', name: 'xbRegionBR', desc: '', args: []);
+  }
+
+  /// `Argentina`
+  String get xbRegionAR {
+    return Intl.message('Argentina', name: 'xbRegionAR', desc: '', args: []);
+  }
+
+  /// `India`
+  String get xbRegionIN {
+    return Intl.message('India', name: 'xbRegionIN', desc: '', args: []);
+  }
+
+  /// `Russia`
+  String get xbRegionRU {
+    return Intl.message('Russia', name: 'xbRegionRU', desc: '', args: []);
+  }
+
+  /// `Ukraine`
+  String get xbRegionUA {
+    return Intl.message('Ukraine', name: 'xbRegionUA', desc: '', args: []);
+  }
+
+  /// `Switzerland`
+  String get xbRegionCH {
+    return Intl.message('Switzerland', name: 'xbRegionCH', desc: '', args: []);
+  }
+
+  /// `UAE`
+  String get xbRegionAE {
+    return Intl.message('UAE', name: 'xbRegionAE', desc: '', args: []);
+  }
+
+  /// `Nigeria`
+  String get xbRegionNG {
+    return Intl.message('Nigeria', name: 'xbRegionNG', desc: '', args: []);
+  }
+
+  /// `South Africa`
+  String get xbRegionZA {
+    return Intl.message('South Africa', name: 'xbRegionZA', desc: '', args: []);
+  }
+
+  /// `Canada`
+  String get xbRegionCA {
+    return Intl.message('Canada', name: 'xbRegionCA', desc: '', args: []);
+  }
+
+  /// `Netherlands`
+  String get xbRegionNL {
+    return Intl.message('Netherlands', name: 'xbRegionNL', desc: '', args: []);
+  }
+
+  /// `France`
+  String get xbRegionFR {
+    return Intl.message('France', name: 'xbRegionFR', desc: '', args: []);
+  }
+
+  /// `Iraq`
+  String get xbRegionIQ {
+    return Intl.message('Iraq', name: 'xbRegionIQ', desc: '', args: []);
   }
 }
 

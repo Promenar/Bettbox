@@ -194,19 +194,32 @@ extension ProfileExtension on Profile {
       final message =
           await clashCore.validateConfig(content, ageSecretKey: ageSecretKey);
       if (message.isNotEmpty) {
-        final patched = utils.patchValidateConfig(content);
-        if (patched != content) {
-          final patchedMessage =
-              await clashCore.validateConfig(patched, ageSecretKey: ageSecretKey);
-          if (patchedMessage.isEmpty) {
-            content = patched;
+        // 受管订阅（managed）允许重复名，运行时经 applyManagedPackaging 重命名
+        if (managed && message.contains('duplicate name')) {
+          commonPrint.log('Ignoring duplicate name for managed profile: $message');
+        } else {
+          final patched = utils.patchValidateConfig(content);
+          if (patched != content) {
+            final patchedMessage =
+                await clashCore.validateConfig(patched, ageSecretKey: ageSecretKey);
+            if (patchedMessage.isEmpty) {
+              content = patched;
+            } else {
+              throw message;
+            }
           } else {
             throw message;
           }
-        } else {
-          throw message;
         }
       }
+    } else {
+      // 即使 validate=false，对受管订阅的重复名也仅记录不阻断，避免上游寄生节点命名冲突导致刷新失败
+      try {
+        final msg = await clashCore.validateConfig(content, ageSecretKey: ageSecretKey);
+        if (msg.isNotEmpty && msg.contains('duplicate name')) {
+          commonPrint.log('Managed profile duplicate (validate:false, ignored): $msg');
+        }
+      } catch (_) {}
     }
     final file = await getFile();
     await file.writeAsString(content);

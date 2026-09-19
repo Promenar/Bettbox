@@ -7,5 +7,14 @@
   "dns_txt_hint": "",
   "min_app_version": 1000000,
   "announcement_url": "",
-  "region_catalog": []
+  "region_catalog": [
+    {"code": "HK", "name": "香港", "plan_ids": [1, 2]},
+    {"code": "TW", "name": "台湾", "plan_ids": [1, 2]},
+    {"code": "JP", "name": "日本", "plan_ids": [2]},
+    {"code": "SG", "name": "新加坡", "plan_ids": [2]},
+    {"code": "US", "name": "美国", "plan_ids": [1, 2, 3]},
+    {"code": "KR", "name": "韩国", "plan_ids": [2]},
+    {"code": "DE", "name": "德国", "plan_ids": [3]},
+    {"code": "UK", "name": "英国", "plan_ids": [3]}
+  ]
 }

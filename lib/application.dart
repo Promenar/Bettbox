@@ -12,6 +12,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/xboard/binding.dart';
+import 'package:bett_box/xboard/node_packager.dart';
 import 'package:bett_box/xboard/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -32,6 +33,8 @@ class ApplicationState extends ConsumerState<Application>
     with WidgetsBindingObserver {
   Timer? _autoUpdateGroupTaskTimer;
   Timer? _autoUpdateProfilesTaskTimer;
+  Timer? _managedSubscriptionTimer;
+  DateTime? _lastDomainForegroundRefresh;
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -56,6 +59,13 @@ class ApplicationState extends ConsumerState<Application>
     globalState.backgroundMode.addListener(_syncAutoUpdateTasks);
     _syncAutoUpdateTasks();
     globalState.appController = AppController(context, ref);
+    // F-NODE-4：恢复分流均衡开关
+    ref.read(xboardSecureStoreProvider).readLoadBalance().then((v) {
+      if (v != null) {
+        ref.read(xboardLoadBalanceProvider.notifier).state = v;
+        setXboardLoadBalanceEnabled(v);
+      }
+    });
     // 启动即恢复 Xboard 会话（安全存储凭据 → checkLogin），供商店/我的等页使用。
     ref.read(xboardSessionProvider.notifier).restore();
     // F-DOMAIN：加载域名池 → 引导源刷新 + 健康探测（异步，不阻塞 UI）。
@@ -101,6 +111,17 @@ class ApplicationState extends ConsumerState<Application>
   }
 
   @override
+  void didChangeLocales(List<Locale>? locales) {
+    // 未显式选语言时跟随系统：重解系统语言并重建，MaterialApp 即切换
+    if (ref.read(appSettingProvider).locale == null) {
+      final locale = utils.getSystemLocale();
+      AppLocalizations.load(locale).then((_) {
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _syncAutoUpdateTasks();
     if (state == AppLifecycleState.resumed) {
@@ -108,6 +129,17 @@ class ApplicationState extends ConsumerState<Application>
           globalState.config.appSetting.enableHighRefreshRate) {
         _restoreHighRefreshRate();
       }
+      // F-DOMAIN-2 触发时机④：后台回前台且距上次>30min 时刷新引导源
+      final now = DateTime.now();
+      final last = _lastDomainForegroundRefresh;
+      if (last == null || now.difference(last) > const Duration(minutes: 30)) {
+        _lastDomainForegroundRefresh = now;
+        try {
+          ref.read(xboardDomainSchedulerProvider).refresh();
+        } catch (_) {}
+      }
+    } else if (state == AppLifecycleState.paused) {
+      _lastDomainForegroundRefresh ??= DateTime.now();
     }
   }
 
@@ -120,6 +152,8 @@ class ApplicationState extends ConsumerState<Application>
         _autoUpdateProfilesTaskTimer?.cancel();
         _autoUpdateProfilesTaskTimer = null;
       }
+      _managedSubscriptionTimer?.cancel();
+      _managedSubscriptionTimer = null;
       return;
     }
     if (_autoUpdateGroupTaskTimer == null) {
@@ -127,6 +161,9 @@ class ApplicationState extends ConsumerState<Application>
     }
     if (_autoUpdateProfilesTaskTimer == null) {
       _autoUpdateProfilesTask();
+    }
+    if (_managedSubscriptionTimer == null) {
+      _managedSubscriptionTask();
     }
   }
 
@@ -149,6 +186,21 @@ class ApplicationState extends ConsumerState<Application>
     _autoUpdateProfilesTaskTimer = Timer.periodic(
       const Duration(hours: 24),
       (_) => unawaited(globalState.appController.autoUpdateProfiles()),
+    );
+  }
+
+  /// SaaS 受管订阅自更新（F-SUB-5）：前台每 6h 拉齐面板数据与订阅内容。
+  /// 未登录态由 refreshSubscriptionCycle 内部直接返回（登出冻结）。
+  void _managedSubscriptionTask() {
+    _managedSubscriptionTimer = Timer.periodic(
+      const Duration(hours: 6),
+      (_) async {
+        try {
+          await ref
+              .read(xboardSessionProvider.notifier)
+              .refreshSubscriptionCycle(force: true);
+        } catch (_) {}
+      },
     );
   }
 
@@ -286,6 +338,7 @@ class ApplicationState extends ConsumerState<Application>
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();
     _autoUpdateProfilesTaskTimer?.cancel();
+    _managedSubscriptionTimer?.cancel();
     ExternalControl.stop();
     if (!system.isAndroid && !globalState.isExiting) {
       unawaited(globalState.appController.handleExit());
