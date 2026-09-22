@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "project": {
+    "id": "bettbox",
+    "remote": "https://github.com/Promenar/Bettbox.git"
+  },
+  "status": "approved",
+  "approval": {
+    "reference": ".pdec/README.md#授权与适用范围；2026-09-22 Bettbox 当前任务用户明确允许开发配置按需调整并要求继续跨平台适配，仅登记同范围桌面开发验证",
+    "contract_digest": "1d19a2f2f6ad16005662d1f77d4e71f3df18dd5fb3a29b47a3bc78461f55ba81"
+  },
+  "targets": {
+    "local-mac": {
+      "os": "macos",
+      "arch": "arm64"
+    },
+    "github-windows": {
+      "os": "windows",
+      "arch": "x86_64"
+    }
+  },
+  "operations": {
+    "validate-macos": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/validate_desktop.py",
+        "--target",
+        "macos-arm64",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 2700,
+      "artifacts": [
+        "build/macos/Build/Products/Release/Bettbox.app"
+      ]
+    },
+    "validate-windows": {
+      "executor": "github-windows",
+      "target_os": "windows",
+      "target_arch": "x86_64",
+      "argv": [
+        "python",
+        "scripts/validate_desktop.py",
+        "--target",
+        "windows-x64",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 2700,
+      "artifacts": [
+        "build/windows/x64/runner/Release"
+      ]
+    }
+  },
+  "deployment": {
+    "enabled": false,
+    "transport": "",
+    "target": "",
+    "approval_required": true,
+    "healthcheck": "",
+    "rollback": ""
+  },
+  "evidence": {
+    "scripts/validate_desktop.py": "2f66679f4251f21aa158008068fbddf0e8cb6de30a88a67f76abaccf281540aa",
+    ".github/workflows/validate-desktop.yaml": "3dfa282bc05094cf6d2ccc45ccf07494fd9d586b94c96210282b8a4d55ba116e",
+    "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
+    "macos/Podfile.lock": "b6dfed0b40e048526d756a13ffd4c4a1d67f1761e7f6c6e6b1f867e73be816cc",
+    "core/go.mod": "a668af77c5528bce28bf4530a1f443992db432e0a5bbda6de74af77654ccce43",
+    "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
+    "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd",
+    "macos/Podfile": "afad6ff9548660062696f56f9e4981fa728481517442a27d3c560a66967dec60",
+    "macos/Runner.xcodeproj/project.pbxproj": "cdada87394da01efe013879f2c9a982aa3a6ade3dd272b6bab06b799cd327e50",
+    "macos/Runner/Release.entitlements": "0672f83103b450e4e0b5b86e42238d9b9ba39af727de43d185f22ec56143cda5",
+    "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0"
+  }
+}

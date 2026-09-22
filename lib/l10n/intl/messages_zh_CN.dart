@@ -974,6 +974,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbNoPlanTip": MessageLookupByLibrary.simpleMessage("开通套餐后节点与流量自动同步，一键连接"),
     "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage("还没有可用订阅"),
     "xbOpenCashier": MessageLookupByLibrary.simpleMessage("打开支付页面"),
+    "xbOpenCashierFailed": MessageLookupByLibrary.simpleMessage(
+      "无法打开支付页面，请重试或选择其他支付方式。",
+    ),
     "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("已取消"),
     "xbOrderCredited": MessageLookupByLibrary.simpleMessage("已折抵"),
     "xbOrderDone": MessageLookupByLibrary.simpleMessage("已完成"),

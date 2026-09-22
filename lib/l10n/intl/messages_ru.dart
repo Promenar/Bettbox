@@ -1344,6 +1344,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage(
       "Нет активной подписки",
     ),
+    "xbOpenCashierFailed": MessageLookupByLibrary.simpleMessage(
+      "Не удалось открыть страницу оплаты. Повторите попытку или выберите другой способ оплаты.",
+    ),
     "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("Отменён"),
     "xbOrderCredited": MessageLookupByLibrary.simpleMessage("Зачтён"),
     "xbOrderDone": MessageLookupByLibrary.simpleMessage("Завершён"),

@@ -88,3 +88,5 @@ app.*.map.json
 # 项目注册表要求随源码同步的核心文档
 !/docs/ARCHITECTURE.md
 !/docs/CHANGELOG.md
+!/docs/PLATFORM_VALIDATION.md
+!/.pdec/README.md

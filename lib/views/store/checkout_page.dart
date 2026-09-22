@@ -7,8 +7,8 @@ import 'package:bett_box/xboard/xboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+
+import 'redirect_cashier.dart';
 
 /// 收银页（F-PAY-2/3）：二维码渲染 / 收银台跳转 / 订单轮询（3s→5s→10s 退避）。
 ///
@@ -137,8 +137,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         child: switch (_phase) {
           _CheckoutPhase.paid => _buildPaid(),
           _CheckoutPhase.failed => Center(
-              child: Text(appLocalizations.xbPayFailed),
-            ),
+            child: Text(appLocalizations.xbPayFailed),
+          ),
           _CheckoutPhase.pending => _buildPending(),
         },
       ),
@@ -165,9 +165,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             onPressed: _refreshingAccount
                 ? null
                 : () => Navigator.of(context).popUntil((r) => r.isFirst),
-            child: Text(_refreshingAccount
-                ? '...'
-                : appLocalizations.xbBackToAccount),
+            child: Text(
+              _refreshingAccount ? '...' : appLocalizations.xbBackToAccount,
+            ),
           ),
         ],
       ),
@@ -216,18 +216,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           )
         else if (checkout.type == XboardCheckoutType.redirect &&
             (checkout.data?.isNotEmpty ?? false))
-          Column(
-            children: [
-              FilledButton.tonal(
-                onPressed: () =>
-                    launchUrl(Uri.parse(checkout.data!),
-                        mode: LaunchMode.externalApplication),
-                child: Text(appLocalizations.xbOpenCashier),
-              ),
-              const SizedBox(height: 12),
-              _buildEmbeddedCashier(checkout.data!),
-            ],
-          )
+          RedirectCashier(url: checkout.data!)
         else
           Padding(
             padding: const EdgeInsets.all(16),
@@ -238,20 +227,6 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             ),
           ),
       ],
-    );
-  }
-
-  /// Android 内嵌收银台（F-PAY-2 假设 A1）；无法加载时用户可走上方外链按钮。
-  Widget _buildEmbeddedCashier(String url) {
-    final controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse(url));
-    return SizedBox(
-      height: 420,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: WebViewWidget(controller: controller),
-      ),
     );
   }
 }

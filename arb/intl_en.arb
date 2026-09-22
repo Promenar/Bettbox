@@ -816,5 +816,6 @@
   "xbInviteCopyError": "Could not copy. Please try again.",
   "xbInviteWebsiteUnavailable": "The invitation website is unavailable. You can copy the code. Refresh later or contact support.",
   "xbInviteLoadError": "Invitation information could not be loaded. Please try again later.",
-  "xbInviteRefresh": "Refresh"
+  "xbInviteRefresh": "Refresh",
+  "xbOpenCashierFailed": "Could not open the payment page. Try again or choose another payment method."
 }

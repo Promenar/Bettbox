@@ -817,5 +817,6 @@
   "xbInviteCopyError": "複製失敗，請重試。",
   "xbInviteWebsiteUnavailable": "邀請網頁暫不可用，可先複製邀請碼。請稍後重新整理或聯絡客服。",
   "xbInviteLoadError": "邀請資訊暫時無法載入，請稍後重試。",
-  "xbInviteRefresh": "重新整理"
+  "xbInviteRefresh": "重新整理",
+  "xbOpenCashierFailed": "無法開啟付款頁面，請重試或選擇其他付款方式。"
 }

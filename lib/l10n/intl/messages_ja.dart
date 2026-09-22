@@ -1042,6 +1042,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "プランを購入するとノードとトラフィックが自動で同期され、ワンタップで接続できます",
     ),
     "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage("有効なサブスクリプションがありません"),
+    "xbOpenCashierFailed": MessageLookupByLibrary.simpleMessage(
+      "支払いページを開けません。再試行するか、別の支払い方法を選択してください。",
+    ),
     "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("キャンセル済み"),
     "xbOrderCredited": MessageLookupByLibrary.simpleMessage("相殺済み"),
     "xbOrderDone": MessageLookupByLibrary.simpleMessage("完了"),

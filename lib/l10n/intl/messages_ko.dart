@@ -1056,6 +1056,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "요금제를 구매하면 노드와 트래픽이 자동 동기화되어 원터치로 연결됩니다",
     ),
     "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage("사용 가능한 구독이 없습니다"),
+    "xbOpenCashierFailed": MessageLookupByLibrary.simpleMessage(
+      "결제 페이지를 열 수 없습니다. 다시 시도하거나 다른 결제 방법을 선택하세요.",
+    ),
     "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("취소됨"),
     "xbOrderCredited": MessageLookupByLibrary.simpleMessage("상계됨"),
     "xbOrderDone": MessageLookupByLibrary.simpleMessage("완료"),

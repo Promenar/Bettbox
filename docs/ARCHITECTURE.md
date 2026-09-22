@@ -75,3 +75,5 @@ flowchart TD
 分享站点取自 `guest/comm/config.app_url`，币种取自 `user/comm/config.currency`。分享站点与 API 域名池分离，公开 URL 不承载登录凭据或订阅 token。邀请码创建虽然是 GET，客户端仍按有副作用操作处理，仅接受主动点击，不自动重试。邀请码/收益不跨账户缓存。
 
 macOS 与 Windows 已有原生工程、内核管理与打包流程；商业版的实际平台可用性需独立构建和设备验证。iOS 尚无主工程，当前非 Android 内核分支走桌面服务，不能直接用于 iOS；需要 Runner、Packet Tunnel Extension、共享容器与内核通信，IAP 按 PRD 已决方案接服务端交易验证及返佣账务。详细工作包及验收见 `.agents/plans/2026-09-22-invite-and-platforms.md`。
+
+页面和业务保持共享主线，原生平台能力分别验收。`RedirectCashier` 为 Android 保留 WebView，桌面使用系统浏览器；初始支付地址只接受 HTTPS。macOS Keychain entitlement 已按安全存储插件要求配置；当前 Flutter SDK 将 macOS 最低系统要求设为 12.0。桌面候选编译入口为 `scripts/validate_desktop.py`，执行位置及产物由 `.pdec/contract.yaml` 登记。邀请内存集成验证和各平台完成边界见 `docs/PLATFORM_VALIDATION.md`。

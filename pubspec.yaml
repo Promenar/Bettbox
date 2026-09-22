@@ -81,6 +81,7 @@ dependency_overrides:
       path: packages/hotkey_manager_linux
       ref: fix-build-failure
 dev_dependencies:
+  webview_flutter_platform_interface: 2.15.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

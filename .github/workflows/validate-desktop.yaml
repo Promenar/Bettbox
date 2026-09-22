@@ -1,0 +1,103 @@
+name: Validate desktop
+
+on:
+  push:
+    branches:
+      - feature/m1-account-subscription
+    paths:
+      - .github/workflows/validate-desktop.yaml
+      - arb/**
+      - assets/**
+      - core/**
+      - lib/**
+      - pubspec.lock
+      - pubspec.yaml
+      - scripts/validate_desktop.py
+      - scripts/tests/test_validate_desktop.py
+      - services/helper/**
+      - test/**
+      - windows/**
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 仅前置检查，或执行未签名且不打包的 Windows 原生编译
+        required: true
+        default: preflight
+        type: choice
+        options:
+          - preflight
+          - build
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-x64:
+    name: Windows x64 ${{ github.event_name == 'push' && 'build' || inputs.mode }}
+    runs-on: windows-2022
+    timeout-minutes: 45
+
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: ${{ github.workspace }}\s
+
+    steps:
+      - name: Checkout to short path
+        uses: actions/checkout@v6
+        with:
+          path: s
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.44.9'
+          cache: true
+          cache-key: flutter-windows-x64-${{ hashFiles('s/pubspec.lock') }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.x'
+          cache-dependency-path: s/core/go.sum
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@1.98.0
+
+      - name: Map short build path
+        run: subst S: '${{ github.workspace }}\s'
+
+      - name: Test validation entry
+        run: python -m unittest scripts.tests.test_validate_desktop -v
+        working-directory: 'S:\'
+
+      - name: Run bounded desktop validation
+        run: |
+          $arguments = @('--target', 'windows-x64')
+          if ('${{ github.event_name }}' -eq 'push' -or '${{ inputs.mode }}' -eq 'build') {
+            $arguments += '--execute'
+          }
+          python scripts/validate_desktop.py @arguments
+        working-directory: 'S:\'
+
+      - name: Upload development bundle
+        if: github.event_name == 'push' || inputs.mode == 'build'
+        uses: actions/upload-artifact@v7
+        with:
+          name: bettbox-windows-x64-${{ github.sha }}
+          path: |
+            s/build/windows/x64/runner/Release/
+            s/build/desktop-validation/windows-x64.json
+          if-no-files-found: error
+          retention-days: 7

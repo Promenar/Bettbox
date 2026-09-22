@@ -1375,6 +1375,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "No active subscription yet",
     ),
     "xbOpenCashier": MessageLookupByLibrary.simpleMessage("Open payment page"),
+    "xbOpenCashierFailed": MessageLookupByLibrary.simpleMessage(
+      "Could not open the payment page. Try again or choose another payment method.",
+    ),
     "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("Cancelled"),
     "xbOrderCredited": MessageLookupByLibrary.simpleMessage("Credited"),
     "xbOrderDone": MessageLookupByLibrary.simpleMessage("Completed"),

@@ -761,5 +761,6 @@
   "xbInviteCopyError": "복사하지 못했습니다. 다시 시도하세요.",
   "xbInviteWebsiteUnavailable": "초대 웹사이트를 사용할 수 없습니다. 코드는 복사할 수 있습니다. 나중에 새로고침하거나 고객지원에 문의하세요.",
   "xbInviteLoadError": "초대 정보를 불러올 수 없습니다. 나중에 다시 시도하세요.",
-  "xbInviteRefresh": "새로고침"
+  "xbInviteRefresh": "새로고침",
+  "xbOpenCashierFailed": "결제 페이지를 열 수 없습니다. 다시 시도하거나 다른 결제 방법을 선택하세요."
 }

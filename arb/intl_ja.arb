@@ -761,5 +761,6 @@
   "xbInviteCopyError": "コピーできませんでした。もう一度お試しください。",
   "xbInviteWebsiteUnavailable": "招待用ウェブサイトを利用できません。コードはコピーできます。後で更新するか、サポートにお問い合わせください。",
   "xbInviteLoadError": "招待情報を読み込めません。後でもう一度お試しください。",
-  "xbInviteRefresh": "更新"
+  "xbInviteRefresh": "更新",
+  "xbOpenCashierFailed": "支払いページを開けません。再試行するか、別の支払い方法を選択してください。"
 }

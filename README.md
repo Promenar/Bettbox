@@ -65,7 +65,7 @@ Bettbox意为: Better Experience, Out of the box，更好的体验，亦开箱�
 * **全平台桌面端**: 
 **Windows 8.1+:** (x64/arm64)
 **Linux Kernel 5.4+:** (x64/arm64)
-**macOS 10.15+:** (Intel/Apple Silicon)
+**macOS 12+:** (Intel/Apple Silicon)
 * **Android 8.0+:** Android (ARMv8/ ARMv7/ x86_64/ Universal) 
 * **Android TV:** 已适配，可选 ARMv7 32位
 * **鸿蒙 NEXT:** 可配合 [[卓易通]](https://harmonyos.cool/android-app) 使用
@@ -110,6 +110,8 @@ Bettbox意为: Better Experience, Out of the box，更好的体验，亦开箱�
 ---
 
 ##  开发构建及UI适配
+
+商业版桌面开发候选使用[平台验收入口](docs/PLATFORM_VALIDATION.md)与[开发执行契约](.pdec/README.md)。邀请返利、账户和商店共用 Flutter 业务代码，平台原生能力分别验收；iOS 尚处于独立隧道工程准备阶段。
 
 以 Windows 平台构建为例：
 

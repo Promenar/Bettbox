@@ -6638,6 +6638,16 @@ class AppLocalizations {
   String get xbInviteRefresh {
     return Intl.message('Refresh', name: 'xbInviteRefresh', desc: '', args: []);
   }
+
+  /// `Could not open the payment page. Try again or choose another payment method.`
+  String get xbOpenCashierFailed {
+    return Intl.message(
+      'Could not open the payment page. Try again or choose another payment method.',
+      name: 'xbOpenCashierFailed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

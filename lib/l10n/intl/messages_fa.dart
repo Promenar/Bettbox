@@ -1341,6 +1341,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbNoPlanTitle": MessageLookupByLibrary.simpleMessage(
       "اشتراک فعالی وجود ندارد",
     ),
+    "xbOpenCashierFailed": MessageLookupByLibrary.simpleMessage(
+      "صفحه پرداخت باز نشد. دوباره تلاش کنید یا روش پرداخت دیگری انتخاب کنید.",
+    ),
     "xbOrderCancelled": MessageLookupByLibrary.simpleMessage("لغو شد"),
     "xbOrderCredited": MessageLookupByLibrary.simpleMessage("تهاتر شد"),
     "xbOrderDone": MessageLookupByLibrary.simpleMessage("تکمیل شد"),
