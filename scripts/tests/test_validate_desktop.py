@@ -19,6 +19,15 @@ SPEC.loader.exec_module(validate_desktop)
 
 
 class ValidateDesktopTest(unittest.TestCase):
+    def test_flutter_first_start_logs_do_not_replace_machine_version(self) -> None:
+        machine = json.dumps({"frameworkVersion": "3.44.9", "dartSdkVersion": "3.12.2"})
+        self.assertEqual(validate_desktop.parse_flutter_version(machine), "3.44.9")
+        first_start = "Building flutter tool...\nRunning pub upgrade...\nResolving dependencies...\n" + machine
+        self.assertEqual(validate_desktop.parse_flutter_version(first_start), "3.44.9")
+        for invalid in ["Flutter 3.44.9", '{}', '{"frameworkVersion":null}', machine + machine]:
+            with self.subTest(invalid=invalid), self.assertRaises(RuntimeError):
+                validate_desktop.parse_flutter_version(invalid)
+
     def test_batch_entry_is_resolved_without_losing_arguments(self) -> None:
         batch = r"C:\Program Files\Flutter\bin\flutter.bat"
         with mock.patch.object(validate_desktop.shutil, "which", return_value=batch):

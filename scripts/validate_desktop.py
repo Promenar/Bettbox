@@ -191,6 +191,32 @@ def executable_argv(argv: Sequence[str]) -> tuple[str, ...]:
     return (shutil.which(argv[0]) or argv[0], *argv[1:])
 
 
+def parse_flutter_version(output: str) -> str:
+    # Windows SDK 首次启动会先运行工具初始化，日志可能位于版本 JSON 前。
+    decoder = json.JSONDecoder()
+    candidates: list[tuple[str, int]] = []
+    for match in re.finditer(r"\{", output):
+        try:
+            value, _ = decoder.raw_decode(output, match.start())
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(value, dict):
+            continue
+        version = value.get("frameworkVersion")
+        if (
+            isinstance(version, str)
+            and re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][\w.+-]+)?", version)
+            and isinstance(value.get("dartSdkVersion"), str)
+        ):
+            candidates.append((version, match.start()))
+    if len(candidates) != 1:
+        raise RuntimeError("无法解析唯一的 Flutter 版本 JSON")
+    version, start = candidates[0]
+    if output[:start].strip():
+        print(f"Flutter 版本 JSON 前含 {len(output[:start].splitlines())} 行初始化输出，已独立解析。")
+    return version
+
+
 def check_tool_versions(root: Path, target: Target) -> dict[str, str]:
     required = ["flutter", "dart", "go"]
     if target.needs_helper:
@@ -202,10 +228,7 @@ def check_tool_versions(root: Path, target: Target) -> dict[str, str]:
         raise RuntimeError(f"缺少构建工具：{', '.join(missing)}")
 
     flutter_raw = _version_output(("flutter", "--version", "--machine"), root)
-    try:
-        flutter_version = str(json.loads(flutter_raw)["frameworkVersion"])
-    except (json.JSONDecodeError, KeyError, TypeError) as error:
-        raise RuntimeError("无法解析 Flutter 版本") from error
+    flutter_version = parse_flutter_version(flutter_raw)
     go_raw = _version_output(("go", "version"), root)
     go_match = re.search(r"\bgo(\d+\.\d+(?:\.\d+)?)\b", go_raw)
     if go_match is None:

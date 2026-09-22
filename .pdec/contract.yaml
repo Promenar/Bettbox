@@ -7,7 +7,7 @@
   "status": "approved",
   "approval": {
     "reference": ".pdec/README.md#授权与适用范围；2026-09-22 Bettbox 当前任务用户明确允许开发配置按需调整并要求继续跨平台适配，仅登记同范围桌面开发验证",
-    "contract_digest": "fe53abed3f80e244de1b291893323c921445bd0267c26d358bfffb4ca479dddd"
+    "contract_digest": "336e07eec59b4850279922121f2b7432e1c9070e2092b2c5a8cc21d922a9b2da"
   },
   "targets": {
     "local-mac": {
@@ -65,7 +65,7 @@
     "rollback": ""
   },
   "evidence": {
-    "scripts/validate_desktop.py": "bcf3be55cb35518e78207190012ac36d5c653b4e9c87dfcd35cbaa30b963a4c0",
+    "scripts/validate_desktop.py": "9e3709f55edae4456a27e5f50eccbeb2e7343afa49a4d8a139613829befeed63",
     ".github/workflows/validate-desktop.yaml": "b302ed75851246e4d0be200403555439f036a3f20ef3cb1017b4229874a5cfee",
     "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
     "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
