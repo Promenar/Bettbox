@@ -135,3 +135,34 @@ curl 经普通域名、noproxy 直连、resolve 指定源站三条路径请求�
 
 ### HLG
 通过 append dry-run 后 apply 追加核验与勘误，保留前序事实链；后台配置更正与业务验收维持 waiting。
+
+## 2026-09-22T14:09:33+08:00 · 测试面板 app_url 配置调整与邀请入口验证
+
+type: maintenance
+scope: ["Bettbox", "xboard", "test-panel"]
+status: done
+tags: ["invite", "configuration", "authorization", "rollback"]
+continuity: waiting
+continuity-key: bettbox-invite-platforms
+record-fingerprint: a24772e96d8db69b0ba22dc0966b4d85fbb51cdb1835c1e22bd0077db294d3ab
+
+### Summary
+用户明确允许将测试面板 app_url 调整为 https://cloud.microsoftnexushub.top:8443，并授权开发阶段可配置项按需调整。该项已生效，App 实际数据访问及链接构造代码与浏览器邀请码预填均验证通过；不将此阶段授权扩大为真实交易、凭据/权限变更或生产发布授权。
+
+### Changed
+经现有 SSH 认证管理 170.106.143.23 的 /opt/xboard-test 服务，容器 xboard-test-xboard-1 对应上游 SHA 4f48e61a2cbc6db5338872b6bdb45ef954ec1256。通过 Xboard 原生 admin_setting 接口，在事务内仅将 app_url 从 https://cloud.bingcn.site 更新为 https://cloud.microsoftnexushub.top:8443；其他设置的前后 SHA256 一致。随后 php artisan octane:reload 重载 Web 工作进程。客户端代码与依赖无变更。
+
+### Validation
+域名入口及 --resolve 指向源站 IP 的 guest/comm/config 均返回 success 与新 app_url；本地同一 Dart SDK 直接运行项目 XboardApiClient 和 buildXboardInviteLink，生成 https://cloud.microsoftnexushub.top:8443/#/register?code=BETTBOX_QA_ONLY，断言通过。Codex 浏览器注册页邀请码字段正确预填该测试标记，未提交注册。Setting 支持类与 helper 在容器和本地源码 SHA256 一致。回滚记录 286 字节，持久备份权限 600；git diff --check 通过。源码未修改，未重复运行此前已通过的 91 项测试。
+
+### Next
+使用受控测试账号核验登录态邀请码/佣金接口，以及网页真实注册归属与返佣状态。macOS/Windows 商业链路与 iOS 最小真机隧道继续按实施计划推进。开发阶段与本任务相关的可配置项可在既有授权内按需调整，保留范围、验证和回滚记录。
+
+### Risks
+只有公开配置、生产链接构造与网页预填完成真实验证；未创建真实邀请码、未注册账户、未产生付款或佣金流水，不能认定返佣到账闭环已验收。回滚数据位于服务器 /opt/xboard-test/config-backups/app-url-20260922T060534Z.json，旧值为 https://cloud.bingcn.site；需要回滚时经相同 admin_setting 接口恢复该单项并重载 Octane。未向模型或日志输出登录密码、私钥、Cookie 或令牌。
+
+### DIA
+已同步 docs/CHANGELOG.md 和 .agents/plans/2026-09-22-invite-and-platforms.md 的测试面板配置、验证及回滚状态；PRD、架构、registry 的行为约定未变化。
+
+### HLG
+经 append dry-run 后 apply 追加配置操作与会话授权事实，并重建索引；bettbox-invite-platforms 后续为测试账号业务验收和平台开发。
