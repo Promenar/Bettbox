@@ -81,11 +81,11 @@ jobs:
 
       - name: Map short build path
         run: |
-          subst S: '${{ github.workspace }}\s'
+          subst S: '${{ github.workspace }}'
 
       - name: Test validation entry
         run: python -m unittest scripts.tests.test_validate_desktop -v
-        working-directory: 'S:\'
+        working-directory: 'S:\s'
 
       - name: Run bounded desktop validation
         run: |
@@ -94,13 +94,21 @@ jobs:
             $arguments += '--execute'
           }
           python scripts/validate_desktop.py @arguments
-        working-directory: 'S:\'
+        working-directory: 'S:\s'
+
+      - name: Inspect generated-source changes
+        if: always()
+        working-directory: 'S:\s'
+        run: |
+          git status --short
+          git ls-files --eol linux/flutter macos/Flutter/GeneratedPluginRegistrant.swift windows/flutter
+          git diff --ignore-space-at-eol -- linux/flutter macos/Flutter/GeneratedPluginRegistrant.swift windows/flutter
 
       - name: Diagnose Flutter assembly failure
         if: failure()
         timeout-minutes: 5
         continue-on-error: true
-        working-directory: 'S:\'
+        working-directory: 'S:\s'
         run: |
           if (Test-Path 'build/windows/x64/flutter/flutter_assemble.vcxproj') {
             cmake --build build/windows/x64 --target flutter_assemble --config Release --verbose
