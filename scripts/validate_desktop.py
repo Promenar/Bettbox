@@ -175,7 +175,7 @@ def evaluate_locks(
 
 def _version_output(argv: Sequence[str], root: Path) -> str:
     result = subprocess.run(
-        argv,
+        executable_argv(argv),
         cwd=root,
         check=True,
         text=True,
@@ -184,6 +184,11 @@ def _version_output(argv: Sequence[str], root: Path) -> str:
         env=sanitized_environment(),
     )
     return result.stdout.strip()
+
+
+def executable_argv(argv: Sequence[str]) -> tuple[str, ...]:
+    # Windows CreateProcess 不按 PATHEXT 查找无后缀的 flutter/dart 批处理入口。
+    return (shutil.which(argv[0]) or argv[0], *argv[1:])
 
 
 def check_tool_versions(root: Path, target: Target) -> dict[str, str]:
@@ -395,7 +400,7 @@ def run_commands(commands: Sequence[Command]) -> list[str | None]:
         environment = sanitized_environment(command.env)
         print(f"执行：{command.label}", flush=True)
         result = subprocess.run(
-            command.argv,
+            executable_argv(command.argv),
             cwd=command.cwd,
             env=environment,
             check=command.check,

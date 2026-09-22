@@ -1,0 +1,687 @@
+{
+  "bundle_bindings": [
+    {
+      "bundled": "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore",
+      "sha256": "c1ecc1d0a92cb7dabb0e8baf6deb8388830914bea88d7a72945d37cdef02b912",
+      "source": "libclash/macos/BettboxCore"
+    }
+  ],
+  "bundle_files": [
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/App",
+      "sha256": "39c479ad45dcc983d152536ab3e16e57f4da4b5c966a3aee58d603fad5f3de38",
+      "size": 35641040
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/App",
+      "sha256": "39c479ad45dcc983d152536ab3e16e57f4da4b5c966a3aee58d603fad5f3de38",
+      "size": 35641040
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/Info.plist",
+      "sha256": "08b03b58e4ff25c66f5e60193b2728ab5246563bc4f253211a5c4835bbc1d333",
+      "size": 666
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/AssetManifest.bin",
+      "sha256": "5ff8646e99453db0fd06b68313bb5829a3401d38d34de029351b97fed57dd4d1",
+      "size": 3817
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/FontManifest.json",
+      "sha256": "27f39a8e8ad9fe5c86a47eb27cd444ef2920ee252067a4156c057544b3006fee",
+      "size": 1259
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/NOTICES.Z",
+      "sha256": "f4c0afb0966bdcfe3f8f6c7d7855fe21eea1d443b1b98daa88d9edfa8a55087f",
+      "size": 135391
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/NativeAssetsManifest.json",
+      "sha256": "1f886d741ac6552a07906d60740dfc6ccf232bc70ff0c4889031a45069454a40",
+      "size": 422
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/data/ASN.mmdb",
+      "sha256": "fc0a47ef3f006c7a7c9ebf856ec23bb8eb922e4d11c058a97344d81ad88e4b44",
+      "size": 391611
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/data/BundleMRS.7z",
+      "sha256": "7415b320ab7a2e4e812c657806097effa06cd61462fc0be85564a5cd065eb69b",
+      "size": 4664566
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/data/GeoSite.dat",
+      "sha256": "2bc7500767053200de5b960cca168f2eb20a3359afd4afdb3dc93b3db514acd4",
+      "size": 4227400
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/data/geoip.metadb",
+      "sha256": "6755f9d96b1648dca9b4dc6faa7ba07bce701450560bfb0b8a0312fb39eb6722",
+      "size": 8803904
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/data/zash.zip",
+      "sha256": "d6e1c34771885ceb642f92c75864951bf3a35d682eafd8e088521da17aab7375",
+      "size": 2912355
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/fonts/HarmonyOS_Sans_SC_Regular.ttf",
+      "sha256": "d7e9f37373efd1315520ba4bb6ec4537e256b4e8bbaa546b6b3901fe4e92d250",
+      "size": 1351320
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/fonts/Icons.ttf",
+      "sha256": "f22dfb72fc9450155b88f97103c4716698109b2e2cd76a1de5659fbf1744e836",
+      "size": 1224
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/fonts/JetBrainsMono-Regular.ttf",
+      "sha256": "a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f",
+      "size": 273900
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/fonts/Twemoji.Mozilla.ttf",
+      "sha256": "61db6397b8b32b72c585d538ef698a84cf78cf2558a14046b3fa0ec4cc362540",
+      "size": 1454532
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/AIsouler.jpg",
+      "sha256": "0e97c5e4bb4da7dfa7da971d52c069c3d22b86ce8cdb7c625317226d90fa8fd0",
+      "size": 2105
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/AdySnowflake.png",
+      "sha256": "6bd21098f18ca22f205a4ee3fbf59cf2a8d5a75c798a3753a5741c48bcb2e3e7",
+      "size": 1550
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/CyberVacation.jpg",
+      "sha256": "4b95edd76befabb0da8c6eb6fcabb90effe937b1518b2809b21456738b34f518",
+      "size": 1786
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/EriDeLee.jpg",
+      "sha256": "852bd056d76397b3314436b1aa0f772483104ce8fce0310acf56fb431635e194",
+      "size": 1202
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/VillagerTom.jpg",
+      "sha256": "d987d9e3ba943db0fc0339e39e205893c62744c428a7ef3280eec78f3a8e3bc4",
+      "size": 1791
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/VillagerTom.png",
+      "sha256": "355ca53312ad205ae09d7ad9ddf196df709fef746d2a533bcbbce7d7376b21ed",
+      "size": 1526
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/ZeonX.jpg",
+      "sha256": "09ed40cda4a67a1664949b94bb84813b206d503136e7cdfaa14c44b065ed629a",
+      "size": 1504
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/arue.jpg",
+      "sha256": "66b890e3ffd61b5611644241e3eb7a3689410fbb2569705173fb95cc265e81a2",
+      "size": 4362
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/dabaozi.jpg",
+      "sha256": "39a3a6c542c666cfc87fc9eb2ecb4402233a48a95789886a84126ab274185662",
+      "size": 4894
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/feitianmoo.png",
+      "sha256": "a4245141655d4fe0cf66d9383cd4c31529f867ba292070a4e318c54c60351bfd",
+      "size": 1528
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/june2.jpg",
+      "sha256": "681f5eeaee14e1a8bd5e4d87cfea0c05a0d9913c0654a3b4567d8d23381b9906",
+      "size": 4555
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/kouhe3.jpg",
+      "sha256": "073e693af9e3db2987875260e5a021b670266b45652b193647dd6a62e3a8dfb9",
+      "size": 1816
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/soffchen.png",
+      "sha256": "c9e15eac40cb01098b5af5041d68e1f11cea2fbbd14980657f3ccf3bcf45bdda",
+      "size": 1717
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/songchenwen.jpg",
+      "sha256": "66217ac48587e508c311626204eebf0b86bfe2206e333a962d2de531eb027821",
+      "size": 1483
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/utafrali.jpg",
+      "sha256": "a3cc6ac4f4697336037fc48828b20a0f67329fc0c3fa953d4e2c42bedb9360ff",
+      "size": 1679
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/wfion.png",
+      "sha256": "568c7f6be480d8117d6c0c5ca138d684d31168bb71a889344b27484568fcdc31",
+      "size": 1552
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/www.jpg",
+      "sha256": "d21b1deeb7dc48b02f221e77aea2e15d0a3c8d301f2f04c01ede1fff50c0653d",
+      "size": 4884
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/avatars/xiaolou.png",
+      "sha256": "731b94542d4cc2a2fd1042a2f7772d57dc92a97e9a25c63f25c30571733ce098",
+      "size": 3465
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon.ico",
+      "sha256": "738643ceaf19f37f2a81a7bdcee4a5e004d6279ca0b3ae8f3b3b3fb7cf693df0",
+      "size": 202265
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon.png",
+      "sha256": "1f286d8602c21a16089fee84735efb016efd89e89af02e6862e239bcd0525650",
+      "size": 28181
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_black.ico",
+      "sha256": "bfb282c8c422bc54d53925a60b42235285a05a832dd1da0a9a0c0eaadfa17290",
+      "size": 168643
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_black.png",
+      "sha256": "6bfc8d355ebef606645b2c7663ca1c5af21e3203ea0d138908a3eb0831064516",
+      "size": 13435
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_black_macOS.png",
+      "sha256": "da632bd6fc285e0a81290caa7dd3ee604621e0603117cb4531165449c529b8b2",
+      "size": 11194
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_light.ico",
+      "sha256": "9f3e0141bad4aacff5bb7b112247841fba6c3f29fb2ae1ad172db76e04b009c5",
+      "size": 199929
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_light.png",
+      "sha256": "2e4acbbb3ced67f0f5654e1a6ff6a28227b56111256e5475d5a44e06efece9cf",
+      "size": 30657
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_light_macOS.png",
+      "sha256": "98bba614ba752d8bc2fc421d63e2a0c58f16046384b555e5aae8964009b272ef",
+      "size": 11541
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_template.png",
+      "sha256": "8351719224fca13bc0ba82a3d8ea148536c67216bf4840aebb1cfc58576c0894",
+      "size": 21126
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_white.ico",
+      "sha256": "881d8535f78e96f5a55807f4c4e323041057cb6779cb7e6dbfb65eaf9a42e786",
+      "size": 169337
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/assets/images/icon_white.png",
+      "sha256": "ddc5c7acf260e7c1be3877a1bffbecba28d45d75dd7f72372f7220298feacbae",
+      "size": 13468
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/fonts/MaterialIcons-Regular.otf",
+      "sha256": "3986e4aa6704b2def8e2590d424b726b34aff0c6c595b59bc4b147c2035aed0e",
+      "size": 27488
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/class.ttf",
+      "sha256": "ae9535e21dae5ba6bc17263927a06f4d1cbcf07709b1f91497c529b8a417a753",
+      "size": 1172
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/event.ttf",
+      "sha256": "843c5354933fb0141d882078697f3f853f7ef7e5d793c260cf245251436fe4ec",
+      "size": 1096
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/field.ttf",
+      "sha256": "afddb0ffb27d3d70e660ea5a4672785544bb6909e9aa2acb54a1f201dace7fbd",
+      "size": 1124
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/interface.ttf",
+      "sha256": "f9f50e9acf5a12f9d26495d4e1ed507338a3f3fffea47b0f1ddf055d53ba2495",
+      "size": 1192
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/method.ttf",
+      "sha256": "1a8b6a7372d137d4d20099d8ec6a2702b65c64651ec4cd4caaf76bc93b28264a",
+      "size": 1132
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/operator.ttf",
+      "sha256": "ce8f39fce11bab0859a9347d264a1ad58894dfeeedb2aaf9f2ca258d324e907f",
+      "size": 1436
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/struct.ttf",
+      "sha256": "4840d9cef4b0bfce23e170fceb1789e9a0ee7bdae4cec443b67beeee6c901a57",
+      "size": 1140
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/code_forge/assets/icons/variable.ttf",
+      "sha256": "cdedc0ac8ded732e19f6730215fcdbfdb123c810d7ddbee0bca35da48472d12a",
+      "size": 1164
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/packages/wakelock_plus/assets/no_sleep.js",
+      "sha256": "726c644cda17bf271d996fb629806a59409607e9b00e0dfbf75adfd3986bbb7e",
+      "size": 13669
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/shaders/ink_sparkle.frag",
+      "sha256": "c4b3f5d1db405d50b8b7678d8bb446237f37ead86501e32c7a77fac963baff2d",
+      "size": 11992
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/App.framework/Versions/A/Resources/flutter_assets/shaders/stretch_effect.frag",
+      "sha256": "50c8c225a68bcb36805a9d3fde5be28e315e666fd1c142a2d88f3fb5dfc7d9ff",
+      "size": 10192
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/FlutterMacOS.framework/FlutterMacOS",
+      "sha256": "13254b173882ecde0a9449279636d53b7055bc1a56575d1dc41de929d161639e",
+      "size": 29802720
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/FlutterMacOS.framework/Versions/A/FlutterMacOS",
+      "sha256": "13254b173882ecde0a9449279636d53b7055bc1a56575d1dc41de929d161639e",
+      "size": 29802720
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/FlutterMacOS.framework/Versions/A/Resources/Info.plist",
+      "sha256": "2af393a670fbc25ba17682ae67cda742adeabe294b92e7078175435f39555cc9",
+      "size": 850
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/FlutterMacOS.framework/Versions/A/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "42542470043a0a3af3ab452ae4355bf764b916b7a442d3c814f362241a794454",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/FlutterMacOS.framework/Versions/A/Resources/icudtl.dat",
+      "sha256": "998367809a821d595928089c197b3f7959f0420f81f79d4d0daee53378492ed5",
+      "size": 862304
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/FlutterMacOS.framework/Versions/A/_CodeSignature/CodeResources",
+      "sha256": "e194a3b63a75c9d8c6ca9e67d61b7fb2fd345575f636671c26f1de6c17edcf60",
+      "size": 5310
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/HotKey.framework/HotKey",
+      "sha256": "7bd83000924fd95df4d39be90bd70b093bfbd33ae19ef9f75cae9f309c5c2caa",
+      "size": 273672
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/HotKey.framework/Versions/A/HotKey",
+      "sha256": "7bd83000924fd95df4d39be90bd70b093bfbd33ae19ef9f75cae9f309c5c2caa",
+      "size": 273672
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/HotKey.framework/Versions/A/Resources/Info.plist",
+      "sha256": "c8d62e29817da73d65bab3e3609750d9235f4f5db47b066beb97c59b81274b4a",
+      "size": 1332
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/code_forge.framework/Versions/A/Resources/Info.plist",
+      "sha256": "ca73be1184493d2ac270224df566e2dea07e7997e5cb7cbf9c41550de3bdd166",
+      "size": 1345
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/code_forge.framework/Versions/A/code_forge",
+      "sha256": "8ec798390f175c6ac71a7ee677cda64ccb2a2b35fe29b9070fad6d50e79277c6",
+      "size": 8168856
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/code_forge.framework/code_forge",
+      "sha256": "8ec798390f175c6ac71a7ee677cda64ccb2a2b35fe29b9070fad6d50e79277c6",
+      "size": 8168856
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/flutter_qjs.framework/Versions/A/Resources/Info.plist",
+      "sha256": "430bd5ba93f6a08ce4c84fbc599e5100d18d6a5570f139057ebbcf119843efa3",
+      "size": 1347
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/flutter_qjs.framework/Versions/A/flutter_qjs",
+      "sha256": "302ea1e2ab9d66d6cfb564ed9a5973ed8c6dbe39837c8b9f780b1242bb788e50",
+      "size": 1379864
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/flutter_qjs.framework/flutter_qjs",
+      "sha256": "302ea1e2ab9d66d6cfb564ed9a5973ed8c6dbe39837c8b9f780b1242bb788e50",
+      "size": 1379864
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/hotkey_manager_macos.framework/Versions/A/Resources/Info.plist",
+      "sha256": "c12935b05310f5639767743c1ddd30aee5633369a0e0cc1b2ef304bdd984a130",
+      "size": 1374
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/hotkey_manager_macos.framework/Versions/A/hotkey_manager_macos",
+      "sha256": "b6bc96bdd091eac92b8e8635e7c451cd837ff00b0dffb8de87d8127b6dc2b7d4",
+      "size": 181960
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/hotkey_manager_macos.framework/hotkey_manager_macos",
+      "sha256": "b6bc96bdd091eac92b8e8635e7c451cd837ff00b0dffb8de87d8127b6dc2b7d4",
+      "size": 181960
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/objective_c.framework/Versions/A/Resources/Info.plist",
+      "sha256": "57f0160881d1040458efd11a5256f761775e915a0060496b4a79ccb902f8485c",
+      "size": 739
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/objective_c.framework/Versions/A/objective_c",
+      "sha256": "9f532bc922725bfa8305ce39b7e776d2d8c0b3b37b573c8960538da069662b75",
+      "size": 348568
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/objective_c.framework/objective_c",
+      "sha256": "9f532bc922725bfa8305ce39b7e776d2d8c0b3b37b573c8960538da069662b75",
+      "size": 348568
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/sqlite3.framework/Versions/A/Resources/Info.plist",
+      "sha256": "7bd8795d9bcbdebbb396fd334ec789265f9947fe36fff90cf6046fab60b209e9",
+      "size": 727
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/sqlite3.framework/Versions/A/sqlite3",
+      "sha256": "129c44c69f0b66275960fcc24623b2c6431bb51b09d65db925d40aef936b74ae",
+      "size": 3300632
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/sqlite3.framework/sqlite3",
+      "sha256": "129c44c69f0b66275960fcc24623b2c6431bb51b09d65db925d40aef936b74ae",
+      "size": 3300632
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/tray_manager.framework/Versions/A/Resources/Info.plist",
+      "sha256": "18369e943156f82836f9ccf2432e1b3c415bcad3b38ee9adbdf9708802876a9f",
+      "size": 1350
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/tray_manager.framework/Versions/A/tray_manager",
+      "sha256": "80c10ca878eefe86e680e566e81574ca242bc20c0bc32eb47333aa956405b4d1",
+      "size": 367680
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/tray_manager.framework/tray_manager",
+      "sha256": "80c10ca878eefe86e680e566e81574ca242bc20c0bc32eb47333aa956405b4d1",
+      "size": 367680
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/window_ext.framework/Versions/A/Resources/Info.plist",
+      "sha256": "db8048de28823103bb9e958f2c64bebecdef4e6464742275df3241ef9cd2853e",
+      "size": 1344
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/window_ext.framework/Versions/A/window_ext",
+      "sha256": "354a3672cf0b16c100cd9286602abde36ab18cc83a6ee1aa8cc88f5636f6231a",
+      "size": 152824
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Frameworks/window_ext.framework/window_ext",
+      "sha256": "354a3672cf0b16c100cd9286602abde36ab18cc83a6ee1aa8cc88f5636f6231a",
+      "size": 152824
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Info.plist",
+      "sha256": "4a22f6865961cf7512d80077b00460bb1cfa221ad4a190b8b9c899d963b539db",
+      "size": 1935
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/Bettbox",
+      "sha256": "fc62caea17e06c3809c38b92c1440e6fd43c9b46a977fa10243d4c60d83633b0",
+      "size": 4433672
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore",
+      "sha256": "c1ecc1d0a92cb7dabb0e8baf6deb8388830914bea88d7a72945d37cdef02b912",
+      "size": 55471138
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/PkgInfo",
+      "sha256": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+      "size": 8
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/AppIcon.icns",
+      "sha256": "dabc6122e5f57111ae46e248cb19c0bebfae36df8a35666b4f87336575c59fce",
+      "size": 33247
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/Assets.car",
+      "sha256": "5f761ec7c9cf4b103c8f9f0b53125fa2324da0842cf2b716f9d81500448d77b9",
+      "size": 235144
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/Base.lproj/MainMenu.nib",
+      "sha256": "7659dd352f3d75668f1863cf444c7def0f973c96e3128341cba7af6917bc28e2",
+      "size": 16526
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Info.plist",
+      "sha256": "d7271bbf9a550a5ebc423160ba99bbf3cf1085cd1a6d80be77c9e5bc6d9d4264",
+      "size": 1150
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/LaunchAtLogin.entitlements",
+      "sha256": "b746c74b201e6af4e0864fbd1f4f629f96156a7ec4b7208bc995d0a5089bb592",
+      "size": 240
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/LaunchAtLoginHelper-with-runtime.zip",
+      "sha256": "98ef556b490e02f4084a11d8a07c33a880177a9816b355885a11f58c95876d62",
+      "size": 3386534
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/LaunchAtLoginHelper.zip",
+      "sha256": "0a3d09438fb595802d554ce0a7c4ba8e1d2d91d5170362adc965da82e70d74cb",
+      "size": 25929
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/copy-helper-swiftpm.sh",
+      "sha256": "ead895cdce169e9d692d3a57810ec5b28c2ce31e16baf1e025bce44b157fa109",
+      "size": 1777
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/app_links_app_links.bundle/Contents/Info.plist",
+      "sha256": "f7ff582770c815fbb48163bd4393711608595d792a210146e31c9af7e16fed18",
+      "size": 1140
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/app_links_app_links.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "df01bf8f311b7b350d01d55afe5059ead9ba2b0069c5421e69d9b405f7cabea2",
+      "size": 415
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/connectivity_plus_connectivity_plus.bundle/Contents/Info.plist",
+      "sha256": "a0279a1fd80cb00a68902fb0aa89fccc3abb684dd3e80074fc6a34bf199e883a",
+      "size": 1172
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/connectivity_plus_connectivity_plus.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/device_info_plus_device_info_plus.bundle/Contents/Info.plist",
+      "sha256": "f9ad5c3c2aba7e5f9f4955eb09a20959559ae2800d8bc7fa5b9402d4bf353cac",
+      "size": 1169
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/device_info_plus_device_info_plus.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/dynamic_color_dynamic_color.bundle/Contents/Info.plist",
+      "sha256": "dd1c777117faf351ffb3fe7d74dd5de40ca8ee68ff9c6dcafbea5e0e9980cb33",
+      "size": 1156
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/dynamic_color_dynamic_color.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "2b90f999b2194ba5d1f8e6b181b9d8fa5c1037d389d2be4428e18e3074e8388a",
+      "size": 324
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/file_picker_file_picker.bundle/Contents/Info.plist",
+      "sha256": "12676f66eb777655a9ef74388d928314bd7aa1b32c271c7dd8173a778e4fa250",
+      "size": 1148
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/file_picker_file_picker.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/file_selector_macos_file_selector_macos.bundle/Contents/Info.plist",
+      "sha256": "f377564ad732c1a66116992eea8d4eecc2c270a907146d91e17e25f906e57ed5",
+      "size": 1180
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/file_selector_macos_file_selector_macos.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/flutter_secure_storage_darwin_flutter_secure_storage_darwin.bundle/Contents/Info.plist",
+      "sha256": "04326e533a8b6de7c1efaadf00054d066fbe131b0e7016dca72dba5912926fec",
+      "size": 1220
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/flutter_secure_storage_darwin_flutter_secure_storage_darwin.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "47226a29608df206ad0a110e6afeb5a77ff575ac1df9c76bfdb2d6dfb3fafed1",
+      "size": 372
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/mobile_scanner_mobile_scanner.bundle/Contents/Info.plist",
+      "sha256": "b2861a3e6f4ca5e42e1ea497db709ae910e9a41ab72f7d08a2abdf2324a17e96",
+      "size": 1160
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/mobile_scanner_mobile_scanner.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "1bac827f49b2b8a5358491b9698203bf191791a6f1ba3a3ace3b1285d52d2d17",
+      "size": 373
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/package_info_plus_package_info_plus.bundle/Contents/Info.plist",
+      "sha256": "9f528e032b685d4b58ae34eab9e728f1d2240dd186b04e0dec7b9dd88be71431",
+      "size": 1172
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/package_info_plus_package_info_plus.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/shared_preferences_foundation_shared_preferences_foundation.bundle/Contents/Info.plist",
+      "sha256": "1d4a533f0a1379cb9df37b79db3b5398982e3d70b74fb380b3427a7817ef28da",
+      "size": 1220
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/shared_preferences_foundation_shared_preferences_foundation.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "056428b938bd57018a60019d15c3c1ee2fa727f23687598bbbd934848b180b1a",
+      "size": 598
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/sqflite_darwin_sqflite_darwin.bundle/Contents/Info.plist",
+      "sha256": "9b51302bd9380b6396799e8ef5981bebf76ec2f21fdd3fe9f0c784e286610464",
+      "size": 1162
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/sqflite_darwin_sqflite_darwin.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "47226a29608df206ad0a110e6afeb5a77ff575ac1df9c76bfdb2d6dfb3fafed1",
+      "size": 372
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/url_launcher_macos_url_launcher_macos.bundle/Contents/Info.plist",
+      "sha256": "26838806b198de08af64d9fd08bcb4f61abae823bcbbf6b3e923ea73ae6baaea",
+      "size": 1176
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/url_launcher_macos_url_launcher_macos.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/wakelock_plus_wakelock_plus.bundle/Contents/Info.plist",
+      "sha256": "d50e3efba7eaa4477f92ac4471244791c0371f841c6baf8d15b4389a5291d4d1",
+      "size": 1156
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/wakelock_plus_wakelock_plus.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "204d035a88eab2281b3d914f46c796766ae78e3cb82537711928dca9e28dbbb8",
+      "size": 325
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/webview_flutter_wkwebview_webview_flutter_wkwebview.bundle/Contents/Info.plist",
+      "sha256": "fe1a3fbaa82cf6bd28556acc5fb143e406296b20e8c15595124ecef14230f100",
+      "size": 1205
+    },
+    {
+      "path": "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/webview_flutter_wkwebview_webview_flutter_wkwebview.bundle/Contents/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "6d2da0d8d930227d428c1d9363b0ad6e3a12e2c9b68c5ce297158a7412fc8c31",
+      "size": 373
+    }
+  ],
+  "bundle_path": "build/macos/Build/Products/Release/Bettbox.app",
+  "commands_succeeded": true,
+  "completed_at": "2026-09-22T09:43:25.262943+00:00",
+  "lock_sha256": {
+    "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
+    "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
+    "macos/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved": "b6f691bab38585211c29413db6f0c7ceb637d4bcc71c4a072e105e9476991d06",
+    "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
+    "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd"
+  },
+  "locks_unchanged": true,
+  "requested_signing_mode": "unsigned",
+  "schema_version": 1,
+  "signature_evidence": [
+    "Signature=adhoc",
+    "Info.plist=not bound",
+    "TeamIdentifier=not set",
+    "Sealed Resources=none"
+  ],
+  "source_after": {
+    "dirty": false,
+    "head": "9a59d0d56a55b5b8c78b295b56500b462d463634",
+    "status": [],
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_artifacts": [
+    {
+      "path": "libclash/macos/BettboxCore",
+      "sha256": "c1ecc1d0a92cb7dabb0e8baf6deb8388830914bea88d7a72945d37cdef02b912",
+      "size": 55471138
+    }
+  ],
+  "source_before": {
+    "dirty": false,
+    "head": "9a59d0d56a55b5b8c78b295b56500b462d463634",
+    "status": [],
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_unchanged": true,
+  "started_at": "2026-09-22T09:42:41.225004+00:00",
+  "target": "macos-arm64"
+}

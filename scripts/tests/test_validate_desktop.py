@@ -19,6 +19,14 @@ SPEC.loader.exec_module(validate_desktop)
 
 
 class ValidateDesktopTest(unittest.TestCase):
+    def test_batch_entry_is_resolved_without_losing_arguments(self) -> None:
+        batch = r"C:\Program Files\Flutter\bin\flutter.bat"
+        with mock.patch.object(validate_desktop.shutil, "which", return_value=batch):
+            self.assertEqual(
+                validate_desktop.executable_argv(("flutter", "--version", "--machine")),
+                (batch, "--version", "--machine"),
+            )
+
     def test_windows_plan_uses_readonly_core_and_locked_helper(self) -> None:
         root = Path("repo")
         plan = validate_desktop.command_plan(
