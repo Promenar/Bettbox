@@ -17,7 +17,7 @@ Bettbox 使用 Flutter。页面、Riverpod 状态、Xboard API、邀请分享及
 
 `RedirectCashier` 只在 Android 创建 WebView 控制器。桌面使用 `url_launcher` 的 externalApplication；失败有本地化反馈。初始支付地址必须为 HTTPS 且不能包含 userinfo。Android 控制器在普通重绘时复用，地址变更时重新初始化并丢弃旧异步结果。QR 收银分支独立。
 
-macOS 的 DebugProfile 与 Release entitlements 含安全存储插件要求的 `keychain-access-groups` 空数组；Team/App Group 未被硬编码。实际 Xcode 构建确认该 capability 要求开发证书；无团队时只能先做显式未签名编译，不能认定 Keychain 登录持久化已验收。插件具体要求以锁定版本 flutter_secure_storage 10.3.1 的文档为依据，实际持久化仍须同签名标识的原生冷启动验证。
+macOS 的 DebugProfile 与 Release entitlements 含安全存储插件要求的 `keychain-access-groups` 空数组；Team/App Group 未被硬编码。实际 Xcode 构建确认该 capability 要求开发证书；无团队时只能先做显式关闭 Xcode 签名的编译，不能认定 Keychain 登录持久化已验收。插件具体要求以锁定版本 flutter_secure_storage 10.3.1 的文档为依据，实际持久化仍须同签名标识的原生冷启动验证。
 
 ## 邀请业务验证
 
@@ -40,7 +40,7 @@ python3 scripts/run_xboard_invite_check.py \
 
 ## 原生构建与设备验收
 
-开发执行位置、工具版本、触发和产物见 `.pdec/README.md`。`scripts/validate_desktop.py` 默认只做前置检查，`--execute` 才编译；无开发证书时 macOS 另加 `--unsigned-macos`，其 manifest 标为未签名，不能作为可分发安装包。Windows 构建产物只上传为保留 7 天的开发 artifact，不发布正式版本。
+开发执行位置、工具版本、触发和产物见 `.pdec/README.md`。`scripts/validate_desktop.py` 默认只做前置检查，`--execute` 才编译；无开发证书时 macOS 另加 `--unsigned-macos`，其 manifest 记录请求关闭 Xcode 签名及实际签名事实，不能作为可分发安装包。Windows 构建产物只上传为保留 7 天的开发 artifact，不发布正式版本。
 
 设备验收应使用相同候选 SHA：登录/退出与冷启动恢复、邀请码复制与实际扫码、系统浏览器收银跳转、订阅刷新、代理连接、TUN 权限、休眠恢复。Windows x64 和 macOS arm64 的结果不能替代 Windows arm64/macOS Intel 验收。Android WebView 的第三方 Cookie 与导航白名单约束也需单独补齐实机验证。
 

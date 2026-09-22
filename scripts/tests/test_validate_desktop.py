@@ -58,6 +58,12 @@ class ValidateDesktopTest(unittest.TestCase):
         self.assertEqual(
             validate_desktop.TARGETS["macos-arm64"].go_version_prefix, "1.26."
         )
+        self.assertEqual(
+            validate_desktop.TARGETS["macos-arm64"].bundled_core_path,
+            Path(
+                "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore"
+            ),
+        )
         self.assertEqual(plan[2].argv, ("pod", "install", "--deployment"))
         self.assertEqual(plan[3].argv[2], "macos")
         self.assertEqual(plan[4].argv[:3], ("codesign", "--verify", "--deep"))
@@ -70,11 +76,25 @@ class ValidateDesktopTest(unittest.TestCase):
             "digest",
             unsigned_macos=True,
         )
-        self.assertEqual(len(plan), 4)
+        self.assertEqual(len(plan), 5)
         self.assertEqual(
-            plan[-1].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
+            plan[3].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
         )
-        self.assertFalse(any(command.argv[0] == "codesign" for command in plan))
+        self.assertEqual(plan[-1].argv[:2], ("codesign", "--display"))
+        self.assertTrue(plan[-1].capture_output)
+        self.assertFalse(plan[-1].check)
+        self.assertEqual(
+            validate_desktop.parse_unsigned_signature(
+                "Signature=adhoc\nTeamIdentifier=not set\n"
+                "Sealed Resources=none\nInfo.plist=not bound\nExecutable=/tmp/Bettbox"
+            ),
+            [
+                "Signature=adhoc",
+                "TeamIdentifier=not set",
+                "Sealed Resources=none",
+                "Info.plist=not bound",
+            ],
+        )
         self.assertEqual(
             validate_desktop.signing_mode(
                 validate_desktop.TARGETS["macos-arm64"], True
@@ -234,11 +254,60 @@ class ValidateDesktopTest(unittest.TestCase):
             manifest_path = root / "build/desktop-validation/windows-x64.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             self.assertFalse(manifest["commands_succeeded"])
-            self.assertEqual(manifest["signing_mode"], "not-applicable")
+            self.assertEqual(
+                manifest["requested_signing_mode"], "not-applicable"
+            )
             self.assertFalse(manifest["source_unchanged"])
             self.assertFalse(manifest["locks_unchanged"])
             self.assertEqual(manifest["command_error"]["returncode"], 9)
             self.assertIn("pubspec.lock", manifest["changed_locks"])
+
+    def test_validation_failure_is_closed_after_commands_succeed(self) -> None:
+        target = validate_desktop.TARGETS["windows-x64"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in validate_desktop.LOCK_FILES:
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("locked", encoding="utf-8")
+            core = root / target.core_path
+            core.parent.mkdir(parents=True, exist_ok=True)
+            core.write_bytes(b"core")
+            state = {
+                "head": "candidate",
+                "dirty": False,
+                "status": [],
+                "tracked_diff_sha256": "same",
+            }
+            validation_error = RuntimeError("bundle validation failed")
+
+            with (
+                mock.patch.object(
+                    validate_desktop,
+                    "git_source_state",
+                    side_effect=[state, state, state],
+                ),
+                mock.patch.object(validate_desktop, "run_commands", return_value=[]),
+                mock.patch.object(validate_desktop, "copy_windows_helper"),
+                mock.patch.object(
+                    validate_desktop,
+                    "validate_bundle",
+                    side_effect=validation_error,
+                ),
+            ):
+                with self.assertRaises(RuntimeError) as caught:
+                    validate_desktop.execute_build(root, target)
+
+            self.assertIs(caught.exception, validation_error)
+            manifest = json.loads(
+                (
+                    root / "build/desktop-validation/windows-x64.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertTrue(manifest["commands_succeeded"])
+            self.assertEqual(
+                manifest["command_error"]["message"], "bundle validation failed"
+            )
 
 
 if __name__ == "__main__":

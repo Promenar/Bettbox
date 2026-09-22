@@ -57,7 +57,7 @@ TARGETS = {
         core_path=Path("libclash/macos/BettboxCore"),
         bundle_path=Path("build/macos/Build/Products/Release/Bettbox.app"),
         bundled_core_path=Path(
-            "build/macos/Build/Products/Release/Bettbox.app/Contents/Resources/BettboxCore"
+            "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore"
         ),
         bundled_helper_path=None,
         app_paths=(
@@ -106,11 +106,12 @@ class Command:
     env: Mapping[str, str] | None = None
     label: str = ""
     capture_output: bool = False
+    check: bool = True
 
 
 def repository_root() -> Path:
     # Windows CI 通过临时盘符缩短 checkout 路径；不要把映射解析回长路径。
-    return Path(__file__).absolute().parents[1]
+    return Path(os.path.abspath(__file__)).parents[1]
 
 
 def normalized_machine(machine: str) -> str:
@@ -353,6 +354,16 @@ def command_plan(
                 ),
             ]
         )
+    elif unsigned_macos:
+        commands.append(
+            Command(
+                ("codesign", "--display", "--verbose=4", target.bundle_path.as_posix()),
+                root,
+                label="读取 macOS 编译产物签名事实",
+                capture_output=True,
+                check=False,
+            )
+        )
     return commands
 
 
@@ -387,7 +398,7 @@ def run_commands(commands: Sequence[Command]) -> list[str | None]:
             command.argv,
             cwd=command.cwd,
             env=environment,
-            check=True,
+            check=command.check,
             text=command.capture_output,
             stdout=subprocess.PIPE if command.capture_output else None,
             stderr=subprocess.STDOUT if command.capture_output else None,
@@ -468,6 +479,15 @@ def parse_adhoc_signature(output: str) -> list[str]:
     return evidence
 
 
+def parse_unsigned_signature(output: str) -> list[str]:
+    prefixes = ("Signature=", "TeamIdentifier=", "Sealed Resources=", "Info.plist=")
+    return [
+        line.strip()
+        for line in output.splitlines()
+        if line.strip().startswith(prefixes)
+    ]
+
+
 def validate_bundle(
     root: Path, target: Target
 ) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]]]:
@@ -543,7 +563,8 @@ def close_failed_execution(
     lock_snapshot: Mapping[Path, str],
     source_before: Mapping[str, object],
     error: BaseException,
-    build_signing_mode: str,
+    requested_signing_mode: str,
+    commands_succeeded: bool,
 ) -> None:
     closure_problems: list[str] = []
     try:
@@ -579,8 +600,8 @@ def close_failed_execution(
         "target": target.name,
         "started_at": started_at,
         "completed_at": datetime.now(timezone.utc).isoformat(),
-        "commands_succeeded": False,
-        "signing_mode": build_signing_mode,
+        "commands_succeeded": commands_succeeded,
+        "requested_signing_mode": requested_signing_mode,
         "command_error": command_error,
         "source_unchanged": source_unchanged,
         "locks_unchanged": locks_unchanged,
@@ -617,7 +638,7 @@ def execute_build(
     root: Path, target: Target, unsigned_macos: bool = False
 ) -> None:
     started_at = datetime.now(timezone.utc).isoformat()
-    build_signing_mode = signing_mode(target, unsigned_macos)
+    requested_signing_mode = signing_mode(target, unsigned_macos)
     lock_snapshot = snapshot_locks(root)
     source_before = git_source_state(root)
     core_path = root / target.core_path
@@ -626,6 +647,7 @@ def execute_build(
         root, target, placeholder, unsigned_macos=unsigned_macos
     )[:2]
     signature_output = ""
+    commands_succeeded = False
     try:
         run_commands(initial_commands)
         if not core_path.is_file():
@@ -640,10 +662,53 @@ def execute_build(
             run_commands(plan[3:])
         else:
             run_commands(plan[2:4])
-            if not unsigned_macos:
-                signature_outputs = run_commands(plan[4:])
-                signature_output = signature_outputs[-1] or ""
-    except (RuntimeError, subprocess.CalledProcessError) as error:
+            signature_outputs = run_commands(plan[4:])
+            signature_output = signature_outputs[-1] or ""
+        commands_succeeded = True
+
+        signature_evidence = (
+            []
+            if target.needs_helper
+            else (
+                parse_unsigned_signature(signature_output)
+                if unsigned_macos
+                else parse_adhoc_signature(signature_output)
+            )
+        )
+        source_after = git_source_state(root)
+        locks_unchanged, _, _ = evaluate_locks(root, lock_snapshot)
+        sources, bundle_files, bindings = validate_bundle(root, target)
+        source_unchanged = source_state_unchanged(source_before, source_after)
+        manifest = {
+            "schema_version": 1,
+            "target": target.name,
+            "started_at": started_at,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "commands_succeeded": True,
+            "requested_signing_mode": requested_signing_mode,
+            "source_unchanged": source_unchanged,
+            "locks_unchanged": locks_unchanged,
+            "source_before": source_before,
+            "source_after": source_after,
+            "lock_sha256": {
+                path.as_posix(): digest
+                for path, digest in sorted(lock_snapshot.items())
+            },
+            "source_artifacts": sources,
+            "bundle_path": target.bundle_path.as_posix(),
+            "bundle_files": bundle_files,
+            "bundle_bindings": bindings,
+            "signature_evidence": signature_evidence,
+        }
+        manifest_path = write_manifest(root, target, manifest)
+        print(f"验证清单：{manifest_path.relative_to(root).as_posix()}")
+        for artifact in sources:
+            print(f"  {artifact['sha256']}  {artifact['path']}")
+        if not locks_unchanged:
+            raise RuntimeError("构建期间依赖锁文件发生变化，验证清单已记录")
+        if not source_unchanged:
+            raise RuntimeError("构建期间候选源码状态发生变化，验证清单已记录")
+    except Exception as error:
         close_failed_execution(
             root,
             target,
@@ -651,48 +716,10 @@ def execute_build(
             lock_snapshot,
             source_before,
             error,
-            build_signing_mode,
+            requested_signing_mode,
+            commands_succeeded,
         )
         raise
-
-    signature_evidence = (
-        []
-        if target.needs_helper or unsigned_macos
-        else parse_adhoc_signature(signature_output)
-    )
-
-    source_after = git_source_state(root)
-    locks_unchanged, _, _ = evaluate_locks(root, lock_snapshot)
-    sources, bundle_files, bindings = validate_bundle(root, target)
-    source_unchanged = source_state_unchanged(source_before, source_after)
-    manifest = {
-        "schema_version": 1,
-        "target": target.name,
-        "started_at": started_at,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-        "commands_succeeded": True,
-        "signing_mode": build_signing_mode,
-        "source_unchanged": source_unchanged,
-        "locks_unchanged": locks_unchanged,
-        "source_before": source_before,
-        "source_after": source_after,
-        "lock_sha256": {
-            path.as_posix(): digest for path, digest in sorted(lock_snapshot.items())
-        },
-        "source_artifacts": sources,
-        "bundle_path": target.bundle_path.as_posix(),
-        "bundle_files": bundle_files,
-        "bundle_bindings": bindings,
-        "signature_evidence": signature_evidence,
-    }
-    manifest_path = write_manifest(root, target, manifest)
-    print(f"验证清单：{manifest_path.relative_to(root).as_posix()}")
-    for artifact in sources:
-        print(f"  {artifact['sha256']}  {artifact['path']}")
-    if not locks_unchanged:
-        raise RuntimeError("构建期间依赖锁文件发生变化，验证清单已记录")
-    if not source_unchanged:
-        raise RuntimeError("构建期间候选源码状态发生变化，验证清单已记录")
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -706,12 +733,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--unsigned-macos",
         action="store_true",
-        help="仅编译 macOS 未签名候选；不作为登录、权限或持久化验收",
+        help="关闭 Xcode signing 编译 macOS 候选；不作为登录、权限或持久化验收",
     )
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            reconfigure(encoding="utf-8")
     args = parse_args(argv)
     root = repository_root()
     target = TARGETS[args.target]
