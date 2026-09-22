@@ -13,15 +13,17 @@
 | macOS 编译验证 | 本机 macOS arm64，local | macOS arm64 | `python3 scripts/validate_desktop.py --target macos-arm64 --execute --unsigned-macos` |
 | Windows 编译验证 | GitHub 标准 `windows-2022`，github-hosted | Windows x86_64 | `.github/workflows/validate-desktop.yaml` |
 
-既有 `.github/workflows/build.yaml` 为发版 tag 构建入口，保留不变。验证入口单独产出开发候选，不执行发布。Windows 验证由当前 feature 分支相关文件的 push 或人工 workflow_dispatch 触发；每次使用事件绑定的确切 SHA，checkout 到工作区短目录 `s`。同步和构建触发不共用发版 tag。没有部署 Main/FNOS 的后台同步或任务执行服务。
+既有 `.github/workflows/build.yaml` 为发版 tag 构建入口，保留不变。验证入口单独产出开发候选，不执行发布。Windows 验证由当前 feature 分支相关文件的 push 或人工 workflow_dispatch 触发；每次使用事件绑定的确切 SHA，checkout 到工作区短目录 `s`，将工作区映射到 `S:` 后在 `S:\s` 构建。项目不能位于盘符根目录，否则末尾反斜杠会破坏 Flutter/CMake 环境变量边界。同步和构建触发不共用发版 tag。没有部署 Main/FNOS 的后台同步或任务执行服务。
 
 macOS 当前验证操作为显式关闭 Xcode 签名的编译：保留正式 Keychain entitlement，但不声称签名或登录持久化通过。实际 Xcode 检查已确认该 capability 需要开发证书。准备好团队签名后，再单独完成签名与 Keychain 验收。Windows 验证不读取签名密钥。不同 SHA 的日志和产物以 GitHub run 区分，同工作区不并发执行脚本。脚本默认只检查环境并展示命令，显式 `--execute` 才编译。
 
 ## 工具、依赖与证据
 
 - 固定 Flutter 3.44.9；macOS 使用已核验 Go 1.26.x、Xcode 与 CocoaPods；Windows 使用 Go 1.25.x、Rust 1.98.0、Visual Studio/CMake 原生工具链。实际版本由入口打印并核验。
+- macOS 编译实测使用 Xcode 27.0、Go 1.26.5、CocoaPods 1.17.0 与 Ruby 4.0.7；系统基线和 Pod targets 为 macOS 12.0。
 - 使用 `pubspec.lock`、`core/go.sum`、Cargo.lock、Podfile.lock、Package.resolved。构建不运行 pub upgrade / go mod tidy / flutter clean；锁文件变化直接报告失败，依赖更新另行审阅。
 - core 进入 `libclash/<平台>/`；Windows helper 的 IPC 校验值由同次 core SHA256 生成。Flutter 构建使用该摘要。
+- `.gitattributes` 为 7 个 Flutter 平台生成文件固定 LF；Windows checkout 与生成器采用相同换行。源码与锁文件漂移检查保持启用。Windows CMake 安装步骤包含 `native_assets/windows`，用于交付 SQLite 等 FFI 原生依赖。
 - 本机产物位于 `build/macos/Build/Products/Release/Bettbox.app`；Windows bundle 位于 `build/windows/x64/runner/Release`。入口检查文件存在并输出 SHA256。原生编译成功仅证明构建能力，实际代理连接、系统浏览器、Keychain 冷启动及权限仍须设备验收。
 - Windows job 有有限超时，runner 随 job 回收；不使用家庭自托管 Runner，不向候选代码传入生产凭据。缓存按平台与依赖锁隔离；开发产物保留期由 workflow 声明。
 - 本机依赖由现有 Flutter/Go/Cargo 缓存和 CocoaPods 管理，不自动清理用户缓存。一次性构建不开放服务端口；停止可中断构建进程，清理仅针对明确的项目生成目录。

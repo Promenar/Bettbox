@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-09-22T14:09:33+08:00
+> generated_at: 2026-09-22T18:46:18+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -8,13 +8,15 @@
 
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
-| bettbox-invite-platforms | waiting | 2026-09-22T14:09:33+08:00 | done | ["Bettbox", "xboard", "test-panel"] | 测试面板 app_url 配置调整与邀请入口验证 | `.agents/handover.md` · `2026-09-22T14:09:33+08:00` · `fp:a24772e96d` |
+| bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-09-22T18:46:18+08:00 | iso | done | waiting | ["Bettbox", "xboard", "platforms"] | ["invite", "windows", "macos", "ios", "validation", "pause"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
+| 2026-09-22T17:51:51+08:00 | iso | in-progress | resume | ["Bettbox", "xboard", "platforms"] | ["invite", "macos", "windows", "ios", "validation"] | 邀请集成验证与桌面候选构建进展 | `.agents/handover.md` · `2026-09-22T17:51:51+08:00` · `fp:fcb4b5ed0d` |
 | 2026-09-22T14:09:33+08:00 | iso | done | waiting | ["Bettbox", "xboard", "test-panel"] | ["invite", "configuration", "authorization", "rollback"] | 测试面板 app_url 配置调整与邀请入口验证 | `.agents/handover.md` · `2026-09-22T14:09:33+08:00` · `fp:a24772e96d` |
 | 2026-09-22T10:26:36+08:00 | iso | done | waiting | ["Bettbox", "xboard"] | ["invite", "panel", "connectivity", "configuration"] | 测试面板可达性与邀请站点配置核验 | `.agents/handover.md` · `2026-09-22T10:26:36+08:00` · `fp:25883c8068` |
 | 2026-09-22T10:15:59+08:00 | iso | done | waiting | ["Bettbox", "xboard", "platforms"] | ["invite", "commission", "ios", "macos", "windows", "candidate"] | 邀请返利客户端候选与平台扩展路线 | `.agents/handover.md` · `2026-09-22T10:15:59+08:00` · `fp:4299f4386f` |

@@ -36,13 +36,19 @@ python3 scripts/run_xboard_invite_check.py \
 
 2026-09-22 验证通过：100 元订单按 10% 规则产生 1000 分佣金，`invite/fetch.stat` 从 `[1,0,1000,10,0]` 变为 `[1,1000,0,10,1000]`，顺序重复执行保持余额和流水不变。原始脱敏结果见 `validation/2026-09-22-invite-isolated.json`。
 
-这不覆盖公网注册提交、邮件收件、下载引导、真实支付、提现或并发结算。服务端现有 `CheckCommission` 查询没有行锁，CommissionLog 没有 trade_no 唯一约束，不能承诺并发幂等；运营启用前须在 Xboard 服务端单独修复并以并发测试验收。
+这不覆盖公网注册提交、邮件收件、下载引导、真实支付、提现或并发结算。正常定时调度已使用 `onOneServer()` 与 `withoutOverlapping(5)` 防止任务重入。`CheckCommission` 单笔查询没有行锁，CommissionLog 没有相应交易唯一约束；直接并发调用命令或调度锁失效时，数据库层幂等仍需独立验证。当前没有正常调度重复入账的实测证据，不能把这一边界描述成已发生的重复返佣。
+
+测试面板只读配置检查确认 `android_download_url`、`windows_download_url`、`macos_download_url` 均为空。客户端下载接口已有这些配置项；网页注册后的安装引导，需要先准备适合分发的安装包，再配置有效地址并验证网页实际入口。GitHub CI 的开发 artifact 不能直接视为匿名用户可用的正式下载地址。
 
 ## 原生构建与设备验收
 
 开发执行位置、工具版本、触发和产物见 `.pdec/README.md`。`scripts/validate_desktop.py` 默认只做前置检查，`--execute` 才编译；无开发证书时 macOS 另加 `--unsigned-macos`，其 manifest 记录请求关闭 Xcode 签名及实际签名事实，不能作为可分发安装包。Windows 构建产物只上传为保留 7 天的开发 artifact，不发布正式版本。
 
 设备验收应使用相同候选 SHA：登录/退出与冷启动恢复、邀请码复制与实际扫码、系统浏览器收银跳转、订阅刷新、代理连接、TUN 权限、休眠恢复。Windows x64 和 macOS arm64 的结果不能替代 Windows arm64/macOS Intel 验收。Android WebView 的第三方 Cookie 与导航白名单约束也需单独补齐实机验证。
+
+2026-09-22，macOS arm64 在候选 `9a59d0d56a55b5b8c78b295b56500b462d463634` 上完成编译和 bundle 核对：App 169.3 MB、127 个 bundle 文件纳入哈希清单，源码与锁文件无漂移，`Contents/MacOS/BettboxCore` 与源 core SHA256 相同。签名事实为链接器 ad hoc、无 Team、Info.plist 未绑定且无资源封印；这份编译产物尚未完成开发者签名。证据见 `validation/2026-09-22-macos-arm64.json`。后续 Windows 工具入口修复未改变这份候选的客户端 Dart/Go/macOS 业务源码。
+
+2026-09-22，Windows x64 在候选 `dd2998859b23f6fac9245077ebcd842e1e424d2a` 上完成原生编译、源码/锁文件无漂移检查及开发产物上传，见 [Windows 构建记录](https://github.com/Promenar/Bettbox/actions/runs/35716722203)。82 个 bundle 文件纳入哈希清单，包含 `sqlite3.dll`；App、Mihomo core 和 helper 均已生成，bundle 内 core/helper 与本次源产物 SHA256 一致。证据见 `validation/2026-09-22-windows-x64.json`。短路径构建使用 `S:\s`，7 个 Flutter 平台生成文件通过 `.gitattributes` 固定 LF；源码漂移检查持续启用。此结果不包含 Windows 图形界面、代理/TUN 或服务安装的实机运行验收。
 
 ## iOS 工程工作包
 

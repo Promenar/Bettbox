@@ -1,0 +1,467 @@
+{
+  "bundle_bindings": [
+    {
+      "bundled": "build/windows/x64/runner/Release/BettboxCore.exe",
+      "sha256": "8c93dc679fc8f6e21ff447126cb0ab75aac6c7e19fe25e24069578161404d06d",
+      "source": "libclash/windows/BettboxCore.exe"
+    },
+    {
+      "bundled": "build/windows/x64/runner/Release/BettboxHelperService.exe",
+      "sha256": "ed788f0b4995715e04f951f554072441dbe9b0027019dfdfc29afb356c6ceb0f",
+      "source": "libclash/windows/BettboxHelperService.exe"
+    }
+  ],
+  "bundle_files": [
+    {
+      "path": "build/windows/x64/runner/Release/Bettbox.exe",
+      "sha256": "75d4a608d647c27021c7e333a391bec6c9655fd2f9773b1c759f027783214686",
+      "size": 324096
+    },
+    {
+      "path": "build/windows/x64/runner/Release/BettboxCore.exe",
+      "sha256": "8c93dc679fc8f6e21ff447126cb0ab75aac6c7e19fe25e24069578161404d06d",
+      "size": 49558016
+    },
+    {
+      "path": "build/windows/x64/runner/Release/BettboxHelperService.exe",
+      "sha256": "ed788f0b4995715e04f951f554072441dbe9b0027019dfdfc29afb356c6ceb0f",
+      "size": 467456
+    },
+    {
+      "path": "build/windows/x64/runner/Release/WindowsLoopbackManager.exe",
+      "sha256": "d9b1bd0e9f05c8f046578c6f870b1c6822fbd660a01c55a4c838386432215263",
+      "size": 197120
+    },
+    {
+      "path": "build/windows/x64/runner/Release/app_links_plugin.dll",
+      "sha256": "edd3a57fe76762a2e17a9d26cd82a1168fe47814ad2b7e5726891685441b1b13",
+      "size": 139264
+    },
+    {
+      "path": "build/windows/x64/runner/Release/code_forge.dll",
+      "sha256": "236a10ae9951a1a3859dc0e668407095ee197074a555fd0eb5bd976c6e4c6ad6",
+      "size": 1015808
+    },
+    {
+      "path": "build/windows/x64/runner/Release/connectivity_plus_plugin.dll",
+      "sha256": "e39fcf5a593e61aba084f694a6ef798c8da6c99fd1967e14280bef55943e6b53",
+      "size": 99840
+    },
+    {
+      "path": "build/windows/x64/runner/Release/dartjni.dll",
+      "sha256": "a55e37f922edd4131ad6eda0bdd5f4ddceab289ae387951de02c6ed95fac223e",
+      "size": 59904
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/app.so",
+      "sha256": "348334a7a07c29ea7a3680ec65632aa81c0a4cfb4a1ecacefabde1e85e9b2b59",
+      "size": 17957776
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/AssetManifest.bin",
+      "sha256": "5ff8646e99453db0fd06b68313bb5829a3401d38d34de029351b97fed57dd4d1",
+      "size": 3817
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/FontManifest.json",
+      "sha256": "27f39a8e8ad9fe5c86a47eb27cd444ef2920ee252067a4156c057544b3006fee",
+      "size": 1259
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/NOTICES.Z",
+      "sha256": "2e0932f47f36dec3bd1631f95c282e58ef67f8f4e6fc44ef9961ba59074b718d",
+      "size": 135901
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/NativeAssetsManifest.json",
+      "sha256": "4ac70f7d67abb2ffc105d2cabfdee68c9aa138d132107e5be4949c539f7ce379",
+      "size": 131
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/data/ASN.mmdb",
+      "sha256": "fc0a47ef3f006c7a7c9ebf856ec23bb8eb922e4d11c058a97344d81ad88e4b44",
+      "size": 391611
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/data/BundleMRS.7z",
+      "sha256": "7415b320ab7a2e4e812c657806097effa06cd61462fc0be85564a5cd065eb69b",
+      "size": 4664566
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/data/GeoSite.dat",
+      "sha256": "2bc7500767053200de5b960cca168f2eb20a3359afd4afdb3dc93b3db514acd4",
+      "size": 4227400
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/data/geoip.metadb",
+      "sha256": "6755f9d96b1648dca9b4dc6faa7ba07bce701450560bfb0b8a0312fb39eb6722",
+      "size": 8803904
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/data/zash.zip",
+      "sha256": "d6e1c34771885ceb642f92c75864951bf3a35d682eafd8e088521da17aab7375",
+      "size": 2912355
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/fonts/HarmonyOS_Sans_SC_Regular.ttf",
+      "sha256": "d7e9f37373efd1315520ba4bb6ec4537e256b4e8bbaa546b6b3901fe4e92d250",
+      "size": 1351320
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/fonts/Icons.ttf",
+      "sha256": "f22dfb72fc9450155b88f97103c4716698109b2e2cd76a1de5659fbf1744e836",
+      "size": 1224
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/fonts/JetBrainsMono-Regular.ttf",
+      "sha256": "a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f",
+      "size": 273900
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/fonts/Twemoji.Mozilla.ttf",
+      "sha256": "61db6397b8b32b72c585d538ef698a84cf78cf2558a14046b3fa0ec4cc362540",
+      "size": 1454532
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/AIsouler.jpg",
+      "sha256": "0e97c5e4bb4da7dfa7da971d52c069c3d22b86ce8cdb7c625317226d90fa8fd0",
+      "size": 2105
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/AdySnowflake.png",
+      "sha256": "6bd21098f18ca22f205a4ee3fbf59cf2a8d5a75c798a3753a5741c48bcb2e3e7",
+      "size": 1550
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/CyberVacation.jpg",
+      "sha256": "4b95edd76befabb0da8c6eb6fcabb90effe937b1518b2809b21456738b34f518",
+      "size": 1786
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/EriDeLee.jpg",
+      "sha256": "852bd056d76397b3314436b1aa0f772483104ce8fce0310acf56fb431635e194",
+      "size": 1202
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/VillagerTom.jpg",
+      "sha256": "d987d9e3ba943db0fc0339e39e205893c62744c428a7ef3280eec78f3a8e3bc4",
+      "size": 1791
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/VillagerTom.png",
+      "sha256": "355ca53312ad205ae09d7ad9ddf196df709fef746d2a533bcbbce7d7376b21ed",
+      "size": 1526
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/ZeonX.jpg",
+      "sha256": "09ed40cda4a67a1664949b94bb84813b206d503136e7cdfaa14c44b065ed629a",
+      "size": 1504
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/arue.jpg",
+      "sha256": "66b890e3ffd61b5611644241e3eb7a3689410fbb2569705173fb95cc265e81a2",
+      "size": 4362
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/dabaozi.jpg",
+      "sha256": "39a3a6c542c666cfc87fc9eb2ecb4402233a48a95789886a84126ab274185662",
+      "size": 4894
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/feitianmoo.png",
+      "sha256": "a4245141655d4fe0cf66d9383cd4c31529f867ba292070a4e318c54c60351bfd",
+      "size": 1528
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/june2.jpg",
+      "sha256": "681f5eeaee14e1a8bd5e4d87cfea0c05a0d9913c0654a3b4567d8d23381b9906",
+      "size": 4555
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/kouhe3.jpg",
+      "sha256": "073e693af9e3db2987875260e5a021b670266b45652b193647dd6a62e3a8dfb9",
+      "size": 1816
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/soffchen.png",
+      "sha256": "c9e15eac40cb01098b5af5041d68e1f11cea2fbbd14980657f3ccf3bcf45bdda",
+      "size": 1717
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/songchenwen.jpg",
+      "sha256": "66217ac48587e508c311626204eebf0b86bfe2206e333a962d2de531eb027821",
+      "size": 1483
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/utafrali.jpg",
+      "sha256": "a3cc6ac4f4697336037fc48828b20a0f67329fc0c3fa953d4e2c42bedb9360ff",
+      "size": 1679
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/wfion.png",
+      "sha256": "568c7f6be480d8117d6c0c5ca138d684d31168bb71a889344b27484568fcdc31",
+      "size": 1552
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/www.jpg",
+      "sha256": "d21b1deeb7dc48b02f221e77aea2e15d0a3c8d301f2f04c01ede1fff50c0653d",
+      "size": 4884
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/avatars/xiaolou.png",
+      "sha256": "731b94542d4cc2a2fd1042a2f7772d57dc92a97e9a25c63f25c30571733ce098",
+      "size": 3465
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon.ico",
+      "sha256": "738643ceaf19f37f2a81a7bdcee4a5e004d6279ca0b3ae8f3b3b3fb7cf693df0",
+      "size": 202265
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon.png",
+      "sha256": "1f286d8602c21a16089fee84735efb016efd89e89af02e6862e239bcd0525650",
+      "size": 28181
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_black.ico",
+      "sha256": "bfb282c8c422bc54d53925a60b42235285a05a832dd1da0a9a0c0eaadfa17290",
+      "size": 168643
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_black.png",
+      "sha256": "6bfc8d355ebef606645b2c7663ca1c5af21e3203ea0d138908a3eb0831064516",
+      "size": 13435
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_black_macOS.png",
+      "sha256": "da632bd6fc285e0a81290caa7dd3ee604621e0603117cb4531165449c529b8b2",
+      "size": 11194
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_light.ico",
+      "sha256": "9f3e0141bad4aacff5bb7b112247841fba6c3f29fb2ae1ad172db76e04b009c5",
+      "size": 199929
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_light.png",
+      "sha256": "2e4acbbb3ced67f0f5654e1a6ff6a28227b56111256e5475d5a44e06efece9cf",
+      "size": 30657
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_light_macOS.png",
+      "sha256": "98bba614ba752d8bc2fc421d63e2a0c58f16046384b555e5aae8964009b272ef",
+      "size": 11541
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_template.png",
+      "sha256": "8351719224fca13bc0ba82a3d8ea148536c67216bf4840aebb1cfc58576c0894",
+      "size": 21126
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_white.ico",
+      "sha256": "881d8535f78e96f5a55807f4c4e323041057cb6779cb7e6dbfb65eaf9a42e786",
+      "size": 169337
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/assets/images/icon_white.png",
+      "sha256": "ddc5c7acf260e7c1be3877a1bffbecba28d45d75dd7f72372f7220298feacbae",
+      "size": 13468
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/fonts/MaterialIcons-Regular.otf",
+      "sha256": "d9865b671a09d683d13a863089d8825e0f61a37696ce5d7d448bc8023aa62453",
+      "size": 1645184
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/class.ttf",
+      "sha256": "ae9535e21dae5ba6bc17263927a06f4d1cbcf07709b1f91497c529b8a417a753",
+      "size": 1172
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/event.ttf",
+      "sha256": "843c5354933fb0141d882078697f3f853f7ef7e5d793c260cf245251436fe4ec",
+      "size": 1096
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/field.ttf",
+      "sha256": "afddb0ffb27d3d70e660ea5a4672785544bb6909e9aa2acb54a1f201dace7fbd",
+      "size": 1124
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/interface.ttf",
+      "sha256": "f9f50e9acf5a12f9d26495d4e1ed507338a3f3fffea47b0f1ddf055d53ba2495",
+      "size": 1192
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/method.ttf",
+      "sha256": "1a8b6a7372d137d4d20099d8ec6a2702b65c64651ec4cd4caaf76bc93b28264a",
+      "size": 1132
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/operator.ttf",
+      "sha256": "ce8f39fce11bab0859a9347d264a1ad58894dfeeedb2aaf9f2ca258d324e907f",
+      "size": 1436
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/struct.ttf",
+      "sha256": "4840d9cef4b0bfce23e170fceb1789e9a0ee7bdae4cec443b67beeee6c901a57",
+      "size": 1140
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/code_forge/assets/icons/variable.ttf",
+      "sha256": "cdedc0ac8ded732e19f6730215fcdbfdb123c810d7ddbee0bca35da48472d12a",
+      "size": 1164
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/packages/wakelock_plus/assets/no_sleep.js",
+      "sha256": "726c644cda17bf271d996fb629806a59409607e9b00e0dfbf75adfd3986bbb7e",
+      "size": 13669
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/shaders/ink_sparkle.frag",
+      "sha256": "1fe8436a743884cb65078fe8c7b38e18f5365f2a2961270916f426fd13c604af",
+      "size": 21856
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/flutter_assets/shaders/stretch_effect.frag",
+      "sha256": "62a899ff4e168ac6ca888ce7c2f40e5d3fbf8ca20a1c3ded781a116a6d7907e2",
+      "size": 17624
+    },
+    {
+      "path": "build/windows/x64/runner/Release/data/icudtl.dat",
+      "sha256": "998367809a821d595928089c197b3f7959f0420f81f79d4d0daee53378492ed5",
+      "size": 862304
+    },
+    {
+      "path": "build/windows/x64/runner/Release/dynamic_color_plugin.dll",
+      "sha256": "3b1c268dec0967978cf0ed236805960a9915b436550c2f37a163fa3013107b58",
+      "size": 82944
+    },
+    {
+      "path": "build/windows/x64/runner/Release/file_selector_windows_plugin.dll",
+      "sha256": "674f3e720b248dbafda2068c46e7aa554bb9d767ca695ccd5f393e755e3339a9",
+      "size": 111616
+    },
+    {
+      "path": "build/windows/x64/runner/Release/flutter_qjs_plugin.dll",
+      "sha256": "edd070ff61305466fc19e4d8f22fa40e0cc77f573faa25abaaecc10d86cd6218",
+      "size": 706048
+    },
+    {
+      "path": "build/windows/x64/runner/Release/flutter_secure_storage_windows_plugin.dll",
+      "sha256": "3c920c304ce0c43d52943cd59eb796f5d0d2b30f25120623bc48fce8b8b0ce86",
+      "size": 159744
+    },
+    {
+      "path": "build/windows/x64/runner/Release/flutter_windows.dll",
+      "sha256": "67db13c69a0ce93242d11c2f99dd86ccbabce18ea9de613f126e9e31817d6de6",
+      "size": 21284864
+    },
+    {
+      "path": "build/windows/x64/runner/Release/hotkey_manager_windows_plugin.dll",
+      "sha256": "4d52319921d6a412012f36ba9cc92148b2a75e49c3625d6e7f18d27389969f09",
+      "size": 106496
+    },
+    {
+      "path": "build/windows/x64/runner/Release/msvcp140.dll",
+      "sha256": "08db4c39137815733db3adfc62e0a437798d7a5ec9eb40eecc638009e7189e5a",
+      "size": 590576
+    },
+    {
+      "path": "build/windows/x64/runner/Release/proxy_plugin.dll",
+      "sha256": "25e161e211149440267a24d699dbbb1d10a8ff527fe35672d64e7c06482a5cf2",
+      "size": 89088
+    },
+    {
+      "path": "build/windows/x64/runner/Release/restart_app_plugin.dll",
+      "sha256": "891b1f72ea096b12e2862bfcaf90807aa78216e68b2e298c53b7cb3723ac705e",
+      "size": 94208
+    },
+    {
+      "path": "build/windows/x64/runner/Release/screen_retriever_windows_plugin.dll",
+      "sha256": "18cb2dddaf7da06c4fe10e2540d51b981b3fea9272d09bc66cc1b3df5c71d63e",
+      "size": 119296
+    },
+    {
+      "path": "build/windows/x64/runner/Release/sqlite3.dll",
+      "sha256": "e6ebc2642223bb419a666e278ae4d2cef586cd528633e1a595270490b51c278a",
+      "size": 1710592
+    },
+    {
+      "path": "build/windows/x64/runner/Release/tray_manager_plugin.dll",
+      "sha256": "e6c05ef8fa682daaaaaa64992fdbffee2ea6bc598f5206d74d656df77a1ba0f7",
+      "size": 114176
+    },
+    {
+      "path": "build/windows/x64/runner/Release/url_launcher_windows_plugin.dll",
+      "sha256": "8e8ae2897ac9fd785d5a46db33e679ce0855c2b6261b2cd2f98ec45a07f3a860",
+      "size": 98304
+    },
+    {
+      "path": "build/windows/x64/runner/Release/vclibs_plugin.dll",
+      "sha256": "fc2e82ba70ad5898f3d477bb2ccf9fe0a8ab66b3decebe3180189dbf594824a3",
+      "size": 89088
+    },
+    {
+      "path": "build/windows/x64/runner/Release/vcruntime140.dll",
+      "sha256": "554c3c0ee01e3c875cd77452fd298a953756c1999e9baeab86ca0e79fec6e4da",
+      "size": 120048
+    },
+    {
+      "path": "build/windows/x64/runner/Release/vcruntime140_1.dll",
+      "sha256": "22e55ccae823b7d69786fc5f7d8626bb25882f127df875b42cfc58ca5fae780d",
+      "size": 60168
+    },
+    {
+      "path": "build/windows/x64/runner/Release/window_ext_plugin.dll",
+      "sha256": "625ca0e6c5ee45c770324305d7c0206324da0ed186c74913de816346ba4d3187",
+      "size": 95232
+    },
+    {
+      "path": "build/windows/x64/runner/Release/window_manager_plugin.dll",
+      "sha256": "00da01299756457549e9e53996fc4229875303d5b25a920a4617fcc4f141e5a1",
+      "size": 130048
+    }
+  ],
+  "bundle_path": "build/windows/x64/runner/Release",
+  "commands_succeeded": true,
+  "completed_at": "2026-09-22T10:43:45.026175+00:00",
+  "lock_sha256": {
+    "core/go.sum": "eb88e2bbcc3786a8dd83e21012b62ed170aa3e6502e47327fe644f0e0bbf8de6",
+    "macos/Podfile.lock": "22225284264df5a3c9ccb5027c646ef5f15b3dd50c6e75e95006e5aba75fc262",
+    "macos/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved": "547391782fe3596c46183857c64517e4c3c71fb42ce0709368b206aeee338a62",
+    "pubspec.lock": "9524ae6fb6289d144a5cc6a060300347b09ca2455866a60d57f3334a58d31a18",
+    "services/helper/Cargo.lock": "dbac3f5606e1f5ab1aa58a50b7f63a734bf193fa02d9f178b2d971e0863bf642"
+  },
+  "locks_unchanged": true,
+  "requested_signing_mode": "not-applicable",
+  "schema_version": 1,
+  "signature_evidence": [],
+  "source_after": {
+    "dirty": false,
+    "head": "dd2998859b23f6fac9245077ebcd842e1e424d2a",
+    "status": [],
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_artifacts": [
+    {
+      "path": "libclash/windows/BettboxCore.exe",
+      "sha256": "8c93dc679fc8f6e21ff447126cb0ab75aac6c7e19fe25e24069578161404d06d",
+      "size": 49558016
+    },
+    {
+      "path": "libclash/windows/BettboxHelperService.exe",
+      "sha256": "ed788f0b4995715e04f951f554072441dbe9b0027019dfdfc29afb356c6ceb0f",
+      "size": 467456
+    }
+  ],
+  "source_before": {
+    "dirty": false,
+    "head": "dd2998859b23f6fac9245077ebcd842e1e424d2a",
+    "status": [],
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_unchanged": true,
+  "started_at": "2026-09-22T10:36:55.038271+00:00",
+  "target": "windows-x64"
+}

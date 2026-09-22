@@ -166,3 +166,65 @@ record-fingerprint: a24772e96d8db69b0ba22dc0966b4d85fbb51cdb1835c1e22bd0077db294
 
 ### HLG
 经 append dry-run 后 apply 追加配置操作与会话授权事实，并重建索引；bettbox-invite-platforms 后续为测试账号业务验收和平台开发。
+
+## 2026-09-22T17:51:51+08:00 · 邀请集成验证与桌面候选构建进展
+
+type: maintenance
+scope: ["Bettbox", "xboard", "platforms"]
+status: in-progress
+tags: ["invite", "macos", "windows", "ios", "validation"]
+continuity: resume
+continuity-key: bettbox-invite-platforms
+record-fingerprint: fcb4b5ed0de853ad637a36899efc29b2b5c4f9088e20e97827f7565f71c120b3
+
+### Summary
+邀请客户端共享逻辑与桌面收银适配已完成，沿用单仓库业务主线。用户有 iPhone、Apple Developer 团队尚未准备好。macOS 已通过关闭 Xcode 签名的原生编译及包内核心哈希验收；Windows 首次 CI 原生构建仍在执行。
+
+### Changed
+候选提交依次为 aa4b6c3、fe121ca、9a59d0d、7e0d08b。增加 Android WebView 控制器复用、桌面系统浏览器收银、HTTPS 地址校验、7 语言错误反馈、macOS Keychain capability、macOS 12 工程/Pod 基线及桌面验证入口。新增受限 Windows GitHub Runner workflow、PDEC 与安全的 Xboard 内存验证工具。本任务开发配置与持续推进授权作为限定桌面开发操作依据，不扩展到生产发布或真实资金变更。
+
+### Validation
+Flutter 全量 99 项通过；相关 3 文件 analyze clean；当前 Python 15 项通过。真实 Xboard 镜像在无网络、只读根/源卷、256 MiB/1 CPU 临时容器中完成 32 个检查，HTTP Kernel 注册绑定、100 元订单按 10% 算出 1000 分佣金、结算统计 [1,0,1000,10,0]→[1,1000,0,10,1000]、顺序重跑不重复；付款完成状态为夹具，不调用真实支付。macOS 9a59d0d clean 源码编译 App 169.3 MB，127 个文件进入 manifest，core SHA c1ecc1d0a92cb7dabb0e8baf6deb8388830914bea88d7a72945d37cdef02b912 与 bundle Contents/MacOS/BettboxCore 一致，源码/锁无漂移。署名事实为 linker ad hoc、无 Team、无资源封印，不能视为开发者签名安装包。
+
+### Next
+等待并核对 Windows run 35712369349（7e0d08b21770d9410dad17fa370ff883428a76bc，https://github.com/Promenar/Bettbox/actions/runs/35712369349）的真实构建、core/helper 绑定与 artifact；失败则修复并验证新候选。完成最终 DIA/HLG 文档提交。iOS 仍需 Runner、Packet Tunnel 桥接、App Group/Keychain、IAP 与团队真机验证；不只是签名就绪即可上线。
+
+### Risks
+macOS Keychain capability 经真实 Xcode 检查要求开发证书；未签名路线只用于编译。Apple 本机工具为 Xcode 27.0、Go 1.26.5、CocoaPods 1.17.0/Ruby 4.0.7，安装 CocoaPods 同时安装/更新其 OpenSSL 3.6.4 依赖。Windows 已修复 YAML 单行冒号、Python cp1252 输出和 Flutter/Dart .bat CreateProcess 查找问题，尚待原生构建最终结果。服务端 CheckCommission 缺少并发幂等保护，未改真实后端账务。公网真实注册、邮件收件、下载引导、付款/提现、各端系统权限及 VPN 设备体验均未验收。
+
+### DIA
+已同步 README、PRD、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、registry、PDEC 与实施计划；脱敏服务验证和 macOS 构建报告已随候选提交。
+
+### HLG
+阶段事实通过 append dry-run/apply 保存；Windows 最终结果待追加，continuity 保持 resume。
+
+## 2026-09-22T18:46:18+08:00 · 桌面原生构建验收与阶段暂停
+
+type: maintenance
+scope: ["Bettbox", "xboard", "platforms"]
+status: done
+tags: ["invite", "windows", "macos", "ios", "validation", "pause"]
+continuity: waiting
+continuity-key: bettbox-invite-platforms
+record-fingerprint: 6843946713b6e62652f6797c30e0f62812c8c0f2fb76aa87f3c38918143463d9
+
+### Summary
+邀请返利与桌面工程验证阶段已收口。Windows x64 和 macOS arm64 均完成原生编译及包内文件哈希验证，邀请后端隔离业务验证已通过。用户要求“这阶段动作完成后暂停”，因此只完成当前候选验收、文档交接及提交同步，随后暂停后续开发；iOS 原生工程与设备验收未启动。
+
+### Changed
+候选 601fba7 修复 Flutter 首次启动日志与版本 JSON 混合输出；804f327 保留原生失败诊断；7ebadef 将仓库从 S:\ 盘符根调整为 S:\s，避免 PROJECT_DIR 末尾反斜杠与 FLUTTER_TARGET 拼接，并按锁定 Flutter 3.44.9 模板补上 native_assets/windows 安装规则；dd2998859b23f6fac9245077ebcd842e1e424d2a 为 7 个生成文件固定 LF。前一候选已编译成功但被源码漂移检查拒绝，诊断确认仅 CRLF/LF 差异，无注册代码差异。源码和锁文件检查未被绕过。PDEC 已更新引用摘要并通过执行校验。
+
+### Validation
+Windows run 35716722203（https://github.com/Promenar/Bettbox/actions/runs/35716722203）在 dd2998859b23f6fac9245077ebcd842e1e424d2a 上整体 success：Go core、Rust helper、Flutter App 编译成功，源码/锁文件无漂移，82 个 bundle 文件进入清单，含 sqlite3.dll，core/helper 源与包内哈希一致。主控下载 artifact 后逐一复核 82 个文件大小与 SHA256，并解析 Bettbox.exe、BettboxCore.exe、BettboxHelperService.exe、sqlite3.dll 的 PE Machine=0x8664。Windows 证据已保存 docs/validation/2026-09-22-windows-x64.json。本地 Python 16 项通过；客户端源码与之前 99 项 Flutter 回归通过的版本未变。macOS 9a59d0d 的客户端/Go/macOS 源码与当前候选相同，本机 127 个 bundle 文件复核全部匹配证据。原生独立审阅者 invite_review 对构建脚本失败收口、签名事实、短路径和 native assets 规则未发现新的 P0/P1/P2，主控补齐其提出的 CI、生成文件差异和 DLL 实物验收缺口。
+
+### Next
+按用户明确要求暂停，不开展新的平台实现、CI 重跑、设备联调或发布。恢复后先读取本条交接与 docs/PLATFORM_VALIDATION.md：按适当签名在 Windows/macOS 验证登录持久化、邀请实际扫码、系统浏览器、代理/TUN、服务和休眠恢复；准备可分发安装包及网页下载入口；iOS 需要 Runner、Packet Tunnel 桥接、App Group/Keychain、IAP 与开发者团队签名。用户有 iPhone，开发者团队尚未准备好。
+
+### Risks
+编译通过不等于 VPN、系统权限或设备体验验收；macOS 产物是请求禁用 Xcode 签名后的链接器 ad hoc，无 Team/资源封印。Windows artifact 保留 7 天，非正式发布。测试面板 android_download_url、windows_download_url、macos_download_url 均为空，公网注册提交、真实邮件、下载引导、付款和提现仍未验收。勘误：前条 HLG“CheckCommission 缺少并发幂等保护”表述过宽；实际正常调度有 onOneServer() 与 withoutOverlapping(5)，当前没有正常调度重复返佣证据。单笔查询缺少数据库行锁及相应唯一约束，直接并发调用或调度锁失效时的数据库幂等未验证。隔离测试只证明顺序重跑不重复入账，没有修改真实账务。
+
+### DIA
+已同步 PLATFORM_VALIDATION、CHANGELOG、PDEC README、平台实施计划和 Windows 构建证据；README、ARCHITECTURE、PRD 与 registry 已复核，共享架构和业务约定无新增变化。
+
+### HLG
+使用 append dry-run/apply 追加最终构建证据、前序并发风险勘误与用户暂停边界，重建索引；continuity=waiting，等待用户恢复指令。

@@ -12,6 +12,8 @@
 - 桌面收银使用系统浏览器，Android 控制器在重绘时复用，初始收银地址只接受 HTTPS；增加失败反馈及平台回归测试。
 - 补齐 macOS Keychain entitlement，将 Podfile 与 Xcode 最低系统版本对齐当前 Xcode 27 SDK 的 macOS 12 要求，并更新 Pod 锁文件。
 - 增加非发布的桌面构建验证脚本、Windows GitHub 标准 Runner 工作流与 PDEC；保留既有发版入口。
+- 修复 Windows 首次 Flutter 初始化日志、批处理入口与短路径盘符根目录兼容问题，补齐 SQLite 等原生资产的安装目录复制，并固定 Flutter 平台生成文件为 LF 换行。
+- macOS arm64 和 Windows x64 原生编译通过，分别保留 127/82 个包内文件的哈希清单；Windows 开发产物上传至 CI。正式签名、安装分发与 VPN 实机验收仍需完成。
 
 ## [Unreleased] - feature/m1-account-subscription (2026-09-08)
 
