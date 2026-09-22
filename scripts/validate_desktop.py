@@ -158,6 +158,20 @@ def assert_locks_unchanged(root: Path, before: Mapping[Path, str]) -> None:
         raise RuntimeError(f"构建期间依赖锁文件发生变化：{names}")
 
 
+def evaluate_locks(
+    root: Path, before: Mapping[Path, str]
+) -> tuple[bool, dict[str, str | None], list[str]]:
+    current: dict[str, str | None] = {}
+    changed: list[str] = []
+    for path, digest in before.items():
+        file_path = root / path
+        current_digest = sha256_file(file_path) if file_path.is_file() else None
+        current[path.as_posix()] = current_digest
+        if current_digest != digest:
+            changed.append(path.as_posix())
+    return not changed, current, changed
+
+
 def _version_output(argv: Sequence[str], root: Path) -> str:
     result = subprocess.run(
         argv,
@@ -241,7 +255,19 @@ def sanitized_environment(extra: Mapping[str, str] | None = None) -> dict[str, s
     return environment
 
 
-def command_plan(root: Path, target: Target, core_sha256: str) -> list[Command]:
+def signing_mode(target: Target, unsigned_macos: bool) -> str:
+    if unsigned_macos and target.needs_helper:
+        raise RuntimeError("--unsigned-macos 仅支持 macos-arm64 目标")
+    return "unsigned" if unsigned_macos else ("not-applicable" if target.needs_helper else "adhoc-verified")
+
+
+def command_plan(
+    root: Path,
+    target: Target,
+    core_sha256: str,
+    unsigned_macos: bool = False,
+) -> list[Command]:
+    signing_mode(target, unsigned_macos)
     core_env = {
         "GOOS": target.goos,
         "GOARCH": target.goarch,
@@ -300,8 +326,17 @@ def command_plan(root: Path, target: Target, core_sha256: str) -> list[Command]:
         f"--dart-define=CORE_SHA256={core_sha256}",
         "--dart-define=APP_ENV=pre",
     )
-    commands.append(Command(flutter_args, root, label="编译 Flutter 桌面应用"))
-    if not target.needs_helper:
+    commands.append(
+        Command(
+            flutter_args,
+            root,
+            env={"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
+            if unsigned_macos
+            else None,
+            label="编译 Flutter 桌面应用",
+        )
+    )
+    if not target.needs_helper and not unsigned_macos:
         bundle = target.bundle_path.as_posix()
         commands.extend(
             [
@@ -501,33 +536,133 @@ def write_manifest(root: Path, target: Target, manifest: Mapping[str, object]) -
     return destination
 
 
-def execute_build(root: Path, target: Target) -> None:
+def close_failed_execution(
+    root: Path,
+    target: Target,
+    started_at: str,
+    lock_snapshot: Mapping[Path, str],
+    source_before: Mapping[str, object],
+    error: BaseException,
+    build_signing_mode: str,
+) -> None:
+    closure_problems: list[str] = []
+    try:
+        source_after: Mapping[str, object] = git_source_state(root)
+        source_unchanged: bool | None = source_state_unchanged(
+            source_before, source_after
+        )
+    except Exception as closure_error:  # 失败收口不得覆盖原始命令异常。
+        source_after = {"collection_error": str(closure_error)}
+        source_unchanged = None
+        closure_problems.append(f"源码状态采集失败：{closure_error}")
+
+    try:
+        locks_unchanged, lock_current, changed_locks = evaluate_locks(
+            root, lock_snapshot
+        )
+    except Exception as closure_error:  # 失败收口不得覆盖原始命令异常。
+        locks_unchanged = None
+        lock_current = {}
+        changed_locks = []
+        closure_problems.append(f"锁文件状态采集失败：{closure_error}")
+
+    command_error: dict[str, object] = {
+        "type": type(error).__name__,
+        "message": str(error),
+    }
+    if isinstance(error, subprocess.CalledProcessError):
+        command_error["returncode"] = error.returncode
+        command_error["command"] = list(error.cmd) if not isinstance(error.cmd, str) else error.cmd
+
+    manifest = {
+        "schema_version": 1,
+        "target": target.name,
+        "started_at": started_at,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "commands_succeeded": False,
+        "signing_mode": build_signing_mode,
+        "command_error": command_error,
+        "source_unchanged": source_unchanged,
+        "locks_unchanged": locks_unchanged,
+        "source_before": source_before,
+        "source_after": source_after,
+        "lock_sha256_before": {
+            path.as_posix(): digest for path, digest in sorted(lock_snapshot.items())
+        },
+        "lock_sha256_after": lock_current,
+        "changed_locks": changed_locks,
+        "closure_problems": closure_problems,
+    }
+    manifest_path: Path | None = None
+    try:
+        manifest_path = write_manifest(root, target, manifest)
+    except Exception as closure_error:  # 失败收口不得覆盖原始命令异常。
+        closure_problems.append(f"失败 manifest 写入失败：{closure_error}")
+
+    summary_parts = [
+        f"source_unchanged={source_unchanged}",
+        f"locks_unchanged={locks_unchanged}",
+    ]
+    if changed_locks:
+        summary_parts.append(f"changed_locks={','.join(changed_locks)}")
+    if manifest_path is not None:
+        summary_parts.append(
+            f"manifest={manifest_path.relative_to(root).as_posix()}"
+        )
+    summary_parts.extend(closure_problems)
+    error.add_note("失败收口｜" + "；".join(summary_parts))
+
+
+def execute_build(
+    root: Path, target: Target, unsigned_macos: bool = False
+) -> None:
     started_at = datetime.now(timezone.utc).isoformat()
+    build_signing_mode = signing_mode(target, unsigned_macos)
     lock_snapshot = snapshot_locks(root)
     source_before = git_source_state(root)
     core_path = root / target.core_path
     placeholder = "<core-sha256>"
-    initial_commands = command_plan(root, target, placeholder)[:2]
-    run_commands(initial_commands)
-    if not core_path.is_file():
-        raise RuntimeError(f"core 产物不存在：{target.core_path.as_posix()}")
-    core_sha256 = sha256_file(core_path)
-    plan = command_plan(root, target, core_sha256)
-    signature_evidence: list[str] = []
-    if target.needs_helper:
-        run_commands(plan[2:3])
-        copy_windows_helper(root)
-        run_commands(plan[3:])
-    else:
-        run_commands(plan[2:4])
-        signature_outputs = run_commands(plan[4:])
-        signature_evidence = parse_adhoc_signature(signature_outputs[-1] or "")
+    initial_commands = command_plan(
+        root, target, placeholder, unsigned_macos=unsigned_macos
+    )[:2]
+    signature_output = ""
+    try:
+        run_commands(initial_commands)
+        if not core_path.is_file():
+            raise RuntimeError(f"core 产物不存在：{target.core_path.as_posix()}")
+        core_sha256 = sha256_file(core_path)
+        plan = command_plan(
+            root, target, core_sha256, unsigned_macos=unsigned_macos
+        )
+        if target.needs_helper:
+            run_commands(plan[2:3])
+            copy_windows_helper(root)
+            run_commands(plan[3:])
+        else:
+            run_commands(plan[2:4])
+            if not unsigned_macos:
+                signature_outputs = run_commands(plan[4:])
+                signature_output = signature_outputs[-1] or ""
+    except (RuntimeError, subprocess.CalledProcessError) as error:
+        close_failed_execution(
+            root,
+            target,
+            started_at,
+            lock_snapshot,
+            source_before,
+            error,
+            build_signing_mode,
+        )
+        raise
+
+    signature_evidence = (
+        []
+        if target.needs_helper or unsigned_macos
+        else parse_adhoc_signature(signature_output)
+    )
 
     source_after = git_source_state(root)
-    locks_unchanged = all(
-        (root / path).is_file() and sha256_file(root / path) == digest
-        for path, digest in lock_snapshot.items()
-    )
+    locks_unchanged, _, _ = evaluate_locks(root, lock_snapshot)
     sources, bundle_files, bindings = validate_bundle(root, target)
     source_unchanged = source_state_unchanged(source_before, source_after)
     manifest = {
@@ -536,6 +671,7 @@ def execute_build(root: Path, target: Target) -> None:
         "started_at": started_at,
         "completed_at": datetime.now(timezone.utc).isoformat(),
         "commands_succeeded": True,
+        "signing_mode": build_signing_mode,
         "source_unchanged": source_unchanged,
         "locks_unchanged": locks_unchanged,
         "source_before": source_before,
@@ -567,6 +703,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="通过前置检查后执行不打包、不发布的原生编译",
     )
+    parser.add_argument(
+        "--unsigned-macos",
+        action="store_true",
+        help="仅编译 macOS 未签名候选；不作为登录、权限或持久化验收",
+    )
     return parser.parse_args(argv)
 
 
@@ -574,6 +715,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     root = repository_root()
     target = TARGETS[args.target]
+    signing_mode(target, args.unsigned_macos)
     if not (root / "pubspec.yaml").is_file():
         raise RuntimeError(f"无法识别 Bettbox 仓库根目录：{root}")
 
@@ -584,11 +726,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"目标：{target.name}；模式：{mode}")
     print("工具版本：" + "，".join(f"{key} {value}" for key, value in versions.items()))
     print("命令计划：")
-    for command in command_plan(root, target, "<core-sha256>"):
+    for command in command_plan(
+        root,
+        target,
+        "<core-sha256>",
+        unsigned_macos=args.unsigned_macos,
+    ):
         print(f"  {display_command(command, root)}")
 
     if args.execute:
-        execute_build(root, target)
+        execute_build(root, target, unsigned_macos=args.unsigned_macos)
     else:
         print("preflight 完成；未执行编译。传入 --execute 后才会构建。")
     return 0
@@ -599,4 +746,6 @@ if __name__ == "__main__":
         raise SystemExit(main())
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"错误：{error}", file=sys.stderr)
+        for note in getattr(error, "__notes__", ()):
+            print(note, file=sys.stderr)
         raise SystemExit(1) from error

@@ -10,12 +10,12 @@
 
 | 操作 | 执行主机 | 目标 | 入口 |
 | --- | --- | --- | --- |
-| macOS 编译验证 | 本机 macOS arm64，local | macOS arm64 | `python3 scripts/validate_desktop.py --target macos-arm64 --execute` |
+| macOS 编译验证 | 本机 macOS arm64，local | macOS arm64 | `python3 scripts/validate_desktop.py --target macos-arm64 --execute --unsigned-macos` |
 | Windows 编译验证 | GitHub 标准 `windows-2022`，github-hosted | Windows x86_64 | `.github/workflows/validate-desktop.yaml` |
 
 既有 `.github/workflows/build.yaml` 为发版 tag 构建入口，保留不变。验证入口单独产出开发候选，不执行发布。Windows 验证由当前 feature 分支相关文件的 push 或人工 workflow_dispatch 触发；每次使用事件绑定的确切 SHA，checkout 到工作区短目录 `s`。同步和构建触发不共用发版 tag。没有部署 Main/FNOS 的后台同步或任务执行服务。
 
-macOS 保留现有 Xcode ad hoc 签名；不需要 Apple Developer 团队。Windows 验证不读取签名密钥。不同 SHA 的日志和产物以 GitHub run 区分，同工作区不并发执行脚本。脚本默认只检查环境并展示命令，显式 `--execute` 才编译。
+macOS 当前验证操作为显式未签名编译：保留正式 Keychain entitlement，但不声称签名或登录持久化通过。实际 Xcode 检查已确认该 capability 需要开发证书。准备好团队签名后，再单独完成签名与 Keychain 验收。Windows 验证不读取签名密钥。不同 SHA 的日志和产物以 GitHub run 区分，同工作区不并发执行脚本。脚本默认只检查环境并展示命令，显式 `--execute` 才编译。
 
 ## 工具、依赖与证据
 

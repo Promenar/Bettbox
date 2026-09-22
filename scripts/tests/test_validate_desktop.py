@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import subprocess
 import sys
 import tempfile
@@ -61,6 +62,32 @@ class ValidateDesktopTest(unittest.TestCase):
         self.assertEqual(plan[3].argv[2], "macos")
         self.assertEqual(plan[4].argv[:3], ("codesign", "--verify", "--deep"))
         self.assertTrue(plan[5].capture_output)
+
+    def test_unsigned_macos_is_explicit_and_rejected_for_windows(self) -> None:
+        plan = validate_desktop.command_plan(
+            Path("repo"),
+            validate_desktop.TARGETS["macos-arm64"],
+            "digest",
+            unsigned_macos=True,
+        )
+        self.assertEqual(len(plan), 4)
+        self.assertEqual(
+            plan[-1].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
+        )
+        self.assertFalse(any(command.argv[0] == "codesign" for command in plan))
+        self.assertEqual(
+            validate_desktop.signing_mode(
+                validate_desktop.TARGETS["macos-arm64"], True
+            ),
+            "unsigned",
+        )
+        with self.assertRaisesRegex(RuntimeError, "仅支持 macos-arm64"):
+            validate_desktop.command_plan(
+                Path("repo"),
+                validate_desktop.TARGETS["windows-x64"],
+                "digest",
+                unsigned_macos=True,
+            )
 
     def test_host_validation_rejects_wrong_platform_or_architecture(self) -> None:
         target = validate_desktop.TARGETS["windows-x64"]
@@ -155,6 +182,63 @@ class ValidateDesktopTest(unittest.TestCase):
         after = dict(before)
         after["tracked_diff_sha256"] = "two"
         self.assertFalse(validate_desktop.source_state_unchanged(before, after))
+
+    def test_command_failure_records_lock_and_source_drift_without_masking(self) -> None:
+        target = validate_desktop.TARGETS["windows-x64"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in validate_desktop.LOCK_FILES:
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("locked", encoding="utf-8")
+
+            before = {
+                "head": "candidate",
+                "dirty": False,
+                "status": [],
+                "tracked_diff_sha256": "before",
+            }
+            after = {
+                "head": "candidate",
+                "dirty": True,
+                "status": [" M pubspec.lock"],
+                "tracked_diff_sha256": "after",
+            }
+            failure = subprocess.CalledProcessError(9, ("flutter", "pub", "get"))
+
+            def fail_and_change_lock(commands: object) -> None:
+                del commands
+                (root / validate_desktop.LOCK_FILES[0]).write_text(
+                    "changed", encoding="utf-8"
+                )
+                raise failure
+
+            with (
+                mock.patch.object(
+                    validate_desktop,
+                    "git_source_state",
+                    side_effect=[before, after],
+                ),
+                mock.patch.object(
+                    validate_desktop,
+                    "run_commands",
+                    side_effect=fail_and_change_lock,
+                ),
+            ):
+                with self.assertRaises(subprocess.CalledProcessError) as caught:
+                    validate_desktop.execute_build(root, target)
+
+            self.assertIs(caught.exception, failure)
+            self.assertIn("source_unchanged=False", failure.__notes__[0])
+            self.assertIn("locks_unchanged=False", failure.__notes__[0])
+            manifest_path = root / "build/desktop-validation/windows-x64.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self.assertFalse(manifest["commands_succeeded"])
+            self.assertEqual(manifest["signing_mode"], "not-applicable")
+            self.assertFalse(manifest["source_unchanged"])
+            self.assertFalse(manifest["locks_unchanged"])
+            self.assertEqual(manifest["command_error"]["returncode"], 9)
+            self.assertIn("pubspec.lock", manifest["changed_locks"])
 
 
 if __name__ == "__main__":

@@ -76,7 +76,8 @@ jobs:
         uses: dtolnay/rust-toolchain@1.98.0
 
       - name: Map short build path
-        run: subst S: '${{ github.workspace }}\s'
+        run: |
+          subst S: '${{ github.workspace }}\s'
 
       - name: Test validation entry
         run: python -m unittest scripts.tests.test_validate_desktop -v
