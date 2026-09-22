@@ -1289,8 +1289,53 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbHasAccount": MessageLookupByLibrary.simpleMessage(
       "Have an account? Sign in",
     ),
+    "xbInviteAvailable": MessageLookupByLibrary.simpleMessage(
+      "Available commission",
+    ),
+    "xbInviteCode": MessageLookupByLibrary.simpleMessage("Invitation code"),
     "xbInviteCodeOptional": MessageLookupByLibrary.simpleMessage(
       "Invite code (optional)",
+    ),
+    "xbInviteCopied": MessageLookupByLibrary.simpleMessage("Copied"),
+    "xbInviteCopyCode": MessageLookupByLibrary.simpleMessage(
+      "Copy invitation code",
+    ),
+    "xbInviteCopyError": MessageLookupByLibrary.simpleMessage(
+      "Could not copy. Please try again.",
+    ),
+    "xbInviteCopyLink": MessageLookupByLibrary.simpleMessage(
+      "Copy invitation link",
+    ),
+    "xbInviteCreate": MessageLookupByLibrary.simpleMessage(
+      "Create invitation code",
+    ),
+    "xbInviteCreating": MessageLookupByLibrary.simpleMessage("Creating…"),
+    "xbInviteDescription": MessageLookupByLibrary.simpleMessage(
+      "Share your link or QR code. Friends are linked to your invitation when they register on the website.",
+    ),
+    "xbInviteEmpty": MessageLookupByLibrary.simpleMessage(
+      "No invitation code is available yet.",
+    ),
+    "xbInviteLoadError": MessageLookupByLibrary.simpleMessage(
+      "Invitation information could not be loaded. Please try again later.",
+    ),
+    "xbInvitePending": MessageLookupByLibrary.simpleMessage(
+      "Pending commission",
+    ),
+    "xbInviteQrLabel": MessageLookupByLibrary.simpleMessage(
+      "Invitation registration QR code",
+    ),
+    "xbInviteRefresh": MessageLookupByLibrary.simpleMessage("Refresh"),
+    "xbInviteRegistered": MessageLookupByLibrary.simpleMessage(
+      "Invited registrations",
+    ),
+    "xbInviteSettlementNote": MessageLookupByLibrary.simpleMessage(
+      "Rewards and settlement follow the service rules. A registration does not mean commission has been credited.",
+    ),
+    "xbInviteTitle": MessageLookupByLibrary.simpleMessage("Invite rewards"),
+    "xbInviteTotal": MessageLookupByLibrary.simpleMessage("Total commission"),
+    "xbInviteWebsiteUnavailable": MessageLookupByLibrary.simpleMessage(
+      "The invitation website is unavailable. You can copy the code. Refresh later or contact support.",
     ),
     "xbLoadBalance": MessageLookupByLibrary.simpleMessage("Load balancing"),
     "xbLoadBalanceDesc": MessageLookupByLibrary.simpleMessage(

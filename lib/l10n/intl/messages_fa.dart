@@ -1278,6 +1278,45 @@ class MessageLookup extends MessageLookupByLibrary {
       "به‌روزرسانی داده‌ها",
     ),
     "xbFollowSystem": MessageLookupByLibrary.simpleMessage("دنبال کردن سیستم"),
+    "xbInviteAvailable": MessageLookupByLibrary.simpleMessage(
+      "کمیسیون قابل استفاده",
+    ),
+    "xbInviteCode": MessageLookupByLibrary.simpleMessage("کد دعوت"),
+    "xbInviteCopied": MessageLookupByLibrary.simpleMessage("کپی شد"),
+    "xbInviteCopyCode": MessageLookupByLibrary.simpleMessage("کپی کد دعوت"),
+    "xbInviteCopyError": MessageLookupByLibrary.simpleMessage(
+      "کپی انجام نشد. دوباره تلاش کنید.",
+    ),
+    "xbInviteCopyLink": MessageLookupByLibrary.simpleMessage("کپی پیوند دعوت"),
+    "xbInviteCreate": MessageLookupByLibrary.simpleMessage("ایجاد کد دعوت"),
+    "xbInviteCreating": MessageLookupByLibrary.simpleMessage("در حال ایجاد…"),
+    "xbInviteDescription": MessageLookupByLibrary.simpleMessage(
+      "پیوند یا کد QR خود را به اشتراک بگذارید. دعوت شما هنگام ثبت‌نام دوستتان در وب‌سایت ثبت می‌شود.",
+    ),
+    "xbInviteEmpty": MessageLookupByLibrary.simpleMessage(
+      "هنوز کد دعوتی در دسترس نیست.",
+    ),
+    "xbInviteLoadError": MessageLookupByLibrary.simpleMessage(
+      "اطلاعات دعوت بارگیری نشد. لطفاً بعداً دوباره تلاش کنید.",
+    ),
+    "xbInvitePending": MessageLookupByLibrary.simpleMessage(
+      "کمیسیون در انتظار تأیید",
+    ),
+    "xbInviteQrLabel": MessageLookupByLibrary.simpleMessage(
+      "کد QR ثبت‌نام با دعوت",
+    ),
+    "xbInviteRefresh": MessageLookupByLibrary.simpleMessage("تازه‌سازی"),
+    "xbInviteRegistered": MessageLookupByLibrary.simpleMessage(
+      "ثبت‌نام‌های دعوت‌شده",
+    ),
+    "xbInviteSettlementNote": MessageLookupByLibrary.simpleMessage(
+      "پاداش و تسویه تابع قوانین سرویس است. ثبت‌نام به معنی واریز کمیسیون نیست.",
+    ),
+    "xbInviteTitle": MessageLookupByLibrary.simpleMessage("پاداش دعوت"),
+    "xbInviteTotal": MessageLookupByLibrary.simpleMessage("مجموع کمیسیون"),
+    "xbInviteWebsiteUnavailable": MessageLookupByLibrary.simpleMessage(
+      "وب‌سایت دعوت در دسترس نیست. می‌توانید کد را کپی کنید. بعداً تازه‌سازی کنید یا با پشتیبانی تماس بگیرید.",
+    ),
     "xbLoadBalance": MessageLookupByLibrary.simpleMessage("توازن بار"),
     "xbLoadBalanceDesc": MessageLookupByLibrary.simpleMessage(
       "توازن بار بین گره‌های یک منطقه با نشست چسبنده (sticky-sessions)",

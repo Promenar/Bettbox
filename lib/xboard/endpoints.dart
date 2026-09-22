@@ -28,4 +28,7 @@ abstract final class XboardEndpoints {
   static const orderCancel = '/user/order/cancel';
   static const orderGetPaymentMethod = '/user/order/getPaymentMethod';
   static const couponCheck = '/user/coupon/check';
+  static const userCommConfig = '/user/comm/config';
+  static const inviteFetch = '/user/invite/fetch';
+  static const inviteSave = '/user/invite/save';
 }

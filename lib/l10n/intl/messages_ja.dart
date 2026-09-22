@@ -997,6 +997,35 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbContinuePay": MessageLookupByLibrary.simpleMessage("支払いを続ける"),
     "xbDataUpdated": MessageLookupByLibrary.simpleMessage("更新日時"),
     "xbFollowSystem": MessageLookupByLibrary.simpleMessage("システムに従う"),
+    "xbInviteAvailable": MessageLookupByLibrary.simpleMessage("利用可能な報酬"),
+    "xbInviteCode": MessageLookupByLibrary.simpleMessage("招待コード"),
+    "xbInviteCopied": MessageLookupByLibrary.simpleMessage("コピーしました"),
+    "xbInviteCopyCode": MessageLookupByLibrary.simpleMessage("招待コードをコピー"),
+    "xbInviteCopyError": MessageLookupByLibrary.simpleMessage(
+      "コピーできませんでした。もう一度お試しください。",
+    ),
+    "xbInviteCopyLink": MessageLookupByLibrary.simpleMessage("招待リンクをコピー"),
+    "xbInviteCreate": MessageLookupByLibrary.simpleMessage("招待コードを作成"),
+    "xbInviteCreating": MessageLookupByLibrary.simpleMessage("作成中…"),
+    "xbInviteDescription": MessageLookupByLibrary.simpleMessage(
+      "リンクまたは QR コードを共有すると、友達のウェブ登録時に招待が関連付けられます。",
+    ),
+    "xbInviteEmpty": MessageLookupByLibrary.simpleMessage("利用可能な招待コードはありません。"),
+    "xbInviteLoadError": MessageLookupByLibrary.simpleMessage(
+      "招待情報を読み込めません。後でもう一度お試しください。",
+    ),
+    "xbInvitePending": MessageLookupByLibrary.simpleMessage("確認中の報酬"),
+    "xbInviteQrLabel": MessageLookupByLibrary.simpleMessage("招待登録用 QR コード"),
+    "xbInviteRefresh": MessageLookupByLibrary.simpleMessage("更新"),
+    "xbInviteRegistered": MessageLookupByLibrary.simpleMessage("招待による登録数"),
+    "xbInviteSettlementNote": MessageLookupByLibrary.simpleMessage(
+      "報酬と精算はサービスの規則に従います。登録だけでは報酬の付与は確定しません。",
+    ),
+    "xbInviteTitle": MessageLookupByLibrary.simpleMessage("招待報酬"),
+    "xbInviteTotal": MessageLookupByLibrary.simpleMessage("累計報酬"),
+    "xbInviteWebsiteUnavailable": MessageLookupByLibrary.simpleMessage(
+      "招待用ウェブサイトを利用できません。コードはコピーできます。後で更新するか、サポートにお問い合わせください。",
+    ),
     "xbLoadBalance": MessageLookupByLibrary.simpleMessage("負荷分散"),
     "xbLoadBalanceDesc": MessageLookupByLibrary.simpleMessage(
       "同一地域の複数ノード間でセッションを維持して分散（sticky-sessions）",

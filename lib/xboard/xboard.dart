@@ -11,6 +11,7 @@ export 'domain_manager.dart';
 export 'domain_scheduler.dart';
 export 'endpoints.dart';
 export 'error_map.dart';
+export 'invite.dart';
 export 'models.dart';
 export 'order_models.dart';
 export 'region_catalog.dart';

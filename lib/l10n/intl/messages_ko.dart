@@ -1009,6 +1009,37 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbContinuePay": MessageLookupByLibrary.simpleMessage("계속 결제하기"),
     "xbDataUpdated": MessageLookupByLibrary.simpleMessage("데이터 업데이트"),
     "xbFollowSystem": MessageLookupByLibrary.simpleMessage("시스템 따르기"),
+    "xbInviteAvailable": MessageLookupByLibrary.simpleMessage("사용 가능한 수수료"),
+    "xbInviteCode": MessageLookupByLibrary.simpleMessage("초대 코드"),
+    "xbInviteCopied": MessageLookupByLibrary.simpleMessage("복사됨"),
+    "xbInviteCopyCode": MessageLookupByLibrary.simpleMessage("초대 코드 복사"),
+    "xbInviteCopyError": MessageLookupByLibrary.simpleMessage(
+      "복사하지 못했습니다. 다시 시도하세요.",
+    ),
+    "xbInviteCopyLink": MessageLookupByLibrary.simpleMessage("초대 링크 복사"),
+    "xbInviteCreate": MessageLookupByLibrary.simpleMessage("초대 코드 생성"),
+    "xbInviteCreating": MessageLookupByLibrary.simpleMessage("생성 중…"),
+    "xbInviteDescription": MessageLookupByLibrary.simpleMessage(
+      "링크나 QR 코드를 공유하세요. 친구가 웹사이트에서 가입하면 초대 관계가 연결됩니다.",
+    ),
+    "xbInviteEmpty": MessageLookupByLibrary.simpleMessage(
+      "아직 사용 가능한 초대 코드가 없습니다.",
+    ),
+    "xbInviteLoadError": MessageLookupByLibrary.simpleMessage(
+      "초대 정보를 불러올 수 없습니다. 나중에 다시 시도하세요.",
+    ),
+    "xbInvitePending": MessageLookupByLibrary.simpleMessage("확인 중인 수수료"),
+    "xbInviteQrLabel": MessageLookupByLibrary.simpleMessage("초대 가입 QR 코드"),
+    "xbInviteRefresh": MessageLookupByLibrary.simpleMessage("새로고침"),
+    "xbInviteRegistered": MessageLookupByLibrary.simpleMessage("초대로 가입한 사용자"),
+    "xbInviteSettlementNote": MessageLookupByLibrary.simpleMessage(
+      "보상과 정산은 서비스 규칙에 따릅니다. 가입 완료가 수수료 지급을 의미하지는 않습니다.",
+    ),
+    "xbInviteTitle": MessageLookupByLibrary.simpleMessage("초대 보상"),
+    "xbInviteTotal": MessageLookupByLibrary.simpleMessage("누적 수수료"),
+    "xbInviteWebsiteUnavailable": MessageLookupByLibrary.simpleMessage(
+      "초대 웹사이트를 사용할 수 없습니다. 코드는 복사할 수 있습니다. 나중에 새로고침하거나 고객지원에 문의하세요.",
+    ),
     "xbLoadBalance": MessageLookupByLibrary.simpleMessage("부하 분산"),
     "xbLoadBalanceDesc": MessageLookupByLibrary.simpleMessage(
       "같은 지역 여러 노드 간 세션 유지 분산(sticky-sessions)",

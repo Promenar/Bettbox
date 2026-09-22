@@ -84,3 +84,7 @@ app.*.map.json
 !.agents/
 !.agents/*.md
 !.agents/**/*.md
+
+# 项目注册表要求随源码同步的核心文档
+!/docs/ARCHITECTURE.md
+!/docs/CHANGELOG.md

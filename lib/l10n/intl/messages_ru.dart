@@ -1275,6 +1275,51 @@ class MessageLookup extends MessageLookupByLibrary {
     "xbContinuePay": MessageLookupByLibrary.simpleMessage("Продолжить оплату"),
     "xbDataUpdated": MessageLookupByLibrary.simpleMessage("Данные обновлены"),
     "xbFollowSystem": MessageLookupByLibrary.simpleMessage("Следовать системе"),
+    "xbInviteAvailable": MessageLookupByLibrary.simpleMessage(
+      "Доступная комиссия",
+    ),
+    "xbInviteCode": MessageLookupByLibrary.simpleMessage("Код приглашения"),
+    "xbInviteCopied": MessageLookupByLibrary.simpleMessage("Скопировано"),
+    "xbInviteCopyCode": MessageLookupByLibrary.simpleMessage("Копировать код"),
+    "xbInviteCopyError": MessageLookupByLibrary.simpleMessage(
+      "Не удалось скопировать. Попробуйте ещё раз.",
+    ),
+    "xbInviteCopyLink": MessageLookupByLibrary.simpleMessage(
+      "Копировать ссылку",
+    ),
+    "xbInviteCreate": MessageLookupByLibrary.simpleMessage(
+      "Создать код приглашения",
+    ),
+    "xbInviteCreating": MessageLookupByLibrary.simpleMessage("Создание…"),
+    "xbInviteDescription": MessageLookupByLibrary.simpleMessage(
+      "Поделитесь ссылкой или QR-кодом. При регистрации на сайте друг будет привязан к вашему приглашению.",
+    ),
+    "xbInviteEmpty": MessageLookupByLibrary.simpleMessage(
+      "Доступных кодов приглашения пока нет.",
+    ),
+    "xbInviteLoadError": MessageLookupByLibrary.simpleMessage(
+      "Не удалось загрузить информацию о приглашениях. Повторите попытку позже.",
+    ),
+    "xbInvitePending": MessageLookupByLibrary.simpleMessage(
+      "Ожидает подтверждения",
+    ),
+    "xbInviteQrLabel": MessageLookupByLibrary.simpleMessage(
+      "QR-код регистрации по приглашению",
+    ),
+    "xbInviteRefresh": MessageLookupByLibrary.simpleMessage("Обновить"),
+    "xbInviteRegistered": MessageLookupByLibrary.simpleMessage(
+      "Регистрации по приглашению",
+    ),
+    "xbInviteSettlementNote": MessageLookupByLibrary.simpleMessage(
+      "Начисление и расчёты определяются правилами сервиса. Регистрация не означает зачисление комиссии.",
+    ),
+    "xbInviteTitle": MessageLookupByLibrary.simpleMessage(
+      "Награды за приглашения",
+    ),
+    "xbInviteTotal": MessageLookupByLibrary.simpleMessage("Всего начислено"),
+    "xbInviteWebsiteUnavailable": MessageLookupByLibrary.simpleMessage(
+      "Сайт приглашений недоступен. Можно скопировать код. Обновите позже или обратитесь в поддержку.",
+    ),
     "xbLoadBalance": MessageLookupByLibrary.simpleMessage("Балансировка"),
     "xbLoadBalanceDesc": MessageLookupByLibrary.simpleMessage(
       "Балансировка между узлами региона с sticky-сессиями (sticky-sessions)",

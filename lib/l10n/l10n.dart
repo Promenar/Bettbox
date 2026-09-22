@@ -6458,6 +6458,186 @@ class AppLocalizations {
   String get xbRegionIQ {
     return Intl.message('Iraq', name: 'xbRegionIQ', desc: '', args: []);
   }
+
+  /// `Invite rewards`
+  String get xbInviteTitle {
+    return Intl.message(
+      'Invite rewards',
+      name: 'xbInviteTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share your link or QR code. Friends are linked to your invitation when they register on the website.`
+  String get xbInviteDescription {
+    return Intl.message(
+      'Share your link or QR code. Friends are linked to your invitation when they register on the website.',
+      name: 'xbInviteDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invited registrations`
+  String get xbInviteRegistered {
+    return Intl.message(
+      'Invited registrations',
+      name: 'xbInviteRegistered',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total commission`
+  String get xbInviteTotal {
+    return Intl.message(
+      'Total commission',
+      name: 'xbInviteTotal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pending commission`
+  String get xbInvitePending {
+    return Intl.message(
+      'Pending commission',
+      name: 'xbInvitePending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Available commission`
+  String get xbInviteAvailable {
+    return Intl.message(
+      'Available commission',
+      name: 'xbInviteAvailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rewards and settlement follow the service rules. A registration does not mean commission has been credited.`
+  String get xbInviteSettlementNote {
+    return Intl.message(
+      'Rewards and settlement follow the service rules. A registration does not mean commission has been credited.',
+      name: 'xbInviteSettlementNote',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No invitation code is available yet.`
+  String get xbInviteEmpty {
+    return Intl.message(
+      'No invitation code is available yet.',
+      name: 'xbInviteEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create invitation code`
+  String get xbInviteCreate {
+    return Intl.message(
+      'Create invitation code',
+      name: 'xbInviteCreate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Creating…`
+  String get xbInviteCreating {
+    return Intl.message(
+      'Creating…',
+      name: 'xbInviteCreating',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invitation code`
+  String get xbInviteCode {
+    return Intl.message(
+      'Invitation code',
+      name: 'xbInviteCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy invitation link`
+  String get xbInviteCopyLink {
+    return Intl.message(
+      'Copy invitation link',
+      name: 'xbInviteCopyLink',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy invitation code`
+  String get xbInviteCopyCode {
+    return Intl.message(
+      'Copy invitation code',
+      name: 'xbInviteCopyCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invitation registration QR code`
+  String get xbInviteQrLabel {
+    return Intl.message(
+      'Invitation registration QR code',
+      name: 'xbInviteQrLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copied`
+  String get xbInviteCopied {
+    return Intl.message('Copied', name: 'xbInviteCopied', desc: '', args: []);
+  }
+
+  /// `Could not copy. Please try again.`
+  String get xbInviteCopyError {
+    return Intl.message(
+      'Could not copy. Please try again.',
+      name: 'xbInviteCopyError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The invitation website is unavailable. You can copy the code. Refresh later or contact support.`
+  String get xbInviteWebsiteUnavailable {
+    return Intl.message(
+      'The invitation website is unavailable. You can copy the code. Refresh later or contact support.',
+      name: 'xbInviteWebsiteUnavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invitation information could not be loaded. Please try again later.`
+  String get xbInviteLoadError {
+    return Intl.message(
+      'Invitation information could not be loaded. Please try again later.',
+      name: 'xbInviteLoadError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Refresh`
+  String get xbInviteRefresh {
+    return Intl.message('Refresh', name: 'xbInviteRefresh', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

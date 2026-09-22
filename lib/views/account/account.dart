@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../store/orders_page.dart';
 import 'register_page.dart';
+import 'invite_page.dart';
 
 class AccountView extends ConsumerStatefulWidget {
   const AccountView({super.key});
@@ -212,6 +213,11 @@ class _AccountViewState extends ConsumerState<AccountView> {
                   leading: const Icon(Icons.receipt_long_rounded),
                   title: Text(appLocalizations.xbMyOrders),
                   onTap: () => BaseNavigator.push(context, const OrdersPage()),
+                ),
+                ListItem(
+                  leading: const Icon(Icons.card_giftcard_rounded),
+                  title: Text(appLocalizations.xbInviteTitle),
+                  onTap: () => BaseNavigator.push(context, const InvitePage()),
                 ),
                 ListItem(
                   leading: const Icon(Icons.construction),
