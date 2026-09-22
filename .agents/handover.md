@@ -104,3 +104,34 @@ Flutter 3.44.9 / Dart 3.12.2 既有工具链；flutter test --no-pub 91 项全�
 
 ### HLG
 使用 HLG append 先 dry-run 后 apply 追加此记录并重建索引。邀请部署验收及平台扩展以 bettbox-invite-platforms 工作流接续。
+
+## 2026-09-22T10:26:36+08:00 · 测试面板可达性与邀请站点配置核验
+
+type: diagnosis
+scope: ["Bettbox", "xboard"]
+status: done
+tags: ["invite", "panel", "connectivity", "configuration"]
+continuity: waiting
+continuity-key: bettbox-invite-platforms
+record-fingerprint: 25883c8068b8a55404d923dcda62104823b0102254a355e2384d1ef1f05492b7
+
+### Summary
+用户确认测试面板为 https://cloud.microsoftnexushub.top:8443/，源站 IP 170.106.143.23。已验证入口可用与邀请注册页预填；当前邀请链接指向不可达的后台 app_url，需明确授权后更正该持久配置。
+
+### Changed
+仅同步 .agents/plans/2026-09-22-invite-and-platforms.md 的当前联调状态；客户端源代码、后台配置和业务数据均未修改。
+
+### Validation
+curl 经普通域名、noproxy 直连、resolve 指定源站三条路径请求首页和 /api/v1/guest/comm/config 均 HTTP 200，TLS 校验为 0。Python 默认 User-Agent 请求公开配置返回 403，curl 标识返回 200；以项目实际 XboardApiClient/Dio 请求成功。浏览器 /#/register?code=BETTBOX_QA_ONLY 将测试标记预填到禁用邀请码字段，未提交表单。部署主题 JS 含已核对的 invite/fetch、invite/save、user/comm/config 与同源注册分享路由；主题 SHA256=69ff1e68dd44b84f803e631367b6fc9dfd52e79d049067fa52cfa859031f20dc。公开 app_url 为 https://cloud.bingcn.site，该域名 curl TLS 失败且浏览器 ERR_CONNECTION_CLOSED。
+
+### Next
+拟将测试面板 app_url 从 https://cloud.bingcn.site 更正为 https://cloud.microsoftnexushub.top:8443；需用户明确授权服务端持久配置变更。取得授权与安全的管理访问后，只更新该项并验证公开配置、客户端生成链接与网页路由。随后使用受控测试账号核验登录态邀请统计、注册归属与返佣流程。
+
+### Risks
+已复现请求客户端标识造成的结果差异，但服务端具体拦截规则未查证，不能称服务宕机或断言具体 WAF 配置。网页预填不证明邀请码有效或注册已绑定；未登录、未创建邀请、未注册、未触发真实付款或结算。dart run 触发既有 objective_c 缓存 kernel 版本不匹配，改用同一 Dart SDK 直接运行无原生依赖的 API 探针成功；未清理缓存或改工具链。
+
+### DIA
+已同步实施计划的联调事实；产品行为、接口设计和架构无变化，PRD/ARCHITECTURE/CHANGELOG 无需修改。
+
+### HLG
+通过 append dry-run 后 apply 追加核验与勘误，保留前序事实链；后台配置更正与业务验收维持 waiting。
