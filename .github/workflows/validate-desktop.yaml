@@ -96,6 +96,25 @@ jobs:
           python scripts/validate_desktop.py @arguments
         working-directory: 'S:\'
 
+      - name: Diagnose Flutter assembly failure
+        if: failure()
+        timeout-minutes: 5
+        continue-on-error: true
+        working-directory: 'S:\'
+        run: |
+          if (Test-Path 'build/windows/x64/flutter/flutter_assemble.vcxproj') {
+            cmake --build build/windows/x64 --target flutter_assemble --config Release --verbose
+          }
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-validation-evidence-${{ github.sha }}
+          path: s/build/desktop-validation/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload development bundle
         if: github.event_name == 'push' || inputs.mode == 'build'
         uses: actions/upload-artifact@v7
