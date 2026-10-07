@@ -908,3 +908,34 @@ record-fingerprint: cfd14642a91aa6f934eb591ec94e885f50a5ef816fdbb70903b6ee392d4c
 
 ### HLG
 标准append dry-run/apply，保存真实runtime证据与设计假设失效；旧事实链不改。
+
+## 2026-10-08T04:41:06+08:00 · Android配置协调候选30场景实际JVM验收
+
+type: development
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["release", "android", "config"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 8bf98e730b2aef8776b6f50991c7bdef4d9ea1a67e53d35a6ba4ee8abedb584b
+
+### Summary
+Android配置协调候选实际离线编译与30场景执行通过，交付范围保持Android/macOS优先、iOS开发版。
+
+### Changed
+增加公开脱敏配置协调验收回执，同步架构、平台验证、CHANGELOG和实施计划；实际客户端尚未应用候选。
+
+### Validation
+Kotlin2.1.0 compile_exit=0、run_exit=0；MANIFEST 63f5f15ab4f691fddabb037f308e6c940f3154999dbb8e6af00d9c5a96b7c205匹配。6源独立审阅通过。临时PDEC已恢复canonical并validate execution_ready=true。
+
+### Next
+形成同步Go/JNI配置桥真实合同，完成普通监听器/provider资源完成语义；macOS固定supervisor隔离Dart竞争reaper并接线owned专用入口。
+
+### Risks
+fake backend不能证明系统VPN、JNI、provider/listener；所有正式安装包与有效节点流量仍待验证。未使用凭据或进行生产支付/发布。
+
+### DIA
+已同步架构、平台验收、版本记录和实施计划。
+
+### HLG
+通过标准append记录实际候选验收与未完成边界。

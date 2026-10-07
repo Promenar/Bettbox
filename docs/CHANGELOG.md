@@ -2,6 +2,8 @@
 
 ## 2026-10-08
 
+- Android配置协调候选的30个JVM场景通过，覆盖配置副作用与启停串行、撤销和粘性恢复；真实同步JNI、监听器完成事实及Dart接线仍待实施。
+
 - 当前Dart退出线程竞争回收原生child经真实短时夹具复现；macOS原生独占回收方案需统一或隔离父属，未把纯Swift证据标为Flutter生产通过。
 
 - Android 联合候选修复旧Doze回调跨lease影响新连接的问题；23个JVM协调场景、权限归属夹具与20个Go helper/静态接线race测试通过，实际Android/Dart整包接线另验。

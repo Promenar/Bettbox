@@ -86,3 +86,5 @@ Android联合候选的Go/JNI/Service/Dart必须原子集成。开始/停止意�
 macOS真实签名宿主准入因Foundation child独立进程组失败。不得删除guard直接运行；固定child创建、管道继承、wait/reap与超时回收须形成独占合同并独立审阅。SDK身份候选已编译，9项fake及执行器22mock不能替代真实guest认证。
 
 Mac生产回收不能与Dart全局wait()竞争；当前同revision源码与真实FFI短时夹具已证实ECHILD。设计阶段评估固定sealed无Dart supervisor：Dart唯一持有supervisor Process，supervisor独占Core的未reap归属；宿主认证supervisor，supervisor认证固定Core且父属链必须明确。不可沿用“Core直接PPID宿主”的旧假设，也不能kill supervisor后把Core判为停止。受控退出与宿主外部强杀边界分别验收，不增加root服务或共享控制端口。设计未进入施工，待主控与独立审阅封闭合同。
+
+Android 配置协调候选的30场景实际JVM编译运行通过。配置bridge必须同步提交且关闭legacy写旁路；普通监听器当前无条件true/丢弃Close错误、隧道资源在setup中创建等事实须先形成可验证完成合同。不能把fake Applied解释为普通socket/provider完成，也不能单独应用Kotlin overlay破坏真实backend ABI。

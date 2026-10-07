@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "冻结配置协调候选的生产Kotlin helper；未集成Android后台服务/JNI/Go/Dart",
+  "manifest_sha256": "63f5f15ab4f691fddabb037f308e6c940f3154999dbb8e6af00d9c5a96b7c205",
+  "compile_exit": 0,
+  "run_exit": 0,
+  "scenarios": 30,
+  "source_sha256": {
+    "AndroidNativeOperations.kt": "e838e1544125095383a0d7db2fee8da53538130178676367684c2eb66dd0a173",
+    "NativePreparedConfig.kt": "aecc1005280a2cde22a5eb9384ad08cafd6ec912bcc021bdc841fd01f5625b69",
+    "AndroidNativeOperationsFixture.kt": "c069a1b36aba1f232ce79c043ba531a14452f0b58de50ad040a666bfab6889bf"
+  },
+  "independent_review": "冻结6源核验通过；有界审阅未发现确定P1/P2",
+  "limitations": [
+    "Applied与Confirmed使用fake backend，不证明实际监听、provider或TUN完成",
+    "Kotlin异常不代表Go panic/abort",
+    "同步配置JNI、HTTP/FFI写入旁路拒绝和Dart generation尚未接线",
+    "协程1.6.4是编译夹具缓存版本，非App最终解析证据"
+  ]
+}
