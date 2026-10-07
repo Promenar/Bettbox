@@ -2,6 +2,8 @@
 
 ## 2026-10-08
 
+- 当前Dart退出线程竞争回收原生child经真实短时夹具复现；macOS原生独占回收方案需统一或隔离父属，未把纯Swift证据标为Flutter生产通过。
+
 - Android 联合候选修复旧Doze回调跨lease影响新连接的问题；23个JVM协调场景、权限归属夹具与20个Go helper/静态接线race测试通过，实际Android/Dart整包接线另验。
 - macOS native身份候选SDK编译与9项fake通过；真实launch暴露Foundation独立child进程组，创建/回收合同进入专门诊断，未标记真实guest或完整发行通过。
 

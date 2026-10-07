@@ -84,3 +84,5 @@ macOS 固定核心身份使用最终签名后重新绑定的文件；合法codes
 Android联合候选的Go/JNI/Service/Dart必须原子集成。开始/停止意图需先登记generation，配置写入、副作用完成与TUN启停由同一所有者串行；异步配置任务的token检查不足以证明旧任务已停止，必须明确实际排空与超时保留恢复状态。真实JVM23场景和Go20函数已通过，平台编译与有效流量不可据此豁免。
 
 macOS真实签名宿主准入因Foundation child独立进程组失败。不得删除guard直接运行；固定child创建、管道继承、wait/reap与超时回收须形成独占合同并独立审阅。SDK身份候选已编译，9项fake及执行器22mock不能替代真实guest认证。
+
+Mac生产回收不能与Dart全局wait()竞争；当前同revision源码与真实FFI短时夹具已证实ECHILD。设计阶段评估固定sealed无Dart supervisor：Dart唯一持有supervisor Process，supervisor独占Core的未reap归属；宿主认证supervisor，supervisor认证固定Core且父属链必须明确。不可沿用“Core直接PPID宿主”的旧假设，也不能kill supervisor后把Core判为停止。受控退出与宿主外部强杀边界分别验收，不增加root服务或共享控制端口。设计未进入施工，待主控与独立审阅封闭合同。

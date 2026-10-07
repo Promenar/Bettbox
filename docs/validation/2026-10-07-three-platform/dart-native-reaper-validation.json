@@ -1,0 +1,36 @@
+{
+  "scope": "固定true与sleep1；无核心/配置/账户/网络，native不signal、不reap",
+  "compile_exit": 0,
+  "run_exit": 0,
+  "result": {
+    "schema": 1,
+    "native_spawned": true,
+    "native_already_reaped_by_other_owner": true,
+    "registered_exit": 0,
+    "observation": 2
+  },
+  "passed": true,
+  "schema": 1,
+  "source": {
+    "url": "https://raw.githubusercontent.com/dart-lang/sdk/d684a576a6aa954ae107a03b2b4e1d61c3bebe93/runtime/bin/process_macos.cc",
+    "dart_version": "3.12.2",
+    "revision": "d684a576a6aa954ae107a03b2b4e1d61c3bebe93",
+    "sha256": "bf30d8bca2a154148fe4e7f8f0705c3603a98e1af0f5258ccb97424ba1cbdc53"
+  },
+  "limitations": [
+    "只证明当前Dart3.12.2与固定true/sleep1的竞争回收；没有核心或业务动作",
+    "posix_spawn+C WNOWAIT在纯Swift宿主可单独验；不能据此宣称Flutter宿主唯一native reaper成立",
+    "必须调整或统一父属/回收策略后再生产接线"
+  ],
+  "owned_launch_bridge_compile_only": {
+    "exit_code": 0,
+    "manifest_sha256": "e46cb17164bbf9ecc68b1cd92315c4a4caa23cf1636da61178c2b8a363a71123",
+    "flags": [
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsyntax-only"
+    ],
+    "spawn_executed": false
+  }
+}

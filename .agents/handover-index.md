@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T04:01:36+08:00
+> generated_at: 2026-10-08T04:17:30+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T04:01:36+08:00 | partial | ["Bettbox"] | Android旧回调修复实测与macOS独立child分组取证 | `.agents/handover.md` · `2026-10-08T04:01:36+08:00` · `fp:b99d4a7e24` |
+| three-platform-release | resume | 2026-10-08T04:17:30+08:00 | partial | ["Bettbox"] | macOS当前Dart竞争回收真实复现 | `.agents/handover.md` · `2026-10-08T04:17:30+08:00` · `fp:cfd14642a9` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T04:17:30+08:00 | iso | partial | resume | ["Bettbox"] | ["macos", "runtime", "reaper", "release"] | macOS当前Dart竞争回收真实复现 | `.agents/handover.md` · `2026-10-08T04:17:30+08:00` · `fp:cfd14642a9` |
 | 2026-10-08T04:01:36+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "macos", "native", "release"] | Android旧回调修复实测与macOS独立child分组取证 | `.agents/handover.md` · `2026-10-08T04:01:36+08:00` · `fp:b99d4a7e24` |
 | 2026-10-08T03:10:57+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "macos", "identity", "release"] | Android启停基础与macOS最终签名身份实测 | `.agents/handover.md` · `2026-10-08T03:10:57+08:00` · `fp:b44a49a13f` |
 | 2026-10-08T02:17:21+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "startup", "race", "release"] | Android快速配置失败短路与启停候选审阅 | `.agents/handover.md` · `2026-10-08T02:17:21+08:00` · `fp:f9fccc7898` |

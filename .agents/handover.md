@@ -877,3 +877,34 @@ JVM coroutine1.6.4是compiler POM夹具非App解析证据；helper不代表真�
 
 ### HLG
 标准append dry-run/apply保存真实失败、通过及设计任务边界，不覆盖旧记录。
+
+## 2026-10-08T04:17:30+08:00 · macOS当前Dart竞争回收真实复现
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["macos", "runtime", "reaper", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: cfd14642a91aa6f934eb591ec94e885f50a5ef816fdbb70903b6ee392d4c0e51
+
+### Summary
+关闭macOS原生独占child回收方案的关键不确定性：Dart全局退出线程竞争reap已真实复现，生产方案待修，目标活跃。
+
+### Changed
+无实际生产代码修改；四源POSIX spawn桥为ignored候选。文档与公开回执记录runtime兼容边界。
+
+### Validation
+本机Flutter3.44/Dart3.12.2 revision d684a576a6aa954ae107a03b2b4e1d61c3bebe93；官方同SHA process_macos.cc wait(&status)源码核验。固定FFI posix_spawn true与登记Dart sleep1，compile/run0、native WNOWAIT ECHILD、Dart exit0。四源桥SHA e46cb171当前SDK clang -Wall/-Wextra/-Werror syntax-only0，未spawn。独立审阅C静态无其他P1/P2，生产唯一reaper假设属于P1待封闭。
+
+### Next
+两个有界设计候选待主控收束：Android同步实际配置/旁路关闭与Mac固定可信supervisor隔离父属。另由独立Agent设计Macowned-only盲HTTP入口/代次/关闭接线。未应用现38文件Android联合overlay，旧Dart仍不满足generation合同。
+
+### Risks
+纯Swift独立identity/launchfixture不代表Flutter生产兼容；仅禁向Dart交该PID不足。supervisor概念方案需重新验证sealed身份/父属链、relay来源与真实Core退出，不把helper exit或被kill判为Core停止。未新增root服务、网络、权限、付费或真实付款，没有正式包交付。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、计划和公开脱敏回执；临时PDEC恢复持久f0b8ebe输入，validate已确认execution_ready无漂移。
+
+### HLG
+标准append dry-run/apply，保存真实runtime证据与设计假设失效；旧事实链不改。
