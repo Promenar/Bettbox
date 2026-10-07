@@ -33,3 +33,5 @@
 - .pdec/contract.yaml、.pdec/README.md — 三端开发执行契约、授权来源、执行位置与回滚
 
 - docs/validation/2026-10-07-three-platform/ — 平台候选公开脱敏构建回执
+
+- docs/validation/2026-10-07-three-platform/macos-runner-real-go-validation.json — Runner冻结Release构建、真实Go签名链与退出验证；完整应用另验

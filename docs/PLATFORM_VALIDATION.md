@@ -157,4 +157,8 @@ macOS supervisor原生模块已纳入 `macos/CoreSupervisor`，当前SDK真实�
 
 2026-10-08 supervisor接线模块：actual生产helper及固定产物发行器完成SDK编译，32项原生步骤通过；host提交后期限与整链出生缺口已建立实际红例并修复，最终host定向回归通过。出生负例通过转发实际authority并在SDK结束后无条件改生，红/绿均发生变化。relay缓存取消和HUP前残留输入曾实际返回0，修复后固定失败31；paused-HUP的旧实现公开场景未稳定复现，源码审阅及修复后运行证明已采用明确EOF与缓存保护，不能把它写成实际红例。12项Python工具测试、17项Dart Session及155项Flutter全量测试、静态分析通过。
 
-实际host六ABI、production helper/owner/relay与公开framed Core的签名矩阵通过，SDK27.0；正常case确认握手、credit/result、exit0和native出生消失，清单篡改及helper错误ID拒绝exit70，检查时无匹配夹具进程。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json` 保存源SHA与执行界限。Runner工程、ClashService应用路由、真实Go/Mihomo、SC和完整发行包尚未覆盖；iOS按用户选择保留开发版及发行研究，Android/macOS优先交付。
+实际host六ABI、production helper/owner/relay与公开framed Core的签名矩阵通过，SDK27.0；正常case确认握手、credit/result、exit0和native出生消失，清单篡改及helper错误ID拒绝exit70，检查时无匹配夹具进程。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json` 保存源SHA与执行界限。该回执未覆盖Runner工程、ClashService应用路由、真实Go/Mihomo、SC或完整发行包；iOS按用户选择保留开发版及发行研究，Android/macOS优先交付。
+
+2026-10-08 Runner与真实Go专项：Host/Identity六源、Identity桥接头及窗口通道持有已纳入实际Runner；真实Go Core使用冻结SHA与生产helper/native host完成握手、getIsInit、credit/result和退出，exit0且native确认出生消失，检查时无该夹具残留。公开Core正常/篡改/错误ID矩阵通过，9项Python输出与Core准入测试通过。完整Flutter会话、helper/清单封装、系统代理及有效账户流量另验。证据为 `validation/2026-10-07-three-platform/macos-runner-real-go-validation.json`。
+
+Runner完整Release构建通过，宿主签名关闭，源码与依赖锁均未漂移；Core签名与bundle清单一致。首轮编译成功但因构建中清理空白导致源码漂移被拒绝，冻结后重建通过。宿主未签名且未封装helper，不作为可用发行包或运行身份链证据。

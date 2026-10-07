@@ -2,6 +2,8 @@
 
 ## 2026-10-08
 
+- 将固定宿主通道、Host/Identity源码与桥接头接入macOS Runner；真实Mihomo签名链通过握手、getIsInit及原生退出确认，9项Python拒绝/输出测试通过。helper封装、完整Flutter会话与系统代理另验。
+
 - 纳入macOS production helper/relay、宿主六ABI和Dart Session。提交期限、SDK后出生变化及背压/EOF丢数据缺口已建立红例并修复；32项原生步骤、最终host定向回归、17项Session测试、155项Flutter全量测试与静态分析通过。
 - 生产helper与真实host ABI的公开签名进程链矩阵通过：握手、credit/result、exit0/native出生消失；清单篡改及错误签名ID拒绝。公开Core不是Mihomo，完整App/Go业务/SC与发行另验。
 

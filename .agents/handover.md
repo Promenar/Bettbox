@@ -1063,3 +1063,34 @@ record-fingerprint: 73d87736be40ce51f9b88450b7b7fe019ffa551e5888b21b5b100fb4f985
 
 ### HLG
 通过Skill append dry-run/apply追加，保留事实链并重建索引；Goal维持active。
+
+## 2026-10-08T06:37:29+08:00 · macOS Runner编译接线及真实Mihomo签名进程链验证
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["release", "runner", "supervisor", "mihomo"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 084992c4057dceebc377c32d67ae17a02de13f82a9b0c77c00ede1f801f1a8c9
+
+### Summary
+Android/macOS优先交付、iOS保留开发版和发行研究。Runner工程接入固定宿主通道，真实Go Core完成独立签名身份链、只读动作及退出验收；完整发行目标继续推进。
+
+### Changed
+Runner窗口持有HostSupervisorFlutterBridge；Host/Identity六Swift源加入Runner Sources，Identity桥接头进入三配置。签名fixture新增真实Go变体及固定SHA/符号链接拒绝测试。新增PDEC真实Go操作及公开回执，不变更系统代理、生产服务或用户.video_agent目录。
+
+### Validation
+离线CGO0真实Go构建通过，未签名SHA fa9d2280b4b34fcad7092ce8faab1eb90af7aeb639c6ce1d900c0bf62aeea70b；签后生产helper/native host HELLO/ACK、getIsInit、credit/result、exit0/nativegone通过，检查无夹具进程。公开Core正常/清单篡改/helper错误ID矩阵通过，9个Python测试通过，plutil工程检查通过。完整Runner Release编译通过；首轮编译后因主控清理一处空白被源码漂移门禁拒绝，冻结后重建source_unchanged/locks_unchanged均true。独立只读审阅未发现明确P1/P2；执行脚本SHA由公开回执绑定。PDEC validate0/execution_ready=true，摘要781c0f4eb0978e408ee1ea08200999b84a2ccf3f0548eb584f5ece8d3abaa657。
+
+### Next
+将helper与身份清单纳入打包，两个产物及清单先签、host最终seal；接入ClashService生产Session并验证完整Flutter背压/退出与SC事务。Android推进真实JNI/Service/config所有者接线、正式APK和有效订阅流量；iOS开发版与发行研究。
+
+### Risks
+当前完整App宿主未签名且未封装helper，实际ClashService仍为既有启动路径，不能声明可用发行版本。真实Go验证只读未初始化状态，没有配置、有效业务流量或系统代理。Debug身份不同于固定生产身份，不用于链验收。Apple团队、Android有效订阅与付呗商户门店/安全注入条件尚缺；未执行真实资金或支付部署。
+
+### DIA
+已同步模块README、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC说明、registry、实施计划和公开Runner/Go回执。
+
+### HLG
+使用Skill append dry-run/apply追加并重建索引，Goal维持active。

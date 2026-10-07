@@ -21,6 +21,12 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		B8C010080000000000000101 /* HostSupervisorFlutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000001 /* HostSupervisorFlutter.swift */; };
+		B8C010080000000000000102 /* HostSupervisorProduction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000002 /* HostSupervisorProduction.swift */; };
+		B8C010080000000000000103 /* HostSupervisorAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000003 /* HostSupervisorAuthority.swift */; };
+		B8C010080000000000000104 /* SSIAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000004 /* SSIAuthority.swift */; };
+		B8C010080000000000000105 /* SSIFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000005 /* SSIFile.swift */; };
+		B8C010080000000000000106 /* SSIAppleBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000006 /* SSIAppleBackend.swift */; };
 		F50091162CF74B7700D43AEA /* BettboxCoreIdentity.json in Resources */ = {isa = PBXBuildFile; fileRef = F50091172CF74B7700D43AEA /* BettboxCoreIdentity.json */; };
 		331C80D8294CF71000263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294CF71000263BE5 /* RunnerTests.swift */; };
 		335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335BBD1A22A9A15E00E9071D /* GeneratedPluginRegistrant.swift */; };
@@ -96,6 +102,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B8C010080000000000000001 /* HostSupervisorFlutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host/HostSupervisorFlutter.swift; sourceTree = "<group>"; };
+		B8C010080000000000000002 /* HostSupervisorProduction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host/HostSupervisorProduction.swift; sourceTree = "<group>"; };
+		B8C010080000000000000003 /* HostSupervisorAuthority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host/HostSupervisorAuthority.swift; sourceTree = "<group>"; };
+		B8C010080000000000000004 /* SSIAuthority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identity/SSIAuthority.swift; sourceTree = "<group>"; };
+		B8C010080000000000000005 /* SSIFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identity/SSIFile.swift; sourceTree = "<group>"; };
+		B8C010080000000000000006 /* SSIAppleBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identity/SSIAppleBackend.swift; sourceTree = "<group>"; };
+		B8C010080000000000000202 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		F50091172CF74B7700D43AEA /* BettboxCoreIdentity.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ../libclash/macos/BettboxCoreIdentity.json; sourceTree = "<group>"; };
 		331C80D5294CF71000263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C80D7294CF71000263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
@@ -149,6 +162,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B8C010080000000000000201 /* CoreSupervisor */ = {
+			isa = PBXGroup;
+			children = (
+				B8C010080000000000000001 /* HostSupervisorFlutter.swift */,
+				B8C010080000000000000002 /* HostSupervisorProduction.swift */,
+				B8C010080000000000000003 /* HostSupervisorAuthority.swift */,
+				B8C010080000000000000004 /* SSIAuthority.swift */,
+				B8C010080000000000000005 /* SSIFile.swift */,
+				B8C010080000000000000006 /* SSIAppleBackend.swift */,
+			);
+			path = CoreSupervisor;
+			sourceTree = "<group>";
+		};
 		331C80D6294CF71000263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -174,6 +200,7 @@
 				F50091042CF74B7700D43AEA /* BettboxCore */,
 				F50091172CF74B7700D43AEA /* BettboxCoreIdentity.json */,
 				33FAB671232836740065AC1E /* Runner */,
+				B8C010080000000000000201 /* CoreSupervisor */,
 				33CEB47122A05771004F2AC0 /* Flutter */,
 				331C80D6294CF71000263BE5 /* RunnerTests */,
 				33CC10EE2044A3C60003C045 /* Products */,
@@ -219,6 +246,7 @@
 			children = (
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
+				B8C010080000000000000202 /* Runner-Bridging-Header.h */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
 				33E51914231749380026EE4D /* Release.entitlements */,
 				33CC11242044D66E0003C045 /* Resources */,
@@ -488,6 +516,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8C010080000000000000101 /* HostSupervisorFlutter.swift in Sources */,
+				B8C010080000000000000102 /* HostSupervisorProduction.swift in Sources */,
+				B8C010080000000000000103 /* HostSupervisorAuthority.swift in Sources */,
+				B8C010080000000000000104 /* SSIAuthority.swift in Sources */,
+				B8C010080000000000000105 /* SSIFile.swift in Sources */,
+				B8C010080000000000000106 /* SSIAppleBackend.swift in Sources */,
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
@@ -632,6 +666,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.appshub.bettbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Profile;
@@ -763,6 +798,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.appshub.bettbox.debug;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -786,6 +822,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.appshub.bettbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

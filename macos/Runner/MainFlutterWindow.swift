@@ -5,6 +5,7 @@ import LaunchAtLogin
 
 class MainFlutterWindow: NSWindow {
     private var appMethodChannel: FlutterMethodChannel?
+    private var hostSupervisorBridge: HostSupervisorFlutterBridge?
     
     override func awakeFromNib() {
         let flutterViewController = FlutterViewController()
@@ -31,6 +32,11 @@ class MainFlutterWindow: NSWindow {
         
         // Setup app method channel
         setupAppMethodChannel(flutterViewController: flutterViewController)
+
+        // 窗口持有桥接对象，确保固定宿主通道覆盖窗口生命周期。
+        hostSupervisorBridge = HostSupervisorFlutterBridge(
+            messenger: flutterViewController.engine.binaryMessenger
+        )
         
         RegisterGeneratedPlugins(registry: flutterViewController)
         

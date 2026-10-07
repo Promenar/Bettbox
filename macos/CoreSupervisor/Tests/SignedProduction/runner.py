@@ -75,7 +75,7 @@ def snapshot_sources(output):
         target.write_bytes((HERE / name).read_bytes())
     return snapshot, before
 
-def build(case, source):
+def build(case, source, real_core=None):
     app = case / "Bettbox.app"; macos = app / "Contents/MacOS"; resources = app / "Contents/Resources"
     macos.mkdir(parents=True, mode=0o700); resources.mkdir(mode=0o700)
     (app / "Contents/Info.plist").write_bytes(plistlib.dumps({"CFBundleIdentifier": "com.appshub.bettbox",
@@ -84,7 +84,11 @@ def build(case, source):
     actual = source / HELPER_ROOT; host_source = source / HOST_ROOT; public = source / "fixture"
     clang = ["/usr/bin/xcrun", "clang", "-target", "arm64-apple-macos12", "-Wall", "-Wextra", "-Werror"]
     core = macos / "BettboxCore"; helper = macos / "BettboxCoreSupervisor"; host = macos / "Bettbox"
-    tool(clang + [str(public / "Core.c"), "-o", str(core)])
+    if real_core is None:
+        tool(clang + [str(public / "Core.c"), "-o", str(core)])
+    else:
+        # 调用方提供已冻结的任务产物；不接收任意命令或Core启动参数。
+        core.write_bytes(real_core.read_bytes()); core.chmod(0o700)
     owned = case / "owned.o"; relay = case / "relay.o"
     tool(clang + ["-I", str(actual), "-c", str(actual / "Owner/OwnedBackend.c"), "-o", str(owned)])
     tool(clang + ["-I", str(actual), "-c", str(actual / "Relay/HelperC.c"), "-o", str(relay)])
@@ -96,7 +100,7 @@ def build(case, source):
     # 无fake/PublicFixture宏，helper main、owner、relay均来自actual冻结快照。
     tool(swift + production + [str(owned), str(relay), "-framework", "Security", "-framework", "Foundation", "-lproc", "-o", str(helper)], case / "helper-compile.log")
     host_files = identity + [str(host_source / name) for name in HOST_FILES] + [str(actual / "Relay/RelayCodec.swift"), str(public / "main.swift")]
-    tool(swift + host_files + [str(relay), "-framework", "Security", "-framework", "Foundation", "-lproc", "-o", str(host)], case / "host-compile.log")
+    tool(swift + (["-D", "REAL_GO_CORE"] if real_core is not None else []) + host_files + [str(relay), "-framework", "Security", "-framework", "Foundation", "-lproc", "-o", str(host)], case / "host-compile.log")
     sign(core, "com.appshub.bettbox.core"); sign(helper, "com.appshub.bettbox.core.supervisor")
     baseline = {}
     for binary, identifier in ((core, "com.appshub.bettbox.core"), (helper, "com.appshub.bettbox.core.supervisor")):

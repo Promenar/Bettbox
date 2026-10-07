@@ -3,8 +3,13 @@ import CoreFoundation
 import Darwin
 
 private struct FixtureFailure: Error {}
+#if REAL_GO_CORE
+private let action = Data("{\"protocol\":1,\"generation\":1,\"action\":{\"id\":\"fixture\",\"method\":\"getIsInit\",\"data\":null}}".utf8)
+private let result = Data("{\"protocol\":1,\"generation\":1,\"result\":{\"id\":\"fixture\",\"method\":\"getIsInit\",\"data\":false,\"code\":0,\"Port\":0}}".utf8)
+#else
 private let action = Data("{\"protocol\":1,\"generation\":1,\"action\":{\"id\":\"fixture\",\"method\":\"public_fixture\",\"data\":null}}".utf8)
 private let result = Data("{\"protocol\":1,\"generation\":1,\"result\":{\"id\":\"fixture\",\"data\":\"ok\"}}".utf8)
+#endif
 func publicLine(_ text: String) { FileHandle.standardOutput.write(Data((text + "\n").utf8)) }
 
 // 生产factory的replyQueue为main；执行线程等待，main通过dispatchMain交付真实异步ABI。

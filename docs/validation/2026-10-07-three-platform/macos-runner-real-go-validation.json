@@ -1,0 +1,335 @@
+{
+  "initial_build": {
+    "accepted": false,
+    "compiled": true,
+    "reason": "构建期间主控清理一处空白，源码漂移门禁拒绝；冻结后重建通过"
+  },
+  "public_core_matrix": {
+    "cases": {
+      "core-manifest-tamper": {
+        "baseline_signed_artifacts": {
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "schema": 1,
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "16261837955f1cd2014101becd7feb9f0937be72",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "schema": 1,
+            "sha256": "0520adf5f43e434cefaded83bf8bf6c8ebd7060630b5c39a452a04be61e5393c",
+            "signingmode": "adhoc"
+          }
+        },
+        "classification": "REJECTED",
+        "execution_artifacts": {
+          "Bettbox": {
+            "cdhash": "8611590d290b173fcca1eb25304fc2e649784910",
+            "identifier": "com.appshub.bettbox",
+            "sha256": "41c651ad94bd3bf2548b17661796ed94cc9c3cb3bbb47bbcb4f478f6a3349da1",
+            "signingmode": "adhoc"
+          },
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "16261837955f1cd2014101becd7feb9f0937be72",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "sha256": "0520adf5f43e434cefaded83bf8bf6c8ebd7060630b5c39a452a04be61e5393c",
+            "signingmode": "adhoc"
+          }
+        },
+        "execution_manifest_sha256": {
+          "BettboxCore": "330cccce942d85dd75be614c82378d514aa9076e267e1a35f32d67d7bc48441a",
+          "BettboxCoreSupervisor": "687a5e8841b4b0b0092294e81aec0a332f738f3a94fbb4f4ca107c38587acf6d"
+        },
+        "expected": "REJECTED",
+        "handshake": false,
+        "host_exit": 70,
+        "native_confirmed_gone": false,
+        "owner_retained_unknown": false,
+        "passed": true
+      },
+      "helper-wrong-id": {
+        "baseline_signed_artifacts": {
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "schema": 1,
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "16261837955f1cd2014101becd7feb9f0937be72",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "schema": 1,
+            "sha256": "0520adf5f43e434cefaded83bf8bf6c8ebd7060630b5c39a452a04be61e5393c",
+            "signingmode": "adhoc"
+          }
+        },
+        "classification": "REJECTED",
+        "execution_artifacts": {
+          "Bettbox": {
+            "cdhash": "b4a4737cd197c3eefcb32fef5042a54ef2f1c836",
+            "identifier": "com.appshub.bettbox",
+            "sha256": "3c93ede45e12f0fc856ff837330b312c9cd3099c0e80f44bbc916da8cde889b6",
+            "signingmode": "adhoc"
+          },
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "8099bafce807863d783eb5c4f96910f84efa31b3",
+            "identifier": "com.appshub.bettbox.fixture.wrong",
+            "sha256": "57921561705c67a6838f118f016bb63b0d35cec06e3d25a95db88b8504af687b",
+            "signingmode": "adhoc"
+          }
+        },
+        "execution_manifest_sha256": {
+          "BettboxCore": "dbee103dc5f3ab0dee4819da4a2e41dae3b6af414547d6c61a4fcea79f9a15b5",
+          "BettboxCoreSupervisor": "f54ac1478d3e040c4db681f21088d590c1d3fa768f0788c67fc1dd065c0ae58e"
+        },
+        "expected": "REJECTED",
+        "handshake": false,
+        "host_exit": 70,
+        "native_confirmed_gone": false,
+        "owner_retained_unknown": false,
+        "passed": true
+      },
+      "positive": {
+        "baseline_signed_artifacts": {
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "schema": 1,
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "16261837955f1cd2014101becd7feb9f0937be72",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "schema": 1,
+            "sha256": "0520adf5f43e434cefaded83bf8bf6c8ebd7060630b5c39a452a04be61e5393c",
+            "signingmode": "adhoc"
+          }
+        },
+        "classification": "ACCEPTED",
+        "execution_artifacts": {
+          "Bettbox": {
+            "cdhash": "8611590d290b173fcca1eb25304fc2e649784910",
+            "identifier": "com.appshub.bettbox",
+            "sha256": "41c651ad94bd3bf2548b17661796ed94cc9c3cb3bbb47bbcb4f478f6a3349da1",
+            "signingmode": "adhoc"
+          },
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "16261837955f1cd2014101becd7feb9f0937be72",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "sha256": "0520adf5f43e434cefaded83bf8bf6c8ebd7060630b5c39a452a04be61e5393c",
+            "signingmode": "adhoc"
+          }
+        },
+        "execution_manifest_sha256": {
+          "BettboxCore": "dbee103dc5f3ab0dee4819da4a2e41dae3b6af414547d6c61a4fcea79f9a15b5",
+          "BettboxCoreSupervisor": "687a5e8841b4b0b0092294e81aec0a332f738f3a94fbb4f4ca107c38587acf6d"
+        },
+        "expected": "ACCEPTED",
+        "handshake": true,
+        "host_exit": 0,
+        "native_confirmed_gone": true,
+        "owner_retained_unknown": false,
+        "passed": true
+      }
+    },
+    "execution": "PUBLIC_PRODUCTION_HELPER_FIXTURE",
+    "passed": true,
+    "sdk_version": "27.0",
+    "source_hashes_after": {
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+    },
+    "source_hashes_before": {
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+    }
+  },
+  "python_tests": {
+    "command": "python3 -m unittest discover -s macos/CoreSupervisor/Tests/SignedProduction -p 'test_*.py'",
+    "passed": 9
+  },
+  "real_go": {
+    "execution": {
+      "classification": "ACCEPTED",
+      "handshake": true,
+      "host_exit": 0,
+      "native_confirmed_gone": true,
+      "owner_retained_unknown": false
+    },
+    "passed": true,
+    "remaining_fixture_processes": 0,
+    "scope": "真实Mihomo getIsInit；不含Flutter、有效订阅流量或系统代理",
+    "signed_artifacts": {
+      "BettboxCore": {
+        "cdhash": "3a5cd7fd30d5016b9f477e72bd884d1b2799a237",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "a5a4ddef2d5b99d5e2e637ad8102f2b9b9c5f92f2e95868edc472a57d0b0a630",
+        "signingmode": "adhoc"
+      },
+      "BettboxCoreSupervisor": {
+        "cdhash": "711762e9f362d77820566ceb56bcc000adcf5c62",
+        "identifier": "com.appshub.bettbox.core.supervisor",
+        "schema": 1,
+        "sha256": "866125a59d21afcdcab663079ce1cdccf625462a0651544ac27b2393836fa5cd",
+        "signingmode": "adhoc"
+      }
+    },
+    "source_hashes_after": {
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+    },
+    "source_hashes_before": {
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+    },
+    "unsigned_core_sha256": "fa9d2280b4b34fcad7092ce8faab1eb90af7aeb639c6ce1d900c0bf62aeea70b"
+  },
+  "remaining": [
+    "helper产物/清单封装与最终host签名",
+    "ClashService/Session联合路由和背压验证",
+    "SC事务及有效账户流量",
+    "Android完整JNI/Service接线和正式APK",
+    "iOS开发版与发行研究"
+  ],
+  "review": "独立只读审阅未发现明确P1/P2；执行脚本版本由本回执source_hashes绑定",
+  "runner_build": {
+    "bundle_bindings": [
+      {
+        "bundled": "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore",
+        "core_identity": {
+          "cdhash": "7971b7cac3fe716ab0d496e4649d137a48eab3ec",
+          "identifier": "com.appshub.bettbox.core",
+          "schema": 1,
+          "sha256": "4f7aa21c314e91c53bd51a3125d9f189d0d3aa2b378cf969d98db42f0c1755af",
+          "signingmode": "adhoc"
+        },
+        "sha256": "4f7aa21c314e91c53bd51a3125d9f189d0d3aa2b378cf969d98db42f0c1755af",
+        "source": "libclash/macos/BettboxCore"
+      }
+    ],
+    "commands_succeeded": true,
+    "completed_at": "2026-10-07T22:36:22.634308+00:00",
+    "core_identity": {
+      "cdhash": "7971b7cac3fe716ab0d496e4649d137a48eab3ec",
+      "identifier": "com.appshub.bettbox.core",
+      "schema": 1,
+      "sha256": "4f7aa21c314e91c53bd51a3125d9f189d0d3aa2b378cf969d98db42f0c1755af",
+      "signingmode": "adhoc"
+    },
+    "lock_sha256": {
+      "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
+      "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
+      "macos/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved": "b6f691bab38585211c29413db6f0c7ceb637d4bcc71c4a072e105e9476991d06",
+      "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
+      "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd"
+    },
+    "locks_unchanged": true,
+    "requested_signing_mode": "unsigned",
+    "source_artifacts": [
+      {
+        "path": "libclash/macos/BettboxCore",
+        "sha256": "4f7aa21c314e91c53bd51a3125d9f189d0d3aa2b378cf969d98db42f0c1755af",
+        "size": 55250144
+      }
+    ],
+    "source_unchanged": true,
+    "started_at": "2026-10-07T22:36:02.379492+00:00"
+  },
+  "runner_executable_sha256": "e8a68d58349e4a4c5f7f016c6d9403b79faf6700deabbeb982e3e9c2fdbc5ffe",
+  "schema": 1,
+  "scope": "Runner真实Release编译与真实Go独立签名进程链；不含完整Flutter会话、SC或发行",
+  "source_hashes": {
+    "macos/CoreSupervisor/Tests/SignedProduction/BASE.json": "fa6dc956b9467a3912710d0a51dd9e0835194bab390e94ef918c8501c6f9ea60",
+    "macos/CoreSupervisor/Tests/SignedProduction/main.swift": "425bf905372a0ec1fc09d98eb3a2d9d8d5674607c089a95873540bc9712fccff",
+    "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py": "c93f39325fb30cd4b38bf24b22535a5f694f4a7f7f7525bf6e46e821e3c7f06c",
+    "macos/CoreSupervisor/Tests/SignedProduction/runner.py": "0c2b1697118515387d6a052b89257ffd4890e7a3611a75d217dff3481a4f0a51",
+    "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1",
+    "macos/CoreSupervisor/Tests/SignedProduction/test_runner.py": "22b662a46ac9b18eaabf96ffa64c6964deb40758d4f0da9b12afbdf572d9a914",
+    "macos/Runner.xcodeproj/project.pbxproj": "b4d80583a8fee619a83064dab80f05fd33f428557f6bf0457eb1b1045d4af0dc",
+    "macos/Runner/MainFlutterWindow.swift": "0f54186750626e31c7b1ff36f3ff6d50274937a84704ddc9afcb7390467e6212",
+    "macos/Runner/Runner-Bridging-Header.h": "3882f6fb721fe1b153594020d03ab14ce3e25e36a0a46b11f7c0ceb3238ae6c3"
+  }
+}

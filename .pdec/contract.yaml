@@ -809,7 +809,7 @@
         "python3",
         "macos/CoreSupervisor/Tests/SignedProduction/runner.py",
         "--output-name",
-        "run-20261008-production"
+        "run-20261008-wiring"
       ],
       "cwd": ".",
       "timeout_seconds": 600,
@@ -829,11 +829,28 @@
         "-s",
         "macos/CoreSupervisor/Tests/SignedProduction",
         "-p",
-        "test_runner.py"
+        "test_*.py"
       ],
       "cwd": ".",
       "timeout_seconds": 60,
       "artifacts": []
+    },
+    "test-supervisor-real-go": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py",
+        "--expected-core-sha256",
+        "fa9d2280b4b34fcad7092ce8faab1eb90af7aeb639c6ce1d900c0bf62aeea70b"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [
+        ".test/three-platform-release/macos-supervisor-real-go/RESULT.json"
+      ],
+      "verification": "本机冻结真实Go Core、生产helper/native host，ad hoc seal与getIsInit/EOF收束；无系统代理、有效账户流量或发行签名"
     }
   },
   "deployment": {
@@ -853,7 +870,7 @@
     "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
     "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd",
     "macos/Podfile": "f2024443bc69a9652010081500a9d8b24c8e483a8d63ca525337c8950ab6d438",
-    "macos/Runner.xcodeproj/project.pbxproj": "7593ad719abbd9deda739df88a1c6ecc0e27dae97f066edb98771bcf3d46893f",
+    "macos/Runner.xcodeproj/project.pbxproj": "b4d80583a8fee619a83064dab80f05fd33f428557f6bf0457eb1b1045d4af0dc",
     "macos/Runner/Release.entitlements": "0672f83103b450e4e0b5b86e42238d9b9ba39af727de43d185f22ec56143cda5",
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
@@ -983,11 +1000,15 @@
     "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
     "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
     "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "f64ffc5a21dd796caf801e9f87a82401100690dd352329bff0362c812235e6f6",
-    "macos/CoreSupervisor/Tests/SignedProduction/runner.py": "a0e9a7ae399d4e2bd11b3e58436c6134f16f1b96b7213e167f326f37d27e1e43",
+    "macos/CoreSupervisor/Tests/SignedProduction/runner.py": "0c2b1697118515387d6a052b89257ffd4890e7a3611a75d217dff3481a4f0a51",
     "macos/CoreSupervisor/Tests/SignedProduction/Core.c": "4074a699e2cea2aa19fdfe617f46a3a5719f06356ab48b57324e6a8d91b3909c",
     "macos/CoreSupervisor/Tests/SignedProduction/test_runner.py": "22b662a46ac9b18eaabf96ffa64c6964deb40758d4f0da9b12afbdf572d9a914",
-    "macos/CoreSupervisor/Tests/SignedProduction/BASE.json": "2044df883dd76dd775a3d47ea49e6e743d2bd79e008bf1094db5e40e91d7fca2",
-    "macos/CoreSupervisor/Tests/SignedProduction/main.swift": "516c813f2f8f386e9ddc55b759b6c804829c880bb5944bf344ec4b457f3a1211"
+    "macos/CoreSupervisor/Tests/SignedProduction/BASE.json": "fa6dc956b9467a3912710d0a51dd9e0835194bab390e94ef918c8501c6f9ea60",
+    "macos/CoreSupervisor/Tests/SignedProduction/main.swift": "425bf905372a0ec1fc09d98eb3a2d9d8d5674607c089a95873540bc9712fccff",
+    "macos/Runner/MainFlutterWindow.swift": "0f54186750626e31c7b1ff36f3ff6d50274937a84704ddc9afcb7390467e6212",
+    "macos/Runner/Runner-Bridging-Header.h": "3882f6fb721fe1b153594020d03ab14ce3e25e36a0a46b11f7c0ceb3238ae6c3",
+    "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py": "c93f39325fb30cd4b38bf24b22535a5f694f4a7f7f7525bf6e46e821e3c7f06c",
+    "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1"
   },
   "platform_extensions": {
     "android": {
@@ -1024,6 +1045,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "56822275cad4343602c4ed79e8b107159e9c709245f7eda99933ed2fe6474216"
+    "contract_digest": "781c0f4eb0978e408ee1ea08200999b84a2ccf3f0548eb584f5ece8d3abaa657"
   }
 }

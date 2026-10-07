@@ -1,12 +1,12 @@
 {
   "fixture_source_hashes": {
     "Core.c": "4074a699e2cea2aa19fdfe617f46a3a5719f06356ab48b57324e6a8d91b3909c",
-    "main.swift": "516c813f2f8f386e9ddc55b759b6c804829c880bb5944bf344ec4b457f3a1211",
-    "runner.py": "a0e9a7ae399d4e2bd11b3e58436c6134f16f1b96b7213e167f326f37d27e1e43",
+    "main.swift": "425bf905372a0ec1fc09d98eb3a2d9d8d5674607c089a95873540bc9712fccff",
+    "runner.py": "0c2b1697118515387d6a052b89257ffd4890e7a3611a75d217dff3481a4f0a51",
     "test_runner.py": "22b662a46ac9b18eaabf96ffa64c6964deb40758d4f0da9b12afbdf572d9a914"
   },
   "schema": 1,
-  "scope": "公开framed Core与实际production helper/host ABI，不代表Mihomo、Flutter、SC或发行",
+  "scope": "\u516c\u5f00framed Core\u4e0e\u5b9e\u9645production helper/host ABI\uff0c\u4e0d\u4ee3\u8868Mihomo\u3001Flutter\u3001SC\u6216\u53d1\u884c",
   "source_hashes": {
     "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
     "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",

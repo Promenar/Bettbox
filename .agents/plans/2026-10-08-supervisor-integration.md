@@ -30,4 +30,4 @@ relay使用nonblocking poll，每次读取只填当前帧所需字节；stdout�
 
 独立审阅发现的commit跨截止、SDK后出生变化与HUP背压缺口已修复，实际输出缓存取消和HUP残留输入红例得到复现。Core未取得出生记录时保持未知；未发行reservation的预检失败只有SDK退出后释放。host主动EOF正常完成仅证明已捕获的本代Core回收，不承诺取消后的未来业务结果；缓存或未读输入丢弃固定失败。
 
-Runner工程、helper打包/签名顺序、ClashService路由、真实Go Core及SC消费尚未接入。应用验证需在相同冻结版本确认完整签名seal、真实动作/结果、IOSink背压与退出、系统代理事务和账户有效流量。Android继续整包JNI/Service/配置所有者接线与正式APK验收；iOS保留开发版及发行方案研究。
+Runner工程已纳入Host/Identity源码及固定通道，真实Go Core与生产helper/native host独立进程链已验证；helper打包/签名顺序、ClashService路由及SC消费尚未接入。应用验证需在相同冻结版本确认完整签名seal、真实动作/结果、IOSink背压与退出、系统代理事务和账户有效流量。Android继续整包JNI/Service/配置所有者接线与正式APK验收；iOS保留开发版及发行方案研究。

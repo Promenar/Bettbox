@@ -142,6 +142,8 @@ StopListenerChecked使用各资源真实重建锁，覆盖ordinary、inbound和T
 
 `macos/CoreSupervisor` 包含Security/内核身份链、固定产物发行器、独占子进程生命周期、非阻塞relay和宿主六ABI。Host只发行native路径与不透明handle；Dart负责唯一helper Process，Core由无Dart的helper创建、信号与精确回收。SDK单worker不持意图锁，期限与整链出生在提交点核对；未知资源保留所有权。
 
-控制帧为4KiB，业务帧为10MiB；连续credit为写入流控，不代表RPC完成。HUP、半帧、背压和退出分别处理，缓存丢弃固定失败。`lib/clash/supervisor` 已提供生产Session及17项行为测试，ClashService和Runner工程尚未启用该通道。异步结果消费者的限额、真实Go入口和SC事务仍需应用层联合接线。
+控制帧为4KiB，业务帧为10MiB；连续credit为写入流控，不代表RPC完成。HUP、半帧、背压和退出分别处理，缓存丢弃固定失败。`lib/clash/supervisor` 已提供生产Session及17项行为测试，Runner窗口已持有固定宿主桥，六份Host/Identity源加入实际编译。ClashService尚未启用该通道；helper封装签名、异步结果消费者限额和SC事务需应用层联合接线。
 
 `scripts/check_macos_supervisor.py` 编译实际生产helper并运行身份/owner/relay/host验证。公开签名夹具通过真实宿主ABI和生产helper交换framed消息并确认停止；它的Core不是Mihomo，也不验证完整Flutter应用或系统代理。来源和实际执行证据见 `validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json`。
+
+真实Mihomo专用入口已与生产helper/native host完成签名身份链、HELLO/ACK、`getIsInit`及EOF退出验证，native确认本代出生消失；这项独立App验证不覆盖完整Flutter会话或业务流量。回执为 `validation/2026-10-07-three-platform/macos-runner-real-go-validation.json`。
