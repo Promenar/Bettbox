@@ -258,3 +258,33 @@ NoSLA物理内存929MiB且已使用swap；512MiB初始启动曾OOM/超时，调�
 
 ### HLG
 通过append dry-run/apply追加迁移事实与验收边界并重建索引；原邀请平台工作流的waiting/暂停记录保持不变。
+
+## 2026-10-07T18:27:59+08:00 · 本机开发分工与 iOS 模拟器环境就绪
+
+type: maintenance
+scope: ["Bettbox", "platforms", "environment"]
+status: done
+tags: ["android", "ios", "macos", "environment", "validation"]
+continuity: none
+record-fingerprint: b2e9dc0551b74b82144dc99bc494105fa8be13908ad09689663d89552c43180b
+
+### Summary
+用户确定本机负责 Android、iOS、macOS 开发调试，Windows 原生调试在 Windows 环境完成。授权体积合理时安装 iOS 运行时；已完成官方安装及设备启动验证。
+
+### Changed
+通过 xcodebuild -downloadPlatform iOS -architectureVariant arm64 安装 iOS 27.0（24A434）。下载约8.05GB，运行时 AssetData 实测约7.5GiB。Xcode 自动生成机型配置，共用同一运行时；没有额外手工创建 iOS 或 Android 设备，也未删除任何既有设备。更新 PLATFORM_VALIDATION 与 CHANGELOG。
+
+### Validation
+安装命令退出0，simctl runtime list 显示 Ready、arm64、sizeBytes=8067000161。现有自动生成 iPhone17 经 simctl bootstatus -b 启动完成，Flutter devices --machine 识别 isSupported=true、targetPlatform=ios、emulator=true。随后定向 shutdown 验证设备。Android 3个AVD均ARM64；Nexara文档明确引用API31/API35/Pixel7兼容和性能测试，Pixel7当前镜像API36.1；日常无需按项目各建AVD。工作树仅任务文档/交接变更，用户.video_agent保留。
+
+### Next
+日常共用一个Android模拟器与一个iPhone模拟器，兼容性回归时切换版本。正式Android/iOS构建与联调前登记并核验PDEC入口。本轮仅环境准备，不自动启动既有暂停的平台实现或支付联调。
+
+### Risks
+模拟器安装和启动不等于Bettbox iOS支持；仓库仍无ios主工程，Packet Tunnel、内核桥接、项目签名、IAP和真机VPN待开发验收。当前Apple Development身份存在，不代表团队及项目权限已具备。未修改shell PATH、资金或支付凭据。
+
+### DIA
+已同步PLATFORM_VALIDATION和CHANGELOG，架构与客户端代码无变更，既有PDEC构建字段保持原状。
+
+### HLG
+按append dry-run/apply新增环境事实与本机分工，不回写暂停记录，平台业务验收不外推。

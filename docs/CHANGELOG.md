@@ -1,5 +1,11 @@
 # 版本变更记录 (CHANGELOG)
 
+## [开发环境] - 本机平台分工与 iOS 模拟器 (2026-10-07)
+
+- 本机负责 Android、iOS、macOS 开发调试，Windows 原生调试使用 Windows 环境，保留现有 Windows CI。
+- 安装官方 iOS 27.0（24A434）ARM64 模拟器运行时，iPhone 17 启动及 Flutter 设备识别通过，验证后关闭。
+- Android 日常开发共用已有 AVD，其他版本用于兼容性回归；保留 Nexara 使用的现有设备。未创建 Bettbox iOS 工程或执行支付/VPN 验收。
+
 ## [运维] - NoSLA 服务端迁移 (2026-10-07)
 
 - Xboard、SQLite/Redis、CloudBridgeRelay、主题补丁、Caddy 和辅助 Mihomo 从腾讯云迁至 NoSLA；冻结快照及 34 张表、35 个绑定资源摘要一致。

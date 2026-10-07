@@ -13,6 +13,16 @@ Bettbox 使用 Flutter。页面、Riverpod 状态、Xboard API、邀请分享及
 | 内核运行 | 原生动态库与 VPNService | 独立 core 进程和平台服务 | 需 Packet Tunnel 与独立内核桥接 |
 | 系统集成 | Android 权限及生命周期 | Keychain/安全存储、托盘、代理、TUN、安装服务 | App Group、签名、隧道权限、后台生命周期 |
 
+## 本机开发环境与分工
+
+本机负责 Android、iOS、macOS 的开发与调试；Windows 原生构建、UI、代理/TUN 和服务调试使用 Windows 环境，现有 GitHub Windows 编译验证保留。具体 Android/iOS 构建与联调入口须在执行前登记到 PDEC；环境安装不代表平台业务已验收。
+
+2026-10-07 本机核对：Apple M5、32GB 内存，Flutter 3.44.9、Xcode 27.0、CocoaPods 1.17.0、Go 1.26.5，Android SDK、项目指定 NDK 28.2.13676358 与 CMake 3.22.1 已安装。Flutter/Dart 尚未加入当前 shell PATH，命令可使用已配置 SDK 或项目工具入口。
+
+Android 的 Nexara_API_31、Nexara_API_35 和 Pixel_7 是共享主机上的多系统版本测试设备，前两个由 Nexara 兼容性验证使用，Pixel_7 的当前镜像为 API 36.1。日常开发共用一个 AVD，兼容性回归才切换版本；不按项目数量新建模拟器，不删除其他项目仍引用的设备。关闭的 AVD 只占磁盘。
+
+iOS 27.0（24A434）ARM64 运行时已通过 Xcode 官方下载入口安装，下载约 8.05GB，运行时文件约占 7.5GiB。iPhone 17 的 simctl bootstatus 验证通过，Flutter 识别为受支持的 iOS 模拟器；验证后已关闭设备以释放运行资源。Xcode 自动生成的机型配置共用这份运行时，日常使用一个 iPhone 模拟器即可。Bettbox 尚无 iOS 主工程，模拟器环境不能替代 Packet Tunnel、项目签名与真机 VPN 验收。
+
 ## 已落地的平台差异
 
 `RedirectCashier` 只在 Android 创建 WebView 控制器。桌面使用 `url_launcher` 的 externalApplication；失败有本地化反馈。初始支付地址必须为 HTTPS 且不能包含 userinfo。Android 控制器在普通重绘时复用，地址变更时重新初始化并丢弃旧异步结果。QR 收银分支独立。

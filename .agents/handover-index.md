@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-07T17:56:04+08:00
+> generated_at: 2026-10-07T18:27:59+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -15,6 +15,7 @@
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-07T18:27:59+08:00 | iso | done | none | ["Bettbox", "platforms", "environment"] | ["android", "ios", "macos", "environment", "validation"] | 本机开发分工与 iOS 模拟器环境就绪 | `.agents/handover.md` · `2026-10-07T18:27:59+08:00` · `fp:b2e9dc0551` |
 | 2026-10-07T17:56:04+08:00 | iso | done | none | ["Bettbox", "xboard", "server", "cloudflare"] | ["migration", "nosla", "dns", "tls", "backup", "validation"] | Xboard 全量迁移至 NoSLA 与 Cloudflare 域名切换 | `.agents/handover.md` · `2026-10-07T17:56:04+08:00` · `fp:92845fea23` |
 
 ## Undated Records
