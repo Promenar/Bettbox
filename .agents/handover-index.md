@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-07T21:47:07+08:00
+> generated_at: 2026-10-07T22:44:53+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,14 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-07T21:47:07+08:00 | partial | ["Bettbox"] | Android官方依赖容量与签名集成冻结，交付优先Android和macOS | `.agents/handover.md` · `2026-10-07T21:47:07+08:00` · `fp:7b90a3bada` |
+| three-platform-release | resume | 2026-10-07T22:44:53+08:00 | partial | ["Bettbox"] | Android清理独立审阅闭合与真实Java身份验证 | `.agents/handover.md` · `2026-10-07T22:44:53+08:00` · `fp:1cfb8b706d` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-07T22:44:53+08:00 | iso | partial | resume | ["Bettbox"] | ["android-cleanup", "review"] | Android清理独立审阅闭合与真实Java身份验证 | `.agents/handover.md` · `2026-10-07T22:44:53+08:00` · `fp:1cfb8b706d` |
+| 2026-10-07T22:37:57+08:00 | iso | partial | resume | ["Bettbox"] | ["android-regression", "macos-proxy", "three-platform-release"] | Android缺陷隔离对照与macOS代理事务核心验收 | `.agents/handover.md` · `2026-10-07T22:37:57+08:00` · `fp:2010eb7496` |
 | 2026-10-07T21:47:07+08:00 | iso | partial | resume | ["Bettbox"] | ["three-platform-release", "android-network", "release-priority"] | Android官方依赖容量与签名集成冻结，交付优先Android和macOS | `.agents/handover.md` · `2026-10-07T21:47:07+08:00` · `fp:7b90a3bada` |
 | 2026-10-07T21:40:51+08:00 | iso | partial | resume | ["Bettbox", "Android", "iOS", "macOS"] | ["three-platform-release", "android-signing", "network-dependency", "apple-networkextension"] | Android正式签名接线通过与Apple用途边界复核 | `.agents/handover.md` · `2026-10-07T21:40:51+08:00` · `fp:18d45267ef` |
 | 2026-10-07T21:17:45+08:00 | iso | in_progress | resume | ["Bettbox"] | ["ios", "android", "macos", "validation", "release"] | iOS原生七项通过与Android Gradle启动参数定位 | `.agents/handover.md` · `2026-10-07T21:17:45+08:00` · `fp:1f0b34dccb` |

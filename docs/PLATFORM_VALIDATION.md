@@ -92,8 +92,15 @@ Android 正式发行密钥已在本机创建，密码位于登录钥匙串，密
 
 完整 iOS 模拟器应用构建使用当前工作树，来源检查通过；Pods 最低系统版本对齐 iOS 15、Runner 与 PacketTunnel 链接 SDK libresolv，模拟器候选仅包含 arm64。模拟器不支持系统 VPN，编译和页面操作不作为真机隧道、商店签名或可分发版本证据。最新共享 Flutter 135 项测试通过，静态检查无问题。
 
-Android 官方依赖使用仅任务的 loopback CONNECT 代理，90项网络、构建、契约及签名集成测试及独立审阅通过；32条转发与6条解析/连接分别有界限流，回执记录代理自产拒绝计数。实际 Java TLS、官方重定向与 Gradle 8.14 下载通过；早期 JVM 参数注入后，Gradle 已进入插件配置，不再报 DNS 缓存门禁错误。最新实际失败为 Kotlin 依赖解析（annotations:13.0、kotlin-gradle-plugin-idea:2.2.20），正在定位具体上游错误。来源与锁文件无漂移，任务 Gradle 进程清理已验证；实际 APK 及签名尚未验收。
+Android 官方依赖使用仅任务的 loopback CONNECT 代理，100项网络、构建、契约及签名集成测试通过；32条转发与6条解析/连接分别有界限流，回执记录代理自产拒绝计数。实际 Java TLS、官方重定向与 Gradle 8.14 下载通过。容量调整后的真实门禁仍失败：213次上游连接、3次排队超时和1次请求头拒绝，不足以认定官方源或网络容量为最终根因。原回执的进程清理验证失败；后续只读检查没有发现该任务持有者，不覆盖原失败记录。
+
+隔离复现脚本 `python3 scripts/check_android_regressions.py` 在候选 `23747c0` 上证明慢请求头使全局门禁失败，以及带空格 Java 路径无法认定归属；当前实现两项通过。请求头超时仅关闭该连接，安全边界拒绝保持全局失败。清理使用内核可执行路径、仅 argc 个参数和实际目录文件描述符校验身份，终止前重新核对 PID 与启动时间；保留原始失败并独立记录清理失败。该证据仅为公开夹具、回环和 mock，不包含真实进程终止、正式 APK 或签名验收。
 
 macOS 发行审阅确认尚需修复：当前 TUN 提权把整个 core 设为 root/setuid，IPC 入口缺少调用者鉴权；监听成功与系统代理操作返回值尚未完整约束连接显示，代理清理没有本应用配置所有权快照。桌面来源冻结已加入构建输入实际字节哈希，包含未跟踪源码并排除秘密文件；19项测试通过，独立审阅确认该来源冻结补丁无新增P1/P2；Windows回退拒绝reparse point并在读取后核对父路径，句柄级竞态防护尚未在Windows验证。正式 Apple 签名路径还需要身份校验与签名前后制品关系，现有 ad hoc 验收不能替代正式签名。
 
 iOS 发行存在用途兼容风险：当前捕获流量交给 Mihomo 后仍允许 DIRECT 回退与逐连接代理，DNS 缺省捕获 `any:53`；这与 Apple TN3120 的 Packet Tunnel 用途限制冲突，不能按当前实现判定发行验收通过。未发现扩展托管外部代理服务器的证据。用户已确认优先交付 Android、macOS，iOS 保留开发版并研究发行方案；未授权收缩节点协议或完整代理功能。macOS 保留现有规则代理功能时，受限 utun fd broker 优先于套用该 Packet Tunnel 路径。依据：[Apple TN3120](https://developer.apple.com/documentation/technotes/tn3120-expected-use-cases-for-network-extension-packet-tunnel-providers)；直接 Developer ID 的 Network Extension 分发形式另见 [TN3134](https://developer.apple.com/documentation/technotes/tn3134-network-extension-provider-deployment)。
+
+
+macOS 系统代理事务核心位于 `plugins/proxy/macos/`，实际 Swift 编译与23项隔离测试通过，覆盖串行生命周期、取消、提交/应用差异、外部配置冲突和有证据恢复。测试后端为 fake；SCPreferences、受保护 journal、Flutter channel 与现有 App 接线尚未完成，系统代理实际行为未验收。当前已有应用为 ad hoc 候选且嵌套签名核验失败；本机确认 Apple Development 身份，但未找到 Developer ID Application 身份。
+
+自有短寿命 Java 夹具实际核验 JBR 内核路径、精确 argv 与环境隔离通过，进程自然退出且无信号。清理补充同 UID/PID 候选枚举，发现无目录FD的任务JVM时只阻断成功、不授予信号权限；独立审阅闭合两项P2，初始/最终枚举异常均有回归。

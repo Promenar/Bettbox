@@ -404,8 +404,74 @@ class DependencyNetworkTest(unittest.TestCase):
                 self.assertEqual(client.recv(1), b'')
                 client.close()
                 with self.assertRaises(network.NetworkError): lease.check()
+                self.assertEqual(lease._event_counts['target-outside-allowlist'], 1)
             finally:
                 self.assertTrue(lease.close())
+
+    def test_slow_header_timeout_is_local_while_authorized_tunnel_stays_usable(self):
+        clock = time.monotonic
+        offset = [0]
+        entered = threading.Event()
+        with tempfile.TemporaryDirectory() as temp:
+            lease = network.NetworkLease(Path(temp), clock() + 100)
+            upstream, peer = socket.socketpair()
+            peer.settimeout(2)
+            original_header = lease._header
+            def header(client, accepted):
+                entered.set()
+                return original_header(client, accepted)
+            def supplied(host, **kwargs):
+                lease._track(upstream)
+                return upstream
+            with mock.patch.object(network.time, 'monotonic', side_effect=lambda: clock() + offset[0]), \
+                    mock.patch.object(lease, '_upstream', side_effect=supplied):
+                lease.start()
+                active = socket.create_connection(('127.0.0.1', lease.proxy_port), timeout=2)
+                slow = None
+                try:
+                    active.sendall(b'CONNECT plugins.gradle.org:443 HTTP/1.1\r\n\r\n')
+                    self.assertIn(b'200 Connection Established', active.recv(4096))
+                    with mock.patch.object(lease, '_header', side_effect=header):
+                        slow = socket.create_connection(('127.0.0.1', lease.proxy_port), timeout=2)
+                        slow.sendall(b'CONNECT plugins.gradle.org:443 HTTP/1.1\r\n')
+                        self.assertTrue(entered.wait(2))
+                        offset[0] = 16
+                        self.assertIn(b'408 Request Timeout', slow.recv(4096))
+                    lease.check()
+                    self.assertFalse(lease._failure)
+                    self.assertEqual(lease._event_counts['header-timeout'], 1)
+                    self.assertEqual(lease._event_counts['target-outside-allowlist'], 0)
+                    peer.sendall(b'PUBLIC_CONCURRENT_TLS')
+                    self.assertEqual(active.recv(4096), b'PUBLIC_CONCURRENT_TLS')
+                finally:
+                    active.close(); peer.close()
+                    if slow is not None:
+                        slow.close()
+                    self.assertTrue(lease.close())
+
+    def test_header_security_reasons_are_fixed_and_fail_closed(self):
+        cases = [(b'CONNECT plugins.gradle.org:443 HTTP/1.1\r\nBAD\r\n\r\n', 'header-malformed'),
+                 (b'CONNECT plugins.gradle.org:443 HTTP/1.1\r\nX: ' + b'A' * 4096, 'header-too-large'),
+                 (b'CONNECT unknown.invalid:443 HTTP/1.1\r\n\r\n', 'target-outside-allowlist')]
+        for request, category in cases:
+            with self.subTest(category=category), tempfile.TemporaryDirectory() as temp:
+                lease = network.NetworkLease(Path(temp), time.monotonic() + 10)
+                with mock.patch.object(lease, '_upstream') as supplied:
+                    lease.start()
+                    client = socket.create_connection(('127.0.0.1', lease.proxy_port), timeout=2)
+                    try:
+                        client.sendall(request)
+                        try:
+                            self.assertEqual(client.recv(4096), b'')
+                        except ConnectionResetError:
+                            pass  # 超长头尚有未读取字节，关闭连接可能返回RST。
+                        with self.assertRaises(network.NetworkError):
+                            lease.check()
+                        self.assertEqual(lease._event_counts[category], 1)
+                        supplied.assert_not_called()
+                        self.assertNotIn('unknown.invalid', json.dumps(lease.history))
+                    finally:
+                        client.close(); self.assertTrue(lease.close())
 
     def test_close_cancels_owned_live_doh_and_all_proxy_threads(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -580,7 +646,7 @@ class DependencyNetworkTest(unittest.TestCase):
                         self.assertEqual(client.recv(1), b'')
                         with self.assertRaises(network.NetworkError): lease.check()
                         query.assert_not_called(); upstream.assert_not_called()
-                        self.assertEqual(lease._event_counts['header-rejected'], 1)
+                        self.assertEqual(lease._event_counts['target-outside-allowlist'], 1)
                         self.assertEqual(lease.history, [{'category': 'proxy-events', 'counts': lease._event_counts}])
                     finally:
                         client.close(); self.assertTrue(lease.close())

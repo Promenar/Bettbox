@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
+import errno
 import hashlib
 import json
 import os
@@ -227,87 +229,304 @@ def run(argv: Sequence[str], root: Path, env: Mapping[str, str], *, timeout: flo
     return output
 
 
-def owned_gradle_processes(home: Path, root: Path, env: Mapping[str, str], deadline: float) -> dict[int, str]:
-    raw = run(("lsof", "-nP", "-Fpcn", "+D", str(home)), root, env,
+@dataclass(frozen=True)
+class JavaIdentity:
+    executable: Path
+    sha256: str
+
+
+@dataclass(frozen=True)
+class OwnedProcess:
+    started: str
+    executable: Path
+    executable_sha256: str
+    argv_sha256: str
+
+
+def process_executable(pid: int) -> Path:
+    """从 macOS 内核取真实 executable，不信任 argv0 或 ps 空格文本。"""
+    library = ctypes.CDLL("/usr/lib/libproc.dylib", use_errno=True)
+    function = library.proc_pidpath
+    function.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint32]
+    function.restype = ctypes.c_int
+    buffer = ctypes.create_string_buffer(4096)  # SDK：4 * MAXPATHLEN。
+    try:
+        if function(pid, buffer, len(buffer)) <= 0:
+            if ctypes.get_errno() == errno.ESRCH:
+                raise ProcessLookupError("进程已退出")
+            raise RuntimeError("无法核验内核进程入口")
+        value = buffer.value.decode("utf-8", errors="strict")
+        if not value or not Path(value).is_absolute():
+            raise RuntimeError("内核进程入口格式拒绝")
+        return Path(value).resolve(strict=True)
+    except ProcessLookupError:
+        raise
+    except (OSError, UnicodeError):
+        raise RuntimeError("无法核验内核进程入口") from None
+    finally:
+        ctypes.memset(ctypes.addressof(buffer), 0, ctypes.sizeof(buffer))
+
+
+def decode_process_argv(buffer: ctypes.Array, size: int) -> tuple[str, ...]:
+    """只解码 argc 限定 argv；不得复制、解析或记录其后的环境区。"""
+    if not 5 <= size <= 1048576:
+        raise RuntimeError("内核参数范围拒绝")
+    argc = struct.unpack_from("=i", buffer, 0)[0]
+    if not 1 <= argc <= 4096:
+        raise RuntimeError("内核参数范围拒绝")
+    position = 4
+    # 跳过内核 executable 文本，不转换整个 buffer。
+    while position < size and buffer[position] != b"\0":
+        position += 1
+    if position >= size or position - 4 > 4096:
+        raise RuntimeError("内核参数范围拒绝")
+    while position < size and buffer[position] == b"\0":
+        position += 1
+    arguments = []
+    for _ in range(argc):
+        start = position
+        while position < size and buffer[position] != b"\0":
+            position += 1
+        if position >= size or position - start > 32768:
+            raise RuntimeError("内核参数范围拒绝")
+        try:
+            arguments.append(bytes(buffer[start:position]).decode("utf-8", errors="strict"))
+        except UnicodeError:
+            raise RuntimeError("内核参数编码拒绝") from None
+        position += 1
+    return tuple(arguments)
+
+
+def process_arguments(pid: int) -> tuple[str, ...]:
+    """KERN_PROCARGS2 含环境尾部，原缓冲在 finally 清零。"""
+    library = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True)
+    function = library.sysctl
+    function.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c_uint, ctypes.c_void_p,
+                         ctypes.POINTER(ctypes.c_size_t), ctypes.c_void_p, ctypes.c_size_t]
+    function.restype = ctypes.c_int
+    mib = (ctypes.c_int * 3)(1, 49, pid)  # 公开 SDK：CTL_KERN / KERN_PROCARGS2。
+    size = ctypes.c_size_t()
+    def query(output) -> None:
+        if function(mib, 3, output, ctypes.byref(size), None, 0) != 0:
+            if ctypes.get_errno() == errno.ESRCH:
+                raise ProcessLookupError("进程已退出")
+            raise RuntimeError("无法核验内核进程参数")
+    query(None)
+    if not 5 <= size.value <= 1048576:
+        raise RuntimeError("内核参数范围拒绝")
+    buffer = ctypes.create_string_buffer(size.value)
+    try:
+        query(buffer)
+        if size.value > ctypes.sizeof(buffer):
+            raise RuntimeError("内核参数范围拒绝")
+        return decode_process_argv(buffer, size.value)
+    finally:
+        ctypes.memset(ctypes.addressof(buffer), 0, ctypes.sizeof(buffer))
+
+
+def java_main_class(arguments: tuple[str, ...]) -> str | None:
+    # 只允许真实主类，不接受藏在 property/classpath/程序参数里的同名字符串。
+    values = {"-cp", "-classpath", "--class-path", "-p", "--module-path",
+              "--upgrade-module-path", "--add-opens", "--add-exports", "--add-modules",
+              "--limit-modules", "--patch-module", "--enable-native-access"}
+    index = 1
+    while index < len(arguments):
+        argument = arguments[index]
+        if argument in ("-jar", "-m", "--module"):
+            return None
+        if argument in values:
+            index += 2
+            continue
+        if argument == "--":
+            return arguments[index + 1] if index + 1 < len(arguments) else None
+        if argument.startswith("-"):
+            index += 1
+            continue
+        return argument
+    return None
+
+
+def argv_owns_home(arguments: tuple[str, ...], home: Path) -> bool:
+    for argument in arguments[1:]:
+        if argument.startswith("-Dgradle.user.home="):
+            value = Path(argument.split("=", 1)[1])
+            if value.is_absolute() and value.resolve() == home:
+                return True
+    # worker/Kotlin 的 classpath 必须有本任务 home 下实际文件参数；不匹配子串。
+    for index, argument in enumerate(arguments[:-1]):
+        if argument in ("-cp", "-classpath", "--class-path"):
+            for item in arguments[index + 1].split(os.pathsep):
+                candidate = Path(item)
+                if candidate.is_absolute() and candidate.resolve().is_relative_to(home) and candidate.is_file():
+                    return True
+    return False
+
+
+def process_start_time(pid: int, root: Path, env: Mapping[str, str], deadline: float) -> str:
+    value = run(("ps", "-p", str(pid), "-o", "lstart="), root, {**env, "LC_ALL": "C"},
+                timeout=min(5, remaining_budget(deadline)), allowed_returncodes=(0, 1)).strip()
+    if value and not re.fullmatch(r"(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+"
+            r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+"
+            r"[0-9]{1,2}\s+[0-9]{2}:[0-9]{2}:[0-9]{2}\s+[0-9]{4}", value):
+        raise RuntimeError("PID 起始时间证据格式拒绝")
+    return value
+
+
+def owned_gradle_processes(home: Path, root: Path, env: Mapping[str, str], deadline: float,
+                           java_identity: JavaIdentity | None = None) -> dict[int, OwnedProcess]:
+    if home.is_symlink():
+        raise RuntimeError("独立 Gradle 目录边界拒绝")
+    home = home.resolve()
+    if not home.is_relative_to(root.resolve() / ".test/android-build") or not home.name.startswith("gradle-home-"):
+        raise RuntimeError("独立 Gradle 目录边界拒绝")
+    raw = run(("lsof", "-nP", "-Fpcfn", "+D", str(home)), root, env,
               timeout=min(10, remaining_budget(deadline)), allowed_returncodes=(0, 1))
+    if len(raw) > 1048576:
+        raise RuntimeError("独立目录归属证据范围拒绝")
     holders: dict[int, list[str]] = {}
-    pid = None
+    pid, descriptor = None, None
     for line in raw.splitlines():
         if line.startswith("p") and line[1:].isdigit():
-            pid = int(line[1:])
-            holders.setdefault(pid, [])
-        elif line.startswith("n") and pid is not None:
-            holders[pid].append(line[1:])
-        elif not line.startswith("c"):
+            pid, descriptor = int(line[1:]), None
+        elif line.startswith("f"):
+            descriptor = line[1:] if line[1:].isdigit() else None
+        elif line.startswith("n") and pid is not None and descriptor is not None:
+            holders.setdefault(pid, []).append(line[1:])
+        elif not line.startswith(("c", "n")):
             raise RuntimeError("无法可靠解析独立 Gradle 目录的进程归属证据")
+    if not holders:
+        return {}
+    if java_identity is None or not re.fullmatch(r"[0-9a-f]{64}", java_identity.sha256):
+        raise RuntimeError("缺少预检选定 Java 的入口摘要绑定")
+    selected = java_identity.executable.resolve(strict=True)
+    if sha256(selected) != java_identity.sha256:
+        raise RuntimeError("预检 Java 入口摘要变化")
+    allowed = {"org.gradle.launcher.daemon.bootstrap.GradleDaemon",
+               "org.gradle.process.internal.worker.GradleWorkerMain",
+               "worker.org.gradle.process.internal.worker.GradleWorkerMain",
+               "org.jetbrains.kotlin.daemon.KotlinCompileDaemon"}
     verified = {}
     for pid, paths in holders.items():
-        if not any(Path(path).is_relative_to(home) for path in paths):
-            raise RuntimeError("目录持有者缺少实际归属证据")
-        command = run(("ps", "-p", str(pid), "-o", "command="), root, env,
-                      timeout=min(5, remaining_budget(deadline)), allowed_returncodes=(0, 1))
-        if not command.strip():
+        remaining_budget(deadline)
+        if pid <= 0 or not any(Path(path).resolve().is_relative_to(home) for path in paths):
+            raise RuntimeError("目录持有者缺少实际文件描述符归属证据")
+        started = process_start_time(pid, root, env, deadline)
+        if not started:
             continue
-        parts = shlex.split(command)
-        if not parts or Path(parts[0]).name != "java" or not any(
-                item == "org.gradle.launcher.daemon.bootstrap.GradleDaemon" or item.endswith(".GradleWorkerMain")
-                for item in parts):
+        try:
+            executable = process_executable(pid)
+            arguments = process_arguments(pid)
+        except ProcessLookupError:
+            continue
+        if executable != selected or sha256(executable) != java_identity.sha256 or                 java_main_class(arguments) not in allowed or not argv_owns_home(arguments, home):
             raise RuntimeError("独立 Gradle 目录存在无法授权终止的进程")
-        started = run(("ps", "-p", str(pid), "-o", "lstart="), root, env,
-                      timeout=min(5, remaining_budget(deadline)), allowed_returncodes=(0, 1)).strip()
-        if started:
-            verified[pid] = started
+        if process_start_time(pid, root, env, deadline) != started:
+            continue
+        verified[pid] = OwnedProcess(started, executable, java_identity.sha256,
+            hashlib.sha256(json.dumps(arguments, ensure_ascii=False).encode()).hexdigest())
     return verified
 
 
-def cleanup_gradle(root: Path, home: Path, env: Mapping[str, str], deadline: float) -> dict[str, object]:
+def task_gradle_candidates(home: Path, root: Path, env: Mapping[str, str], deadline: float,
+                           java_identity: JavaIdentity | None = None) -> list[int]:
+    """补查已关闭目录 FD 的任务 JVM；此证据仅阻断成功，不授权发送信号。"""
+    raw = run(("ps", "-axo", "pid=,uid="), root, env,
+              timeout=min(5, remaining_budget(deadline)))
+    lines = raw.splitlines()
+    if len(raw) > 1048576 or len(lines) > 16384:
+        raise RuntimeError("进程候选枚举范围拒绝")
+    pids = []
+    for line in lines:
+        fields = line.split()
+        if len(fields) != 2 or not all(value.isdigit() for value in fields):
+            raise RuntimeError("进程候选枚举格式拒绝")
+        pid, uid = map(int, fields)
+        if pid <= 0:
+            raise RuntimeError("进程候选枚举格式拒绝")
+        if uid == os.getuid():
+            pids.append(pid)
+    if not pids:
+        return []
+    if java_identity is None:
+        raise RuntimeError("缺少候选 Java 摘要绑定")
+    selected = java_identity.executable.resolve(strict=True)
+    if sha256(selected) != java_identity.sha256:
+        raise RuntimeError("候选 Java 入口摘要变化")
+    allowed = {"org.gradle.launcher.daemon.bootstrap.GradleDaemon",
+               "org.gradle.process.internal.worker.GradleWorkerMain",
+               "worker.org.gradle.process.internal.worker.GradleWorkerMain",
+               "org.jetbrains.kotlin.daemon.KotlinCompileDaemon"}
+    candidates = []
+    for pid in pids:
+        remaining_budget(deadline)
+        try:
+            if process_executable(pid) != selected:
+                continue
+            arguments = process_arguments(pid)
+        except ProcessLookupError:
+            continue
+        if java_main_class(arguments) in allowed and argv_owns_home(arguments, home.resolve()):
+            candidates.append(pid)
+    return candidates
+
+
+def cleanup_gradle(root: Path, home: Path, env: Mapping[str, str], deadline: float,
+                   java_identity: JavaIdentity | None = None) -> dict[str, object]:
     evidence: dict[str, object] = {"verified": False, "stop_scope": str(home), "terminated_pids": []}
+    # 清理最多45秒，且总体期限内为最后源码复核保留5秒。
+    end = min(deadline - 5, time.monotonic() + CLEANUP_RESERVE_SECONDS)
+    def owned() -> dict[int, OwnedProcess]:
+        return owned_gradle_processes(home, root, env, end, java_identity)
+    def surviving(known: Mapping[int, OwnedProcess]) -> list[int]:
+        return [pid for pid, identity in known.items()
+                if process_start_time(pid, root, env, end) == identity.started]
     try:
-        # 停止前保留已核实的 PID 身份，防止停止后关闭文件的存活 worker 逃过复核。
-        known = owned_gradle_processes(home, root, env, deadline)
-        # --stop 只能作用于该执行创建的独立目录，不接触用户或其它任务的 daemon。
+        known = owned()
+        initial_candidates = task_gradle_candidates(home, root, env, end, java_identity)
+        evidence["initial_unbound_task_pids"] = [pid for pid in initial_candidates if pid not in known]
         try:
             run((str(root / "android/gradlew"), "--stop", "--gradle-user-home", str(home),
                  "-Dorg.gradle.daemon=false"), root / "android", env,
-                timeout=min(15, remaining_budget(deadline)))
+                timeout=min(15, remaining_budget(end)))
             evidence["stop_command_passed"] = True
         except RuntimeError:
             evidence["stop_command_passed"] = False
-        known.update(owned_gradle_processes(home, root, env, deadline))
+        for pid, identity in owned().items():
+            # 同 PID 新身份不能覆盖停止前证据，避免把复用进程纳入终止授权。
+            known.setdefault(pid, identity)
         evidence["observed_owned_pids"] = list(known)
-        for pid, started in known.items():
-            current = owned_gradle_processes(home, root, env, deadline)
-            if current.get(pid) != started:
+        for pid, identity in known.items():
+            if owned().get(pid) != identity:
                 continue
             try:
                 os.kill(pid, signal.SIGTERM)
                 evidence["terminated_pids"].append(pid)
             except ProcessLookupError:
                 pass
-        until = min(deadline, time.monotonic() + 5)
-        while time.monotonic() < until:
-            current = owned_gradle_processes(home, root, env, deadline)
-            if not current:
+        until = min(end, time.monotonic() + 5)
+        while time.monotonic() < until and (owned() or surviving(known)):
+            time.sleep(min(0.2, remaining_budget(end)))
+        current = owned()
+        for pid, identity in current.items():
+            # SIGKILL 前重新核验全部证据，而非复用首次 argv 或仅看进程名。
+            if known.get(pid) != identity or owned().get(pid) != identity:
+                continue
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        # SIGKILL 不是退出证据：有界等待内核实际回收，同 PID 新代次不算原进程。
+        until = min(end, time.monotonic() + 5)
+        while True:
+            current, alive = owned(), surviving(known)
+            if not current and not alive or time.monotonic() >= until:
                 break
-            time.sleep(0.2)
-        current = owned_gradle_processes(home, root, env, deadline)
-        for pid, started in current.items():
-            # 仅终止曾核实且起始时间不变、仍持有独立目录文件的 Gradle 进程。
-            if known.get(pid) == started:
-                try:
-                    os.kill(pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-        current = owned_gradle_processes(home, root, env, deadline)
-        surviving = []
-        for pid, started in known.items():
-            actual = run(("ps", "-p", str(pid), "-o", "lstart="), root, env,
-                         timeout=min(5, remaining_budget(deadline)), allowed_returncodes=(0, 1)).strip()
-            if actual == started:
-                surviving.append(pid)
-        evidence.update({"remaining_owned_pids": list(current), "surviving_verified_pids": surviving,
-                         "verified": not current and not surviving,
-                         "method": "独立目录文件持有证据、Gradle类名、PID起始时间与退出检查"})
+            time.sleep(min(0.2, remaining_budget(end)))
+        candidates = task_gradle_candidates(home, root, env, end, java_identity)
+        evidence.update({"remaining_owned_pids": list(current), "surviving_verified_pids": alive,
+                         "remaining_task_candidates": candidates,
+                         "verified": not current and not alive and not candidates,
+                         "method": "owned文件描述符、内核Java入口及预检摘要、精确主类/目录参数、PID起始时间和退出检查"})
     except Exception:
         evidence["failure_reason"] = "无法完成独立 Gradle 进程的终止归属复核"
     return evidence
@@ -552,7 +771,7 @@ def preflight(root: Path, sdk: Path, deadline: float | None = None) -> tuple[dic
     env.update({"JAVA_HOME": str(java.parent.parent), "ANDROID_NDK": str(ndk)})
     versions = {"Flutter": fv, "Go": gv, "NDK": NDK_VERSION, "CMake": CMAKE_VERSION,
                 "SDK": "android-36", "BuildTools": "36.0.0", "JDK": jv.group(1), "JDKSelection": selection_source,
-                "Clang": clang_raw.splitlines()[0]}
+                "Clang": clang_raw.splitlines()[0], "JavaExecutablePath": str(java.resolve())}
     for name, file in (("Flutter", Path(flutter)), ("Go", Path(go)), ("Java", java),
                        ("Clang", cc), ("CMake", cmake), ("Zipalign", zipalign)):
         versions[f"{name}ExecutableSHA256"] = sha256(file)
@@ -633,6 +852,13 @@ def execute(root: Path, versions: Mapping[str, str], env: Mapping[str, str],
     owned_home: Path | None = None
     gradle_started = False
     network_lease = None
+    def final_failure(message: str) -> None:
+        # 所有调用文案固定；最终门禁失败不替换主要编译/网络/签名失败。
+        receipt["status"] = "failed"
+        receipt.setdefault("failure_reason", message)
+        failures = receipt.setdefault("secondary_failures", [])
+        if message not in failures:
+            failures.append(message)
     try:
         source_before = source_snapshot(root, env, deadline)
         receipt["source_before"] = source_before
@@ -752,31 +978,40 @@ def execute(root: Path, versions: Mapping[str, str], env: Mapping[str, str],
         if network_lease is not None:
             try:
                 network_lease.check()
-            except dependency_network.NetworkError:
-                receipt["status"] = "failed"
-                receipt.setdefault("failure_reason", "最终任务 DNS 租约复核失败")
-        network_stopped = network_lease is None or network_lease.close()
+            except Exception:
+                final_failure("最终任务 DNS 租约复核失败")
+        try:
+            network_stopped = network_lease is None or network_lease.close()
+        except Exception:
+            network_stopped = False
         receipt["dependency_network"] = {"renewal_stopped": network_stopped,
             "connections": network_lease.history if network_lease is not None else [],
             "transport": "task-loopback-https-connect",
             "hosts": list(dependency_network.HOSTS), "resolver": dependency_network.DOH_ENDPOINT}
         if not network_stopped:
-            receipt["status"] = "failed"
-            receipt["failure_reason"] = "任务 DNS 刷新线程退出证据不足"
+            final_failure("任务 DNS 刷新线程退出证据不足")
         if gradle_started and owned_home is not None:
-            cleanup = cleanup_gradle(root, owned_home, env, deadline)
+            try:
+                java_identity = JavaIdentity(Path(versions["JavaExecutablePath"]),
+                    versions["JavaExecutableSHA256"]) if all(key in versions for key in
+                    ("JavaExecutablePath", "JavaExecutableSHA256")) else None
+                cleanup = cleanup_gradle(root, owned_home, env, deadline, java_identity=java_identity)
+            except Exception:
+                cleanup = {"verified": False, "failure_reason": "独立 Gradle 清理无法完成"}
         else:
             cleanup = {"verified": True, "method": "未启动 Gradle 构建", "terminated_pids": []}
         receipt["gradle_cleanup"] = cleanup
         if cleanup.get("verified") is not True:
-            receipt["status"] = "failed"
-            receipt["failure_reason"] = "独立 Gradle daemon/worker 终止证据不足"
-        changed = changed_locks(root, before)
-        receipt.update({"locks_unchanged": not changed, "changed_locks": changed,
-                        "finished_at": datetime.now(timezone.utc).isoformat()})
-        if changed:
-            receipt["status"] = "failed"
-            receipt["failure_reason"] = "最终依赖锁定文件检查发现漂移"
+            final_failure("独立 Gradle daemon/worker 终止证据不足")
+        try:
+            changed = changed_locks(root, before)
+            receipt.update({"locks_unchanged": not changed, "changed_locks": changed})
+            if changed:
+                final_failure("最终依赖锁定文件检查发现漂移")
+        except Exception:
+            receipt["locks_unchanged"] = False
+            final_failure("最终依赖锁定文件检查无法完成")
+        receipt["finished_at"] = datetime.now(timezone.utc).isoformat()
         try:
             source_after = source_snapshot(root, env, deadline)
             receipt["source_after"] = source_after
@@ -784,14 +1019,14 @@ def execute(root: Path, versions: Mapping[str, str], env: Mapping[str, str],
         except Exception:
             receipt["source_unchanged"] = False
         if not receipt["source_unchanged"]:
-            receipt["status"] = "failed"
-            receipt.setdefault("failure_reason", "最终源码输入检查发现漂移或无法完成复核")
+            final_failure("最终源码输入检查发现漂移或无法完成复核")
         if release and receipt.get("apk"):
             try:
                 if sha256(root / apk_output) != receipt["apk"]["sha256"]:
                     raise RuntimeError("正式 APK 最终摘要变化")
             except Exception:
-                receipt.update(status="failed", signature_verified=False, failure_reason="正式 APK 最终摘要变化或无法复核")
+                receipt["signature_verified"] = False
+                final_failure("正式 APK 最终摘要变化或无法复核")
         receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n")
     if receipt["status"] != "passed":
         raise RuntimeError(str(receipt.get("failure_reason", "Android 构建失败")))

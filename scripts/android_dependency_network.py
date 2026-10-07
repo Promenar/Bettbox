@@ -46,6 +46,20 @@ class NetworkError(RuntimeError):
     """只使用固定类别或白名单格式域名，不携带响应正文及签名 URL。"""
 
 
+class HeaderError(NetworkError):
+    """固定请求头原因不携带目标值、请求头或传输正文。"""
+
+    def __init__(self, category: str):
+        messages = {'header-timeout': 'CONNECT 请求头时间预算耗尽',
+                    'header-too-large': 'CONNECT 请求头超出范围',
+                    'header-malformed': 'CONNECT 请求头格式拒绝',
+                    'target-outside-allowlist': 'CONNECT 目标越出批准范围'}
+        if category not in messages:
+            raise NetworkError('代理诊断事件越出固定范围')
+        self.category = category
+        super().__init__(messages[category])
+
+
 def plan() -> dict[str, object]:
     return {"hosts": list(HOSTS), "resolver": DOH_ENDPOINT, "tls_verification": "Java 原 host/SNI 默认校验",
             "transport": "仅任务 JVM 的 127.0.0.1 随机端口 HTTPS CONNECT；DNS 不缓存",
@@ -237,18 +251,18 @@ def connect_host(header: bytes) -> tuple[str, bytes]:
     """只解析 CONNECT authority；TLS 提前到达的字节原样保留。"""
     marker = header.find(b'\r\n\r\n')
     if marker < 0 or marker + 4 > 4096:
-        raise NetworkError("CONNECT 请求头超出范围")
+        raise HeaderError("header-too-large")
     try:
         lines = header[:marker].decode('ascii').split('\r\n')
         match = re.fullmatch(r'CONNECT ([A-Za-z0-9.-]+):443 HTTP/1\.[01]', lines[0])
         if match is None or match[1].lower() not in HOSTS:
-            raise NetworkError("CONNECT 目标越出批准范围")
+            raise HeaderError("target-outside-allowlist")
         for line in lines[1:]:
             if not re.fullmatch(r'[A-Za-z0-9-]+: [\x20-\x7e]*', line):
-                raise NetworkError("CONNECT 请求头格式拒绝")
+                raise HeaderError("header-malformed")
         return match[1].lower(), header[marker + 4:]
     except (UnicodeError, IndexError):
-        raise NetworkError("CONNECT 请求头格式拒绝") from None
+        raise HeaderError("header-malformed") from None
 
 
 def unknown_hosts(output: str) -> list[str]:
@@ -384,7 +398,8 @@ class NetworkLease:
         self._listener: socket.socket | None = None
         self.history: list[dict[str, object]] = []
         self._event_counts = {name: 0 for name in ('overload', 'queue-expired', 'upstream-unavailable',
-                                                  'header-rejected', 'relay-failed', 'resolution-slot-expired')}
+                                                  'header-timeout', 'header-too-large', 'header-malformed', 'target-outside-allowlist',
+                                                  'relay-failed', 'resolution-slot-expired')}
         self._event_summary: dict[str, object] | None = None
 
     def _publish_events(self) -> None:
@@ -468,7 +483,7 @@ class NetworkLease:
         while b'\r\n\r\n' not in data:
             self.check()
             if time.monotonic() >= end:
-                raise NetworkError("CONNECT 请求头时间预算耗尽")
+                raise HeaderError("header-timeout")
             try:
                 part = client.recv(4096)
             except socket.timeout:
@@ -478,7 +493,7 @@ class NetworkLease:
             data.extend(part)
             marker = data.find(b'\r\n\r\n')
             if marker < 0 and len(data) >= 4096:
-                raise NetworkError("CONNECT 请求头超出范围")
+                raise HeaderError("header-too-large")
         return connect_host(bytes(data))
 
     def _address_connect(self, address: str, end: float) -> socket.socket:
@@ -614,7 +629,7 @@ class NetworkLease:
             except queue.Empty:
                 continue
             upstream = None
-            stage = 'header-rejected'
+            stage = 'header-malformed'
             try:
                 if time.monotonic() - accepted >= 15:
                     self._event('queue-expired')
@@ -639,9 +654,21 @@ class NetworkLease:
                 stage = 'relay-failed'
                 client.sendall(b'HTTP/1.1 200 Connection Established\r\n\r\n')
                 self._relay(client, upstream, initial)
+            except HeaderError as error:
+                if not self._stop.is_set() and not self._failure:
+                    self._event(error.category)
+                    if error.category == 'header-timeout':
+                        # 单连接慢请求只返回408；总体截止仍由check统一拒绝。
+                        try:
+                            client.sendall(b'HTTP/1.1 408 Request Timeout\r\nConnection: close\r\n\r\n')
+                        except OSError:
+                            pass  # 客户端已退出不影响其它已授权连接。
+                    else:
+                        self._failure = True
             except NetworkError:
                 if not self._stop.is_set() and not self._failure:
-                    self._event(stage)
+                    if time.monotonic() < self.deadline:
+                        self._event(stage)
                     self._failure = True
             except (OSError, EOFError):
                 pass  # 客户端取消或已关闭的 owned socket 不输出任何传输正文。

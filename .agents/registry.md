@@ -24,6 +24,7 @@
 - docs/validation/2026-10-07-nosla/ — 服务迁移的脱敏数据、DNS、HTTP/TLS、订阅与浏览器证据
 - .agents/plans/2026-10-07-nosla-migration.md — 迁移计划、独立审阅及切换条件
 - .agents/plans/2026-10-07-three-platform-release.md — 三端发行目标、关键路径、服务端边界与验收要求
+- .agents/plans/2026-10-07-macos-proxy-transactions.md — macOS 系统代理事务核心、所有权恢复与原生接线验收
 - SIGNING-POLICY.md — Windows 与 Android 发行签名边界和安全注入
 - ios/README.md、core/iosbridge/README.md — iOS 原生通道、配置快照、内嵌核心与签名验收边界
 - server/plugins/Fubei/README.md — 付呗支付适配契约与商户外部条件

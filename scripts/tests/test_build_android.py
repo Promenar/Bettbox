@@ -474,10 +474,12 @@ class BuildAndroidTest(unittest.TestCase):
             result = android.cleanup_gradle(root, home, {"GRADLE_USER_HOME": str(home)},
                                             android.time.monotonic() + 30)
         self.assertTrue(result["verified"])
-        stop = run.call_args.args[0]
+        calls = [call for call in run.call_args_list if "--stop" in call.args[0]]
+        self.assertEqual(len(calls), 1)
+        stop = calls[0].args[0]
         self.assertEqual(stop, ("/repo/android/gradlew", "--stop", "--gradle-user-home",
                                 str(home), "-Dorg.gradle.daemon=false"))
-        self.assertLessEqual(run.call_args.kwargs["timeout"], 15)
+        self.assertLessEqual(calls[0].kwargs["timeout"], 15)
 
     def test_unproven_holder_is_not_killed_or_marked_verified(self) -> None:
         root, home = Path("/repo"), Path("/repo/.test/android-build/gradle-home-unique")
@@ -488,16 +490,202 @@ class BuildAndroidTest(unittest.TestCase):
         self.assertFalse(result["verified"])
         kill.assert_not_called()
 
-    def test_holder_requires_owned_file_and_gradle_class(self) -> None:
-        root, home = Path("/repo"), Path("/repo/.test/android-build/gradle-home-unique")
-        lsof = f"p123\ncjava\nn{home}/daemon/8.14/daemon-123.out.log\n"
-        with mock.patch.object(android, "run", side_effect=[lsof, "unrelated-process\n"]):
-            with self.assertRaisesRegex(RuntimeError, "无法授权终止"):
-                android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30)
-        with mock.patch.object(android, "run", side_effect=[lsof,
-                "java org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.14\n", "Oct 7 10:00\n"]):
-            self.assertEqual(android.owned_gradle_processes(home, root, {},
-                android.time.monotonic() + 30), {123: "Oct 7 10:00"})
+    def test_holder_requires_kernel_java_owned_fd_exact_class_and_arguments(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); home = root / '.test/android-build/gradle-home-unique'; home.mkdir(parents=True)
+            java = root / 'Android Studio.app/Contents/jbr/bin/java'; java.parent.mkdir(parents=True); java.write_bytes(b'PUBLIC_JAVA_FIXTURE')
+            identity = android.JavaIdentity(java.resolve(), android.sha256(java))
+            lsof = f'p123\ncjava\nf7\nn{home}/daemon.log\n'
+            for main_class in ('org.gradle.launcher.daemon.bootstrap.GradleDaemon',
+                               'worker.org.gradle.process.internal.worker.GradleWorkerMain',
+                               'org.jetbrains.kotlin.daemon.KotlinCompileDaemon'):
+                arguments = (str(java), f'-Dgradle.user.home={home}', main_class)
+                with mock.patch.object(android, 'run', side_effect=[lsof, 'Wed Oct  7 10:00:00 2026', 'Wed Oct  7 10:00:00 2026']), \
+                        mock.patch.object(android, 'process_executable', return_value=java.resolve()), \
+                        mock.patch.object(android, 'process_arguments', return_value=arguments):
+                    owned = android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity)
+                self.assertEqual(owned[123].started, 'Wed Oct  7 10:00:00 2026')
+                self.assertEqual(owned[123].executable, java.resolve())
+            for executable, arguments in [(root / 'other/java', (str(java), f'-Dgradle.user.home={home}', main_class)),
+                    (java.resolve(), (str(java), main_class)),
+                    (java.resolve(), (str(java), f'-Dgradle.user.home={home}', 'thirdparty.GradleWorkerMain')),
+                    (java.resolve(), (str(java), f'-Dgradle.user.home={home}', '-cp', main_class, 'unknown.Main'))]:
+                with mock.patch.object(android, 'run', side_effect=[lsof, 'Wed Oct  7 10:00:00 2026']), \
+                        mock.patch.object(android, 'process_executable', return_value=executable), \
+                        mock.patch.object(android, 'process_arguments', return_value=arguments), \
+                        mock.patch.object(android.os, 'kill') as kill:
+                    with self.assertRaisesRegex(RuntimeError, '无法授权终止'):
+                        android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity)
+                    kill.assert_not_called()
+            with mock.patch.object(android, 'run', return_value=lsof), \
+                    mock.patch.object(android, 'process_executable') as executable:
+                with self.assertRaisesRegex(RuntimeError, '预检选定 Java'):
+                    android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30)
+                executable.assert_not_called()
+            with mock.patch.object(android, 'run', return_value='p123\ncjava\nf8\nn/PUBLIC/another-task/cache.jar\n'), \
+                    mock.patch.object(android, 'process_executable') as executable, \
+                    mock.patch.object(android.os, 'kill') as kill:
+                with self.assertRaisesRegex(RuntimeError, '文件描述符归属'):
+                    android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity)
+                executable.assert_not_called(); kill.assert_not_called()
+            # 相同路径的文件被换掉也不能认定为预检 Java。
+            java.write_bytes(b'CHANGED_PUBLIC_JAVA')
+            with mock.patch.object(android, 'run', return_value=lsof), \
+                    mock.patch.object(android, 'process_executable') as executable:
+                with self.assertRaisesRegex(RuntimeError, '入口摘要变化'):
+                    android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity)
+                executable.assert_not_called()
+
+    def test_pid_reuse_or_exit_during_kernel_identity_read_is_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); home = root / '.test/android-build/gradle-home-unique'; home.mkdir(parents=True)
+            java = root / 'java'; java.write_bytes(b'PUBLIC_JAVA')
+            identity = android.JavaIdentity(java.resolve(), android.sha256(java))
+            lsof = f'p123\ncjava\nf9\nn{home}/daemon.log\n'
+            arguments = (str(java), f'-Dgradle.user.home={home}', 'org.gradle.launcher.daemon.bootstrap.GradleDaemon')
+            with mock.patch.object(android, 'run', side_effect=[lsof, 'Wed Oct  7 10:00:00 2026', 'Wed Oct  7 10:00:01 2026']), \
+                    mock.patch.object(android, 'process_executable', return_value=java.resolve()), \
+                    mock.patch.object(android, 'process_arguments', return_value=arguments):
+                self.assertEqual(android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity), {})
+            with mock.patch.object(android, 'run', side_effect=[lsof, 'Wed Oct  7 10:00:00 2026']), \
+                    mock.patch.object(android, 'process_executable', side_effect=ProcessLookupError), \
+                    mock.patch.object(android, 'process_arguments') as arguments:
+                self.assertEqual(android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity), {})
+                arguments.assert_not_called()
+            with mock.patch.object(android, 'run', return_value=f'p123\ncjava\nfmem\nn{home}/cache.jar\n'), \
+                    mock.patch.object(android, 'process_executable') as executable:
+                self.assertEqual(android.owned_gradle_processes(home, root, {}, android.time.monotonic() + 30, identity), {})
+                executable.assert_not_called()
+
+    def test_kernel_argv_prefix_excludes_environment_and_buffer_is_zeroed(self) -> None:
+        arguments = ('/PUBLIC/Android Studio.app/bin/java', '-Dgradle.user.home=/PUBLIC/home', 'org.jetbrains.kotlin.daemon.KotlinCompileDaemon')
+        prefix = struct.pack('=i', len(arguments)) + b'/PUBLIC/java\0\0' + b'\0'.join(value.encode() for value in arguments) + b'\0'
+        payload = prefix + b'PUBLIC_FAKE_PASSWORD=DO_NOT_RETURN_ENV\0'
+        allocated = []
+        def query(mib, count, buffer, size, new, new_size):
+            self.assertEqual(list(mib), [1, 49, 123]); self.assertEqual(count, 3)
+            size._obj.value = len(payload)
+            if buffer is not None:
+                allocated.append(buffer)
+                android.ctypes.memmove(buffer, payload, len(payload))
+            return 0
+        library = mock.Mock(); library.sysctl = mock.Mock(side_effect=query)
+        with mock.patch.object(android.ctypes, 'CDLL', return_value=library):
+            result = android.process_arguments(123)
+        self.assertEqual(result, arguments)
+        self.assertNotIn('DO_NOT_RETURN_ENV', str(result))
+        self.assertEqual(bytes(allocated[0]), b'\0' * len(payload))
+        for payload in (struct.pack('=i', 99999) + b'PUBLIC\0', struct.pack('=i', 1) + b'PUBLIC\0\0\xff\0',
+                        struct.pack('=i', 2) + b'PUBLIC\0\0one\0'):
+            allocated.clear()
+            with mock.patch.object(android.ctypes, 'CDLL', return_value=library):
+                with self.assertRaisesRegex(RuntimeError, '内核参数'):
+                    android.process_arguments(123)
+            self.assertEqual(bytes(allocated[0]), b'\0' * len(payload))
+
+    def test_kernel_executable_with_spaces_and_sysctl_bounds_fail_safely(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            java = Path(temp) / 'Android Studio.app/bin/java'
+            java.parent.mkdir(parents=True); java.write_bytes(b'PUBLIC_JAVA')
+            captured = []
+            def path_query(pid, buffer, size):
+                captured.append(buffer)
+                raw = str(java.resolve()).encode() + b'\0'
+                android.ctypes.memmove(buffer, raw, len(raw))
+                return len(raw) - 1
+            library = mock.Mock(); library.proc_pidpath = mock.Mock(side_effect=path_query)
+            with mock.patch.object(android.ctypes, 'CDLL', return_value=library):
+                self.assertEqual(android.process_executable(123), java.resolve())
+            self.assertEqual(bytes(captured[0]), b'\0' * 4096)
+            library.proc_pidpath.side_effect = None; library.proc_pidpath.return_value = 0
+            for code, expected in [(android.errno.ESRCH, ProcessLookupError), (android.errno.EPERM, RuntimeError)]:
+                with mock.patch.object(android.ctypes, 'CDLL', return_value=library), \
+                        mock.patch.object(android.ctypes, 'get_errno', return_value=code):
+                    with self.assertRaises(expected): android.process_executable(123)
+        def oversized(mib, count, buffer, size, new, new_size):
+            size._obj.value = 1048577
+            return 0
+        library = mock.Mock(); library.sysctl = mock.Mock(side_effect=oversized)
+        with mock.patch.object(android.ctypes, 'CDLL', return_value=library), \
+                mock.patch.object(android.ctypes, 'create_string_buffer') as allocate:
+            with self.assertRaisesRegex(RuntimeError, '内核参数范围'):
+                android.process_arguments(123)
+            allocate.assert_not_called()
+
+    def test_task_candidate_scan_reads_only_same_uid_selected_java_and_exact_home(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); home = root / 'gradle-home-public'; home.mkdir()
+            java = root / 'java'; java.write_bytes(b'PUBLIC_JAVA')
+            identity = android.JavaIdentity(java.resolve(), android.sha256(java))
+            uid = android.os.getuid()
+            raw = f'101 {uid}\n102 {uid}\n103 {uid+1}\n104 {uid}\n'
+            argv = (str(java), f'-Dgradle.user.home={home}', 'org.jetbrains.kotlin.daemon.KotlinCompileDaemon')
+            with mock.patch.object(android, 'run', return_value=raw) as run, \
+                    mock.patch.object(android, 'process_executable', side_effect=[root/'other', java.resolve(), java.resolve()]) as executable, \
+                    mock.patch.object(android, 'process_arguments', side_effect=[argv, (str(java), 'unrelated.Main')]) as arguments, \
+                    mock.patch.object(android.os, 'kill') as kill:
+                result = android.task_gradle_candidates(home, root, {}, android.time.monotonic()+30, identity)
+            self.assertEqual(result, [102]); self.assertEqual(arguments.call_count, 2)
+            self.assertEqual([call.args[0] for call in executable.call_args_list], [101, 102, 104])
+            self.assertEqual(run.call_args.args[0], ('ps', '-axo', 'pid=,uid='))
+            kill.assert_not_called()
+
+    def test_cleanup_no_fd_task_candidate_is_unverified_and_not_signalled(self) -> None:
+        root = Path('/repo'); home = root / '.test/android-build/gradle-home-public'
+        with mock.patch.object(android, 'run', return_value=''), \
+                mock.patch.object(android, 'owned_gradle_processes', return_value={}), \
+                mock.patch.object(android, 'task_gradle_candidates', return_value=[123], create=True), \
+                mock.patch.object(android.os, 'kill') as kill:
+            result = android.cleanup_gradle(root, home, {}, android.time.monotonic()+30)
+        self.assertFalse(result['verified'])
+        kill.assert_not_called()
+
+    def test_candidate_scan_initial_or_final_failure_never_claims_cleanup(self) -> None:
+        root = Path('/repo'); home = root / '.test/android-build/gradle-home-public'
+        for effects in ([RuntimeError('PUBLIC_ENUMERATION_FAILED')], [[], RuntimeError('PUBLIC_ENUMERATION_FAILED')]):
+            with mock.patch.object(android, 'run', return_value=''), \
+                    mock.patch.object(android, 'owned_gradle_processes', return_value={}), \
+                    mock.patch.object(android, 'task_gradle_candidates', side_effect=effects), \
+                    mock.patch.object(android.os, 'kill') as kill:
+                result = android.cleanup_gradle(root, home, {}, android.time.monotonic()+30)
+            self.assertFalse(result['verified']); kill.assert_not_called()
+            self.assertNotIn('PUBLIC_ENUMERATION_FAILED', json.dumps(result))
+
+    def test_cleanup_pid_reuse_is_not_signalled_and_late_exit_is_waited(self) -> None:
+        root, home = Path('/repo'), Path('/repo/.test/android-build/gradle-home-unique')
+        old = android.OwnedProcess('OLD_START', Path('/public/java'), 'a' * 64, 'b' * 64)
+        new = android.OwnedProcess('NEW_START', Path('/public/java'), 'a' * 64, 'b' * 64)
+        for reused in (False, True):
+            clock = [0.0]; killed_at = [None]; queries = [0]; signals = []
+            def owned(*args, **kwargs):
+                queries[0] += 1
+                if reused and queries[0] >= 2:
+                    return {123: new}
+                if killed_at[0] is not None and clock[0] - killed_at[0] >= 0.6:
+                    return {}
+                return {123: old}
+            def started(*args):
+                if reused and queries[0] >= 2: return 'NEW_START'
+                if killed_at[0] is not None and clock[0] - killed_at[0] >= 0.6: return ''
+                return 'OLD_START'
+            def kill(pid, action):
+                signals.append(action)
+                if action == android.signal.SIGKILL: killed_at[0] = clock[0]
+            def sleep(seconds): clock[0] += seconds
+            with mock.patch.object(android, 'run', return_value=''), \
+                    mock.patch.object(android, 'owned_gradle_processes', side_effect=owned), \
+                    mock.patch.object(android, 'process_start_time', side_effect=started), \
+                    mock.patch.object(android.time, 'monotonic', side_effect=lambda: clock[0]), \
+                    mock.patch.object(android.time, 'sleep', side_effect=sleep), \
+                    mock.patch.object(android.os, 'kill', side_effect=kill):
+                result = android.cleanup_gradle(root, home, {}, 100)
+            if reused:
+                self.assertFalse(result['verified']); self.assertEqual(signals, [])
+            else:
+                self.assertTrue(result['verified'])
+                self.assertEqual(signals, [android.signal.SIGTERM, android.signal.SIGKILL])
+                self.assertGreaterEqual(clock[0] - killed_at[0], 0.6)
+            self.assertLessEqual(clock[0], android.CLEANUP_RESERVE_SECONDS)
 
     def test_unverified_cleanup_overrides_success_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -521,6 +709,37 @@ class BuildAndroidTest(unittest.TestCase):
             receipt = json.loads((root / ".test/android-build/receipt.json").read_text())
             self.assertEqual(receipt["status"], "failed")
             self.assertFalse(receipt["gradle_cleanup"]["verified"])
+
+    def test_primary_help_failure_survives_secondary_cleanup_network_and_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); self.create_locks(root)
+            primary = android.CommandFailed('gradlew', 1, 'java.net.UnknownHostException: jitpack.io')
+            def fake_run(argv, cwd, env, **kwargs):
+                if 'help' in argv:
+                    (root / android.LOCK_FILES[0]).write_text('PUBLIC_LOCK_DRIFT')
+                    raise primary
+                return 'OFFICIAL_TLS plugins.gradle.org 200\n'
+            self.lease.check.side_effect = [None, android.dependency_network.NetworkError('PUBLIC_UNKNOWN_DETAIL')]
+            self.lease.close.side_effect = RuntimeError('PUBLIC_FAKE_SECRET_NOT_FOR_RECEIPT')
+            versions = {'JavaExecutablePath': '/PUBLIC/Android Studio.app/bin/java', 'JavaExecutableSHA256': 'a' * 64}
+            with mock.patch.object(android, 'run', side_effect=fake_run), \
+                    mock.patch.object(android, 'source_snapshot', side_effect=[{'head': 'abc'}] * 3 + [{'head': 'changed'}]), \
+                    mock.patch.object(android, 'authorize_execution', return_value='a' * 64), \
+                    mock.patch.object(android, 'cleanup_gradle', return_value={'verified': False}) as cleanup:
+                with self.assertRaisesRegex(RuntimeError, 'gradlew'):
+                    android.execute(root, versions, self.environment(), network_check_only=True)
+            receipt = json.loads((root / '.test/android-build/receipt.json').read_text())
+            self.assertEqual(receipt['failure_reason'], str(primary))
+            self.assertEqual(receipt['safe_failure_summary'], primary.summary)
+            self.assertEqual(receipt['status'], 'failed')
+            self.assertEqual(set(receipt['secondary_failures']), {
+                '最终任务 DNS 租约复核失败', '任务 DNS 刷新线程退出证据不足',
+                '独立 Gradle daemon/worker 终止证据不足', '最终依赖锁定文件检查发现漂移',
+                '最终源码输入检查发现漂移或无法完成复核'})
+            self.assertNotIn('PUBLIC_FAKE_SECRET', json.dumps(receipt))
+            binding = cleanup.call_args.kwargs['java_identity']
+            self.assertEqual(binding.executable, Path(versions['JavaExecutablePath']))
+            self.assertEqual(binding.sha256, versions['JavaExecutableSHA256'])
 
     def test_failure_summary_extracts_public_fields_without_raw_text(self) -> None:
         summary = android.safe_failure_summary("""

@@ -5,10 +5,6 @@
     "remote": "https://github.com/Promenar/Bettbox.git"
   },
   "status": "approved",
-  "approval": {
-    "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "7d194a24bff3a0f20672572b2fd6837ccd338f74d668d48fd8ae9cf2c6d73660"
-  },
   "targets": {
     "local-mac": {
       "os": "macos",
@@ -475,6 +471,46 @@
       "timeout_seconds": 120,
       "artifacts": [],
       "verification": "来源冻结和现有桌面编译入口纯单元测试，不执行原生构建"
+    },
+    "test-android-regressions": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_regressions.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "test-macos-proxy-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "swift",
+        "test",
+        "--package-path",
+        "plugins/proxy/macos",
+        "--scratch-path",
+        ".test/three-platform-release/macos-proxy-core-build"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": []
+    },
+    "verify-android-java-identity": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/verify_android_java_identity.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
     }
   },
   "deployment": {
@@ -499,7 +535,7 @@
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
     ".gitattributes": "7dae69874619d7772fdd8bf50006fc9b220ece7d0842028a36fe77e8311828cb",
-    "scripts/build_android.py": "088a23051e1d4fde926ce1427e0ee2fc571b5acafe1fc3b9e823d2e7483ee453",
+    "scripts/build_android.py": "4d069bc007c5e1ce28da457900d78b0600d11fdaf5d7f879df9e609f000847b4",
     "scripts/validate_android_contract.py": "4cf1b60519f443d7cef737ab0f7d4224f4a94668c93dd81d3112aed5edef89af",
     "scripts/build_ios_core.py": "5649d3ef7a05195ffdb9c57d4b4fedcee47e5460a292eb5c18aa10b229739e48",
     "server/tests/fubei/run_isolated.py": "22b22ac0883a22ebd08753d2bf13cb5091acba3af3c2c4416ce727698c6fd21d",
@@ -508,9 +544,9 @@
     "scripts/typecheck_ios_native.py": "987380cf5474504718b8eebaf090eea225c8a9d67e066aa7b71f0dc349d6d3de",
     "scripts/create_android_signing.py": "1049c4c4596209af41098c8412adc44fb433b188b678f1734b3c079c1fde5dc4",
     "scripts/tests/test_android_signing.py": "b5a62cd93941e2ceb26c3bc96bbf4c7fef852f14bb5c0c9f8f6a5d90e387780f",
-    "scripts/android_dependency_network.py": "d8b76205602d30703e266c763fdba45d2b8784e7590085c900e727fbb8ba8a31",
-    "scripts/tests/test_build_android.py": "c236d08baa86040a93be4e2e007edf2880f8e5634a87d5e620ee8d963de226ec",
-    "scripts/tests/test_android_dependency_network.py": "c336c9a4fd9fd7cc118091a540f82f4551ddb1c46f8884a21644dda703978622",
+    "scripts/android_dependency_network.py": "319f475ebe46e6622c7adc7d01a8ad84e72e9ec1953204fb14483f305ab95155",
+    "scripts/tests/test_build_android.py": "5626684a442212373405fccc1767cd957874f5c3200914811b757eda32635fa6",
+    "scripts/tests/test_android_dependency_network.py": "e7e383d1205035d11d26eba91ee1e9cf8ef5cbdad1c86a0bd8979bf9c12dce11",
     "server/tests/billing/run_laravel_isolated.py": "3055aaca6f7e363f2904136f476d2fed6ba2a229855df71f88a4cda9c671519e",
     "server/tests/billing/test_laravel_isolated.py": "be8a3b73c96b17ca06ff2c519c26dc1b89ac995d7ba0e1719536635e4944e1ad",
     "server/tests/billing/laravel_check.php": "374ba5cc6e041f85af3e8513421d871b0f62e050f6113b9d99e255c9ce4c4a83",
@@ -519,7 +555,16 @@
     "scripts/tests/test_android_release_signing.py": "6b6f4cc74d99f6da53d7ea8fb6ed917667d633d643b4dba6a7d8c56afb88cd06",
     "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
     "scripts/tests/test_validate_desktop.py": "a4a92f58f31f4ff364be8bd087903519793630ff31bf034381b5f4ea7cbcf837",
-    "scripts/tests/test_android_contract.py": "d1c63546276ffbe667cb35c5cb1d65b9ace8aef85a416719f4e9953399479a43"
+    "scripts/tests/test_android_contract.py": "d1c63546276ffbe667cb35c5cb1d65b9ace8aef85a416719f4e9953399479a43",
+    "scripts/check_android_regressions.py": "9192077d0b1dc7abb38cc394e645577266dfe109e87dabecef087633316819ae",
+    "plugins/proxy/macos/Package.swift": "eb8bd91027c66533c3e5f29b12759721672464922a125fae739f9a59f1313d2d",
+    "plugins/proxy/macos/Tests/Core/LifecycleTests.swift": "75c981dbcbe26fd444cffa738616eb0a82f7ec8fcdecc21ae9e9f4a9ffef2149",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "19d559acecc8a71f84d7f3876d0be28e1a11d700b70840062a3c03bf7894055a",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "d30ea0048983cec1f88f6c18b7fc7ceadc1f37f0468bba4826f107eef62c4716",
+    "plugins/proxy/macos/Classes/Core/Lifecycle.swift": "562050f9876a11363a170cd36c1499fbd42f4d75c6d74edb3ad0bd08bcb6dc07",
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "b9caca17e091ae1e8ecaf65b06176aad62c60cb5b86eda9f20d4401742ff9993",
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "531381c1d9307a933288b0865ac8fd942e0f8cc1e3f2ea204ee31d9eb84342f6",
+    "scripts/verify_android_java_identity.py": "f6c72198c7b317f7735a2eee0613fa52a6cc8553ddf46014009bfc56ba515e09"
   },
   "platform_extensions": {
     "android": {
@@ -553,5 +598,9 @@
         "build/app/outputs/flutter-apk/app-release.apk"
       ]
     }
+  },
+  "approval": {
+    "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
+    "contract_digest": "cfa1619c587bb2688beca9e6cbce62715c3a4eecdafc901fa8816c5f63921fdf"
   }
 }

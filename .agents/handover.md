@@ -474,3 +474,65 @@ record-fingerprint: 7b90a3bada6cd2bbf9f3c0798d7c8aa42d8c89c0a3b35e68d0ad5f2bc8f8
 
 ### HLG
 标准append dry-run后apply记录，索引由工具生成。
+
+## 2026-10-07T22:37:57+08:00 · Android缺陷隔离对照与macOS代理事务核心验收
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android-regression", "macos-proxy", "three-platform-release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 2010eb749693357ebd843161828bab3d964038242107443425e17cd5dd7dae40
+
+### Summary
+交付优先Android、macOS，iOS保留开发版研究；执行用户v1.55失败复现与修复后验证要求。正式Android密钥已创建，APK与macOS发行仍未验收。
+
+### Changed
+请求头超时仅影响该连接，安全边界拒绝维持全局失败。Gradle清理取内核executable与argc限定argv、核验实际owned home和预检Java摘要，信号前复核身份，主失败与清理失败分开保存。集成Swift系统代理事务核心及23项fake测试，未接入SCPreferences/journal/channel或App。
+
+### Validation
+主控实际97项Android网络/构建/契约/签名测试通过，日志.test/three-platform-release/android-regression-integrated-tests.log。scripts/check_android_regressions.py对固定23747c0候选的慢header与带空格Java路径均before=false/after=true，无外网或信号。Swift编译与23项XCTest通过，日志.test/three-platform-release/macos-proxy-core-tests.log。当前PDEC通过，内核argv只读实测未返回环境；Python真实Mach-O与launcher路径不同，不以launcher代替内核身份。
+
+### Next
+独立复核清理补丁与公开复现脚本后冻结候选提交推送，在相同来源运行一次正式Android构建。随后安装模拟器验收和完成macOS真实系统配置/连接状态/TUN权限边界。
+
+### Risks
+容量调整后的真实Gradle门禁失败，213次上游连接、queue-expired3、header-rejected1；不能归因于官方源或新修复已解决外网。原清理回执失败保持；后续只读检查没有owned JVM不追认原清理成功。签名mock、fake事务测试不证明实际APK/system proxy。Developer ID身份、真机与安全支付配置待外部条件。
+
+### DIA
+已同步平台验证、CHANGELOG、架构、macOS实施计划、registry与PDEC说明。
+
+### HLG
+通过标准append dry-run后apply追加，派生索引由工具维护。
+
+## 2026-10-07T22:44:53+08:00 · Android清理独立审阅闭合与真实Java身份验证
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android-cleanup", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 1cfb8b706d7029257ab569be3ee5f4796ca863b875c0f896239fb11e723216e7
+
+### Summary
+独立审阅两项P2已闭合，正式Android实际构建可在冻结候选后执行。
+
+### Changed
+同UID/PID候选枚举只在内核入口等于选定JBR时取argv，无FD候选不加入终止授权，初始/最终枚举失败保持cleanup=false。自有Java诊断kill后立即记录信号事实再wait。
+
+### Validation
+无FD活worker回归修复前True is not false，修复后通过。100项Android集成测试日志.test/three-platform-release/android-regression-integrated-tests-final.log通过，退出码0。Java无网络公开夹具内核path/argv匹配、环境不返回、自然exit0、signals_sent=false。独立review冻结builder SHA4d069bc007c5e1ce28da457900d78b0600d11fdaf5d7f879df9e609f000847b4无新P1/P2。
+
+### Next
+复核当前100项测试退出，候选提交推送后一次正式构建，冻结来源与契约至回执。
+
+### Risks
+PID起始时间复核不是内核原子句柄，真实Gradle退出仍需实际证据；macOS公开认证键/Keychain缺项不能证明任意服务无认证，真实适配器范围尚待收敛。
+
+### DIA
+同步平台验证、PDEC、CHANGELOG及macOS实施计划。
+
+### HLG
+标准dry-run/apply追加，索引由工具更新。
