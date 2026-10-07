@@ -181,19 +181,20 @@ func handleGetAndroidVpnOptions() string {
 	if currentConfig.General.IPv6 {
 		ipv6Address = state.DefaultIpv6Address
 	}
+	clientState := state.Snapshot()
 	options := state.AndroidVpnOptions{
-		Enable:                state.CurrentState.VpnProps.Enable,
+		Enable:                clientState.VpnProps.Enable,
 		Port:                  currentConfig.General.MixedPort,
 		Ipv4Address:           state.DefaultIpv4Address,
 		Ipv6Address:           ipv6Address,
-		AccessControl:         state.CurrentState.VpnProps.AccessControl,
-		SystemProxy:           state.CurrentState.VpnProps.SystemProxy,
-		AllowBypass:           state.CurrentState.VpnProps.AllowBypass,
+		AccessControl:         clientState.VpnProps.AccessControl,
+		SystemProxy:           clientState.VpnProps.SystemProxy,
+		AllowBypass:           clientState.VpnProps.AllowBypass,
 		RouteAddress:          currentConfig.General.Tun.RouteAddress,
-		RouteMode:             state.CurrentState.VpnProps.RouteMode,
-		BypassDomain:          state.CurrentState.BypassDomain,
+		RouteMode:             clientState.VpnProps.RouteMode,
+		BypassDomain:          clientState.BypassDomain,
 		DnsServerAddress:      state.GetDnsServerAddress(),
-		DozeSuspend:           state.CurrentState.VpnProps.DozeSuspend,
+		DozeSuspend:           clientState.VpnProps.DozeSuspend,
 		DisableIcmpForwarding: currentConfig.General.Tun.DisableICMPForwarding,
 		Mtu:                   uint32(currentConfig.General.Tun.MTU),
 	}
@@ -214,10 +215,7 @@ func handleUpdateDns(value string) {
 }
 
 func handleGetCurrentProfileName() string {
-	if state.CurrentState == nil {
-		return ""
-	}
-	return state.CurrentState.CurrentProfileName
+	return state.Snapshot().CurrentProfileName
 }
 
 func nextHandle(action *Action, result ActionResult) bool {

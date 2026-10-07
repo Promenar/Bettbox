@@ -105,3 +105,5 @@ Runner 与 Packet Tunnel 工程已接入该内核，NE 网络设置、系统状�
 Mihomo fork 提供 `NewCredentialBlindLoopback`，仅固定本机临时端口，不读取订阅认证配置；保留目标 Authorization，移除代理认证 Header/Trailer，不提供 SOCKS。连接、内部路由与 EOF watcher 纳入所有权，关闭等待不足返回未完成。默认入口认证与 InUser 归属保持兼容。该模块尚未接入宿主或系统代理，不能据此开放原生认证门禁；匿名管道身份与代次验收单独实施。
 
 macOS Go核心提供独占子进程匿名管道入口 `--owned-pipe-v1`。固定HELLO/ACK、协议和代次绑定，单调期限核验准入，业务结果捕获所属会话；控制FD为FIFO且CLOEXEC，业务日志转stderr。入口失败或发送失败撤销，内部restart副作用前拒绝；逻辑撤销不冒充操作结束，宿主需观察captured child实际退出码。旧UDS/TCP保留兼容格式，但macOS发行接线须使用可信匿名管道与原生身份验证，不能因核心入口存在而采用原共享IPC/root路径。
+
+客户端运行状态由state包私有RWMutex保护；`Snapshot()`返回AccessControl/列表的深复制，`ApplyJSON()`在副本解析成功后原子提交，保留有效部分更新、unknown字段与nil/空列表语义。畸形输入固定错误且不部分提交，action通道回传固定字符串；Android/iOS profile及流量/选项读取统一使用快照。Android快速启动的完整错误和TUN状态回传由启动合同验收。

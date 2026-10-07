@@ -1,0 +1,55 @@
+{
+  "status": "passed-state-and-shared-core",
+  "base_sha": "552934b25c1db26f11b4eb69da4505a0595062fe",
+  "state_race_tests": 4,
+  "shared_core_tests": 22,
+  "before_reproduced": [
+    "错误JSON部分提交",
+    "快照指针/列表别名",
+    "并发DATA RACE",
+    "action error对象序列化不符合固定字符串合同"
+  ],
+  "after_commands": [
+    [
+      "go",
+      "test",
+      "-mod=readonly",
+      "-race",
+      "-count=1",
+      "-timeout=120s",
+      "./state"
+    ],
+    [
+      "go",
+      "test",
+      "-mod=readonly",
+      "-count=1",
+      "-timeout=120s",
+      "-tags",
+      "with_gvisor",
+      "."
+    ]
+  ],
+  "toolchain": "go1.26.5 darwin/arm64，state CGO1-race，shared core CGO0普通test",
+  "source_sha256": {
+    "core/state/state.go": "38ab490b6738db46c3f7f6b9d5110ccaf72fa66c0561496d86f6c6d44211b554",
+    "core/state/snapshot.go": "c2c9fd4a5b94915a1050567f01bad595bff4efded716a95c18b219fc8a606fb9",
+    "core/state/snapshot_test.go": "0eef91b22dacc03cfeb2a4d0fa15f54f22d4778aef6d1eefb83517be3c02318c",
+    "core/hub.go": "109a06c96a424caac84c574087374b2eaa6a9675e06727598a388d3961f0511c",
+    "core/action.go": "85e10544e5f5ee940eeb5d2099b2adc96ac97631941c570af7036920bc2dfb20",
+    "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
+    "core/lib_android.go": "d6f75e073666f90e5a59e67c7332246e8b4b1017832606b09898e397e1676e5e",
+    "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac"
+  },
+  "before_log_sha256": "0305102c43111139411e225c665163c1ce2420a169232875ade79cacf65359ce",
+  "after_state_log_sha256": "4986ec28321d554af5168f44ca02b52c3370bd3bad879ae5b6a09d6b8ebb9233",
+  "after_core_log_sha256": "ce5a829441fb6f7d6471e9ce72f408e332c181ef3c2dbc5aedd7d083a7d55476",
+  "android_native_compiled": false,
+  "ios_native_compiled": false,
+  "limitations": [
+    "Go共享接口编译不替代Android/iOS原生编译",
+    "Android quickStart/void setState仍需错误回传合同",
+    "Android当前配置/TUN生命周期与原生JNI/FD串联另验",
+    "不证明发行可用"
+  ]
+}

@@ -753,3 +753,34 @@ Go1.26.5 Darwin/arm64 CGO0离线只读依赖普通test21函数通过；无race�
 
 ### HLG
 标准append dry-run再apply，保留完整真实与未验证边界。
+
+## 2026-10-08T01:52:48+08:00 · 客户端State原子快照与共享接口回归
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "ios", "state", "race", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: a4c0e15a8d11eb8754e4656975fd6144e8850f142b5575b9f5774d13a96bceb7
+
+### Summary
+Android/macOS发行目标活跃；iOS开发研究。关闭Android启动前置State并发与错误部分提交，未将共享包编译视为原生发行验收。
+
+### Changed
+私有State/RWMutex、深复制Snapshot/原子ApplyJSON；有效部分更新、unknown字段、nil/空列表保留。hub流量和Android options/profile、iOS profile统一读取Snapshot，action错误固定字符串、不返回输入内容。
+
+### Validation
+旧等价包装器实际失败回归复现部分提交、可变别名及10个DATA RACE警告；修复后4项state CGO1 -race通过。action对象错误结果{}合同实际失败后改固定字符串；22项当前shared core CGO0普通test通过。独立只读复核无P1/P2；公开source/log SHA回执client-state-snapshot.json，PDEC有效。
+
+### Next
+Android启动草稿已刷新State API、runLock配置快照先释放再独立state.Snapshot，manifest5903fe8840261d8bc43302fa65556270d6e903333dae4bc1117d07d9914ff19c，9fixture未运行。关闭callback/semaphore/listener等待图与全局resolver hook并发另有界只读诊断，随后Go/JNI/Kotlin/Dart集成及正式包。macOSnative child身份桥接、Dart/SC接线仍待实施。
+
+### Risks
+Android quickStart/void setState仍忽略State错误，完整快速启动错误回传另验；Android/iOS原生编译未覆盖此更新。Android实际订阅/节点流量/正式APK、macOS系统代理/签名、真实商户支付与公开发行未验收。
+
+### DIA
+同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、三端计划、PDEC与公开脱敏回执。
+
+### HLG
+标准append dry-run/apply；保留先失败后通过与实际平台边界。

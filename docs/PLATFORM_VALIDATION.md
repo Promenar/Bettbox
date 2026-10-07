@@ -126,3 +126,5 @@ Android `ea2aa0a` 完整 debug 构建通过，APK SHA `7e6c4454cc8d16b0339240937
 macOS 专用 HTTP 包在 Go1.26.5 Darwin/arm64、只读依赖锁、GOPROXY/GOSUMDB=off、CGO1 下实际执行 -race -count=1，通过23个测试函数；含17MiB流式上传/下载、CONNECT/Upgrade、pipeline/EOF/停止未完成及默认认证响应和InUser归属。公开回执为 `docs/validation/2026-10-07-three-platform/macos-blind-http-race.json`。仅任务loopback/pipe fixture，无公网/系统代理设置；宿主接线、真实服务出口、匿名管道身份、SC事务恢复与发行签名均未由此验证。
 
 macOS owned-child Go入口实际CGO0普通包测试21函数通过，无race证据；生成真实生产入口fixture产物SHA `f63ff6e25187cee38ac85d3430a1545408a9698aba232a6e8e06695257098f86`。`scripts/check_macos_owned_process.py` 五种真实child场景通过，正常首帧/EOF、错误首帧、错误代次、预填65536字节stdout和stderr均自然退出，未强制终止；无有效业务动作、不保留原始标准流、不修改系统代理。满stderr场景仅证明当前初始化/握手/退出，不是活跃业务日志背压验收；宿主身份桥接、初始化exec FD继承与Dart/SC接线另验。公开回执 `docs/validation/2026-10-07-three-platform/macos-owned-pipe.json`。
+
+2026-10-08 状态快照实际先失败后通过：原等价包装器复现畸形JSON部分提交、浅副本别名与并发race；同步深拷贝修复后4项state -race通过。setState action错误字符串合同也先失败再修复，22项共享Go CGO0普通测试通过。公开回执 `docs/validation/2026-10-07-three-platform/client-state-snapshot.json`。Android/iOS Go调用改为快照，原生编译未由这些命令覆盖；Android quickStart/void setState和TUN/JNI失败状态另验。

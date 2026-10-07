@@ -83,11 +83,7 @@ func nextHandle(action *Action, result ActionResult) bool {
 		}
 		result.success(value)
 	case getCurrentProfileNameMethod:
-		name := ""
-		if state.CurrentState != nil {
-			name = state.CurrentState.CurrentProfileName
-		}
-		result.success(name)
+		result.success(state.Snapshot().CurrentProfileName)
 	default:
 		result.error("iOS 不支持该内核方法")
 	}

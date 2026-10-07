@@ -176,7 +176,7 @@ func handleChangeProxy(data string, fn func(string string)) {
 }
 
 func handleGetTraffic() string {
-	up, down := statistic.DefaultManager.NowTraffic(state.CurrentState.OnlyStatisticsProxy)
+	up, down := statistic.DefaultManager.NowTraffic(state.Snapshot().OnlyStatisticsProxy)
 	traffic := map[string]int64{
 		"up":   up,
 		"down": down,
@@ -190,7 +190,7 @@ func handleGetTraffic() string {
 }
 
 func handleGetTotalTraffic() string {
-	up, down := statistic.DefaultManager.TotalTraffic(state.CurrentState.OnlyStatisticsProxy)
+	up, down := statistic.DefaultManager.TotalTraffic(state.Snapshot().OnlyStatisticsProxy)
 	traffic := map[string]int64{
 		"up":   up,
 		"down": down,
@@ -546,8 +546,8 @@ func handleGetMode() string {
 	return tunnel.Mode().String()
 }
 
-func handleSetState(params string) {
-	_ = json.Unmarshal([]byte(params), state.CurrentState)
+func handleSetState(params string) error {
+	return state.ApplyJSON([]byte(params))
 }
 
 func handleGetConfig(params *GetConfigParams) (*config.RawConfig, error) {

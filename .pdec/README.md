@@ -73,3 +73,5 @@ Android APK 门禁还核验动态段地址与文件范围一致、依赖 basenam
 2026-10-08：test-macos-owned-pipe 按现有 !cgo 生产tags本机CGO0编译与普通协议fixture验收，离线只读依赖。该命令不使用-race（工具链要求CGO1），不证明宿主身份、内核管道背压或实际退出。
 
 macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内核管道，不读取用户配置或注入认证；仅终止captured child并wait。正式宿主身份接线、业务路由、系统代理与发行签名单独验收。
+
+2026-10-08：test-client-state 仅本机CGO1 Go状态包race；原子JSON提交、深复制与并发fixture，不运行核心/系统代理。共享Go ordinary test是接口回归，Android/iOS原生候选另行编译验收。

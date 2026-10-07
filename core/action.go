@@ -218,7 +218,10 @@ func handleAction(action *Action, result ActionResult) {
 		return
 	case setStateMethod:
 		data := action.Data.(string)
-		handleSetState(data)
+		if err := handleSetState(data); err != nil {
+			result.error(err.Error())
+			return
+		}
 		result.success(true)
 	case flushFakeIPMethod:
 		result.success(handleFlushFakeIP())

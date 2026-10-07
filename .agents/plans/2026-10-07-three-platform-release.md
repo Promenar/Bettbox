@@ -64,3 +64,9 @@ App在显式目标且非split-per-abi时覆盖Flutter默认全ABI过滤，split�
 Go -w -s核心已无debug段和symtab，Android库与App均保留libclash.so字节以保持构建来源SHA一致。其他库剥离不受影响，最终APK全部ELF/zipalign检查保留。真实NDK转换复现先定位，再以完整修复构建核验。
 
 JNI 动态依赖验收要求 basename libclash.so，并验证 PT_DYNAMIC 与 PT_LOAD 的完整唯一文件映射。实际 APK、设备启动和正式签名分别验收；系统钥匙串兼容检查不修改主机权限或 ACL。macOS IPC 优先评估宿主直接持有的子进程匿名管道，禁止共享控制 listener；产物身份、代次撤销、标准流隔离与真实退出必须先经独立验收。
+
+## 客户端运行状态快照
+
+Android启动修复前关闭跨平台State数据竞争：state包提供 `Snapshot() State` 深拷贝读取和 `ApplyJSON([]byte) error` 原子更新，私有RWMutex保护当前值，保留有效JSON部分更新与未知字段兼容；畸形JSON固定错误且不得提交部分字段。AccessControl指针/列表与BypassDomain复制保留nil/空列表区别。调用者不得直接持有共享可变状态。
+
+主控独占 core/state 与其fixture、hub.go/action.go 的更新回传、Android options/profile读取和iOS profile读取；不改业务字段/平台隧道协议，不扩展网络/权限。先以旧等价薄包装器运行失败回归，再实现同步快照，Go CGO1 -race ./state；Go owned入口普通编译回归用于共享接口，Android/iOS原生编译另由后续候选验收。错误结果采用固定信息，不返回JSON内容。独立复核后统一DIA/HLG。
