@@ -1,0 +1,33 @@
+# macOS supervisor 接线计划
+
+目标是将已验证的身份链和唯一Core回收模块接入实际业务管道与客户端。Android和macOS优先交付，iOS保留开发版及发行研究；本计划不增加管理员权限、共享控制listener或付费服务。
+
+## 固定合同
+
+Core和helper使用固定App产物与最终身份清单，先签两个产物和清单，再签宿主。helper角色由native入口选择，从自身SDK MainExecutable取得App；封存产物发行器保留Core文件FD，spawn前只做文件重检，SDK调用放到独立有界worker。一个helper仅创建一个Core；回收仍仅由SupervisorLifecycle处理。
+
+私有阶段帧为4字节little-endian非零长度加严格UTF8，最大4096。固定紧凑JSON顺序：`supervisor_ready`为type/protocol/generation；`prepare_core`增加launch；`core_ready`增加launch/pid。protocol=1，generation为1..Int64.max，launch为native产生的小写UUID，PID只是定位值。所有重复、额外字段、非canonical字节、错代次、半帧或超限均拒绝。helper argv仅允许固定`--owned-supervisor-v1 --generation G`。
+
+helper先发布supervisor_ready；只有收到prepare且固定自身/父属/seal核验完成才启动Core。Core SDK链worker通过后发布core_ready。host native完成链核验后发送原Go HELLO，helper验证首帧并转发；实际Go ACK完整提交给host后才进入business。spawn之前起算同一5秒Core启动预算，不能在SDK/阶段/ACK之间重置。初始helper核验单独采用5秒预算。SDK worker不写FD、不spawn、不wait或signal；结果只进入有界mailbox，由主loop检查意图/期限后消费。
+
+Go帧和业务动作保持现有协议；helper每方向至多一完整数据帧，business最大10MiB。为避免Dart IOSink在第二个满帧上阻塞close，增加私有`relay_credit`控制帧，字段顺序为type/protocol/generation/sequence；只有上一host帧已完整写入Corestdin并且credit已完整发给host，才允许读取下一host帧。Go ACK给予第一个business发送许可；每个business帧消费一个许可，credit严格连续。此确认只证明管道写入，不证明业务完成。Go result仍独立异步到达；Core输出只接受原protocol/generation/result envelope，不能伪造helper控制帧。
+
+relay使用nonblocking poll，每次读取只填当前帧所需字节；stdout背压不阻断tick/EOF/worker取消。即使输入暂停也观察HUP/error；明确验收Darwin满pipe关闭行为。一个数据帧之外最多一个4096以内credit，不建立无界queue。实际握手完成、输出EOF和子进程退出分别处理；未知资源保留owner，不能kill helper代替Core完成。
+
+宿主ABI：reserveSupervisorLaunch(generation)返回native launch关联值及固定已核验helper路径；bindSupervisor(launch,generation,pid)返回native opaque handle；bindCoreChain(handle,pid)返回另一个opaque handle；recheckCoreChain(handle)在native复核；revokeLaunch(launch,generation)立即撤销同代权限；confirmStopped(launch,generation)核对已记录出生消失。Dart不提供身份字段、UID、路径、哈希或签名；handle只查native表，不能用于重建authority proof。native kernel读取必须区分明确消失、不同出生及未知错误，不能把所有异常当退出。
+
+## 文件所有权与验收
+
+主控负责Identity封存发行器、Owner借用端点接口、宿主native ABI、构建与最终接线。独立helper工作包只写指定候选目录中的codec/poll/主程序及测试；独立Dart工作包只写指定候选目录中的Session/ABI适配/测试。共享actual、PDEC、聚合文件及治理由主控独占。高风险实现完成后串行独立审阅，再登记PDEC实际编译/执行。
+
+必要证据为：生产codec负例；真实SDK/helper/Core链；exactSHA Go HELLO/ACK和有效业务动作；Dart其它Process并发退出；EOF/满pipe/半帧/迟到SDK/取消和真实TERM/KILL；同一Dart Process exitCode与native出生消失；SC事务正确设置及仅持有值恢复。生产签名和安装包在上述接线完成后验收，不能以独立fixture代替完整发行。
+
+回滚仅弃用未启用的模块；macOS新会话不能静默退回共享控制socket或与Dart竞争reaper的路径。停止未确认时保留旧Process和native记录，不创建新helper。
+
+## 执行证据与应用接线边界
+
+生产helper、Host六ABI与DartSession源码已纳入；32项原生步骤、最终host定向回归、17项Session、155项Flutter全量测试和静态分析通过。真实签名矩阵在公开framed Core上确认握手、credit/result和停止；篡改与错误ID拒绝。回执为 `docs/validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json`。
+
+独立审阅发现的commit跨截止、SDK后出生变化与HUP背压缺口已修复，实际输出缓存取消和HUP残留输入红例得到复现。Core未取得出生记录时保持未知；未发行reservation的预检失败只有SDK退出后释放。host主动EOF正常完成仅证明已捕获的本代Core回收，不承诺取消后的未来业务结果；缓存或未读输入丢弃固定失败。
+
+Runner工程、helper打包/签名顺序、ClashService路由、真实Go Core及SC消费尚未接入。应用验证需在相同冻结版本确认完整签名seal、真实动作/结果、IOSink背压与退出、系统代理事务和账户有效流量。Android继续整包JNI/Service/配置所有者接线与正式APK验收；iOS保留开发版及发行方案研究。

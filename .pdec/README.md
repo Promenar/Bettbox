@@ -90,3 +90,5 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 # macOS supervisor 模块验证
 
 `test-macos-supervisor` 在本机 macOS arm64 运行 `python3 scripts/check_macos_supervisor.py --execute`；`test-macos-supervisor-tools` 检查验证器来源绑定和fixture构建隔离。固定生产源码位于 `macos/CoreSupervisor`，工具编译当前SDK并运行authority/owner fake与公开true/sleep child。不签名、不修改系统代理，不表示客户端接线或发行包完成。
+
+`test-supervisor-session` 验证实际DartSession；`test-supervisor-host` / `test-supervisor-host-recheck` 支持宿主定向行为回归。`test-macos-supervisor` 同时编译无fixture宏的生产helper，覆盖relay满pipe、取消、迟到SDK与Core假控制帧。`test-supervisor-production-signed` 使用唯一输出名、冻结actual源、公开framed Core和adhoc签名验证真实六ABI；不修改系统代理或启动客户端，也不代表Mihomo/发行验收。输出目录已存在时拒绝覆盖，新执行须使用新登记的输出名。`test-supervisor-signed-parser` 只检查完整固定输出分类，不证明native身份。

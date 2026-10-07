@@ -1032,3 +1032,34 @@ record-fingerprint: 9ff2f16cade117e4537bee98103be1e2a0ad30b2bdee695b47f13fd197e4
 
 ### HLG
 通过Skill append dry-run与apply追加，保留原始事实链，生成索引；任务持续推进。
+
+## 2026-10-08T06:24:15+08:00 · macOS生产辅助进程、宿主ABI及Dart会话集成验证
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["release", "supervisor", "relay", "native", "dart"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 73d87736be40ce51f9b88450b7b7fe019ffa551e5888b21b5b100fb4f985c03c
+
+### Summary
+用户确认优先交付Android/macOS，iOS保留开发版与发行研究。实际production helper、Host六ABI及DartSession模块已纳入，并通过公开Core真实签名链运行；完整应用和发行目标仍在推进。
+
+### Changed
+增加固定Host/helper产物发行器与heldFD、单SDKworker/mailbox、非阻塞relay/credit/HUP保护、Host不透明handle与出生ledger、Dart唯一Process会话及固定MethodChannel薄桥。扩展实际验证器、公开签名fixture、单元测试和PDEC；未启用Runner/ClashService新路由，不修改生产服务、系统代理或.video_agent。
+
+### Validation
+生产helper实际SDK编译与32步骤全过；最终Host定向3步骤全过，除更新Host测试外的native源与32步回执相等。17项Session测试及155项Flutter全量测试通过，Flutter analyze0；验证器6与签名输出分类6个Python测试通过。提交跨期限与SDK后变生fake红例失败后修复；变生由实际authority.recheck之后无条件注入，红绿均有固定mutation证明。relay缓存取消与HUP残留输入实际曾错误exit0，修复后通过；旧pausedHUP公开场景未稳定复现，不宣称其红例。实际Host ABI/production helper/owner/relay加公开framed Core签名矩阵pass：正常握手credit/result与exit0/nativegone，清单篡改/helper错误ID均拒绝70，源前后SHA相等；检查无匹配fixture进程。永久PDEC validate0/execution_ready=true，临时红例操作已移除。
+
+### Next
+接入Runner工程、helper打包/签名顺序与ClashService生产Session，冻结真实Go Core完成动作、结果、Dart管道退出及SC事务验证。Android同步JNI/Service/config owner整包接线、正式APK和有效订阅流量；iOS保持开发及发行研究。
+
+### Risks
+不是完整可用发行版本。签名为adhoc，真实进程Core仅公开framed测试合同，无Mihomo、Flutter方法通道、系统代理或TUN验收。缺Core出生记录时保留未知owner，不能透明重启；异步结果消费者限额需应用接线。Apple开发者身份、Android有效订阅与支付商商户门店/安全注入仍需外部条件；未发起真实资金或支付部署。
+
+### DIA
+已同步模块README、架构、CHANGELOG、平台验收、执行契约说明、registry、实施计划和公开集成回执。
+
+### HLG
+通过Skill append dry-run/apply追加，保留事实链并重建索引；Goal维持active。

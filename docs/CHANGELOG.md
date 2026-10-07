@@ -2,6 +2,9 @@
 
 ## 2026-10-08
 
+- 纳入macOS production helper/relay、宿主六ABI和Dart Session。提交期限、SDK后出生变化及背压/EOF丢数据缺口已建立红例并修复；32项原生步骤、最终host定向回归、17项Session测试、155项Flutter全量测试与静态分析通过。
+- 生产helper与真实host ABI的公开签名进程链矩阵通过：握手、credit/result、exit0/native出生消失；清单篡改及错误签名ID拒绝。公开Core不是Mihomo，完整App/Go业务/SC与发行另验。
+
 - macOS公开独立签名host/helper/Core的真实Security SDK矩阵通过；正常两角色链与错误locator/退出guest、三项静态篡改拒绝分别验证，执行签名SHA与基线独立记录。Mihomo业务、Dart/SC和发行签名另验。
 
 - 纳入macOS supervisor原生身份与独占回收模块及可重复验证入口；身份提交前整链stamp与启动期限缺口均已失败复现并修复。实际SDK编译、23项身份fake、owner fake及公开true/sleep回收通过，客户端与签名进程链另验。

@@ -140,6 +140,8 @@ StopListenerChecked使用各资源真实重建锁，覆盖ordinary、inbound和T
 
 ### macOS supervisor 原生模块
 
-`macos/CoreSupervisor` 包含 Security/内核身份链与串行子进程生命周期实现。身份提交前在所有SDK检查结束后重读宿主、helper和Core的stamp，再检查原生代次；生命周期提交proof前重新核对原5秒预算。Core由无Dart的helper独占创建/回收的接线尚未完成，本目录目前由固定测试入口编译使用，不改变客户端现有启动路径。
+`macos/CoreSupervisor` 包含Security/内核身份链、固定产物发行器、独占子进程生命周期、非阻塞relay和宿主六ABI。Host只发行native路径与不透明handle；Dart负责唯一helper Process，Core由无Dart的helper创建、信号与精确回收。SDK单worker不持意图锁，期限与整链出生在提交点核对；未知资源保留所有权。
 
-`scripts/check_macos_supervisor.py` 验证实际SDK编译、23项身份fake、生产owner fake和公开true/sleep实际回收，绑定源码前后SHA。生产身份发行器、host/helper opaque handle、非阻塞业务relay、Dart和SC消费者必须联合接线；这些模块的验证不能代替真实签名guest或系统代理发行验收。
+控制帧为4KiB，业务帧为10MiB；连续credit为写入流控，不代表RPC完成。HUP、半帧、背压和退出分别处理，缓存丢弃固定失败。`lib/clash/supervisor` 已提供生产Session及17项行为测试，ClashService和Runner工程尚未启用该通道。异步结果消费者的限额、真实Go入口和SC事务仍需应用层联合接线。
+
+`scripts/check_macos_supervisor.py` 编译实际生产helper并运行身份/owner/relay/host验证。公开签名夹具通过真实宿主ABI和生产helper交换framed消息并确认停止；它的Core不是Mihomo，也不验证完整Flutter应用或系统代理。来源和实际执行证据见 `validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json`。

@@ -1,0 +1,806 @@
+{
+  "scope": "实际supervisor原生模块、DartSession与公开Core签名进程链",
+  "base_git_sha": "f0191daabd440f0b89210593efdcdca7d277f6d5",
+  "production_app_integrated": false,
+  "mihomo_traffic_verified": false,
+  "system_proxy_changed": false,
+  "native_full": {
+    "scope": "macos-supervisor-native-modules",
+    "status": "passed",
+    "source_hashes": {
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+      "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+      "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+      "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
+      "macos/CoreSupervisor/Tests/KernelLiveness.c": "d01ece0e4a8faec27bcfc5ded3c4ccc1bf65bf5e72432c64d7a72b2e0d0d65c3",
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f",
+      "macos/CoreSupervisor/Tests/Relay/Bridge.h": "e8c949f0a6efc2b2fab3e1bfb377a857aa258bff4df3f9ee78ab1b5e69aec22e",
+      "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "220c7f096b81ce43cd0cf112523ff82ce1268d7101f7f2185f802563c4e3ab63",
+      "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
+      "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
+      "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "94f183ba77b07039379aaab0e49877df2e381a6e4c28629394438d7a739f67e6"
+    },
+    "steps": [
+      {
+        "step": "c-syntax",
+        "exit_code": 0
+      },
+      {
+        "step": "c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "identity-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "identity-run",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-fake-run",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-process-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-process-run",
+        "exit_code": 0
+      },
+      {
+        "step": "kernel-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "kernel-run",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "production-owner-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "production-helper-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fixture-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-codec-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-codec-run",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-partial",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-credit",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-half-host",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fullpipe-close",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-late-initial",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-initial-reject",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-late-core",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-core-reject",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-counterfeit-credit",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-half-result",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-paused-hup",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-pending-host-eof",
+        "exit_code": 0
+      },
+      {
+        "step": "host-production-typecheck",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-run",
+        "exit_code": 0
+      }
+    ],
+    "signed_guest_verified": false,
+    "client_integrated": false,
+    "system_proxy_changed": false,
+    "work_directory": ".test/three-platform-release/supervisor-check-8pqistdx",
+    "sdk": "MacOSX27.0.sdk",
+    "component": "all",
+    "host_recheck_only": false,
+    "source_unchanged": true
+  },
+  "host_final": {
+    "scope": "macos-supervisor-native-modules",
+    "status": "passed",
+    "source_hashes": {
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+      "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+      "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+      "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
+      "macos/CoreSupervisor/Tests/KernelLiveness.c": "d01ece0e4a8faec27bcfc5ded3c4ccc1bf65bf5e72432c64d7a72b2e0d0d65c3",
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f",
+      "macos/CoreSupervisor/Tests/Relay/Bridge.h": "e8c949f0a6efc2b2fab3e1bfb377a857aa258bff4df3f9ee78ab1b5e69aec22e",
+      "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "220c7f096b81ce43cd0cf112523ff82ce1268d7101f7f2185f802563c4e3ab63",
+      "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
+      "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
+      "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "f64ffc5a21dd796caf801e9f87a82401100690dd352329bff0362c812235e6f6"
+    },
+    "steps": [
+      {
+        "step": "host-production-typecheck",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-run",
+        "exit_code": 0
+      }
+    ],
+    "signed_guest_verified": false,
+    "client_integrated": false,
+    "system_proxy_changed": false,
+    "work_directory": ".test/three-platform-release/supervisor-check-wzexzzs3",
+    "sdk": "MacOSX27.0.sdk",
+    "component": "host",
+    "host_recheck_only": false,
+    "source_unchanged": true
+  },
+  "reused_native_sources_except_updated_host_test": true,
+  "host_deadline_red": {
+    "scope": "macos-supervisor-native-modules",
+    "status": "failed",
+    "source_hashes": {
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+      "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+      "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+      "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
+      "macos/CoreSupervisor/Tests/KernelLiveness.c": "d01ece0e4a8faec27bcfc5ded3c4ccc1bf65bf5e72432c64d7a72b2e0d0d65c3",
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "91d4cdf5544b70374c5817fb320c871afb4f6d0c0c3d59e314c211f5c8f24fae",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f",
+      "macos/CoreSupervisor/Tests/Relay/Bridge.h": "e8c949f0a6efc2b2fab3e1bfb377a857aa258bff4df3f9ee78ab1b5e69aec22e",
+      "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "8f40156c39499fca74ffd2b7cf46416d5b8e35705f92d3ab08fa094293622d46",
+      "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
+      "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "3281b49cc50388a7bed20e7a8970c718a211a6f2696e2ebbb188c62bce9c75f8",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
+      "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "94f183ba77b07039379aaab0e49877df2e381a6e4c28629394438d7a739f67e6"
+    },
+    "steps": [
+      {
+        "step": "host-production-typecheck",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-run",
+        "exit_code": -5
+      }
+    ],
+    "signed_guest_verified": false,
+    "client_integrated": false,
+    "system_proxy_changed": false,
+    "work_directory": ".test/three-platform-release/supervisor-check-upy7di6r",
+    "sdk": "MacOSX27.0.sdk",
+    "component": "host",
+    "host_recheck_only": false,
+    "source_unchanged": true
+  },
+  "host_birth_red": {
+    "source_hashes": {
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      ".test/three-platform-release/host-recheck-red/HostSupervisorAuthority.swift": "3281b49cc50388a7bed20e7a8970c718a211a6f2696e2ebbb188c62bce9c75f8",
+      "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "f64ffc5a21dd796caf801e9f87a82401100690dd352329bff0362c812235e6f6"
+    },
+    "compile_exit": 0,
+    "expected_red": true,
+    "run_exit": -5,
+    "mutation_observed": true,
+    "source_unchanged": true
+  },
+  "relay_pending_output_red": {
+    "scope": "macos-supervisor-native-modules",
+    "status": "failed",
+    "source_hashes": {
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+      "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+      "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+      "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
+      "macos/CoreSupervisor/Tests/KernelLiveness.c": "d01ece0e4a8faec27bcfc5ded3c4ccc1bf65bf5e72432c64d7a72b2e0d0d65c3",
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "1af206c16155972e7fa6b1f4a8b13f591285c7eea5d39f60c4d01b12711ccb60",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "8f030f492f93eb6324b0982a86f2e023bef095d689f2ccd9d0180e7d9cc0e71c",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f",
+      "macos/CoreSupervisor/Tests/Relay/Bridge.h": "e8c949f0a6efc2b2fab3e1bfb377a857aa258bff4df3f9ee78ab1b5e69aec22e",
+      "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "8f40156c39499fca74ffd2b7cf46416d5b8e35705f92d3ab08fa094293622d46",
+      "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
+      "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "3281b49cc50388a7bed20e7a8970c718a211a6f2696e2ebbb188c62bce9c75f8",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
+      "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "79e8b37f9bfc14d7982e94257dd92df8b178df93c157052f47855d186fc56d85"
+    },
+    "steps": [
+      {
+        "step": "c-syntax",
+        "exit_code": 0
+      },
+      {
+        "step": "c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "identity-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "identity-run",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-fake-run",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-process-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-process-run",
+        "exit_code": 0
+      },
+      {
+        "step": "kernel-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "kernel-run",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "production-owner-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "production-helper-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fixture-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-codec-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-codec-run",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-partial",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-credit",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-half-host",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fullpipe-close",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-late-initial",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-initial-reject",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-late-core",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-core-reject",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-counterfeit-credit",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-half-result",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-paused-hup",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-pending-host-eof",
+        "exit_code": 1
+      }
+    ],
+    "signed_guest_verified": false,
+    "client_integrated": false,
+    "system_proxy_changed": false,
+    "work_directory": ".test/three-platform-release/supervisor-check-too7q8zi",
+    "sdk": "MacOSX27.0.sdk",
+    "source_unchanged": true
+  },
+  "relay_hup_pending_input_red": {
+    "scope": "macos-supervisor-native-modules",
+    "status": "failed",
+    "source_hashes": {
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+      "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+      "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+      "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
+      "macos/CoreSupervisor/Tests/KernelLiveness.c": "d01ece0e4a8faec27bcfc5ded3c4ccc1bf65bf5e72432c64d7a72b2e0d0d65c3",
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "91d4cdf5544b70374c5817fb320c871afb4f6d0c0c3d59e314c211f5c8f24fae",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f",
+      "macos/CoreSupervisor/Tests/Relay/Bridge.h": "e8c949f0a6efc2b2fab3e1bfb377a857aa258bff4df3f9ee78ab1b5e69aec22e",
+      "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "8f40156c39499fca74ffd2b7cf46416d5b8e35705f92d3ab08fa094293622d46",
+      "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
+      "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
+      "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "94f183ba77b07039379aaab0e49877df2e381a6e4c28629394438d7a739f67e6"
+    },
+    "steps": [
+      {
+        "step": "c-syntax",
+        "exit_code": 0
+      },
+      {
+        "step": "c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "identity-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "identity-run",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-fake-run",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-process-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "owner-process-run",
+        "exit_code": 0
+      },
+      {
+        "step": "kernel-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "kernel-run",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "production-owner-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "production-helper-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fixture-c-object",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-codec-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-codec-run",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-partial",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-credit",
+        "exit_code": 0
+      },
+      {
+        "step": "relay-half-host",
+        "exit_code": 1
+      }
+    ],
+    "signed_guest_verified": false,
+    "client_integrated": false,
+    "system_proxy_changed": false,
+    "work_directory": ".test/three-platform-release/supervisor-check-nspm5gn0",
+    "sdk": "MacOSX27.0.sdk",
+    "component": "all",
+    "host_recheck_only": false,
+    "source_unchanged": true
+  },
+  "signed_production": {
+    "cases": {
+      "core-manifest-tamper": {
+        "baseline_signed_artifacts": {
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "schema": 1,
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "dde981ba97d94c43792cbc87c85b6f37e7dd108b",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "schema": 1,
+            "sha256": "4fd8942b8fffef0fb8d2be2a850615487abe5786d763c3e5dad74ec11d742a60",
+            "signingmode": "adhoc"
+          }
+        },
+        "classification": "REJECTED",
+        "execution_artifacts": {
+          "Bettbox": {
+            "cdhash": "0400a1ce120d8f60d01d89328a9ac220e1b617db",
+            "identifier": "com.appshub.bettbox",
+            "sha256": "617441a9e60e8bf90dad7bda71e63eebd7304a5c7c029ae37c8a1f30313e82cf",
+            "signingmode": "adhoc"
+          },
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "dde981ba97d94c43792cbc87c85b6f37e7dd108b",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "sha256": "4fd8942b8fffef0fb8d2be2a850615487abe5786d763c3e5dad74ec11d742a60",
+            "signingmode": "adhoc"
+          }
+        },
+        "execution_manifest_sha256": {
+          "BettboxCore": "330cccce942d85dd75be614c82378d514aa9076e267e1a35f32d67d7bc48441a",
+          "BettboxCoreSupervisor": "7c81a6ca2805351bc84d441e69b83028acb355378af147add6e36e3840a1efe8"
+        },
+        "expected": "REJECTED",
+        "handshake": false,
+        "host_exit": 70,
+        "native_confirmed_gone": false,
+        "owner_retained_unknown": false,
+        "passed": true
+      },
+      "helper-wrong-id": {
+        "baseline_signed_artifacts": {
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "schema": 1,
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "dde981ba97d94c43792cbc87c85b6f37e7dd108b",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "schema": 1,
+            "sha256": "4fd8942b8fffef0fb8d2be2a850615487abe5786d763c3e5dad74ec11d742a60",
+            "signingmode": "adhoc"
+          }
+        },
+        "classification": "REJECTED",
+        "execution_artifacts": {
+          "Bettbox": {
+            "cdhash": "f5dd837f8cd4a771d62f0adbeb0a175f4ebafb4f",
+            "identifier": "com.appshub.bettbox",
+            "sha256": "05c54d7d994c0a6b974cb98ad16e0f29d18915f3e260e1e56df6dfa8c8194747",
+            "signingmode": "adhoc"
+          },
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "f5883f130f45270d2207d6c2fb8332d8d2f77862",
+            "identifier": "com.appshub.bettbox.fixture.wrong",
+            "sha256": "b4469725c13be4886ad11a05150d19f3402bcfee359570623832c03471df63fd",
+            "signingmode": "adhoc"
+          }
+        },
+        "execution_manifest_sha256": {
+          "BettboxCore": "dbee103dc5f3ab0dee4819da4a2e41dae3b6af414547d6c61a4fcea79f9a15b5",
+          "BettboxCoreSupervisor": "92e97aa3d81c6b05b63e595b728f35054f0f85380c5ae3323b034c91ada15085"
+        },
+        "expected": "REJECTED",
+        "handshake": false,
+        "host_exit": 70,
+        "native_confirmed_gone": false,
+        "owner_retained_unknown": false,
+        "passed": true
+      },
+      "positive": {
+        "baseline_signed_artifacts": {
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "schema": 1,
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "dde981ba97d94c43792cbc87c85b6f37e7dd108b",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "schema": 1,
+            "sha256": "4fd8942b8fffef0fb8d2be2a850615487abe5786d763c3e5dad74ec11d742a60",
+            "signingmode": "adhoc"
+          }
+        },
+        "classification": "ACCEPTED",
+        "execution_artifacts": {
+          "Bettbox": {
+            "cdhash": "0400a1ce120d8f60d01d89328a9ac220e1b617db",
+            "identifier": "com.appshub.bettbox",
+            "sha256": "617441a9e60e8bf90dad7bda71e63eebd7304a5c7c029ae37c8a1f30313e82cf",
+            "signingmode": "adhoc"
+          },
+          "BettboxCore": {
+            "cdhash": "06ba9ed37487a6a15883475a984d8e0eece00981",
+            "identifier": "com.appshub.bettbox.core",
+            "sha256": "4e5ec25b5192db93adca33f79f57db93aae9c5c10b2739a1772c1e7245a3a42d",
+            "signingmode": "adhoc"
+          },
+          "BettboxCoreSupervisor": {
+            "cdhash": "dde981ba97d94c43792cbc87c85b6f37e7dd108b",
+            "identifier": "com.appshub.bettbox.core.supervisor",
+            "sha256": "4fd8942b8fffef0fb8d2be2a850615487abe5786d763c3e5dad74ec11d742a60",
+            "signingmode": "adhoc"
+          }
+        },
+        "execution_manifest_sha256": {
+          "BettboxCore": "dbee103dc5f3ab0dee4819da4a2e41dae3b6af414547d6c61a4fcea79f9a15b5",
+          "BettboxCoreSupervisor": "7c81a6ca2805351bc84d441e69b83028acb355378af147add6e36e3840a1efe8"
+        },
+        "expected": "ACCEPTED",
+        "handshake": true,
+        "host_exit": 0,
+        "native_confirmed_gone": true,
+        "owner_retained_unknown": false,
+        "passed": true
+      }
+    },
+    "execution": "PUBLIC_PRODUCTION_HELPER_FIXTURE",
+    "passed": true,
+    "sdk_version": "27.0",
+    "source_hashes_after": {
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+    },
+    "source_hashes_before": {
+      "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+      "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+      "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+      "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+      "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+      "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+      "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+      "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+      "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+      "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+      "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+      "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+      "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+      "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+      "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+    }
+  },
+  "signed_live_matching_processes": 0,
+  "flutter": {
+    "session_tests": 17,
+    "all_tests": 155,
+    "all_exit_code": 0,
+    "analyze_exit_code": 0,
+    "source_hashes": {
+      "lib/clash/supervisor/supervisor_session.dart": "8d2fcf3d67798b1f012bd098959905c7d36aa568e61f5eb01c949b03b4b58fe2",
+      "lib/clash/supervisor/supervisor_codec.dart": "b86e7ea71c642ddef4a8e2b3b3c83e9ba8b01acb11d19b3660204cc6a399fa2f",
+      "lib/clash/supervisor/supervisor_transport.dart": "8b5cb1a194ab2b5be5ffd5654ebee46b8d96306142d2b1dfd8d397641fa1b5a6",
+      "lib/clash/supervisor/supervisor_native.dart": "4430e134e3860344f9d302d71711cc2f73a9896c8fb1e029df7065a6f5224ce6",
+      "lib/clash/supervisor/supervisor_method_channel.dart": "22b85155c960b9fdafecee35f49009b6acc496c25e70b3aa7314d0de7e60e755",
+      "test/clash/supervisor/supervisor_session_test.dart": "f22edef839d38f73a039e73d47b55269a7072191f55b9e8e76441dd9e4d7e839"
+    }
+  },
+  "python_tool_tests": {
+    "source_boundary": 6,
+    "signed_parser": 6,
+    "exit_codes": [
+      0,
+      0
+    ]
+  },
+  "boundaries": [
+    "签名为adhoc，Core只实现公开framed合同",
+    "未验证Go/Mihomo实际业务、Flutter方法通道与SC系统代理",
+    "Core出生未取得时保持未知，未确认owner不得透明重启"
+  ]
+}

@@ -154,3 +154,7 @@ macOS无Dart辅助进程最小隔离：Dart持有固定C helper，同时有登�
 macOS supervisor原生模块已纳入 `macos/CoreSupervisor`，当前SDK真实编译、23项identity fake、owner fake及公开true/sleep子进程回收通过。两项P2（后续SDK期间Core变化、kernel读取跨启动截止）均真实红测试失败后修复并经独立回审，4项验证器Python测试通过。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-native-validation.json` 绑定当前实际12源；真实签名guest、生产身份发行器、非阻塞relay、Dart/SC与App接线尚未由此验证。
 
 真实签名SDK链矩阵通过：公开独立App中的host/helper/Core两角色context、bind和recheck成功；错误定位值及已退出guest拒绝，manifest篡改、Core签名移除、helper错误ID三负例固定exit70。正常链helper精确WNOWAIT/reap后exit0，执行器记录身份的资源清理未报未解决错误，执行后无匹配fixture进程。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-signed-sdk-validation.json` 区分签名基线和执行产物；实际Identity源码SHA与项目一致。Core仅为公开等EOF程序，不是Mihomo业务；没有Dart/SC/relay/DeveloperID公证验收。
+
+2026-10-08 supervisor接线模块：actual生产helper及固定产物发行器完成SDK编译，32项原生步骤通过；host提交后期限与整链出生缺口已建立实际红例并修复，最终host定向回归通过。出生负例通过转发实际authority并在SDK结束后无条件改生，红/绿均发生变化。relay缓存取消和HUP前残留输入曾实际返回0，修复后固定失败31；paused-HUP的旧实现公开场景未稳定复现，源码审阅及修复后运行证明已采用明确EOF与缓存保护，不能把它写成实际红例。12项Python工具测试、17项Dart Session及155项Flutter全量测试、静态分析通过。
+
+实际host六ABI、production helper/owner/relay与公开framed Core的签名矩阵通过，SDK27.0；正常case确认握手、credit/result、exit0和native出生消失，清单篡改及helper错误ID拒绝exit70，检查时无匹配夹具进程。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json` 保存源SHA与执行界限。Runner工程、ClashService应用路由、真实Go/Mihomo、SC和完整发行包尚未覆盖；iOS按用户选择保留开发版及发行研究，Android/macOS优先交付。

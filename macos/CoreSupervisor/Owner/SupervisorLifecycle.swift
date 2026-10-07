@@ -3,9 +3,19 @@ import Dispatch
 // 身份产物只能由同一封存模块产生；候选没有生产发行器或可绕过身份的main。
 struct SealedCoreArtifact {
     let path: String
-    private init(path: String) { self.path = path }
     #if OWNED_PUBLIC_FIXTURE
+    private init(path: String) { self.path = path }
     static func publicFixture() -> Self { Self(path: "public-fixed-stub") }
+    func recheckForSpawn() throws {}
+    #else
+    private let descriptor: SSISealedCoreDescriptor
+    private init(descriptor: SSISealedCoreDescriptor) {
+        self.descriptor = descriptor; path = descriptor.path
+    }
+    static func prepareSupervisor() throws -> Self {
+        Self(descriptor: try SSIAppleBackend(role: .supervisor).verifiedCoreForSupervisor())
+    }
+    func recheckForSpawn() throws { try descriptor.recheckForSpawn() }
     #endif
 }
 struct KernelStamp: Equatable {
@@ -173,5 +183,13 @@ final class SupervisorLifecycle {
         queue.sync { LifecycleSnapshot(phase: phase, failure: failure, ownsChild: child != nil && !exited,
             confirmedExited: exited, identityInFlight: inFlight != nil, proofPermitted: proof,
             deadline: deadline) }
+    }
+    // FD只借给同一主loop；worker禁止借用或操作。关闭仍仅由owner执行。
+    func relayEndpoints() -> OwnedChild? {
+        queue.sync {
+            guard proof, phase == "ready" || phase == "running", !exited,
+                  !inputClosed, !outputClosed else { return nil }
+            return child
+        }
     }
 }

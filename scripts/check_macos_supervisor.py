@@ -15,7 +15,13 @@ SOURCE_NAMES = (
     'Owner/OwnedBackend.c', 'Owner/OwnedBackend.h',
     'Owner/SupervisorLifecycle.swift', 'Owner/SystemBackend.swift',
     'Tests/main.swift', 'Tests/SSIFixtures.swift',
-    'Tests/OwnerTests.swift', 'Tests/PublicProcessFixture.swift',
+    'Tests/OwnerTests.swift', 'Tests/PublicProcessFixture.swift', 'Tests/KernelLiveness.c', 'Bridge.h',
+    'Relay/RelayCodec.swift', 'Relay/HelperC.h', 'Relay/HelperC.c',
+    'Relay/SDKMailbox.swift', 'Relay/RelayMain.swift', 'Relay/main.swift',
+    'Tests/Relay/Bridge.h', 'Tests/Relay/CodecMain.swift', 'Tests/Relay/FakeRuntime.swift',
+    'Tests/Relay/relay_driver.py', 'Host/HostSupervisorAuthority.swift',
+    'Host/HostSupervisorProduction.swift', 'Host/HostSupervisorFlutter.swift',
+    'Tests/HostSupervisorAuthorityTests.swift',
 )
 
 
@@ -58,17 +64,55 @@ def commands(root, work, sdk):
              + [str(tests / main), str(object_file), '-lproc', '-o', str(binary)]),
             (kind + '-run', [str(binary)]),
         ])
+    relay = source / 'Relay'
+    relay_object = work / 'relay.o'
+    fixture_object = work / 'relay-fixture.o'
+    clang = ['xcrun', 'clang', '-target', 'arm64-apple-macos12', '-isysroot', sdk, '-Wall', '-Wextra', '-Werror']
+    result.extend([
+        ('kernel-compile', clang + [str(tests / 'KernelLiveness.c'), '-lproc', '-o', str(work / 'kernel-liveness')]),
+        ('kernel-run', [str(work / 'kernel-liveness')]),
+        ('relay-c-object', clang + ['-I', str(source), '-c', str(relay / 'HelperC.c'), '-o', str(relay_object)]),
+        ('production-owner-c-object', clang + ['-c', str(owner / 'OwnedBackend.c'), '-o', str(work / 'production-owner.o')]),
+        ('production-helper-compile', swift + ['-import-objc-header', str(relay / 'HelperC.h'), '-I', str(source)]
+         + [str(identity / name) for name in ('SSIAuthority.swift', 'SSIAppleBackend.swift', 'SSIFile.swift')]
+         + [str(owner / name) for name in ('SupervisorLifecycle.swift', 'SystemBackend.swift')]
+         + [str(relay / name) for name in ('RelayCodec.swift', 'SDKMailbox.swift', 'RelayMain.swift', 'main.swift')]
+         + [str(relay_object), str(work / 'production-owner.o'), '-framework', 'Security', '-framework', 'CryptoKit', '-lproc', '-o', str(work / 'BettboxCoreSupervisor')]),
+        ('relay-fixture-c-object', clang + ['-I', str(tests / 'Relay'), '-c', str(relay / 'HelperC.c'), '-o', str(fixture_object)]),
+        ('relay-codec-compile', swift + ['-parse-as-library', '-import-objc-header', str(relay / 'HelperC.h'), '-I', str(tests / 'Relay'),
+          str(relay / 'RelayCodec.swift'), str(tests / 'Relay/CodecMain.swift'), str(fixture_object), '-o', str(work / 'relay-codec')]),
+        ('relay-codec-run', [str(work / 'relay-codec')]),
+        ('relay-fake-compile', swift + ['-import-objc-header', str(relay / 'HelperC.h'), '-I', str(tests / 'Relay')]
+         + [str(relay / name) for name in ('RelayCodec.swift', 'SDKMailbox.swift', 'RelayMain.swift')]
+         + [str(tests / 'Relay/FakeRuntime.swift'), str(relay / 'main.swift'), str(fixture_object), '-o', str(work / 'relay-fake')]),
+    ])
+    for case in ('partial', 'credit', 'half-host', 'fullpipe-close'):
+        result.append(('relay-' + case, ['python3', str(tests / 'Relay/relay_driver.py'), '--helper', str(work / 'relay-fake'), '--case', case]))
+    for fault in ('late-initial', 'initial-reject', 'late-core', 'core-reject', 'counterfeit-credit', 'half-result'):
+        result.append(('relay-' + fault, ['python3', str(tests / 'Relay/relay_driver.py'), '--helper', str(work / 'relay-fake'), '--case', 'fault', '--fake-fault', fault]))
+    for case, fault in [('paused-hup', 'hup-while-paused'), ('pending-host-eof', 'fullpipe-result')]:
+        result.append(('relay-' + case, ['python3', str(tests / 'Relay/relay_driver.py'), '--helper', str(work / 'relay-fake'), '--case', case, '--fake-fault', fault]))
+    host_sources = [str(source / 'Host' / name) for name in ('HostSupervisorAuthority.swift', 'HostSupervisorProduction.swift')]
+    result.extend([
+        ('host-production-typecheck', swift + ['-typecheck', '-import-objc-header', str(source / 'Bridge.h')]
+         + [str(identity / name) for name in ('SSIAuthority.swift', 'SSIAppleBackend.swift', 'SSIFile.swift')] + host_sources),
+        ('host-fake-compile', swift + ['-parse-as-library', str(identity / 'SSIAuthority.swift'),
+         str(source / 'Host/HostSupervisorAuthority.swift'), str(tests / 'HostSupervisorAuthorityTests.swift'), '-o', str(work / 'host-fake')]),
+        ('host-fake-run', [str(work / 'host-fake')]),
+    ])
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute', action='store_true')
+    parser.add_argument('--component', choices=('all', 'host'), default='all')
+    parser.add_argument('--host-recheck-only', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     before = hashes(root)
     if not args.execute:
-        print('计划：macOS12 arm64 SDK 编译、23项身份 fake、生产 owner fake 与公开 true/sleep 回收。')
+        print('计划：macOS12 arm64 SDK、生产helper编译、身份/owner/relay fake、公开true/sleep回收及内核消失分类。')
         return 0
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         raise SystemExit('此入口仅在本机 macOS arm64 执行')
@@ -83,14 +127,21 @@ def main():
         sdk = subprocess.check_output(['xcrun', '--sdk', 'macosx', '--show-sdk-path'],
                                       text=True, timeout=30).strip()
         receipt['sdk'] = Path(sdk).name
-        for name, argv in commands(root, work, sdk):
+        planned = commands(root, work, sdk)
+        if args.component == 'host':
+            planned = [(name, argv) for name, argv in planned if name.startswith('host-')]
+        if args.host_recheck_only:
+            planned = [(name, argv + ['--recheck-only'] if name == 'host-fake-run' else argv) for name, argv in planned]
+        receipt['component'] = args.component
+        receipt['host_recheck_only'] = args.host_recheck_only
+        for name, argv in planned:
             result = subprocess.run(argv, cwd=root, capture_output=True, timeout=180)
             (work / (name + '.log')).write_bytes(result.stdout + result.stderr)
             receipt['steps'].append({'step': name, 'exit_code': result.returncode})
             if result.returncode != 0:
                 break
         receipt['source_unchanged'] = hashes(root) == before
-        if len(receipt['steps']) == 8 and all(step['exit_code'] == 0 for step in receipt['steps']) and receipt['source_unchanged']:
+        if len(receipt['steps']) == len(planned) and all(step['exit_code'] == 0 for step in receipt['steps']) and receipt['source_unchanged']:
             receipt['status'] = 'passed'
     except (OSError, subprocess.SubprocessError, ValueError) as error:
         receipt['error_class'] = type(error).__name__

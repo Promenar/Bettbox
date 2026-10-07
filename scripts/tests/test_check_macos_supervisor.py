@@ -29,6 +29,20 @@ class SupervisorCheckTests(unittest.TestCase):
         self.assertFalse(any('OWNED_PUBLIC_FIXTURE' in value or 'SystemBackend' in value for value in argv))
         self.assertEqual(steps['identity-run'], ['/work/identity-fixtures'])
 
+    def test_production_helper_links_only_production_owner_and_actual_identity(self):
+        steps = dict(MODULE.commands(Path('/source'), Path('/work'), '/sdk'))
+        argv = steps['production-helper-compile']
+        self.assertFalse(any('OWNED_PUBLIC_FIXTURE' in value or 'FakeRuntime' in value for value in argv))
+        self.assertIn('/work/production-owner.o', argv)
+        self.assertNotIn('/work/backend.o', argv)
+        self.assertIn('/source/macos/CoreSupervisor/Identity/SSIAppleBackend.swift', argv)
+        self.assertNotIn('-DOWNED_PUBLIC_FIXTURE', steps['production-owner-c-object'])
+
+    def test_backpressure_and_late_sdk_faults_are_registered(self):
+        steps = dict(MODULE.commands(Path('/source'), Path('/work'), '/sdk'))
+        for name in ('relay-fullpipe-close', 'relay-late-core', 'relay-half-result', 'kernel-run'):
+            self.assertIn(name, steps)
+
     def test_hashes_reject_symlink_and_bind_actual_bytes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

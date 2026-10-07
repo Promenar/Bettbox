@@ -2,6 +2,33 @@ import Foundation
 import Security
 import Darwin
 
+// 只由固定supervisor角色核验后发行；保留Core与清单FD，不接受外部路径。
+final class SSISealedCoreDescriptor {
+    let path: String
+    private let core: SSIFile
+    private let manifest: SSIFile
+    fileprivate init(path: String, core: SSIFile, manifest: SSIFile) {
+        self.path = path; self.core = core; self.manifest = manifest
+    }
+    func recheckForSpawn() throws {
+        try core.recheck(); try manifest.recheck()
+    }
+}
+
+// Host固定入口持有辅助进程与清单FD，路径和上下文由实际SDK产生。
+final class SSISealedHelperDescriptor {
+    let path: String
+    let context: SSIContext
+    private let helper: SSIFile
+    private let manifest: SSIFile
+    fileprivate init(path: String, context: SSIContext, helper: SSIFile, manifest: SSIFile) {
+        self.path = path; self.context = context; self.helper = helper; self.manifest = manifest
+    }
+    func recheck() throws { try helper.recheck(); try manifest.recheck() }
+}
+
+enum SSIKernelLiveness { case present(SSIStamp), absent, unknown }
+
 // 角色由native入口固定，绝不接收外部期望路径/UID/PPID/hash。
 final class SSIAppleBackend: SSIBackend {
     private let role: SSIRole
@@ -87,6 +114,43 @@ final class SSIAppleBackend: SSIBackend {
               try unique(selfInfo()) == unique(own),
               try unique(info(checked(bundle))) == bundleUnique else { throw SSIError.invalidSignature }
         return SSIContext(host: host, seal: SSISeal(hostBundleUnique: bundleUnique, helperStatic: helper, coreStatic: core))
+    }
+    func verifiedCoreForSupervisor() throws -> SSISealedCoreDescriptor {
+        guard role == .supervisor else { throw SSIError.invalidArtifact }
+        let initial = try context()
+        let (bundle, _) = try location()
+        let file = try SSIFile(bundle: bundle, components: ["Contents", "MacOS", "BettboxCore"])
+        let manifest = try SSIFile(bundle: bundle, components: ["Contents", "Resources", "BettboxCoreIdentity.json"])
+        guard try file.sha256() == initial.seal.coreStatic.sha256,
+              try context().seal == initial.seal else { throw SSIError.invalidArtifact }
+        try file.recheck(); try manifest.recheck()
+        return SSISealedCoreDescriptor(path: bundle.appendingPathComponent("Contents/MacOS/BettboxCore").path,
+                                       core: file, manifest: manifest)
+    }
+    func verifiedHelperForHost() throws -> SSISealedHelperDescriptor {
+        guard role == .host else { throw SSIError.invalidArtifact }
+        let initial = try context()
+        let (bundle, _) = try location()
+        let file = try SSIFile(bundle: bundle, components: ["Contents", "MacOS", "BettboxCoreSupervisor"])
+        let manifest = try SSIFile(bundle: bundle, components: ["Contents", "Resources", "BettboxCoreSupervisorIdentity.json"])
+        let final = try context()
+        guard try file.sha256() == initial.seal.helperStatic.sha256,
+              final.seal == initial.seal, final.host == initial.host,
+              try stamp(initial.host.pid) == initial.host else { throw SSIError.invalidArtifact }
+        try file.recheck(); try manifest.recheck()
+        return SSISealedHelperDescriptor(path: bundle.appendingPathComponent("Contents/MacOS/BettboxCoreSupervisor").path,
+                                         context: initial, helper: file, manifest: manifest)
+    }
+    // 只有内核明确ESRCH才表示不存在；权限、短读与僵尸均保持未知。
+    func kernelRead(_ locator: Int32) -> SSIKernelLiveness {
+        guard locator > 0 else { return .unknown }
+        var value = proc_bsdinfo()
+        errno = 0
+        let count = withUnsafeMutablePointer(to: &value) { proc_pidinfo(locator, PROC_PIDTBSDINFO, 0, $0, Int32(MemoryLayout<proc_bsdinfo>.size)) }
+        let error = errno
+        if count == 0 && error == ESRCH { return .absent }
+        guard let stamp = try? SSIKernelDecoder.decode(value, count: count, locator: locator) else { return .unknown }
+        return .present(stamp)
     }
     func stamp(_ locator: Int32) throws -> SSIStamp {
         var value = proc_bsdinfo()

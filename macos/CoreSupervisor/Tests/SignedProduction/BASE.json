@@ -1,0 +1,29 @@
+{
+  "fixture_source_hashes": {
+    "Core.c": "4074a699e2cea2aa19fdfe617f46a3a5719f06356ab48b57324e6a8d91b3909c",
+    "main.swift": "516c813f2f8f386e9ddc55b759b6c804829c880bb5944bf344ec4b457f3a1211",
+    "runner.py": "a0e9a7ae399d4e2bd11b3e58436c6134f16f1b96b7213e167f326f37d27e1e43",
+    "test_runner.py": "22b662a46ac9b18eaabf96ffa64c6964deb40758d4f0da9b12afbdf572d9a914"
+  },
+  "schema": 1,
+  "scope": "公开framed Core与实际production helper/host ABI，不代表Mihomo、Flutter、SC或发行",
+  "source_hashes": {
+    "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+    "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+    "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+    "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+    "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+    "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+    "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+    "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+    "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+    "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+    "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+    "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+    "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+    "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+    "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+    "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+    "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+  }
+}

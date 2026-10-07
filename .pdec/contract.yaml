@@ -756,6 +756,84 @@
       "timeout_seconds": 120,
       "artifacts": [],
       "verification": "实际SDK编译、生产原生状态机与公开子进程fixture；不包含客户端、真实签名guest或系统代理"
+    },
+    "test-supervisor-session": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "test/clash/supervisor/supervisor_session_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": []
+    },
+    "test-supervisor-host": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_macos_supervisor.py",
+        "--execute",
+        "--component",
+        "host"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": []
+    },
+    "test-supervisor-host-recheck": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_macos_supervisor.py",
+        "--execute",
+        "--component",
+        "host",
+        "--host-recheck-only"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": []
+    },
+    "test-supervisor-production-signed": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "macos/CoreSupervisor/Tests/SignedProduction/runner.py",
+        "--output-name",
+        "run-20261008-production"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/three-platform-release/macos-supervisor-production/run-20261008-production/RESULT.json"
+      ]
+    },
+    "test-supervisor-signed-parser": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "macos/CoreSupervisor/Tests/SignedProduction",
+        "-p",
+        "test_runner.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": []
     }
   },
   "deployment": {
@@ -869,20 +947,47 @@
     "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
     "core/common.go": "b19ab65b8f5d0e84d611148be7f624891aed40d9dfcc86814bd7d433dd66195e",
     "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
-    "scripts/check_macos_supervisor.py": "88376af3837d2a562d50b4256a730fb2a538cc69c8d5e8332fe71bd53ec61cf4",
-    "scripts/tests/test_check_macos_supervisor.py": "5a08d1de4290068ce533be8e7e3066b41b41e74a1abc9940225bf3519c3b1fdd",
-    "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "5fbf9fea28e94c2cd25e5fdcea0d797559122e7478387f01300b8aa8a81072ea",
-    "macos/CoreSupervisor/Owner/SystemBackend.swift": "8635be1e1fe09901543ce763cab98d335036a75c79a3361ee3ca1298df52961b",
+    "scripts/check_macos_supervisor.py": "78a6e8d827290d743f0c8594fa0ec862653bfb8962b476167aa7e3380754349b",
+    "scripts/tests/test_check_macos_supervisor.py": "ab756788ad93c3d75a3947e20ddae4bd3ca3bd36444074607d9bbc59884d3fae",
+    "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+    "macos/CoreSupervisor/Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
     "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
     "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
-    "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "32b4226d3d0965eb9a91f83b98e1626f70799e52435335d395ae9eabffdbee77",
+    "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
     "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
     "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
     "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
     "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
     "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
     "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
-    "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b"
+    "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+    "macos/CoreSupervisor/Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+    "macos/CoreSupervisor/Tests/KernelLiveness.c": "d01ece0e4a8faec27bcfc5ded3c4ccc1bf65bf5e72432c64d7a72b2e0d0d65c3",
+    "macos/CoreSupervisor/Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+    "macos/CoreSupervisor/Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+    "macos/CoreSupervisor/Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+    "macos/CoreSupervisor/Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f",
+    "macos/CoreSupervisor/Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+    "macos/CoreSupervisor/Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+    "macos/CoreSupervisor/Tests/Relay/Bridge.h": "e8c949f0a6efc2b2fab3e1bfb377a857aa258bff4df3f9ee78ab1b5e69aec22e",
+    "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
+    "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "220c7f096b81ce43cd0cf112523ff82ce1268d7101f7f2185f802563c4e3ab63",
+    "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
+    "lib/clash/supervisor/supervisor_session.dart": "8d2fcf3d67798b1f012bd098959905c7d36aa568e61f5eb01c949b03b4b58fe2",
+    "lib/clash/supervisor/supervisor_codec.dart": "b86e7ea71c642ddef4a8e2b3b3c83e9ba8b01acb11d19b3660204cc6a399fa2f",
+    "lib/clash/supervisor/supervisor_transport.dart": "8b5cb1a194ab2b5be5ffd5654ebee46b8d96306142d2b1dfd8d397641fa1b5a6",
+    "lib/clash/supervisor/supervisor_native.dart": "4430e134e3860344f9d302d71711cc2f73a9896c8fb1e029df7065a6f5224ce6",
+    "lib/clash/supervisor/supervisor_method_channel.dart": "22b85155c960b9fdafecee35f49009b6acc496c25e70b3aa7314d0de7e60e755",
+    "test/clash/supervisor/supervisor_session_test.dart": "f22edef839d38f73a039e73d47b55269a7072191f55b9e8e76441dd9e4d7e839",
+    "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
+    "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+    "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
+    "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "f64ffc5a21dd796caf801e9f87a82401100690dd352329bff0362c812235e6f6",
+    "macos/CoreSupervisor/Tests/SignedProduction/runner.py": "a0e9a7ae399d4e2bd11b3e58436c6134f16f1b96b7213e167f326f37d27e1e43",
+    "macos/CoreSupervisor/Tests/SignedProduction/Core.c": "4074a699e2cea2aa19fdfe617f46a3a5719f06356ab48b57324e6a8d91b3909c",
+    "macos/CoreSupervisor/Tests/SignedProduction/test_runner.py": "22b662a46ac9b18eaabf96ffa64c6964deb40758d4f0da9b12afbdf572d9a914",
+    "macos/CoreSupervisor/Tests/SignedProduction/BASE.json": "2044df883dd76dd775a3d47ea49e6e743d2bd79e008bf1094db5e40e91d7fca2",
+    "macos/CoreSupervisor/Tests/SignedProduction/main.swift": "516c813f2f8f386e9ddc55b759b6c804829c880bb5944bf344ec4b457f3a1211"
   },
   "platform_extensions": {
     "android": {
@@ -919,6 +1024,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "5e056d2c7c396637595d0748b96a8487d88dce044b7c56a4f83f86188ccd0a1f"
+    "contract_digest": "56822275cad4343602c4ed79e8b107159e9c709245f7eda99933ed2fe6474216"
   }
 }

@@ -12,6 +12,7 @@ final class SystemBackend: LifecycleBackend {
     var effectiveUID: UInt32 { OCSelfUID() }
     var realUID: UInt32 { OCSelfRealUID() }
     func spawn(_ artifact: SealedCoreArtifact) -> OwnedChild? {
+        do { try artifact.recheckForSpawn() } catch { return nil }
         var result = OCChild(pid: -1, input_writer: -1, output_reader: -1)
         #if OWNED_PUBLIC_FIXTURE
         let error = OCSpawnPublicFixture(fixture, &result)
