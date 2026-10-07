@@ -408,6 +408,17 @@ class DependencyNetworkTest(unittest.TestCase):
             finally:
                 self.assertTrue(lease.close())
 
+    def test_rejected_repository_diagnostics_never_retain_raw_target(self):
+        for host, label in [('jcenter.bintray.com', 'nonofficial-jcenter'),
+                            ('jitpack.io', 'nonofficial-jitpack'), ('private-token.invalid', 'outside-other')]:
+            with self.assertRaises(network.HeaderError) as caught:
+                network.connect_host(f'CONNECT {host}:443 HTTP/1.1\r\n\r\n'.encode())
+            error = caught.exception
+            self.assertEqual(error.category, 'target-outside-allowlist')
+            self.assertEqual(error.source, label)
+            self.assertNotIn(host, str(error))
+            self.assertNotIn(host, json.dumps(error.__dict__))
+
     def test_slow_header_timeout_is_local_while_authorized_tunnel_stays_usable(self):
         clock = time.monotonic
         offset = [0]

@@ -1,5 +1,6 @@
 """Android 扩展必须保持已批准的主机、目标与入口。"""
 import copy
+import hashlib
 import importlib.util
 import io
 import json
@@ -31,6 +32,24 @@ class AndroidContractTest(unittest.TestCase):
                 "timeout_seconds": 2700,
             }},
         }
+
+    def test_qjs_declares_only_official_repositories(self):
+        root = Path(__file__).resolve().parents[2]
+        source = (root / 'plugins/flutter_qjs/android/build.gradle').read_text()
+        effective = '\n'.join(line for line in source.splitlines() if not line.lstrip().startswith('//'))
+        self.assertNotIn('jcenter()', effective)
+        self.assertNotIn('jitpack.io', effective)
+        self.assertIn("classpath 'com.android.tools.build:gradle:3.5.0'", source)
+        self.assertIn("ext.kotlin_version = '1.3.50'", source)
+        self.assertIn('org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version', source)
+
+    def test_wrapper_distribution_and_bootstrap_match_official_checksums(self):
+        root = Path(__file__).resolve().parents[2]
+        wrapper = root / 'android/gradle/wrapper'
+        self.assertEqual(hashlib.sha256((wrapper/'gradle-wrapper.jar').read_bytes()).hexdigest(),
+                         '7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172')
+        properties = (wrapper/'gradle-wrapper.properties').read_text()
+        self.assertIn('distributionSha256Sum=efe9a3d147d948d7528a9887fa35abcf24ca1a43ad06439996490f77569b02d1', properties)
 
     def test_approved_android_target_is_preserved(self):
         self.assertEqual(module.validate_android(self.root, self.contract)["target_os"], "android")

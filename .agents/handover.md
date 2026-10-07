@@ -536,3 +536,34 @@ PID起始时间复核不是内核原子句柄，真实Gradle退出仍需实际�
 
 ### HLG
 标准dry-run/apply追加，索引由工具更新。
+
+## 2026-10-07T23:24:04+08:00 · 官方Android依赖、Wrapper与ZIP预置候选冻结
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android-wrapper", "official-dependencies", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 5f808f406de9ae277394bc36b93b3d342b8d7c03a7b797880c8898cb716f358e
+
+### Summary
+Android/macOS优先。真实802d510发行尝试在Gradle help因白名单外目标被拒绝，未生成APK或读签名凭据；未将候选标为发行。新候选补官方仓库、真实Java命名、Wrapper与可验证ZIP预置。
+
+### Changed
+QJS仓库只Google/Maven Central，AGP3.5.0/KGP1.3.50不变。未知CONNECT诊断3个固定标签，无hostname/header保留。候选枚举同UID/ucomm java后查kernel；Java身份读取失败保持false，无FD候选不获signal授权。旧Wrapper JAR官方SHA为2.10，从已校验8.14 ZIP中提取官方SHA匹配的8.14 Wrapper，4文件纳入版本控制和PDEC，运行Gradle版本8.14不变。ZIP预置只复用项目内固定大小/官方SHA文件独立副本，无Maven/编译缓存，坏选定源不fallback。
+
+### Validation
+主控实际139项工具集成测试通过含33项cache夹具，日志.test/three-platform-release/android-official-cache-integrated-tests-r2.log。静态仓库、受保护非Java和Wrapper真实hash均修复前失败/修复后通过。自有JBR路径/argv/环境隔离/ucomm java/natural exit全部true，signals=false。独立六文件复审及后续cache/接线/Wrapper审阅均无新P1/P2；实际新Wrapper启动及seed尚未执行。
+
+### Next
+提交推送冻结候选后运行一次Android debug完整编译，先获得公开编译诊断和AVD安装证据，再正式签名构建。实际Gradle/worker accounting name按允许主类取固定布尔证据；macOS系统代理/backend与TUN边界继续开发。
+
+### Risks
+802d510固定事件214上游连接、queue-expired3、target-outside-allowlist1、header-timeout0，确切拒绝主机未知；source/locks true、cleanup false保留。后续只读FD0，候选扫描因2个同UID非Java路径不可读失败；新筛选只读scan count0不追认旧清理成功。PID复核非原子句柄；真实worker命名、退出、APK、VPN/支付、Apple发行身份仍待验收。
+
+### DIA
+同步平台验证、CHANGELOG、签名策略、PDEC与registry；公开脱敏失败回执docs/validation/2026-10-07-three-platform/android-802d510.json。
+
+### HLG
+标准dry-run/apply追加与工具重建索引。

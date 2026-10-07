@@ -35,6 +35,8 @@ def main() -> int:
                 time.sleep(0.1)
                 executable = android.process_executable(process.pid)
                 arguments = android.process_arguments(process.pid)
+                comm = subprocess.run(["ps", "-p", str(process.pid), "-o", "ucomm="], env=env, capture_output=True, text=True, check=True, timeout=2).stdout.strip()
+                facts["kernel_comm_matches"] = comm == "java"
                 facts["kernel_path_matches"] = executable == java
                 facts["argv_matches"] = arguments == argv
                 facts["environment_not_returned"] = all("PUBLIC_ENV_NOT_ARGV" not in item for item in arguments)
@@ -47,7 +49,7 @@ def main() -> int:
                     facts["signals_sent"] = True
                     process.wait(timeout=5)
         facts["verified"] = all(facts.get(key) is True for key in
-            ("kernel_path_matches", "argv_matches", "environment_not_returned", "natural_exit")) and not facts["signals_sent"]
+            ("kernel_path_matches", "kernel_comm_matches", "argv_matches", "environment_not_returned", "natural_exit")) and not facts["signals_sent"]
     except Exception:
         facts["failure"] = "自有Java内核身份未满足预期"
     print(json.dumps(facts, ensure_ascii=False))

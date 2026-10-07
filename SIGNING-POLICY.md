@@ -48,3 +48,7 @@ Android 使用持续沿用的发行 keystore，区别于 Windows 的 SignPath �
 2026-10-07 本机正式 Android 身份创建通过。公开证书 SHA256：`6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82`。失败创建不会删除已有钥匙串记录；回执未完成时保留身份并标记待核对。私钥和密码不纳入仓库。
 
 `scripts/build_android.py --execute --release` 在正式扩展批准后读取本机签名身份，密码只进入 Flutter APK 构建进程，并在结束后清除临时环境引用。该步骤的工具正文不进入诊断、回执或日志；验签过程不使用密码。成功回执必须包含固定证书摘要、单一 signer、APK 前后摘要一致、核心及16KiB校验和来源无漂移。`signature_verified` 不表示业务发行已验收，`release_verified` 保持为 false，直至安装和实际功能验收另有完整证据。
+
+## macOS 发行身份与验收
+
+本机只读核验确认 Apple Development 身份可用，未找到 Developer ID Application 身份。已有 ad hoc 应用的嵌套签名核验失败，不能作为正式分发制品。Developer ID 签名、Hardened Runtime、公证、staple与下载后的Gatekeeper验收独立于本地编译；不得通过自动关闭系统安全设置满足发行门禁。Android、macOS优先交付，iOS保留开发版研究。

@@ -1,0 +1,31 @@
+{
+  "candidate": "802d510450cba6e4f0827dc94536cfd341e4aa0e",
+  "status": "failed",
+  "phase": "gradle-help",
+  "failure_reason": "任务代理失败、取消或时间预算耗尽",
+  "secondary_failures": [
+    "最终任务 DNS 租约复核失败",
+    "独立 Gradle daemon/worker 终止证据不足"
+  ],
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "signature_verified": false,
+  "release_verified": false,
+  "gradle_cleanup_verified": false,
+  "network_closed": true,
+  "upstream_connections": 214,
+  "proxy_events": [
+    {
+      "overload": 0,
+      "queue-expired": 3,
+      "upstream-unavailable": 0,
+      "header-timeout": 0,
+      "header-too-large": 0,
+      "header-malformed": 0,
+      "target-outside-allowlist": 1,
+      "relay-failed": 0,
+      "resolution-slot-expired": 0
+    }
+  ],
+  "distribution_official_sha256": "efe9a3d147d948d7528a9887fa35abcf24ca1a43ad06439996490f77569b02d1"
+}

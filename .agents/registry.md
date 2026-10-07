@@ -30,3 +30,5 @@
 - server/plugins/Fubei/README.md — 付呗支付适配契约与商户外部条件
 - server/patches/billing/PLAN.md — 订单和返佣事务候选、隔离验证与部署回滚边界
 - .pdec/contract.yaml、.pdec/README.md — 三端开发执行契约、授权来源、执行位置与回滚
+
+- docs/validation/2026-10-07-three-platform/ — 平台候选公开脱敏构建回执

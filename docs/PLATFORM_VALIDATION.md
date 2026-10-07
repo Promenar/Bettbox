@@ -92,7 +92,7 @@ Android 正式发行密钥已在本机创建，密码位于登录钥匙串，密
 
 完整 iOS 模拟器应用构建使用当前工作树，来源检查通过；Pods 最低系统版本对齐 iOS 15、Runner 与 PacketTunnel 链接 SDK libresolv，模拟器候选仅包含 arm64。模拟器不支持系统 VPN，编译和页面操作不作为真机隧道、商店签名或可分发版本证据。最新共享 Flutter 135 项测试通过，静态检查无问题。
 
-Android 官方依赖使用仅任务的 loopback CONNECT 代理，100项网络、构建、契约及签名集成测试通过；32条转发与6条解析/连接分别有界限流，回执记录代理自产拒绝计数。实际 Java TLS、官方重定向与 Gradle 8.14 下载通过。容量调整后的真实门禁仍失败：213次上游连接、3次排队超时和1次请求头拒绝，不足以认定官方源或网络容量为最终根因。原回执的进程清理验证失败；后续只读检查没有发现该任务持有者，不覆盖原失败记录。
+Android 官方依赖使用仅任务的 loopback CONNECT 代理，139项网络、构建、契约及签名集成测试通过；32条转发与6条解析/连接分别有界限流，回执记录代理自产拒绝计数。实际 Java TLS、官方重定向与 Gradle 8.14 下载通过。容量调整后的真实门禁仍失败：213次上游连接、3次排队超时和1次请求头拒绝，不足以认定官方源或网络容量为最终根因。原回执的进程清理验证失败；后续只读检查没有发现该任务持有者，不覆盖原失败记录。
 
 隔离复现脚本 `python3 scripts/check_android_regressions.py` 在候选 `23747c0` 上证明慢请求头使全局门禁失败，以及带空格 Java 路径无法认定归属；当前实现两项通过。请求头超时仅关闭该连接，安全边界拒绝保持全局失败。清理使用内核可执行路径、仅 argc 个参数和实际目录文件描述符校验身份，终止前重新核对 PID 与启动时间；保留原始失败并独立记录清理失败。该证据仅为公开夹具、回环和 mock，不包含真实进程终止、正式 APK 或签名验收。
 
@@ -104,3 +104,9 @@ iOS 发行存在用途兼容风险：当前捕获流量交给 Mihomo 后仍允�
 macOS 系统代理事务核心位于 `plugins/proxy/macos/`，实际 Swift 编译与23项隔离测试通过，覆盖串行生命周期、取消、提交/应用差异、外部配置冲突和有证据恢复。测试后端为 fake；SCPreferences、受保护 journal、Flutter channel 与现有 App 接线尚未完成，系统代理实际行为未验收。当前已有应用为 ad hoc 候选且嵌套签名核验失败；本机确认 Apple Development 身份，但未找到 Developer ID Application 身份。
 
 自有短寿命 Java 夹具实际核验 JBR 内核路径、精确 argv 与环境隔离通过，进程自然退出且无信号。清理补充同 UID/PID 候选枚举，发现无目录FD的任务JVM时只阻断成功、不授予信号权限；独立审阅闭合两项P2，初始/最终枚举异常均有回归。
+
+候选 `802d510` 的真实发行尝试通过工具链、Java TLS、官方Gradle文件下载与实际JVM门禁，但在Gradle help阶段因1次白名单外目标拒绝停止，APK未生成、签名凭据未读取。固定事件为214次成功上游连接、queue-expired3、target-outside-allowlist1、header-timeout0；来源与锁文件无漂移。原清理回执false保留；只读定位发现同UID非Java进程的内核路径不可读取，不能解释成仍有任务JVM。候选扫描增加公开ucomm前置筛选，Java候选仍严格核验；真实JBR样本命名与身份通过、无信号，后续只读任务候选count0不追认原清理成功。
+
+QuickJS Android插件移除声明的JCenter/JitPack仓库，依赖版本保持不变，Kotlin1.3.50官方Maven POM可用；被拒绝的原请求确切主机未知，不归因于该声明。修复前静态仓库范围与受保护非Java夹具均失败，修复后139项集成测试通过并独立复审无新P1/P2。未知CONNECT只记录3种固定来源标签，不保存hostname或请求头。Gradle8.14完整发行ZIP的SHA256已与[官方校验和](https://gradle.org/release-checksums/)匹配，Wrapper固定相同校验和；真实依赖配置、APK、实际Gradle/worker命名和退出仍需验收。
+
+Wrapper启动JAR经官方SHA核对确认原本为2.10，不能执行发行ZIP校验和配置；已从完整性匹配的8.14官方ZIP内提取嵌套Wrapper JAR，SHA `7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172` 与官方一致。保留启动脚本，4个Wrapper文件纳入Git/PDEC/来源冻结；旧文件在本机任务目录备份，Gradle运行版本维持8.14。新的ZIP预置仅复用项目内匹配官方SHA的独立副本，检查父目录与实际副本，坏源不回退；不复用Maven或编译缓存。139项工具测试含33项ZIP夹具通过，独立审阅无新P1/P2；真实预置、启动/解压及完整编译仍待验收。失败公开回执为 `validation/2026-10-07-three-platform/android-802d510.json`。

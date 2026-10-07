@@ -49,7 +49,10 @@ class NetworkError(RuntimeError):
 class HeaderError(NetworkError):
     """固定请求头原因不携带目标值、请求头或传输正文。"""
 
-    def __init__(self, category: str):
+    def __init__(self, category: str, source: str | None = None):
+        if source not in (None, "nonofficial-jcenter", "nonofficial-jitpack", "outside-other"):
+            raise NetworkError("代理目标来源标签越出固定范围")
+        self.source = source
         messages = {'header-timeout': 'CONNECT 请求头时间预算耗尽',
                     'header-too-large': 'CONNECT 请求头超出范围',
                     'header-malformed': 'CONNECT 请求头格式拒绝',
@@ -256,7 +259,9 @@ def connect_host(header: bytes) -> tuple[str, bytes]:
         lines = header[:marker].decode('ascii').split('\r\n')
         match = re.fullmatch(r'CONNECT ([A-Za-z0-9.-]+):443 HTTP/1\.[01]', lines[0])
         if match is None or match[1].lower() not in HOSTS:
-            raise HeaderError("target-outside-allowlist")
+            sources = {"jcenter.bintray.com": "nonofficial-jcenter", "jitpack.io": "nonofficial-jitpack"}
+            label = sources.get(match[1].lower(), "outside-other") if match else "outside-other"
+            raise HeaderError("target-outside-allowlist", label)
         for line in lines[1:]:
             if not re.fullmatch(r'[A-Za-z0-9-]+: [\x20-\x7e]*', line):
                 raise HeaderError("header-malformed")
@@ -399,7 +404,7 @@ class NetworkLease:
         self.history: list[dict[str, object]] = []
         self._event_counts = {name: 0 for name in ('overload', 'queue-expired', 'upstream-unavailable',
                                                   'header-timeout', 'header-too-large', 'header-malformed', 'target-outside-allowlist',
-                                                  'relay-failed', 'resolution-slot-expired')}
+                                                  'relay-failed', 'resolution-slot-expired', 'nonofficial-jcenter', 'nonofficial-jitpack', 'outside-other')}
         self._event_summary: dict[str, object] | None = None
 
     def _publish_events(self) -> None:
@@ -657,6 +662,8 @@ class NetworkLease:
             except HeaderError as error:
                 if not self._stop.is_set() and not self._failure:
                     self._event(error.category)
+                    if error.source is not None:
+                        self._event(error.source)
                     if error.category == 'header-timeout':
                         # 单连接慢请求只返回408；总体截止仍由check统一拒绝。
                         try:

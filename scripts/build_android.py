@@ -36,6 +36,11 @@ try:
 except ModuleNotFoundError:
     import android_release_signing as release_signing
 
+try:
+    from scripts import android_distribution_cache as distribution_cache
+except ModuleNotFoundError:
+    import android_distribution_cache as distribution_cache
+
 FLUTTER_VERSION = "3.44.9"
 GO_VERSION = "1.26.5"
 NDK_VERSION = "28.2.13676358"
@@ -430,20 +435,20 @@ def owned_gradle_processes(home: Path, root: Path, env: Mapping[str, str], deadl
 def task_gradle_candidates(home: Path, root: Path, env: Mapping[str, str], deadline: float,
                            java_identity: JavaIdentity | None = None) -> list[int]:
     """补查已关闭目录 FD 的任务 JVM；此证据仅阻断成功，不授权发送信号。"""
-    raw = run(("ps", "-axo", "pid=,uid="), root, env,
+    raw = run(("ps", "-axo", "pid=,uid=,ucomm="), root, env,
               timeout=min(5, remaining_budget(deadline)))
     lines = raw.splitlines()
     if len(raw) > 1048576 or len(lines) > 16384:
         raise RuntimeError("进程候选枚举范围拒绝")
     pids = []
     for line in lines:
-        fields = line.split()
-        if len(fields) != 2 or not all(value.isdigit() for value in fields):
+        fields = line.split(maxsplit=2)
+        if len(fields) != 3 or not all(value.isdigit() for value in fields[:2]):
             raise RuntimeError("进程候选枚举格式拒绝")
-        pid, uid = map(int, fields)
+        pid, uid = map(int, fields[:2])
         if pid <= 0:
             raise RuntimeError("进程候选枚举格式拒绝")
-        if uid == os.getuid():
+        if uid == os.getuid() and fields[2] == "java":
             pids.append(pid)
     if not pids:
         return []
@@ -891,6 +896,10 @@ def execute(root: Path, versions: Mapping[str, str], env: Mapping[str, str],
         if not probe_facts:
             raise RuntimeError("缺少实际 Java TLS 探测证据")
         receipt["official_tls_probes"] = probe_facts
+        check_inputs()
+        receipt["phase"] = "gradle-distribution-seed"
+        receipt["distribution_zip"] = distribution_cache.seed_distribution_zip(
+            root, owned_home, deadline - CLEANUP_RESERVE_SECONDS)
         check_inputs()
         receipt["phase"] = "gradle-help"
         print("执行依赖门禁：Gradle help")
