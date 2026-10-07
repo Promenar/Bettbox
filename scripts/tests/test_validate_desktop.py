@@ -124,7 +124,7 @@ class ValidateDesktopTest(unittest.TestCase):
             "digest",
         )
 
-        self.assertEqual(len(plan), 6)
+        self.assertEqual(len(plan), 9)
         self.assertEqual(plan[1].env["GOOS"], "darwin")
         self.assertEqual(plan[1].env["GOARCH"], "arm64")
         self.assertNotIn("GOAMD64", plan[1].env)
@@ -137,10 +137,10 @@ class ValidateDesktopTest(unittest.TestCase):
                 "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore"
             ),
         )
-        self.assertEqual(plan[2].argv, ("pod", "install", "--deployment"))
-        self.assertEqual(plan[3].argv[2], "macos")
-        self.assertEqual(plan[4].argv[:3], ("codesign", "--verify", "--deep"))
-        self.assertTrue(plan[5].capture_output)
+        self.assertEqual(plan[5].argv, ("pod", "install", "--deployment"))
+        self.assertEqual(plan[6].argv[2], "macos")
+        self.assertEqual(plan[7].argv[:3], ("codesign", "--verify", "--deep"))
+        self.assertTrue(plan[8].capture_output)
 
     def test_unsigned_macos_is_explicit_and_rejected_for_windows(self) -> None:
         plan = validate_desktop.command_plan(
@@ -149,9 +149,9 @@ class ValidateDesktopTest(unittest.TestCase):
             "digest",
             unsigned_macos=True,
         )
-        self.assertEqual(len(plan), 5)
+        self.assertEqual(len(plan), 8)
         self.assertEqual(
-            plan[3].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
+            plan[6].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
         )
         self.assertEqual(plan[-1].argv[:2], ("codesign", "--display"))
         self.assertTrue(plan[-1].capture_output)
@@ -382,6 +382,118 @@ class ValidateDesktopTest(unittest.TestCase):
                 manifest["command_error"]["message"], "bundle validation failed"
             )
 
+
+    def core_signature_fixture(self) -> str:
+        return ("Identifier=com.appshub.bettbox.core\nCDHash=" + "a" * 40 +
+                "\nSignature=adhoc\nTeamIdentifier=not set")
+
+    def test_core_identity_parser_rejects_wrong_or_duplicate_identity(self) -> None:
+        valid = self.core_signature_fixture()
+        self.assertEqual(validate_desktop.parse_core_signature(valid)["identifier"], validate_desktop.CORE_IDENTIFIER)
+        for wrong in [valid.replace("com.appshub.bettbox.core", "a.out"),
+                      valid + "\nCDHash=" + "b" * 40,
+                      valid.replace("Signature=adhoc", "Signature=Developer ID"),
+                      valid.replace("CDHash=" + "a" * 40, "CDHash=invalid")]:
+            with self.assertRaises(RuntimeError):
+                validate_desktop.parse_core_signature(wrong)
+
+    def test_macos_signing_precedes_hash_binding_and_flutter_even_unsigned_host(self) -> None:
+        target = validate_desktop.TARGETS["macos-arm64"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in validate_desktop.LOCK_FILES:
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("locked")
+            seen = []
+            signed_hash = None
+            def fake_run(commands):
+                nonlocal signed_hash
+                outputs = []
+                for command in commands:
+                    seen.append(command.argv)
+                    if command.argv[0] == "go":
+                        path = root / target.core_path
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_bytes(b"GO_PUBLIC_UNSIGNED")
+                    if command.argv[:2] == ("codesign", "--force"):
+                        (root / target.core_path).write_bytes(b"FINAL_PUBLIC_ADHOC_CORE")
+                        signed_hash = validate_desktop.sha256_file(root / target.core_path)
+                    if command.argv[:3] == ("flutter", "build", "macos"):
+                        self.assertIsNotNone(signed_hash)
+                        self.assertIn("--dart-define=CORE_SHA256=" + signed_hash, command.argv)
+                        identity, source = validate_desktop.read_core_identity(root, validate_desktop.CORE_IDENTITY_PATH)
+                        self.assertEqual(identity["sha256"], signed_hash)
+                        for relative in (*target.app_paths, target.bundled_core_path):
+                            path = root / relative
+                            path.parent.mkdir(parents=True, exist_ok=True)
+                            path.write_bytes(b"FINAL_PUBLIC_ADHOC_CORE" if relative == target.bundled_core_path else b"PUBLIC_APP")
+                        manifest = root / target.bundle_path / "Contents/Resources/BettboxCoreIdentity.json"
+                        manifest.parent.mkdir(parents=True, exist_ok=True)
+                        manifest.write_bytes(source)
+                    if command.capture_output:
+                        outputs.append(self.core_signature_fixture() if command.argv[-1].endswith("BettboxCore") else "code object is not signed at all")
+                    else:
+                        outputs.append(None)
+                return outputs
+            def fake_codesign(argv, **kwargs):
+                nonlocal signed_hash
+                self.assertEqual(argv[0], "/usr/bin/codesign")
+                self.assertEqual(kwargs["env"], {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"})
+                self.assertEqual(kwargs["timeout"], 60)
+                if argv[1] == "--force":
+                    (root / target.core_path).write_bytes(b"FINAL_PUBLIC_ADHOC_CORE")
+                    signed_hash = validate_desktop.sha256_file(root / target.core_path)
+                seen.append(tuple(argv))
+                return mock.Mock(stdout=self.core_signature_fixture())
+            with mock.patch.object(validate_desktop, "git_source_state", return_value={"head": "PUBLIC_SAME"}), \
+                    mock.patch.object(validate_desktop, "run_commands", side_effect=fake_run), \
+                    mock.patch.object(validate_desktop.core_identity_module.subprocess, "run", side_effect=fake_codesign) as native_sign:
+                validate_desktop.execute_build(root, target, unsigned_macos=True)
+            self.assertLess(next(i for i, argv in enumerate(seen) if argv[:2] == ("/usr/bin/codesign", "--force")),
+                            next(i for i, argv in enumerate(seen) if argv[:3] == ("flutter", "build", "macos")))
+            self.assertEqual(native_sign.call_count, 5)
+            receipt = json.loads((root / "build/desktop-validation/macos-arm64.json").read_text())
+            self.assertEqual(receipt["host_signing_mode"], "unsigned")
+            self.assertEqual(receipt["core_identity"]["signingmode"], "adhoc")
+            self.assertEqual(receipt["core_identity"]["sha256"], signed_hash)
+
+    def test_macos_manifest_tamper_and_packaging_resign_are_rejected(self) -> None:
+        target = validate_desktop.TARGETS["macos-arm64"]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in (target.core_path, target.bundled_core_path, *target.app_paths):
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"PUBLIC_CORE")
+            identity = validate_desktop.parse_core_signature(self.core_signature_fixture())
+            identity["sha256"] = validate_desktop.sha256_file(root / target.core_path)
+            source = root / validate_desktop.CORE_IDENTITY_PATH
+            bundle = root / target.bundle_path / "Contents/Resources/BettboxCoreIdentity.json"
+            bundle.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text(json.dumps(identity))
+            bundle.write_bytes(source.read_bytes())
+            with mock.patch.object(validate_desktop.core_identity_module, "run_identity_commands", return_value=[None, self.core_signature_fixture()]):
+                validate_desktop.validate_bundle(root, target, identity)
+                for field, bad in [("identifier", "a.out"), ("schema", True), ("signingmode", "DeveloperID"), ("cdhash", "b" * 40)]:
+                    tampered = dict(identity, **{field: bad})
+                    source.write_text(json.dumps(tampered))
+                    bundle.write_bytes(source.read_bytes())
+                    with self.assertRaises(RuntimeError):
+                        validate_desktop.validate_bundle(root, target, identity)
+                source.write_text(json.dumps(identity))
+                bundle.write_bytes(source.read_bytes())
+                (root / target.bundled_core_path).write_bytes(b"PACKAGING_RESIGNED_CORE")
+                with self.assertRaisesRegex(RuntimeError, "core SHA256 不一致"):
+                    validate_desktop.validate_bundle(root, target, identity)
+            self.assertEqual(json.loads(source.read_text()), identity)
+
+    def test_windows_stage_commands_keep_existing_order_and_no_signing(self) -> None:
+        plan = validate_desktop.command_plan(Path("repo"), validate_desktop.TARGETS["windows-x64"], "PUBLIC_HASH")
+        self.assertEqual([command.argv[0] for command in plan], ["flutter", "go", "cargo", "flutter"])
+        self.assertEqual([command.stage for command in plan], ["prepare", "prepare", "dependencies", "flutter"])
+        self.assertEqual(validate_desktop.commands_in_stage(plan, "core-sign"), [])
+        self.assertEqual(plan[2].env, {"TOKEN": "PUBLIC_HASH"})
 
 if __name__ == "__main__":
     unittest.main()

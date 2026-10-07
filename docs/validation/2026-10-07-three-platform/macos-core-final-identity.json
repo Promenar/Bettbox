@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "verification": "公开Go owned-child测试产物副本的固定ad hoc签名与独立验签",
+  "unsigned_input_sha256": "f63ff6e25187cee38ac85d3430a1545408a9698aba232a6e8e06695257098f86",
+  "signed_identity": {
+    "schema": 1,
+    "identifier": "com.appshub.bettbox.core",
+    "cdhash": "8e422080baafb69cf18c02bccbc1663779324e84",
+    "signingmode": "adhoc",
+    "sha256": "e8fea57b10c9de22c2d58924186b6c5c999f2d0a103f096b94a72b28cad1a4a4"
+  },
+  "manifest_sha256": "e312850d06bf4eb8c2cf8248b0dc6ac3a7b479228c5efa5df63f86944d0be11a",
+  "signing_replaced_inode": true,
+  "original_binary_unchanged": true,
+  "python_regression_tests": 34,
+  "source_sha256": {
+    "scripts/macos_core_identity.py": "34e6f9b38b657005906eb4c96f219c0c94fba00f948a4bfc551f4d6384ca0118",
+    "scripts/tests/test_macos_core_identity.py": "8a6569d5b7da4afd6e11841326e88dc6f5d7d5d21de1401ddd2bc578f50c7303",
+    "scripts/validate_desktop.py": "77c65af9f2b6577ca6f156452b47e21bf9e8ebcbbd21c406f72093cf39250cf9",
+    "setup.dart": "aa6878db793e24de6668afc1c836adc97608fc4f766ea3021701bf725e054fc3",
+    "macos/Runner.xcodeproj/project.pbxproj": "7593ad719abbd9deda739df88a1c6ecc0e27dae97f066edb98771bcf3d46893f"
+  },
+  "limits": [
+    "未构建当前完整App或DMG",
+    "不证明Apple Developer ID、公证、Keychain、真实guest或系统代理",
+    "路径式codesign不提供同UID替换还原硬隔离"
+  ]
+}

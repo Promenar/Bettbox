@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import platform
@@ -22,6 +23,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Mapping, Sequence
 
+
+CORE_IDENTIFIER = "com.appshub.bettbox.core"
+CORE_IDENTITY_PATH = Path("libclash/macos/BettboxCoreIdentity.json")
 
 FLUTTER_VERSION = "3.44.9"
 RUST_VERSION = "1.98.0"
@@ -167,6 +171,7 @@ class Command:
     label: str = ""
     capture_output: bool = False
     check: bool = True
+    stage: str = ""
 
 
 def repository_root() -> Path:
@@ -370,6 +375,7 @@ def command_plan(
             ("flutter", "pub", "get", "--enforce-lockfile"),
             root,
             label="恢复 Flutter 锁定依赖",
+            stage="prepare",
         ),
         Command(
             (
@@ -386,8 +392,14 @@ def command_plan(
             root / "core",
             env=core_env,
             label="编译 Mihomo core",
+            stage="prepare",
         ),
     ]
+
+    if not target.needs_helper:
+        labels = ("最终 ad hoc 签名 macOS core", "验证 macOS core 签名", "读取 macOS core 公开身份")
+        commands.extend(Command(argv, root, label=label, capture_output=argv[1] == "--display", stage="core-sign")
+                        for argv, label in zip(core_identity_module.core_signing_arguments(), labels))
 
     if target.needs_helper:
         commands.append(
@@ -396,6 +408,7 @@ def command_plan(
                 root / "services/helper",
                 env={"TOKEN": core_sha256},
                 label="编译 Windows helper",
+                stage="dependencies",
             )
         )
     else:
@@ -404,6 +417,7 @@ def command_plan(
                 ("pod", "install", "--deployment"),
                 root / "macos",
                 label="恢复 macOS 锁定 Pod 依赖",
+                stage="dependencies",
             )
         )
 
@@ -423,6 +437,7 @@ def command_plan(
             if unsigned_macos
             else None,
             label="编译 Flutter 桌面应用",
+            stage="flutter",
         )
     )
     if not target.needs_helper and not unsigned_macos:
@@ -433,11 +448,13 @@ def command_plan(
                     ("codesign", "--verify", "--deep", "--strict", "--verbose=2", bundle),
                     root,
                     label="验证 macOS bundle 签名",
+                    stage="bundle-signature",
                 ),
                 Command(
                     ("codesign", "--display", "--verbose=4", bundle),
                     root,
                     label="读取 macOS bundle 签名证据",
+                    stage="bundle-signature",
                     capture_output=True,
                 ),
             ]
@@ -448,6 +465,7 @@ def command_plan(
                 ("codesign", "--display", "--verbose=4", target.bundle_path.as_posix()),
                 root,
                 label="读取 macOS 编译产物签名事实",
+                    stage="bundle-signature",
                 capture_output=True,
                 check=False,
             )
@@ -602,8 +620,28 @@ def parse_unsigned_signature(output: str) -> list[str]:
     ]
 
 
+def commands_in_stage(plan: Sequence[Command], stage: str) -> list[Command]:
+    return [command for command in plan if command.stage == stage]
+
+
+# 共享模块也供 setup.dart 的独立 CLI 使用；路径来自脚本自身，不依赖 cwd/import 搜索顺序。
+_identity_spec = importlib.util.spec_from_file_location("bettbox_macos_core_identity", Path(__file__).with_name("macos_core_identity.py"))
+assert _identity_spec is not None and _identity_spec.loader is not None
+core_identity_module = importlib.util.module_from_spec(_identity_spec)
+_identity_spec.loader.exec_module(core_identity_module)
+parse_core_signature = core_identity_module.parse_core_signature
+validate_core_identity = core_identity_module.validate_core_identity
+read_core_identity = core_identity_module.read_core_identity
+
+
+def finalize_core_identity(root: Path, target: Target, plan: Sequence[Command]) -> dict[str, object]:
+    if target.core_path != core_identity_module.CORE_EXECUTABLE:
+        raise RuntimeError("macOS core 路径不符合共享签名合同")
+    return core_identity_module.prepare_core_identity(root)
+
+
 def validate_bundle(
-    root: Path, target: Target
+    root: Path, target: Target, expected_core_identity: Mapping[str, object] | None = None
 ) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]]]:
     source_paths = [root / target.core_path]
     if target.needs_helper:
@@ -629,6 +667,24 @@ def validate_bundle(
     ]
     if sha256_file(root / target.core_path) != sha256_file(root / target.bundled_core_path):
         raise RuntimeError("bundle 内 core 与本次编译的 core SHA256 不一致")
+
+    if not target.needs_helper:
+        identity, source_bytes = read_core_identity(root, CORE_IDENTITY_PATH)
+        bundled_manifest = target.bundle_path / "Contents/Resources/BettboxCoreIdentity.json"
+        bundled_identity, bundled_bytes = read_core_identity(root, bundled_manifest)
+        if identity != bundled_identity or source_bytes != bundled_bytes or \
+                (expected_core_identity is not None and dict(expected_core_identity) != identity) or \
+                identity["sha256"] != bindings[0]["sha256"]:
+            raise RuntimeError("core 身份 manifest 与冻结产物不一致")
+        outputs = core_identity_module.run_identity_commands(root, [
+            ("codesign", "--verify", "--strict", target.bundled_core_path.as_posix()),
+            ("codesign", "--display", "--verbose=4", target.bundled_core_path.as_posix()),
+        ])
+        actual = parse_core_signature(outputs[-1] or "")
+        actual["sha256"] = sha256_file(root / target.bundled_core_path)
+        if actual != identity or sha256_file(root / target.core_path) != identity["sha256"]:
+            raise RuntimeError("打包后 core 身份或字节发生漂移")
+        bindings[0]["core_identity"] = identity
 
     if target.bundled_helper_path is not None:
         helper_source = root / "libclash/windows/BettboxHelperService.exe"
@@ -757,26 +813,27 @@ def execute_build(
     source_before = git_source_state(root)
     core_path = root / target.core_path
     placeholder = "<core-sha256>"
-    initial_commands = command_plan(
-        root, target, placeholder, unsigned_macos=unsigned_macos
-    )[:2]
+    initial_plan = command_plan(root, target, placeholder, unsigned_macos=unsigned_macos)
+    initial_commands = commands_in_stage(initial_plan, "prepare")
+    core_identity = None
     signature_output = ""
     commands_succeeded = False
     try:
         run_commands(initial_commands)
         if not core_path.is_file():
             raise RuntimeError(f"core 产物不存在：{target.core_path.as_posix()}")
-        core_sha256 = sha256_file(core_path)
+        if not target.needs_helper:
+            core_identity = finalize_core_identity(root, target, initial_plan)
+        core_sha256 = core_identity["sha256"] if core_identity is not None else sha256_file(core_path)
         plan = command_plan(
             root, target, core_sha256, unsigned_macos=unsigned_macos
         )
+        run_commands(commands_in_stage(plan, "dependencies"))
         if target.needs_helper:
-            run_commands(plan[2:3])
             copy_windows_helper(root)
-            run_commands(plan[3:])
-        else:
-            run_commands(plan[2:4])
-            signature_outputs = run_commands(plan[4:])
+        run_commands(commands_in_stage(plan, "flutter"))
+        if not target.needs_helper:
+            signature_outputs = run_commands(commands_in_stage(plan, "bundle-signature"))
             signature_output = signature_outputs[-1] or ""
         commands_succeeded = True
 
@@ -791,7 +848,7 @@ def execute_build(
         )
         source_after = git_source_state(root)
         locks_unchanged, _, _ = evaluate_locks(root, lock_snapshot)
-        sources, bundle_files, bindings = validate_bundle(root, target)
+        sources, bundle_files, bindings = validate_bundle(root, target, core_identity)
         source_unchanged = source_state_unchanged(source_before, source_after)
         manifest = {
             "schema_version": 1,
@@ -813,6 +870,8 @@ def execute_build(
             "bundle_files": bundle_files,
             "bundle_bindings": bindings,
             "signature_evidence": signature_evidence,
+            "core_identity": core_identity,
+            "host_signing_mode": requested_signing_mode,
         }
         manifest_path = write_manifest(root, target, manifest)
         print(f"验证清单：{manifest_path.relative_to(root).as_posix()}")

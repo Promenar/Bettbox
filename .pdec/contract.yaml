@@ -654,6 +654,35 @@
       "cwd": "core",
       "timeout_seconds": 150,
       "artifacts": []
+    },
+    "test-macos-build-identity": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "scripts.tests.test_validate_desktop",
+        "scripts.tests.test_macos_core_identity"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 150,
+      "artifacts": []
+    },
+    "test-macos-setup-identity": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "--no-pub",
+        "test/setup_macos_identity_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": []
     }
   },
   "deployment": {
@@ -665,7 +694,7 @@
     "rollback": ""
   },
   "evidence": {
-    "scripts/validate_desktop.py": "ee8a0276a6b86f3b60879de56a6d2cb3a56bd49f1ce0459d2fec6080ee3d0b16",
+    "scripts/validate_desktop.py": "77c65af9f2b6577ca6f156452b47e21bf9e8ebcbbd21c406f72093cf39250cf9",
     ".github/workflows/validate-desktop.yaml": "ad83eea5cbb847ccef09045808db62c7cccbcd35de3bbe04aa614855fff7c360",
     "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
     "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
@@ -673,7 +702,7 @@
     "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
     "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd",
     "macos/Podfile": "f2024443bc69a9652010081500a9d8b24c8e483a8d63ca525337c8950ab6d438",
-    "macos/Runner.xcodeproj/project.pbxproj": "cdada87394da01efe013879f2c9a982aa3a6ade3dd272b6bab06b799cd327e50",
+    "macos/Runner.xcodeproj/project.pbxproj": "7593ad719abbd9deda739df88a1c6ecc0e27dae97f066edb98771bcf3d46893f",
     "macos/Runner/Release.entitlements": "0672f83103b450e4e0b5b86e42238d9b9ba39af727de43d185f22ec56143cda5",
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
@@ -697,7 +726,7 @@
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
     "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
-    "scripts/tests/test_validate_desktop.py": "a4a92f58f31f4ff364be8bd087903519793630ff31bf034381b5f4ea7cbcf837",
+    "scripts/tests/test_validate_desktop.py": "35b603bcabd70a1f6bd0f3d2ee573d16aca894d5cba00d26b8d00231fc874471",
     "scripts/tests/test_android_contract.py": "d1cf88bb38cae2f913a7cc78807063637db2eb4164e7df9dce50adb08e6e0e9e",
     "scripts/check_android_regressions.py": "9192077d0b1dc7abb38cc394e645577266dfe109e87dabecef087633316819ae",
     "plugins/proxy/macos/Package.swift": "eb8bd91027c66533c3e5f29b12759721672464922a125fae739f9a59f1313d2d",
@@ -746,7 +775,15 @@
     "core/lib_android.go": "e581e6443009ee6b7f59aa2c7b74a2000570798efffd58efdc414c6b2e446a62",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
     "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
-    "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e"
+    "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e",
+    "core/androidstartup/callback_gate_test.go": "5303bbfaad866ba291d83d892ae6786fac6847cc011515323470a73aaf0912b5",
+    "core/androidstartup/state_test.go": "be31fd19f2c3e7789cfacffdb5a2594f261e1130adf6552c2a4bfb1e917e0103",
+    "core/androidstartup/callback_gate.go": "633c2445a022cc58d8c68029d512fd1830f01e001eca5761954f482c1eff6c9c",
+    "core/androidstartup/state.go": "d8602cdf10b0465a8742e407921399da9090e34bc60a26db64a452f2693969b5",
+    "scripts/macos_core_identity.py": "34e6f9b38b657005906eb4c96f219c0c94fba00f948a4bfc551f4d6384ca0118",
+    "scripts/tests/test_macos_core_identity.py": "8a6569d5b7da4afd6e11841326e88dc6f5d7d5d21de1401ddd2bc578f50c7303",
+    "setup.dart": "aa6878db793e24de6668afc1c836adc97608fc4f766ea3021701bf725e054fc3",
+    "test/setup_macos_identity_test.dart": "bd6b82fb4eb16ead763830fcc206a549f113f9326a395b3a306a86a40f4e42a7"
   },
   "platform_extensions": {
     "android": {
@@ -783,6 +820,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "d31b8d96cfc1ace2d20e1e34acb1bfa3cb1f5dd8fa26691ef61babb94bc5aecb"
+    "contract_digest": "f0b8ebe7cb1f5b335bb552ccd498179e0a9f7de0d8ec79bd8e3cc2ed72e665f0"
   }
 }

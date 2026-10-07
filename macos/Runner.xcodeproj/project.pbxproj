@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		F50091162CF74B7700D43AEA /* BettboxCoreIdentity.json in Resources */ = {isa = PBXBuildFile; fileRef = F50091172CF74B7700D43AEA /* BettboxCoreIdentity.json */; };
 		331C80D8294CF71000263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294CF71000263BE5 /* RunnerTests.swift */; };
 		335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335BBD1A22A9A15E00E9071D /* GeneratedPluginRegistrant.swift */; };
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
@@ -30,7 +31,7 @@
 		5377B2253E1C5AB4D9D56A31 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72CBDF47BB69EDEFE644C48D /* Pods_RunnerTests.framework */; };
 		7AC6855B2B8AF836004C123B /* (null) in Bundle Framework */ = {isa = PBXBuildFile; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CDD319C761C7664F6008596B /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4121E8CCDC7DC35194714CDE /* Pods_Runner.framework */; };
-		F50091052CF74B7700D43AEA /* BettboxCore in CopyFiles */ = {isa = PBXBuildFile; fileRef = F50091042CF74B7700D43AEA /* BettboxCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		F50091052CF74B7700D43AEA /* BettboxCore in CopyFiles */ = {isa = PBXBuildFile; fileRef = F50091042CF74B7700D43AEA /* BettboxCore */; };
 		F5AA39AF2DA1D9FB00F5C816 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = F5AA39AE2DA1D9FB00F5C816 /* LaunchAtLogin */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
 /* End PBXBuildFile section */
@@ -95,6 +96,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F50091172CF74B7700D43AEA /* BettboxCoreIdentity.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ../libclash/macos/BettboxCoreIdentity.json; sourceTree = "<group>"; };
 		331C80D5294CF71000263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C80D7294CF71000263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		333000ED22D3DE5D00554162 /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				F50091042CF74B7700D43AEA /* BettboxCore */,
+				F50091172CF74B7700D43AEA /* BettboxCoreIdentity.json */,
 				33FAB671232836740065AC1E /* Runner */,
 				33CEB47122A05771004F2AC0 /* Flutter */,
 				331C80D6294CF71000263BE5 /* RunnerTests */,
@@ -362,6 +365,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F50091162CF74B7700D43AEA /* BettboxCoreIdentity.json in Resources */,
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
 			);

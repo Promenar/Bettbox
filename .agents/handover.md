@@ -815,3 +815,34 @@ Go纯helper不证明Android编译或系统VPN；当前设备账户订阅过期�
 
 ### HLG
 标准append dry-run/apply，保留实测与候选边界。
+
+## 2026-10-08T03:10:57+08:00 · Android启停基础与macOS最终签名身份实测
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "macos", "identity", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: b44a49a13fa1db604280775c66fe54130cbbac15df6c51909a000e7a2d38f510
+
+### Summary
+Android/macOS优先发行，iOS开发研究；目标活跃。资源helper和macOS最终core签名入口完成可独立交付的基础变更，完整发行仍待原生接线与设备验收。
+
+### Changed
+实际androidstartup资源/回调helper纳入源码；macOS共享固定ad hoc签名入口在签名后重新绑定新inode，verify/display及持FD摘要阶段保持稳定。桌面验证与setup打包使用最终SHA，Runner保留core签名并复制身份清单。
+
+### Validation
+实际androidstartup CGO1 race通过15个新增测试方法和quickStart四子场景；macOS实际codesign先复现合法inode置换误拒，再修正时序通过独立验签/最终SHA与CDHash绑定，原始产物未变。34项Python回归、3项Dartsetup测试通过，独立审阅无实质P1/P2。协调候选Kotlin2.1.0 JVM编译+15场景通过，compiler POM coroutines1.6.4非App resolved证据。
+
+### Next
+Android实际backend候选补smart、bootstrap token、权限回调与Service/JNI整包接线；候选未接actual。macOS native身份候选独立审阅无实质P1/P2，当前Darwin编译暴露Linux XCTMain入口不兼容，作者仅草稿修正后再当前SDK实测；真实host/child/Dartpipe/SC接线待验。
+
+### Risks
+无当前正式APK/完整新App或DMG交付；设备账号订阅过期，节点流量未验证；付呗商户/门店与安全密钥注入、Apple发行团队外部条件待补。签名路径核验不提供同UID替换还原硬隔离；native proof不单独证明pipe来源。没有真实付款或公开发布。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、计划、PDEC及公开脱敏回执。临时fixture契约已恢复持久输入，PDEC有效无漂移。
+
+### HLG
+使用标准append dry-run/apply，记录真实失败与通过，保留候选和实际边界。

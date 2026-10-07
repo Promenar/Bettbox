@@ -130,3 +130,9 @@ macOS owned-child Go入口实际CGO0普通包测试21函数通过，无race证�
 2026-10-08 状态快照实际先失败后通过：原等价包装器复现畸形JSON部分提交、浅副本别名与并发race；同步深拷贝修复后4项state -race通过。setState action错误字符串合同也先失败再修复，22项共享Go CGO0普通测试通过。公开回执 `docs/validation/2026-10-07-three-platform/client-state-snapshot.json`。Android/iOS Go调用改为快照，原生编译未由这些命令覆盖；Android quickStart/void setState和TUN/JNI失败状态另验。
 
 Android 快速配置前置：旧调用顺序的等价薄包装器在初始化失败与状态失败场景实际失败，修复后生产 helper 的四个子场景经 CGO1 race 通过。独立审阅确认实际 adapter 唯一发送调用点；Android 原生编译和真实投递尚未覆盖该变更。
+
+Android 启停基础：实际 `androidstartup` 包含15个新增资源/回调测试方法及快速配置四个子场景，CGO1 race通过。已审阅的构造清理候选还有2个纯 helper测试通过；该候选未接入真实Android构造器，文本检查未计入行为验收。已排除重复关闭独占Linux FD的修复方案；关闭错误不等于描述符仍存在。Go/JNI/Service/coordinator需整包集成后再做Android编译、引用/FD故障注入、许可拒绝和流量验证。
+
+2026-10-08 macOS 最终 core 身份：真实系统 codesign 正常替换 inode 的动作先被旧检查实际拒绝；修正签名与验签时序后，公开 fixture 独立验签、最终 SHA/CDHash 清单绑定通过，输入二进制未变。34项 Python 回归及3项 Dart setup测试通过；当前完整App/DMG、Keychain、宿主/guest身份和系统代理尚未由此验收。公开回执 `validation/2026-10-07-three-platform/macos-core-final-identity.json`。
+
+Android 协调候选的15个场景已使用离线 Kotlin 2.1.0 缓存编译并在JVM实际运行通过，覆盖许可/绑定撤销、已进入JNI所有权、迟到成功清理、停止失败保留、原FD关闭不确定、bootstrap/restart和旧服务身份。夹具使用编译器POM依赖的coroutines 1.6.4，未核对App最终解析版本；候选尚未接入Android实际后台服务，smart行为未实现。公开回执 `validation/2026-10-07-three-platform/android-coordinator-jvm.json`。

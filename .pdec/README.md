@@ -77,3 +77,7 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 2026-10-08：test-client-state 仅本机CGO1 Go状态包race；原子JSON提交、深复制与并发fixture，不运行核心/系统代理。共享Go ordinary test是接口回归，Android/iOS原生候选另行编译验收。
 
 `test-android-preflight` 在本机离线执行 Android 快速配置前置 helper 的 CGO1 race；初始化或状态失败不再执行 setup，adapter 仅一个回执发送调用点。旧调用顺序薄包装器的两项失败复现和四个修复后子场景已运行；这不证明 JNI/设备启动、真实 bridge 投递或跨引擎取消完成。
+
+`test-android-preflight` 覆盖整个生产 `androidstartup` 包，含资源提交、FD采纳责任、回调准入和首次关闭错误保存的15个新增fixture。完整Android adapter尚未接入这些资源helper，CGO1普通宿主race不代替Android JNI或设备验收。
+
+`test-macos-build-identity` 与 `test-macos-setup-identity` 验证共享最终签名入口和打包参数。macOS core 固定使用系统 codesign ad hoc 签名后重新绑定文件，verify/display期间保持新产物稳定；Xcode宿主的关闭签名选项不跳过此步骤。实际副本签名与独立验签通过，完整bundle和发行资格另验。临时JVM/native身份fixture仅登记于运行时契约，不将忽略目录输入作为持久构建依赖。

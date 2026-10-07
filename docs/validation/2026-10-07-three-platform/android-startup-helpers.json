@@ -1,0 +1,32 @@
+{
+  "scope": "Android 资源/回调生产基础helper",
+  "source_sha256": {
+    "core/androidstartup/callback_gate.go": "633c2445a022cc58d8c68029d512fd1830f01e001eca5761954f482c1eff6c9c",
+    "core/androidstartup/callback_gate_test.go": "5303bbfaad866ba291d83d892ae6786fac6847cc011515323470a73aaf0912b5",
+    "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
+    "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e",
+    "core/androidstartup/state.go": "d8602cdf10b0465a8742e407921399da9090e34bc60a26db64a452f2693969b5",
+    "core/androidstartup/state_test.go": "be31fd19f2c3e7789cfacffdb5a2594f261e1130adf6552c2a4bfb1e917e0103"
+  },
+  "production_helper_tests": {
+    "race": true,
+    "exit_code": 0,
+    "resource_test_methods": 15,
+    "preflight_subcases": 4,
+    "log_sha256": "6e2d84672ac9a1ead872124acc55480fba86062cf9e49e3b9c8ab65cf7b3bf87"
+  },
+  "constructor_candidate_tests": {
+    "race": true,
+    "exit_code": 0,
+    "test_methods": 2,
+    "manifest_sha256": "249ede0dd01635cddd570b6a340c464aae347b66949491454127ef1ef85045ad",
+    "log_sha256": "a3b2a3ca4ad679dcc380f725c13966f445c825b274b8e9402548e3a6e17c67d1"
+  },
+  "review": "独立审阅，无新增有证据P1/P2；真实构造失败候选所有权丢失在源码层修复",
+  "limits": [
+    "Go Android adapter资源路径未接线",
+    "JNI/Service/coordinator整包待集成",
+    "不证明Android ABI、完整栈停止、系统VPN或有效节点流量",
+    "文本接线检查未计入行为测试"
+  ]
+}

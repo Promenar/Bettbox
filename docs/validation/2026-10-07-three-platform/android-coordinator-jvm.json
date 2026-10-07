@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "compile_exit": 0,
+  "run_exit": 0,
+  "scenario_count": 15,
+  "source_sha256": {
+    "helper": "a30169338ef329e067c0c7f7bca6bbfed70de14f50ab9c602d72cd9901a51d69",
+    "fixture": "878e9f16c802d1ff815f53734c9dde2e2e2b8134e822e84f88d4ea3e2adf3163"
+  },
+  "compiler": "Kotlin 2.1.0",
+  "coroutines_fixture": "1.6.4",
+  "limits": [
+    "JVM 纯生命周期 helper；未编译 Android/JNI/实际 Service",
+    "coroutines 1.6.4 为编译器 POM 缓存依赖，未声称 App resolved版本",
+    "候选尚未接入实际AppPlugin/VpnPlugin；smart策略未实现",
+    "不证明JNI、真实VPN服务、FD关闭或节点流量"
+  ]
+}

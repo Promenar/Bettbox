@@ -74,3 +74,7 @@ Android启动修复前关闭跨平台State数据竞争：state包提供 `Snapsho
 ## Android 启停与快速配置合同
 
 快速配置前置 helper 独立集成：初始化和状态错误立即短路，原生 adapter 唯一发送点；旧等价顺序先失败、生产 helper 后通过。启动候选的 Go/JNI/Kotlin/Dart 必须整包接线，避免把保留原 ParcelFD 的借用合同与 detachFd 混用。候选构造失败路径必须保留部分 listener 的关闭错误和所有权，关闭未确认时拒绝下一次启动。纯 helper 通过不证明系统 VPN 或有效节点流量。
+
+资源基础helper已独立集成并通过race，Android平台adapter须与Boolean JNI、保留原PFD和唯一进程owner共同接线。coordinator使用短意图锁先登记epoch，再由operation Mutex串行实际JNI；取消排队/许可/绑定不能丢弃已开始JNI的所有权。Core stop=false或原PFD关闭不确定时保留恢复状态并拒绝新start。后台bootstrap、restart沿用用户token，不能通过新token覆盖停止意图。
+
+macOS 固定核心身份使用最终签名后重新绑定的文件；合法codesign inode置换不按外部漂移误拒。宿主必须核验 sealed身份清单、固定core持FD摘要与SDK静态/动态Unique，CLI CDHash不充当SDK Unique。当前最终签名真实fixture通过，native身份候选的SDK编译/真实guest仍单独验收；Dart管道与SC事务接线保持同代次所有权。

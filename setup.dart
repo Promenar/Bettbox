@@ -7,6 +7,42 @@ import 'package:args/command_runner.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart';
 
+// macOS 应用内核使用固定身份，开发变体须先具备一致的原生绑定。
+List<String> macosCoreIdentityPreparationCommand({required bool isDev}) {
+  if (isDev) {
+    throw StateError('macOS 开发身份变体尚未完成内核绑定，请使用标准身份构建。');
+  }
+  return const ['python3', 'scripts/macos_core_identity.py', '--prepare'];
+}
+
+String macosCoreIdentityShaFromOutput(String output) {
+  const failure = 'macOS 内核身份准备结果无效';
+  if (utf8.encode(output).length > 4096) throw StateError(failure);
+  final Object? decoded;
+  try {
+    decoded = jsonDecode(output);
+  } catch (_) {
+    throw StateError(failure);
+  }
+  const fields = {'schema', 'sha256', 'identifier', 'cdhash', 'signingmode'};
+  if (decoded is! Map<String, dynamic> ||
+      decoded.length != fields.length ||
+      !decoded.keys.every(fields.contains) ||
+      decoded['schema'] is! int ||
+      decoded['schema'] != 1 ||
+      decoded['identifier'] != 'com.appshub.bettbox.core' ||
+      decoded['signingmode'] != 'adhoc' ||
+      decoded['sha256'] is! String ||
+      (decoded['sha256'] as String).length != 64 ||
+      !RegExp(r'^[0-9a-f]{64}$').hasMatch(decoded['sha256'] as String) ||
+      decoded['cdhash'] is! String ||
+      (decoded['cdhash'] as String).length != 40 ||
+      !RegExp(r'^[0-9a-f]{40}$').hasMatch(decoded['cdhash'] as String)) {
+    throw StateError(failure);
+  }
+  return decoded['sha256'] as String;
+}
+
 enum Target { windows, linux, android, macos }
 
 extension TargetExt on Target {
@@ -165,6 +201,25 @@ class Build {
     });
     final exitCode = await process.exitCode;
     if (exitCode != 0 && name != null) throw '$name error';
+  }
+
+  static Future<String> prepareMacosCoreIdentity(List<String> command) async {
+    final ProcessResult result;
+    try {
+      result = await Process.run(
+        command.first,
+        command.sublist(1),
+        runInShell: false,
+        includeParentEnvironment: false,
+        environment: {'PATH': Platform.environment['PATH'] ?? '/usr/bin:/bin'},
+        stdoutEncoding: utf8,
+        stderrEncoding: utf8,
+      );
+    } catch (_) {
+      throw StateError('macOS 内核身份准备失败');
+    }
+    if (result.exitCode != 0) throw StateError('macOS 内核身份准备失败');
+    return macosCoreIdentityShaFromOutput(result.stdout as String);
   }
 
   static Future<String> calcSha256(String filePath) async {
@@ -591,6 +646,9 @@ class BuildCommand extends Command {
     final String out = argResults?['out'] ?? (target.same ? 'app' : 'core');
     final env = argResults?['env'] ?? 'pre';
     Build.isDev = argResults?['dev'] ?? false;
+    final macosIdentityCommand = target == Target.macos && out == 'app'
+        ? macosCoreIdentityPreparationCommand(isDev: Build.isDev)
+        : null;
 
     String? archName = argResults?['arch'];
     if (archName == 'auto') {
@@ -745,6 +803,10 @@ class BuildCommand extends Command {
         );
         return;
       case Target.macos:
+        // Go 最终产物签名完成后才固定 SHA，并在 Flutter 打包前生成清单。
+        final coreHash = await Build.prepareMacosCoreIdentity(
+          macosIdentityCommand!,
+        );
         await _getMacosDependencies();
         await _setMacOSImpeller(!compatible);
         await Build.exec(
@@ -756,10 +818,11 @@ class BuildCommand extends Command {
           Build.getExecutable('pod install --repo-update'),
           workingDirectory: 'macos',
         );
-        _buildDistributor(
+        await _buildDistributor(
           target: target,
           targets: 'dmg',
-          args: ' --description $desc',
+          args:
+              ' --description $desc --build-dart-define=CORE_SHA256=$coreHash',
           env: env,
           suffix: appAssetSuffix,
           compatible: compatible,

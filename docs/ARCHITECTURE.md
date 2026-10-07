@@ -111,3 +111,15 @@ macOS Go核心提供独占子进程匿名管道入口 `--owned-pipe-v1`。固定
 ### Android 快速配置预检
 
 `core/androidstartup.QuickStart` 按初始化、客户端状态、配置顺序执行。任一前置失败立即返回固定错误，禁止继续配置；Android adapter 只发送一次返回值。该预检不提交 VPN 启动状态，VPN 建立、原生资源和跨引擎取消由独立启停合同验收。
+
+### Android 启停资源基础逻辑
+
+`core/androidstartup.State` 串行管理运行时间、listener 和 callback lease，资源关闭未确认时保留所有权并拒绝下一次启动。`CallbackGate` 在等待并发许可之前登记回调，关闭准入会取消排队者；`Shutdown` 等待已进入的回调结束后恰一次释放引用，并保存首次关闭错误。Android/Linux 的未采纳独占 dup 只关闭一次，不因 close 错误重试可能复用的 FD。
+
+这些 helper 已纳入源码并经 race 验证，完整 Go Android adapter、JNI Boolean、Service 原 ParcelFD 和跨引擎协调器尚未全部接线；helper 结果不能替代系统 VPN 或底层栈停止证据。
+
+### macOS core 最终身份
+
+`macos_core_identity.py` 是固定 core 的共享 ad hoc 签名入口。签名前拒绝链接与特殊文件；允许系统签名在同一父目录中正常替换 inode，随后重新 no-follow 打开最终文件。独立验签、公开元数据读取及持 FD 摘要计算期间禁止路径、inode 和内容漂移。公开清单只有固定 schema、identifier、CDHash、SHA256 和 signingmode。
+
+桌面验证入口先签 core 再冻结 SHA；`setup.dart` 的 macOS App 打包也调用该入口并传递最终 SHA。Runner 复制 core 时不二次签名，同时复制身份清单；bundle 验证核对封装字节、清单及最终签名。宿主关闭 Xcode 签名不跳过 core 身份准备。legacy `--dev` 的 core 名称与 App 固定产物不一致，App 打包明确拒绝该组合。ad hoc 是开发身份事实，不代表 Developer ID 或公证发行资格；签后路径检查也不构成同 UID 攻击的硬隔离。
