@@ -45,7 +45,10 @@ endforeach()
 add_compile_definitions(LIBCLASH)
 include_directories("${LIB_CLASH_DIR}")
 add_library(clash SHARED IMPORTED)
-set_target_properties(clash PROPERTIES IMPORTED_LOCATION "${LIB_CLASH_PATH}")
+# Go 核心没有 SONAME，必须按库名链接，避免将本机绝对路径写入 DT_NEEDED。
+set_target_properties(clash PROPERTIES
+        IMPORTED_LOCATION "${LIB_CLASH_PATH}"
+        IMPORTED_NO_SONAME TRUE)
 add_library(${CMAKE_PROJECT_NAME} SHARED
         jni_helper.cpp
         core.cpp)

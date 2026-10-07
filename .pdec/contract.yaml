@@ -553,7 +553,7 @@
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
     ".gitattributes": "7dae69874619d7772fdd8bf50006fc9b220ece7d0842028a36fe77e8311828cb",
-    "scripts/build_android.py": "c91a08ebe266d772228b4497d3b2465d6553ccb19436e0d9149ae06002458581",
+    "scripts/build_android.py": "683b024325178562b63046e8f43903bfbcb192f245bbf398adfa6a9964b1eec0",
     "scripts/validate_android_contract.py": "4cf1b60519f443d7cef737ab0f7d4224f4a94668c93dd81d3112aed5edef89af",
     "scripts/build_ios_core.py": "5649d3ef7a05195ffdb9c57d4b4fedcee47e5460a292eb5c18aa10b229739e48",
     "server/tests/fubei/run_isolated.py": "22b22ac0883a22ebd08753d2bf13cb5091acba3af3c2c4416ce727698c6fd21d",
@@ -563,14 +563,14 @@
     "scripts/create_android_signing.py": "1049c4c4596209af41098c8412adc44fb433b188b678f1734b3c079c1fde5dc4",
     "scripts/tests/test_android_signing.py": "b5a62cd93941e2ceb26c3bc96bbf4c7fef852f14bb5c0c9f8f6a5d90e387780f",
     "scripts/android_dependency_network.py": "8704c43fde3d51034f96172e2b638725c76edd1a0d0f46716231ec9bd9c545d5",
-    "scripts/tests/test_build_android.py": "d2fa454583dff79bb2d06bb85572bff69df4e9123ee697dc4fefc76cc5028bbc",
+    "scripts/tests/test_build_android.py": "20b1e4f6106097be2c4b538605187724d05b36cb42688a03c7731321b1e8cf28",
     "scripts/tests/test_android_dependency_network.py": "955c8468f0a36aa8d2c060cb26223fd3e1a97cb47a106b981855fc64aefea968",
     "server/tests/billing/run_laravel_isolated.py": "3055aaca6f7e363f2904136f476d2fed6ba2a229855df71f88a4cda9c671519e",
     "server/tests/billing/test_laravel_isolated.py": "be8a3b73c96b17ca06ff2c519c26dc1b89ac995d7ba0e1719536635e4944e1ad",
     "server/tests/billing/laravel_check.php": "374ba5cc6e041f85af3e8513421d871b0f62e050f6113b9d99e255c9ce4c4a83",
     "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
-    "scripts/android_release_signing.py": "fc327f29903e629173639478811b1925b0272a17ef6813a11bff69aa23046728",
-    "scripts/tests/test_android_release_signing.py": "6b6f4cc74d99f6da53d7ea8fb6ed917667d633d643b4dba6a7d8c56afb88cd06",
+    "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
+    "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
     "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
     "scripts/tests/test_validate_desktop.py": "a4a92f58f31f4ff364be8bd087903519793630ff31bf034381b5f4ea7cbcf837",
     "scripts/tests/test_android_contract.py": "d1cf88bb38cae2f913a7cc78807063637db2eb4164e7df9dce50adb08e6e0e9e",
@@ -592,7 +592,8 @@
     "scripts/android_distribution_cache.py": "1651e5112e246014ed63da522df69e320d87fa740e94f9754d0228877e5fbef8",
     "scripts/tests/test_android_distribution_cache.py": "142649185d32b665f1c95204784c8c22a72a2a4113a1b56d6430c424e085284b",
     "android/core/build.gradle.kts": "df95a98d99607647f6518f115978a7f39f5094da488e4d4c9e3eb5d159295650",
-    "android/app/build.gradle.kts": "01f59a54af90473002ab59f7c2dda0afd94a7c6c6ffe515d254d054abe3e2f51"
+    "android/app/build.gradle.kts": "01f59a54af90473002ab59f7c2dda0afd94a7c6c6ffe515d254d054abe3e2f51",
+    "android/core/src/main/cpp/CMakeLists.txt": "d7d22196a04b4f04eeff70a9f93f38f28614070323430e826ac9955be0be072d"
   },
   "platform_extensions": {
     "android": {
@@ -629,6 +630,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "5673b4cbb72275ed35bf07b95b3ef8d1bb2571134e1325479691950998815a20"
+    "contract_digest": "3c5cc374beedc6aa9dc455864d18db96d9e3bc43bc820a86940886c0be7205e7"
   }
 }

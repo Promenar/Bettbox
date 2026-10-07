@@ -1,0 +1,16 @@
+{
+  "started_at": "2026-10-07T16:43:54.027887+00:00",
+  "finished_at": "2026-10-07T16:52:19.539848+00:00",
+  "target": "android-arm64-release",
+  "status": "failed",
+  "phase": "android-release-build",
+  "failure_reason": "正式签名环境不可用",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "signature_verified": false,
+  "release_verified": false,
+  "gradle_help_verified": true,
+  "candidate_sha": "9d48a29",
+  "cleanup_verified": true,
+  "network_renewal_stopped": true
+}

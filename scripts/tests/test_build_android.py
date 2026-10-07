@@ -31,6 +31,126 @@ def elf(*, align: int = 16384, machine: int = 183, offset: int = 0) -> bytes:
     return bytes(data)
 
 
+def dynamic_elf(names: tuple[bytes, ...] = (b"libclash.so",), *, terminate: bool = True) -> bytes:
+    """构造真实地址映射的 ELF64 动态段，包含系统库和核心依赖。"""
+    strings = bytearray(b"\0")
+    indexes = []
+    for name in names:
+        indexes.append(len(strings))
+        strings.extend(name + b"\0")
+    entries = [(5, 0x4000 + 512), (10, len(strings))]
+    entries.extend((1, index) for index in indexes)
+    if terminate:
+        entries.append((0, 0))
+    data = bytearray(512 + len(strings))
+    data[:6] = b"\x7fELF\x02\x01"
+    struct.pack_into("<H", data, 18, 183)
+    struct.pack_into("<Q", data, 32, 64)
+    struct.pack_into("<HH", data, 54, 56, 2)
+    struct.pack_into("<IIQQQQQQ", data, 64, 1, 4, 0, 0x4000, 0, len(data), len(data), 16384)
+    struct.pack_into("<IIQQQQQQ", data, 120, 2, 4, 256, 0x4100, 0, len(entries) * 16, len(entries) * 16, 8)
+    for index, entry in enumerate(entries):
+        struct.pack_into("<qQ", data, 256 + index * 16, *entry)
+    data[512:] = strings
+    return bytes(data)
+
+
+class AndroidLinkerRegressionTest(unittest.TestCase):
+    def test_core_requires_basename_dependency_and_preserves_alignment(self) -> None:
+        android.verify_elf(dynamic_elf((b"libclash.so", b"libc.so")), "lib/arm64-v8a/libcore.so")
+        with self.assertRaises(RuntimeError):
+            android.verify_elf(dynamic_elf((b"libc.so",)), "libcore.so")
+        with self.assertRaises(RuntimeError):
+            android.verify_elf(elf(), "libcore.so")
+        # Go 核心自身可以没有动态依赖，不能把 JNI 依赖条件误套到全部库。
+        android.verify_elf(elf(), "libclash.so")
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<Q", data, 112, 4096)
+        with self.assertRaises(RuntimeError):
+            android.verify_elf(bytes(data), "libcore.so")
+
+    def test_paths_and_unsafe_names_fail_without_echoing_input(self) -> None:
+        for name in (b"/fixture/project/jniLibs/libclash.so", b"../libclash.so", b"dir/libclash.so",
+                     b"dir\\libclash.so", b"", b".", b"..", b"lib\xff.so", b"lib core.so"):
+            with self.subTest(name=name):
+                with self.assertRaises(RuntimeError) as failure:
+                    android.verify_elf(dynamic_elf((name,)), "libcore.so")
+                self.assertNotIn("/fixture/project", str(failure.exception))
+
+    def test_dynamic_table_termination_size_and_unique_segment(self) -> None:
+        cases = [dynamic_elf(terminate=False)]
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<Q", data, 152, 63)
+        cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<Q", data, 128, len(data))
+        cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<I", data, 64, 2)
+        cases.append(bytes(data))
+        for data in cases:
+            with self.subTest(size=len(data)), self.assertRaises(RuntimeError):
+                android.verify_elf(data, "libcore.so")
+
+    def test_string_table_mapping_bounds_and_dependency_termination(self) -> None:
+        cases = []
+        for pos, value in ((264, 0x9000), (280, 9999), (296, 9999)):
+            data = bytearray(dynamic_elf())
+            struct.pack_into("<Q", data, pos, value)
+            cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        data[-1] = ord("x")
+        cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<q", data, 272, 5)
+        cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<q", data, 272, 11)
+        cases.append(bytes(data))
+        # 字符串落在 LOAD 的内存零填充区而非文件区，不能拿零填充伪造终止符。
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<Q", data, 96, 512)
+        cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<H", data, 56, 3)
+        struct.pack_into("<IIQQQQQQ", data, 176, 1, 4, 0, 0x4000, 0, len(data), len(data), 16384)
+        cases.append(bytes(data))
+        cases.append(dynamic_elf((b"libclash.so", b"libclash.so")))
+        for data in cases:
+            with self.subTest(size=len(data)), self.assertRaises(RuntimeError):
+                android.verify_elf(data, "libcore.so")
+
+    def test_dynamic_segment_runtime_mapping_matches_file_table(self) -> None:
+        cases = []
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<Q", data, 136, 0x4110)
+        cases.append(bytes(data))
+        data = bytearray(dynamic_elf())
+        struct.pack_into("<Q", data, 136, 0x4400)
+        struct.pack_into("<Q", data, 104, 4096)
+        cases.append(bytes(data))
+        for data in cases:
+            with self.subTest(size=len(data)), self.assertRaises(RuntimeError):
+                android.verify_elf(data, "libcore.so")
+
+    def test_apk_gate_rejects_path_linked_jni_without_changing_core_sha(self) -> None:
+        clash = dynamic_elf((b"libc.so",))
+        import hashlib
+        core_sha = hashlib.sha256(clash).hexdigest()
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "app.apk"
+            for needed, rejected in ((b"/fixture/jniLibs/libclash.so", True), (b"libclash.so", False)):
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr("lib/arm64-v8a/libclash.so", clash)
+                    archive.writestr("lib/arm64-v8a/libcore.so", dynamic_elf((needed,)))
+                    archive.writestr("lib/arm64-v8a/libflutter.so", elf())
+                if rejected:
+                    with self.assertRaises(RuntimeError):
+                        android.verify_apk(path)
+                else:
+                    self.assertEqual(android.verify_apk(path)["lib/arm64-v8a/libclash.so"], core_sha)
+
+
 class BuildAndroidTest(unittest.TestCase):
     def setUp(self) -> None:
         self.lease_patch = mock.patch.object(android.dependency_network, "NetworkLease")
@@ -63,7 +183,7 @@ class BuildAndroidTest(unittest.TestCase):
             for name in ("libclash.so", "libcore.so", "libflutter.so"):
                 if missing and name == "libclash.so":
                     continue
-                archive.writestr(f"lib/{abi}/{name}", elf())
+                archive.writestr(f"lib/{abi}/{name}", dynamic_elf() if name == "libcore.so" else elf())
 
     def test_plan_uses_readonly_core_and_debug_without_signing_changes(self) -> None:
         plan = android.command_plan(Path("/repo"), self.environment(), Path("/stage"))

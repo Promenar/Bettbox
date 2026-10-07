@@ -28,7 +28,7 @@ class SigningFailure(RuntimeError):
     """仅返回固定错误类别，禁止携带工具正文、密码或任意输入。"""
 
 
-def _open_regular(path, *, private=False):
+def _open_regular(path, *, private=False, system_keychain=False):
     """逐层拒绝链接；文件描述符负责读取已核实的同一个文件。"""
     path = Path(os.path.abspath(path))
     directory = os.open('/', os.O_RDONLY | os.O_DIRECTORY)
@@ -43,6 +43,8 @@ def _open_regular(path, *, private=False):
             if not stat.S_ISREG(info.st_mode) or (private and
                     (info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o600)):
                 raise SigningFailure('签名文件类型或权限拒绝')
+            if system_keychain and (info.st_uid != os.getuid() or info.st_mode & 0o022):
+                raise SigningFailure('签名文件类型或权限拒绝')
             return fd, info
         except BaseException:
             os.close(fd)
@@ -55,8 +57,8 @@ def _info_fingerprint(info):
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
 
 
-def _fingerprint(path, *, private=False):
-    fd, info = _open_regular(path, private=private)
+def _fingerprint(path, *, private=False, system_keychain=False):
+    fd, info = _open_regular(path, private=private, system_keychain=system_keychain)
     os.close(fd)
     return _info_fingerprint(info)
 
@@ -107,7 +109,9 @@ def _receipt():
     if _fingerprint(receipt_path, private=True) != receipt_identity:
         raise SigningFailure('签名回执在解析期间变化')
     identities = {receipt_path: receipt_identity}
-    identities.update({path: _fingerprint(path, private=True) for path in (target, keychain)})
+    identities[target] = _fingerprint(target, private=True)
+    # 登录钥匙串由系统维护；仅允许同 UID、无他人写权限，不修改其权限或 ACL。
+    identities[keychain] = _fingerprint(keychain, system_keychain=True)
     return target, keychain, identities
 
 
@@ -123,7 +127,8 @@ def signing_environment(base_env):
         # 当前创建入口生成 token_hex(32)，不接受换行、空值或任意工具输出。
         if result.returncode != 0 or not re.fullmatch(rb'[0-9a-f]{64}', password):
             raise SigningFailure('签名凭据读取失败')
-        if any(_fingerprint(path, private=True) != identity for path, identity in identities.items()):
+        if any(_fingerprint(path, private=path != keychain, system_keychain=path == keychain) != identity
+               for path, identity in identities.items()):
             raise SigningFailure('签名身份在读取期间变化')
         env = {key: value for key, value in base_env.items() if key not in _SIGNING_KEYS}
         env.update({'BETTBOX_ANDROID_STORE_FILE': str(target), 'BETTBOX_ANDROID_KEY_ALIAS': ALIAS,
@@ -137,7 +142,7 @@ def signing_environment(base_env):
 def verify_signed_apk(apk, env):
     """验签无密码；返回值只包含绑定的公开证书摘要。"""
     try:
-        _, _, identities = _receipt()
+        _, keychain, identities = _receipt()
         sdk = env.get('ANDROID_SDK_ROOT') or env.get('ANDROID_HOME')
         if not isinstance(sdk, str) or not Path(sdk).is_absolute() or (
                 env.get('ANDROID_SDK_ROOT') and env.get('ANDROID_HOME') and
@@ -162,7 +167,9 @@ def verify_signed_apk(apk, env):
         # 不接受调试身份、多个签名者或缺失的签名证据。
         if len(certificates) != 1 or certificates[0][0] != '1' or certificates[0][1].lower() != CERTIFICATE_SHA256:
             raise SigningFailure('APK 签名身份不匹配')
-        if _fingerprint(apk) != before or any(_fingerprint(path, private=True) != identity for path, identity in identities.items()):
+        if _fingerprint(apk) != before or any(
+                _fingerprint(path, private=path != keychain, system_keychain=path == keychain) != identity
+                for path, identity in identities.items()):
             raise SigningFailure('验签期间输入变化')
         return {'verified': True, 'certificate_sha256': CERTIFICATE_SHA256, 'signers': 1}
     except Exception:

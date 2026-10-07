@@ -62,3 +62,5 @@ macOS TUN 架构采用前需完成 Apple 用途约束核验：TN3134 中直接 D
 App在显式目标且非split-per-abi时覆盖Flutter默认全ABI过滤，split模式由Flutter管理应用过滤，core库始终遵循显式目标。实际候选APK生成与12个ARM64库ELF/16KB检查通过，但含额外架构插件库被最终验证拒绝；修复的实际打包内容独立验收。
 
 Go -w -s核心已无debug段和symtab，Android库与App均保留libclash.so字节以保持构建来源SHA一致。其他库剥离不受影响，最终APK全部ELF/zipalign检查保留。真实NDK转换复现先定位，再以完整修复构建核验。
+
+JNI 动态依赖验收要求 basename libclash.so，并验证 PT_DYNAMIC 与 PT_LOAD 的完整唯一文件映射。实际 APK、设备启动和正式签名分别验收；系统钥匙串兼容检查不修改主机权限或 ACL。macOS IPC 优先评估宿主直接持有的子进程匿名管道，禁止共享控制 listener；产物身份、代次撤销、标准流隔离与真实退出必须先经独立验收。

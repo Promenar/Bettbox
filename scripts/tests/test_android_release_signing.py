@@ -73,7 +73,7 @@ class ReleaseSigningTest(unittest.TestCase):
                 run.assert_not_called()
 
     def test_private_permissions_and_parent_or_file_links_are_rejected(self):
-        for path, permissive in [(self.directory, 0o755), (self.receipt, 0o644), (self.target, 0o644), (self.keychain, 0o644)]:
+        for path, permissive in [(self.directory, 0o755), (self.receipt, 0o644), (self.target, 0o644), (self.keychain, 0o666)]:
             original = path.stat().st_mode & 0o777
             path.chmod(permissive)
             with mock.patch.object(signing.subprocess, 'run') as run, self.assertRaises(signing.SigningFailure):
@@ -86,6 +86,7 @@ class ReleaseSigningTest(unittest.TestCase):
         with mock.patch.object(signing.subprocess, 'run') as run, self.assertRaises(signing.SigningFailure):
             signing.signing_environment({})
         run.assert_not_called()
+
         self.target.unlink()
         moved.rename(self.target)
         folder = self.directory.with_name('PUBLIC_REAL')
@@ -94,6 +95,19 @@ class ReleaseSigningTest(unittest.TestCase):
         with mock.patch.object(signing.subprocess, 'run') as run, self.assertRaises(signing.SigningFailure):
             signing.signing_environment({})
         run.assert_not_called()
+
+    def test_system_keychain_read_permissions_do_not_change_private_key_policy(self):
+        # 系统钥匙串允许常见只读权限；秘密读取仍由 security 与项目固定条目完成。
+        self.keychain.chmod(0o644)
+        with mock.patch.object(signing.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, PUBLIC_PASSWORD, b'')):
+            environment = signing.signing_environment({})
+        self.assertEqual(environment['BETTBOX_ANDROID_KEY_ALIAS'], signing.ALIAS)
+        self.assertEqual(self.keychain.stat().st_mode & 0o777, 0o644)
+        for mode in (0o620, 0o602, 0o666):
+            self.keychain.chmod(mode)
+            with mock.patch.object(signing.subprocess, 'run') as run, self.assertRaises(signing.SigningFailure):
+                signing.signing_environment({})
+            run.assert_not_called()
 
     def test_tool_failures_never_expose_password_or_original_diagnostic(self):
         for outcome in [subprocess.CompletedProcess([], 1, PUBLIC_PASSWORD, b'PUBLIC_DIAGNOSTIC'),

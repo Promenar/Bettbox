@@ -1,5 +1,11 @@
 # 版本变更记录 (CHANGELOG)
 
+## [Unreleased] - Android 设备加载与签名检查 (2026-10-08)
+
+- JNI 链接对无 SONAME 的 Go 核心声明 `IMPORTED_NO_SONAME`；APK 门禁要求 `libcore.so` 依赖 basename `libclash.so`，拒绝构建路径及不一致的 ELF 动态段映射。
+- 项目发行密钥与回执保持 0600。系统登录钥匙串按同用户、无他人写权限检查，读取仍通过固定 security 条目；不修改系统权限或 ACL，保留证书锚。
+- Android 调试候选实际安装、邀请生成与网页邀请码预填通过；VPN 启动暴露路径依赖崩溃，修复后的完整构建和设备验收独立记录。
+
 ## [Unreleased] - 三端发行基础安全 (2026-10-07)
 
 - API 域名池仅接受无凭据的 HTTPS 根地址；远端引导过滤不安全地址，域名池重排保留当前连接。

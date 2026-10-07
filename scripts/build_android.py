@@ -802,6 +802,79 @@ def command_plan(root: Path, env: Mapping[str, str], core_dir: Path, *, release:
     )
 
 
+def elf_dependencies(data: bytes, label: str) -> tuple[str, ...]:
+    """解析已通过 ELF64 头检查的文件，只接受文件内可定位的动态依赖。"""
+    offset = struct.unpack_from("<Q", data, 32)[0]
+    size, count = struct.unpack_from("<HH", data, 54)
+    loads: list[tuple[int, int, int]] = []
+    dynamic: tuple[int, int, int] | None = None
+    for index in range(count):
+        pos = offset + index * size
+        kind = struct.unpack_from("<I", data, pos)[0]
+        file_offset, address, _, file_size, memory_size = struct.unpack_from("<QQQQQ", data, pos + 8)
+        if kind not in (1, 2):
+            continue
+        if file_size > memory_size or file_offset > len(data) or file_size > len(data) - file_offset:
+            raise RuntimeError(f"{label} 的 ELF 段文件范围损坏")
+        if kind == 1:
+            loads.append((address, file_offset, file_size))
+        else:
+            if dynamic is not None or not file_size or file_size % 16:
+                raise RuntimeError(f"{label} 的 ELF 动态段损坏")
+            dynamic = (address, file_offset, file_size)
+    if dynamic is None:
+        return ()
+    needed: list[int] = []
+    strings: dict[int, int] = {}
+    terminated = False
+    address, start, length = dynamic
+    dynamic_mappings = [file_offset + address - base for base, file_offset, file_size in loads
+                        if address >= base and address - base <= file_size
+                        and length <= file_size - (address - base)]
+    if len(dynamic_mappings) != 1 or dynamic_mappings[0] != start:
+        raise RuntimeError(f"{label} 的 ELF 动态段运行地址与文件映射不一致")
+    for pos in range(start, start + length, 16):
+        tag, value = struct.unpack_from("<qQ", data, pos)
+        if tag == 0:
+            terminated = True
+            break
+        if tag == 1:
+            needed.append(value)
+        elif tag in (5, 10):
+            if tag in strings:
+                raise RuntimeError(f"{label} 的 ELF 字符串表声明重复")
+            strings[tag] = value
+    if not terminated:
+        raise RuntimeError(f"{label} 的 ELF 动态表缺少终止项")
+    if not needed and not strings:
+        return ()
+    if set(strings) != {5, 10} or not strings[10]:
+        raise RuntimeError(f"{label} 的 ELF 字符串表声明损坏")
+    address, length = strings[5], strings[10]
+    candidates = [file_offset + address - base for base, file_offset, file_size in loads
+                  if address >= base and address - base <= file_size
+                  and length <= file_size - (address - base)]
+    if len(candidates) != 1:
+        raise RuntimeError(f"{label} 的 ELF 字符串表无法唯一映射到文件")
+    start = candidates[0]
+    names: list[str] = []
+    for index in needed:
+        if index >= length:
+            raise RuntimeError(f"{label} 的 ELF 依赖字符串索引越界")
+        end = data.find(b"\0", start + index, start + length)
+        if end < 0:
+            raise RuntimeError(f"{label} 的 ELF 依赖字符串缺少终止符")
+        raw = data[start + index:end]
+        # 依赖只允许 basename，不输出可能包含本机路径的原始字段。
+        if not raw or raw in (b".", b"..") or re.fullmatch(rb"[A-Za-z0-9_.+\-]+", raw) is None:
+            raise RuntimeError(f"{label} 的 ELF 动态依赖不是安全 basename")
+        name = raw.decode("ascii")
+        if name in names:
+            raise RuntimeError(f"{label} 的 ELF 动态依赖重复")
+        names.append(name)
+    return tuple(names)
+
+
 def verify_elf(data: bytes, label: str) -> None:
     if len(data) < 64 or data[:6] != b"\x7fELF\x02\x01":
         raise RuntimeError(f"{label} 不是 ELF64 小端核心")
@@ -823,6 +896,9 @@ def verify_elf(data: bytes, label: str) -> None:
             raise RuntimeError(f"{label} 的 LOAD 段未满足 16KiB 对齐")
     if not loads:
         raise RuntimeError(f"{label} 缺少可加载段")
+    dependencies = elf_dependencies(data, label)
+    if label.rsplit("/", 1)[-1] == "libcore.so" and "libclash.so" not in dependencies:
+        raise RuntimeError(f"{label} 缺少 basename 核心动态依赖 libclash.so")
 
 
 def verify_apk(path: Path) -> dict[str, str]:

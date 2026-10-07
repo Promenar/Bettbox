@@ -88,6 +88,8 @@ Xboard 与 CloudBridgeRelay 部署在 NoSLA `216.23.116.56`。Cloudflare 橙云�
 
 Android 发行构建必须具备完整签名配置，JNI 构建必须具备目标 ABI 内核及头文件。缺失输入直接失败；debug 开发构建和正式发行验收独立。
 
+JNI 链接的 Go 核心没有 SONAME，CMake 显式声明该属性以避免把构建路径写入依赖。APK 的动态段须唯一映射到实际文件范围，依赖只接受 basename，`libcore.so` 必须依赖 `libclash.so`；核心原字节 SHA 与16KB对齐检查分别保留。系统钥匙串由 security 读取固定条目，项目密钥及回执保持0600，禁止他人写入钥匙串文件，不改变系统 ACL。
+
 ## macOS 系统代理事务
 
 macOS 系统代理事务核心位于 `plugins/proxy/macos/Classes/Core/`，通过类型化字段组、所有权 journal 契约和串行生命周期处理启动与恢复。真实 SCPreferences/journal 适配器及 Flutter channel 尚未接入，现有 networksetup 路径仍待替换；核心测试入口与真实系统验收分别登记，见 `.agents/plans/2026-10-07-macos-proxy-transactions.md`。

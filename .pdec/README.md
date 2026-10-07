@@ -65,3 +65,5 @@ ARM64实际构建已通过官方ZIP复用、Gradle help/JVM门禁与退出清理
 App原生打包配置纳入输入摘要；显式Flutter目标覆盖默认全ABI过滤。真实b6d7a58 APK编译成功但最终ABI拒绝，不能当作发行产物。
 
 Go核心在库与App打包中保持原始字节；AGP默认strip转换已真实复现，builder仍严格比对生成核心与APK SHA，未改为宽松内容比较。
+
+Android APK 门禁还核验动态段地址与文件范围一致、依赖 basename 及 JNI 的 libclash.so 依赖。项目签名文件保持0600，系统钥匙串接受同UID、禁止他人写入的现有权限；安全读取不修改系统ACL。实际149项工具测试通过，设备与正式构建另验。

@@ -660,3 +660,34 @@ Android库与应用对libclash.so使用keepDebugSymbols保持已去调试信息G
 
 ### HLG
 使用append dry-run后apply，保留候选失败与根因复现事实。
+
+## 2026-10-08T01:00:15+08:00 · Android设备动态链接崩溃与正式签名预检修复
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "jni", "signing", "macos", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: d977d1e749bc6115ac1f1d22ce0b567763295fee5963c73636edb021a953986f
+
+### Summary
+发行优先Android/macOS，iOS保留开发版研究。9d48a29实际debug构建产物门禁通过，但设备VPN启动崩溃，不能交付。正式构建在签名环境读取前失败。
+
+### Changed
+CMake imported clash声明IMPORTED_NO_SONAME；APK验证动态段虚拟地址/文件偏移完整唯一映射、依赖basename及JNI所需libclash.so。系统登录钥匙串由同UID/no他人写权限核验，项目私钥/回执600、父链无链接与证书锚保持，不修改系统权限/ACL。PDEC摘要、架构、平台验收、CHANGELOG、计划和公开脱敏回执同步。
+
+### Validation
+真实调试APK SHA d4fb81539f545edfd5b382199e0634e74a563e12a97af3d0f971c25366e4f8b7，核心SHA相同；来源/锁文件与任务清理通过。Pixel_7实际安装/首页、邀请生成、cloud.bingcn.site注册页邀请码预填锁定、套餐/周期弹窗通过，无新注册/订单/付款。实际崩溃为UnsatisfiedLinkError；SDK readelf确认libcore.so DT_NEEDED为构建绝对路径。旧APK被新门禁实际拒绝；6个linker回归及动态映射P2均先失败后通过。系统keychain0644重现原检查失败，新检查真实安全注入ready=true，仅bool输出。149项工具测试通过，独立复核P2已闭合、签名无新P1/P2。Mac请求状态机22个测试函数草稿静态独立复核无新P1/P2，未集成、编译或测试。
+
+### Next
+冻结候选debug重建并设备启停；通过后正式签名候选及独立业务验收。Mac专用HTTP入口PDEC定约后实际编译/race；主控选用owned-child匿名管道候选，核验产物身份、启动/连接代次、FD_CLOEXEC、stdout隔离和停止真实退出后才允许SC能力接线。
+
+### Risks
+当前Android APK设备启动崩溃，正式APK未生成。只读Android复核另发现配置nil重入tunLock及TUN启动错误未回传，须独立复现和修复，权限/核心/UI生命周期未验收。现有订阅过期不能证明节点流量可用。Mac原setuid整体core/共享未认证IPC不可用于发行；可信pipe方案未实施，不声称抵抗同UID调试注入。Apple签名、实际VPN/Keychain、真实支付与公开发行未验收。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、三端计划、PDEC与公开脱敏回执；临时草稿保持.test。
+
+### HLG
+append dry-run再apply，保留真实设备失败、签名失败与已验证范围。
