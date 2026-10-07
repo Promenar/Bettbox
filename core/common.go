@@ -120,6 +120,10 @@ func sideUpdateExternalProvider(p cp.Provider, bytes []byte) error {
 }
 
 func updateListeners() {
+	// 专用进程不启用订阅中的普通监听器；默认平台入口保持原行为。
+	if ownedListenerMode.Load() {
+		return
+	}
 	if !isRunning {
 		return
 	}

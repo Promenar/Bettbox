@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "当前实际Go源码；已集成专用owned listener与Checked关闭API，Dart/JNI/SC尚未消费",
+  "source_sha256": {
+    "core/action.go": "00c334f822cb7767b2f654317695acbf4704ba10fde57aab9b7fae4ed547b6cb",
+    "core/common.go": "b19ab65b8f5d0e84d611148be7f624891aed40d9dfcc86814bd7d433dd66195e",
+    "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
+    "core/owned_session.go": "9c61d280c4fbc965a71385482db5693e05b237bf3666577ec293e7738e729194",
+    "core/owned_pipe_darwin.go": "3729d300c7c124db33e094aade114df636b93846124d4abde140979b2b1b36ff",
+    "core/owned_listener.go": "63c5c7e463a0188ee5055583a51f7d2c795a3acd070a25a79ada63d51e956a2e",
+    "core/owned_listener_contract.go": "19ba5b777a670aa3d9bdd2313856970c5de6843445707b8bf8c88f2ea5bbc435",
+    "core/owned_listener_darwin.go": "02bc3e93bf341ef7d7a4ab7413c1a9209ed6f0e1ae39973ad0197bc25c7bc5cc",
+    "core/owned_listener_test.go": "521c0422be07023ab7d7a55f7355378c9a7f9e7376a85a7aebe0db0eb097361e",
+    "core/Clash.Meta/listener/http/credential_blind.go": "bb5c238847a4d51d3fce392f796ad74d8e30a44b71b39173ddd6dcb498f530b4",
+    "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
+    "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e",
+    "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b"
+  },
+  "macos": {
+    "config_invalid_before_failure_reproduced": true,
+    "owned_main_cgo0_exit": 0,
+    "owned_tests": 36,
+    "http_race_exit": 0,
+    "http_tests": 25,
+    "native_supervisor_implemented": false,
+    "sc_integrated": false
+  },
+  "android_resources": {
+    "legacy_inbound_omission_before_failure_reproduced": true,
+    "checked_close_race_exit": 0,
+    "checked_tests": 5,
+    "platform_backend_integrated": false
+  },
+  "independent_review": "生产候选未发现剩余确定P1/P2；配置失效P2经红绿回归修复，屏障fixture失败清理已收束",
+  "limits": [
+    "Checked nil仅证明已登记对象Close返回nil，不是所有连接/线程/TUN stack停止",
+    "默认旧StopListener未切换，新Android backend和配置所有者须原子接线",
+    "Mac Go capability不是Apple身份认证，真实supervisor/SDK/SC/Dart未接线",
+    "专用资源任务排空不证明所有业务goroutine或pipe写入完成",
+    "完整正式安装包、有效节点流量与真实交易仍待验收"
+  ]
+}

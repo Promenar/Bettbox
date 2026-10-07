@@ -85,6 +85,21 @@ func NewCredentialBlindLoopback(tunnel C.Tunnel) (*CredentialBlindListener, erro
 
 func (l *CredentialBlindListener) Address() string { return l.listener.Addr().String() }
 
+// Endpoint仅返回本listener当前仍允许接收的实际地址，不提供宿主身份认证。
+func (l *CredentialBlindListener) Endpoint() (string, bool) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.closed {
+		return "", false
+	}
+	select {
+	case <-l.acceptedDone:
+		return "", false
+	default:
+	}
+	return l.listener.Addr().String(), true
+}
+
 func (l *CredentialBlindListener) accept() {
 	defer func() {
 		// 即使Accept意外退出也关闭入场，避免迟到EOF在最终Wait后Add。

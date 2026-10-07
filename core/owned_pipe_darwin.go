@@ -35,11 +35,20 @@ func runOwnedPipe() error {
 		}
 	}
 	session := newOwnedSession(&ownedStreams{reader: input, writer: output}, handleAction)
+	if installOwnedListener(session) != nil {
+		return errOwnedPipe
+	}
 	connMu.Lock()
 	ownedBroadcast = session.sendResult
 	connMu.Unlock()
 	// 初始日志污染由宿主首帧验收拒绝；不扫描或重同步。
-	return session.serve()
+	serveErr := session.serve()
+	// serve已撤销准入；仅等待本owner登记的生命周期任务，不声称其它GoTask结束。
+	drainErr := session.control.drain(ownedListenerDrainBudget)
+	if serveErr != nil || drainErr != nil {
+		return errOwnedPipe
+	}
+	return nil
 }
 
 // 仅供显式owned入口；调用者已经保存唯一控制stdout引用。

@@ -14,7 +14,8 @@ type Action struct {
 
 type ActionResult struct {
 	// 仅owned请求携带绑定的发送函数；不会进入JSON。
-	ownedSend func([]byte)
+	ownedSend    func([]byte)
+	ownedControl ownedListenerCapability
 
 	Id     string      `json:"id"`
 	Method Method      `json:"method"`
@@ -41,6 +42,18 @@ func (result ActionResult) error(data interface{}) {
 }
 
 func handleAction(action *Action, result ActionResult) {
+	if result.ownedControl != nil {
+		result.ownedControl.handle(action, result)
+		return
+	}
+	if ownedHttpMethod(action.Method) || (ownedListenerMode.Load() && ownedLifecycleMethod(action.Method)) {
+		result.error("专用入口能力拒绝")
+		return
+	}
+	handleActionDirect(action, result)
+}
+
+func handleActionDirect(action *Action, result ActionResult) {
 	switch action.Method {
 	case initClashMethod:
 		paramsString := action.Data.(string)

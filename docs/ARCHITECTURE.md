@@ -131,3 +131,9 @@ macOS Go核心提供独占子进程匿名管道入口 `--owned-pipe-v1`。固定
 Android 配置与启停目标使用同一operation Mutex及独立配置journal；已开始的同步写入不能随请求取消而丢失归属。未确认副作用完成时保留恢复状态，只有实际Applied派生options可进入启动。候选helper的30项JVM验证已通过；同步JNI和所有配置写入口接线尚未实施，当前客户端不能视为已采用此合同。
 
 TCP/UDP隧道构造器在任何端口绑定前校验目标地址，无效目标不创建socket；合法目标的绑定及错误传递保持原接口。此输入副作用边界已有生产构造器race回归，监听器整体Close、provider及运行状态确认独立验收。
+
+## 专用入口与检查式关闭
+
+Darwin owned pipe现已安装私有会话capability，提供固定空参数的ownedHttpStart/Stop/Get。专用入口只绑定127.0.0.1随机端口，generation与单调listenerEpoch共同标识；配置生命周期先确认关闭入口，再同步实际配置处理。成功init不会清除shutdown或配置拒绝后的失效状态，只有有效setup/update可恢复准入。legacy传输不能获得capability；Go准入不等于Apple身份认证，Dart/supervisor/SDK/SC接线尚未完成。
+
+StopListenerChecked使用各资源真实重建锁，覆盖ordinary、inbound和TCP/UDP tunnel登记资源。Close失败或panic返回固定失败并保留归属，继续其它关闭；只在真实nil后清引用。此API未替换默认StopListener，也不能证明连接排空或完整VPN stack退出；Android平台所有者仍需撤销重建入场后消费。

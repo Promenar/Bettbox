@@ -2,6 +2,9 @@
 
 ## 2026-10-08
 
+- 集成macOS Go专用入口的私有会话能力、端点代次与配置失效门禁；36项main回归及25项HTTP race通过，宿主/系统代理仍待接线。
+- 增加StopListenerChecked资源关闭API，错误保留对象并继续其他关闭；5项含真实loopbacksocket的race通过，Android平台消费者另验。
+
 - TCP/UDP隧道构造器先校验目标再绑定，防止无效目标错误路径遗失socket；生产回归修复前失败、修复后race通过。
 - macOS无Dart辅助进程父属隔离的最小实测通过；生产签名身份、真实核心relay和系统代理仍待接线。
 

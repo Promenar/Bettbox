@@ -701,6 +701,27 @@
       "timeout_seconds": 120,
       "artifacts": [],
       "verification": "生产TCP/UDP constructor输入校验和绑定失败；虚构目标，无实际socket/账号/公网"
+    },
+    "test-listener-close": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-run",
+        "^TestChecked",
+        "github.com/metacubex/mihomo/listener"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "五个生产检查式关闭场景含真实loopbacksocket；仅Close返回证据，不证明Android全部stack/VPN关闭"
     }
   },
   "deployment": {
@@ -768,18 +789,18 @@
     "android/core/src/main/cpp/CMakeLists.txt": "d7d22196a04b4f04eeff70a9f93f38f28614070323430e826ac9955be0be072d",
     "core/Clash.Meta/listener/http/credential_blind_test.go": "082f72c95147c11a01b012801df18f2785c14f0d7a2220970e0f6d8cbbb89459",
     "core/Clash.Meta/listener/http/credential_blind_request_test.go": "6a28e2cea2abd00d96372686b347ad6cf4cd43ef9736f09715a0b6f274728c67",
-    "core/Clash.Meta/listener/http/credential_blind.go": "0f7c63ead7ca8122d2b498b406ebad19fd02b77194e21633f267211fc32c4674",
+    "core/Clash.Meta/listener/http/credential_blind.go": "bb5c238847a4d51d3fce392f796ad74d8e30a44b71b39173ddd6dcb498f530b4",
     "core/Clash.Meta/listener/http/upgrade.go": "03c7e7bffbf82bcd01ac619a662b2fcbc15fdf3edd5b0c6fc5cbd0ad707f0f8e",
     "core/Clash.Meta/listener/http/client.go": "9caf76e6821f2b4b4d34df6e423e66ccb5bff924d16b93ac5e7b16d9d5505b65",
     "core/Clash.Meta/listener/http/credential_blind_request.go": "4d434d8314432df996441d611d2fd371e50721d022bfba9517d623c29b705e17",
     "core/Clash.Meta/listener/http/credential_blind_legacy_test.go": "495743fd213d9f1305e0229ae45f3623a6f0df0e12df569848cbf0c0f6ed4873",
     "core/server.go": "6c9343c89f05d09b69d042ad7468a22f9d455d0bf5f7d2ce8a3ae0b57a6c66cb",
-    "core/action.go": "85e10544e5f5ee940eeb5d2099b2adc96ac97631941c570af7036920bc2dfb20",
+    "core/action.go": "00c334f822cb7767b2f654317695acbf4704ba10fde57aab9b7fae4ed547b6cb",
     "core/owned_pipe_other.go": "2826bb1c9311c6bed30b19814b949c821234c382a8940ccc3398e79c942c69c7",
     "core/owned_session_test.go": "e0d7b1725bf186f0c9ff7df209837c0384eef253923c47beacbe37972b8d8fa9",
     "core/owned_pipe_darwin_test.go": "fece3a95ab30db48776da511c0af7e497353943675cf2ab1385f6c81dda5ab34",
-    "core/owned_session.go": "64a872f63bbd2a5d3f4581d4a7ecad8a269cf47cb7aa3f119b5f8261c677e709",
-    "core/owned_pipe_darwin.go": "ec6db74b72a02a348303e42dfff9c627b77ba82787dfd763ca13270a29c55881",
+    "core/owned_session.go": "9c61d280c4fbc965a71385482db5693e05b237bf3666577ec293e7738e729194",
+    "core/owned_pipe_darwin.go": "3729d300c7c124db33e094aade114df636b93846124d4abde140979b2b1b36ff",
     "core/main.go": "32d36738d0d40d24287d49b1c34fbe45686c9463451a1b0340ba5bcfd56b63c0",
     "core/Clash.Meta/hub/route/restart.go": "2a068d2b5503a8c75d4483918286ad72de10bc0adf9a848869d7b3eafa2273d5",
     "core/Clash.Meta/hub/route/owned_pipe_guard.go": "1c20180c7357be9f6534e4439eb87e3a1c481e4c9a6f5d16e746bc1510992d50",
@@ -804,7 +825,16 @@
     "test/setup_macos_identity_test.dart": "bd6b82fb4eb16ead763830fcc206a549f113f9326a395b3a306a86a40f4e42a7",
     "core/Clash.Meta/listener/tunnel/tcp.go": "734f9ff2f34c6dfa7c3b7ca1fe10024269f4257c22f426c5240dc5487ed55378",
     "core/Clash.Meta/listener/tunnel/udp.go": "67db4855304aa48e0a6b4cffb32fab44dff213eae8237f064b2baadcf7b87ea4",
-    "core/Clash.Meta/listener/tunnel/constructor_test.go": "3115ac86ce476cac4263a62558253a5082ece49bd42a399714c640e6aca3ced6"
+    "core/Clash.Meta/listener/tunnel/constructor_test.go": "3115ac86ce476cac4263a62558253a5082ece49bd42a399714c640e6aca3ced6",
+    "core/owned_listener.go": "63c5c7e463a0188ee5055583a51f7d2c795a3acd070a25a79ada63d51e956a2e",
+    "core/owned_listener_contract.go": "19ba5b777a670aa3d9bdd2313856970c5de6843445707b8bf8c88f2ea5bbc435",
+    "core/owned_listener_darwin.go": "02bc3e93bf341ef7d7a4ab7413c1a9209ed6f0e1ae39973ad0197bc25c7bc5cc",
+    "core/owned_listener_test.go": "521c0422be07023ab7d7a55f7355378c9a7f9e7376a85a7aebe0db0eb097361e",
+    "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e",
+    "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b",
+    "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
+    "core/common.go": "b19ab65b8f5d0e84d611148be7f624891aed40d9dfcc86814bd7d433dd66195e",
+    "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec"
   },
   "platform_extensions": {
     "android": {
@@ -841,6 +871,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "31675652da7dc45e3862636ee8392c6edc64d22e7acefcd7f3e31c0e7f769f3c"
+    "contract_digest": "01b8c165f4b12afeb202e061b481cd41a087f05a3a1c05b4f8a5825632c6d5dc"
   }
 }

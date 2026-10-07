@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T04:53:48+08:00
+> generated_at: 2026-10-08T05:07:04+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T04:53:48+08:00 | done | ["Bettbox", "Android", "macOS"] | 隧道构造预检修复与macOS辅助进程隔离实测 | `.agents/handover.md` · `2026-10-08T04:53:48+08:00` · `fp:471faa42e5` |
+| three-platform-release | resume | 2026-10-08T05:07:04+08:00 | done | ["Bettbox", "Android", "macOS"] | 集成专用Go入口与检查式关闭资源合同 | `.agents/handover.md` · `2026-10-08T05:07:04+08:00` · `fp:997b985dd2` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T05:07:04+08:00 | iso | done | resume | ["Bettbox", "Android", "macOS"] | ["release", "native", "ownership"] | 集成专用Go入口与检查式关闭资源合同 | `.agents/handover.md` · `2026-10-08T05:07:04+08:00` · `fp:997b985dd2` |
 | 2026-10-08T04:53:48+08:00 | iso | done | resume | ["Bettbox", "Android", "macOS"] | ["release", "native", "regression"] | 隧道构造预检修复与macOS辅助进程隔离实测 | `.agents/handover.md` · `2026-10-08T04:53:48+08:00` · `fp:471faa42e5` |
 | 2026-10-08T04:41:06+08:00 | iso | done | resume | ["Bettbox", "Android"] | ["release", "android", "config"] | Android配置协调候选30场景实际JVM验收 | `.agents/handover.md` · `2026-10-08T04:41:06+08:00` · `fp:8bf98e730b` |
 | 2026-10-08T04:17:30+08:00 | iso | partial | resume | ["Bettbox"] | ["macos", "runtime", "reaper", "release"] | macOS当前Dart竞争回收真实复现 | `.agents/handover.md` · `2026-10-08T04:17:30+08:00` · `fp:cfd14642a9` |

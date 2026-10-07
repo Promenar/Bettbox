@@ -970,3 +970,34 @@ Android StopListenerChecked候选完成独立审阅并实际验证，资源真�
 
 ### HLG
 使用标准append登记实际修复、分层验证与后续候选风险。
+
+## 2026-10-08T05:07:04+08:00 · 集成专用Go入口与检查式关闭资源合同
+
+type: development
+scope: ["Bettbox", "Android", "macOS"]
+status: done
+tags: ["release", "native", "ownership"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 997b985dd29a448a2d9e02852ae89f181c632c23b69587d00b0ac4435bd7b5cb
+
+### Summary
+Go专用owned入口和StopListenerChecked已进入实际工作树，当前源码分层回归通过。iOS保持开发版范围。
+
+### Changed
+私有cap专用HTTP空参数API、generation/listenerEpoch、配置生命周期串行、失败sticky及EOF有限资源收束；Checked覆盖ordinary/inbound/tunnel maps，只有Close nil清归属；新增真实Endpoint回归，默认legacy Stop未替换。
+
+### Validation
+Mac配置invalid两序列旧helper真实失败，窄修与14fixture独立复核通过；当前CGO0 with_gvisor main测试exit0、HTTP25 race exit0、Checked5 race exit0。旧Stop遗漏inbound实际复现；原13源摘要及实际命令绑定公开回执。
+
+### Next
+Android同步JNI/配置资源lease与Dart generation原子接线；Mac固定无Dart supervisor、SDK host/helper/Core链及SC事务和Dart接线；正式安装包/有效流量验收。
+
+### Risks
+Go cap不是Apple认证，Checked nil不是连接/线程/全stack关闭；Mac资源任务Done不证明全部业务任务或stdout排空；正式发行、真实支付和完整平台验证未完成。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、PDEC说明、计划和公开脱敏回执。
+
+### HLG
+通过标准append登记当前实际源码与下一关键路径，未改长期规则或用户文件。

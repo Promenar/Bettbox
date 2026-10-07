@@ -148,3 +148,5 @@ Android 配置协调候选已通过30个实际JVM场景（23个生命周期场�
 TCP/UDP隧道目标预检：生产构造器回归在修复前两个无效目标子用例失败，修复后 `go test -mod=readonly -race -count=1 -timeout=60s github.com/metacubex/mihomo/listener/tunnel` 通过。验证无效目标零绑定、合法目标绑定一次并保留错误；不直接测量真实FD泄漏。公开回执 `validation/2026-10-07-three-platform/tunnel-constructor-validation.json`。
 
 macOS无Dart辅助进程最小隔离：Dart持有固定C helper，同时有登记的sleep1；helper通过冻结spawn桥创建固定true，250ms后两次WNOWAIT保留child，指定waitpid真实退出0，helper及Dart登记进程均退出0。仅证明该短时父属与回收隔离，不包含Swift supervisor、签名/SDK身份、业务relay或SC。公开回执 `validation/2026-10-07-three-platform/dart-supervisor-reaper-validation.json`。
+
+实际Go集成验收：专用owned入口与既有main包回归在CGO0、with_gvisor下通过；候选36项含14个专用入口场景。两个配置失效绕过序列旧helper实际失败，修复后通过；HTTP现有23项加2项实际Endpoint/accept故障验证经race通过。Checked关闭旧Stop遗漏inbound已实际复现，5项生产API包含真实HTTP/TCP/UDP socket关闭，经当前工作树race通过。回执 `validation/2026-10-07-three-platform/owned-listener-close-validation.json` 绑定格式化后实际13源；不是Dart/JNI/SC或平台流量验收。

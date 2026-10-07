@@ -90,3 +90,5 @@ Mac生产回收不能与Dart全局wait()竞争；当前同revision源码与真�
 Android 配置协调候选的30场景实际JVM编译运行通过。配置bridge必须同步提交且关闭legacy写旁路；普通监听器当前无条件true/丢弃Close错误、隧道资源在setup中创建等事实须先形成可验证完成合同。不能把fake Applied解释为普通socket/provider完成，也不能单独应用Kotlin overlay破坏真实backend ABI。
 
 隧道构造错误先行收口：主控独占TCP/UDP构造器及回归，将目标校验置于资源创建前；旧生产代码两子用例失败、修复后race通过，独立审阅无P1/P2。Android StopListenerChecked候选保留所有Close失败归属的工作独立推进。Mac supervisor设计经独立审阅修正仅核验worker、spawn前单调deadline、EOF与exit正常收敛、PID仅locator；短时C/Dart父属隔离实测通过，生产helper/SDK/relay尚未实施。
+
+Go专用入口与Checked关闭API已集成并通过当前工作树回归：Mac main36、HTTP25 race、Checked5 race。配置invalid被init清洗的P2经实际红绿序列修复；仅有效setup/update恢复配置准入。后续原子接线必须保留Go私有cap、listenerEpoch、失败归属及重建撤销前提。Android真实同步JNI/配置资源lease、Mac固定supervisor与SDK链/SC事务、正式安装包和有效节点流量仍是关键路径。

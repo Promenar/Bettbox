@@ -42,6 +42,7 @@ type ownedRead struct {
 type ownedSession struct {
 	stream            io.ReadWriteCloser
 	dispatch          func(*Action, ActionResult)
+	control           *ownedListenerOwner
 	mu                sync.Mutex
 	writer            sync.Mutex
 	closed            bool
@@ -73,6 +74,9 @@ func (s *ownedSession) stop() {
 	}
 	s.closed = true
 	s.ready = false
+	if s.control != nil {
+		s.control.revokeLocked()
+	}
 	close(s.done)
 	s.mu.Unlock()
 	s.cancel()
@@ -312,6 +316,14 @@ func (s *ownedSession) serve() error {
 		if s.closed {
 			s.mu.Unlock()
 			return errOwnedPipe
+		}
+		if s.control != nil && ownedLifecycleMethod(action.Method) {
+			result.ownedControl = s.control.admitLocked(generation)
+			if result.ownedControl == nil {
+				s.mu.Unlock()
+				// 准入预算耗尽即撤销整个owned会话，不创建额外阻塞发送任务。
+				return errOwnedPipe
+			}
 		}
 		// 已准入任务可能持续到进程退出；不虚称旧业务均支持context取消。
 		go func() {
