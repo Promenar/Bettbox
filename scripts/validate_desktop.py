@@ -412,6 +412,10 @@ def command_plan(
             )
         )
     else:
+        commands.append(Command(
+            (sys.executable, "scripts/macos_supervisor_artifact.py", "--prepare"),
+            root, label="编译并签名固定 macOS supervisor", stage="dependencies",
+        ))
         commands.append(
             Command(
                 ("pod", "install", "--deployment"),
@@ -629,6 +633,11 @@ _identity_spec = importlib.util.spec_from_file_location("bettbox_macos_core_iden
 assert _identity_spec is not None and _identity_spec.loader is not None
 core_identity_module = importlib.util.module_from_spec(_identity_spec)
 _identity_spec.loader.exec_module(core_identity_module)
+sys.modules.setdefault("macos_core_identity", core_identity_module)
+_supervisor_spec = importlib.util.spec_from_file_location("bettbox_macos_supervisor_artifact", Path(__file__).with_name("macos_supervisor_artifact.py"))
+assert _supervisor_spec is not None and _supervisor_spec.loader is not None
+supervisor_artifact_module = importlib.util.module_from_spec(_supervisor_spec)
+_supervisor_spec.loader.exec_module(supervisor_artifact_module)
 parse_core_signature = core_identity_module.parse_core_signature
 validate_core_identity = core_identity_module.validate_core_identity
 read_core_identity = core_identity_module.read_core_identity
@@ -646,6 +655,8 @@ def validate_bundle(
     source_paths = [root / target.core_path]
     if target.needs_helper:
         source_paths.append(root / "libclash/windows/BettboxHelperService.exe")
+    else:
+        source_paths.append(root / supervisor_artifact_module.EXECUTABLE)
     required = [
         *source_paths,
         *(root / path for path in target.app_paths),
@@ -669,6 +680,22 @@ def validate_bundle(
         raise RuntimeError("bundle 内 core 与本次编译的 core SHA256 不一致")
 
     if not target.needs_helper:
+        helper_identity, helper_bytes = supervisor_artifact_module.read_identity(root)
+        helper_bundle = target.bundle_path / "Contents/MacOS/BettboxCoreSupervisor"
+        bundled_identity = root / target.bundle_path / "Contents/Resources/BettboxCoreSupervisorIdentity.json"
+        if helper_bytes != bundled_identity.read_bytes() or helper_identity["sha256"] != sha256_file(root / helper_bundle) or \
+                sha256_file(root / supervisor_artifact_module.EXECUTABLE) != helper_identity["sha256"]:
+            raise RuntimeError("supervisor封装字节或清单不符")
+        outputs = supervisor_artifact_module.run_commands(root, [
+            ("/usr/bin/codesign", "--verify", "--strict", helper_bundle.as_posix()),
+            ("/usr/bin/codesign", "--display", "--verbose=4", helper_bundle.as_posix()),
+        ])
+        actual_helper = supervisor_artifact_module.parse_signature(outputs[-1] or "")
+        actual_helper["sha256"] = sha256_file(root / helper_bundle)
+        if actual_helper != helper_identity: raise RuntimeError("supervisor实际签名不符")
+        bindings.append({"source": supervisor_artifact_module.EXECUTABLE.as_posix(),
+                         "bundled": helper_bundle.as_posix(), "sha256": helper_identity["sha256"],
+                         "identity": helper_identity})
         identity, source_bytes = read_core_identity(root, CORE_IDENTITY_PATH)
         bundled_manifest = target.bundle_path / "Contents/Resources/BettboxCoreIdentity.json"
         bundled_identity, bundled_bytes = read_core_identity(root, bundled_manifest)

@@ -1,6 +1,6 @@
 # macOS supervisor 原生模块
 
-本目录提供固定签名身份核验、独占Core回收、非阻塞relay及宿主原生ABI。生产helper与宿主ABI已在真实Mihomo签名夹具中完成握手、只读动作和停止验证；Runner已编译接线，Dart应用路由、helper打包和系统代理事务尚未联合接入，不是完整发行包。
+本目录提供固定签名身份核验、独占Core回收、非阻塞relay及宿主原生ABI。生产helper与宿主ABI已在真实Mihomo签名夹具中完成握手、只读动作和停止验证；Runner已编译接线，Dart应用路由和系统代理事务尚未联合接入，不是完整发行包。
 
 `Identity` 使用实际 Security SDK 和内核事实，分别核验宿主 bundle、helper 与 Core 的 Unique。PID 仅为定位值；出生、直接父属及 real/effective UID 由内核读取。最终产物清单为严格 canonical JSON；文件使用 no-follow、持 FD 摘要和路径重检。SDK 工作在意图锁之外，提交前重读整链 stamp，再检查 launch/generation/epoch；旧回调不能撤销新代。多进程读取不是原子事务，同 UID 注入和匿名管道来源不由此获得硬隔离保证。
 
@@ -32,3 +32,5 @@ python3 -m unittest discover -s scripts/tests -p test_check_macos_supervisor.py 
 `Tests/SignedProduction/runner.py` 使用冻结actual源及唯一输出目录，已有目录拒绝覆盖；PDEC登记的输出名仅用于对应执行。新的运行需登记新的输出名并核对来源，不能复用旧回执宣称新版本通过。
 
 真实Go验证入口为 `Tests/SignedProduction/real_go_runner.py`，固定读取任务Core并校验预登记SHA，签前冻结字节，使用生产helper/native host发出 `getIsInit`，严格核对真实result、credit、exit0与native出生消失。仅验证未初始化状态，不加载账户或配置，不启用代理。Core源码与helper/host源分别绑定；Python拒绝测试覆盖摘要错误、产物替换和符号链接。执行证据见 `docs/validation/2026-10-07-three-platform/macos-runner-real-go-validation.json`。
+
+生产helper由 `scripts/macos_supervisor_artifact.py --prepare` 编译当前15源/头快照，固定arm64/macOS12，无fixture宏；签后重绑定FD，最后发布canonical身份清单。Xcode复制helper和清单，桌面验证核对源/bundle字节及实际签名。`scripts/seal_macos_candidate.py` 复制完整App到独立候选目录，先签叶级Mach-O和framework，最后签宿主；不重签Core/helper。既有候选或成功清单均拒绝，清单采用目录FD及排他no-follow创建。完整Release构建与10个framework的嵌套严格验签通过；完整Flutter新会话与SC另验。回执为 `docs/validation/2026-10-07-three-platform/macos-helper-bundle-validation.json`。

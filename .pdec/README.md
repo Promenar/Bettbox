@@ -94,3 +94,5 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 `test-supervisor-session` 验证实际DartSession；`test-supervisor-host` / `test-supervisor-host-recheck` 支持宿主定向行为回归。`test-macos-supervisor` 同时编译无fixture宏的生产helper，覆盖relay满pipe、取消、迟到SDK与Core假控制帧。`test-supervisor-production-signed` 使用唯一输出名、冻结actual源、公开framed Core和adhoc签名验证真实六ABI；不修改系统代理或启动客户端，也不代表Mihomo/发行验收。输出目录已存在时拒绝覆盖，新执行须使用新登记的输出名。`test-supervisor-signed-parser` 只检查完整固定输出分类，不证明native身份。
 
 `test-supervisor-real-go` 使用固定任务产物及预登记SHA，冻结真实Go字节后签名并经生产helper/native host验证getIsInit与退出；不启动系统代理，不等同完整Flutter验收。输出目录已存在时拒绝覆盖。Runner源码与桥接头已纳入编译输入；Debug身份不用于生产链验收。
+
+`prepare-macos-supervisor` 编译固定arm64 helper生产源快照，签名后刷新FD绑定并最后发布身份清单；macOS完整验证在Flutter之前执行该步骤，Xcode仅复制已签产物。`seal-macos-candidate` 保留源App并在独立目录制作最终ad hoc候选，由内到外签嵌套框架与宿主，保持Core/helper字节；已有App或seal.json拒绝，清单排他no-follow发布。`test-macos-packaging-tools`覆盖固定身份、字节漂移、链接/特殊文件及发布失败。三者不修改系统代理、不公证、不发布。完整Flutter新会话运行另验；共享setup不删除Pod锁，当前helper打包仅覆盖arm64。

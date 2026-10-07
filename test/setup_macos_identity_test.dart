@@ -44,6 +44,29 @@ void main() {
     }
   });
 
+  test('helper结果必须使用对应固定身份，Core签名不能冒充helper', () {
+    final helper = identity()
+      ..['identifier'] = 'com.appshub.bettbox.core.supervisor';
+    expect(
+      setup.macosCoreIdentityShaFromOutput(
+        jsonEncode(helper),
+        expectedIdentifier: 'com.appshub.bettbox.core.supervisor',
+      ),
+      'a' * 64,
+    );
+    expect(
+      () => setup.macosCoreIdentityShaFromOutput(
+        jsonEncode(identity()),
+        expectedIdentifier: 'com.appshub.bettbox.core.supervisor',
+      ),
+      throwsStateError,
+    );
+    expect(
+      () => setup.macosCoreIdentityShaFromOutput(jsonEncode(helper)),
+      throwsStateError,
+    );
+  });
+
   test('多余字段、非法或超长输出仅返回固定错误', () {
     final extra = identity()..['diagnostic'] = 'PUBLIC_DIAGNOSTIC';
     final newline = identity()..['sha256'] = '${'a' * 64}\n';

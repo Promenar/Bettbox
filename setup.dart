@@ -15,7 +15,10 @@ List<String> macosCoreIdentityPreparationCommand({required bool isDev}) {
   return const ['python3', 'scripts/macos_core_identity.py', '--prepare'];
 }
 
-String macosCoreIdentityShaFromOutput(String output) {
+String macosCoreIdentityShaFromOutput(
+  String output, {
+  String expectedIdentifier = 'com.appshub.bettbox.core',
+}) {
   const failure = 'macOS 内核身份准备结果无效';
   if (utf8.encode(output).length > 4096) throw StateError(failure);
   final Object? decoded;
@@ -30,7 +33,7 @@ String macosCoreIdentityShaFromOutput(String output) {
       !decoded.keys.every(fields.contains) ||
       decoded['schema'] is! int ||
       decoded['schema'] != 1 ||
-      decoded['identifier'] != 'com.appshub.bettbox.core' ||
+      decoded['identifier'] != expectedIdentifier ||
       decoded['signingmode'] != 'adhoc' ||
       decoded['sha256'] is! String ||
       (decoded['sha256'] as String).length != 64 ||
@@ -203,7 +206,10 @@ class Build {
     if (exitCode != 0 && name != null) throw '$name error';
   }
 
-  static Future<String> prepareMacosCoreIdentity(List<String> command) async {
+  static Future<String> prepareMacosCoreIdentity(
+    List<String> command, {
+    String expectedIdentifier = 'com.appshub.bettbox.core',
+  }) async {
     final ProcessResult result;
     try {
       result = await Process.run(
@@ -219,7 +225,10 @@ class Build {
       throw StateError('macOS 内核身份准备失败');
     }
     if (result.exitCode != 0) throw StateError('macOS 内核身份准备失败');
-    return macosCoreIdentityShaFromOutput(result.stdout as String);
+    return macosCoreIdentityShaFromOutput(
+      result.stdout as String,
+      expectedIdentifier: expectedIdentifier,
+    );
   }
 
   static Future<String> calcSha256(String filePath) async {
@@ -803,6 +812,14 @@ class BuildCommand extends Command {
         );
         return;
       case Target.macos:
+        if (archName != 'arm64') {
+          throw StateError('当前 supervisor 打包仅验证 arm64，其它架构需独立构建验收。');
+        }
+        await Build.prepareMacosCoreIdentity(const [
+          'python3',
+          'scripts/macos_supervisor_artifact.py',
+          '--prepare',
+        ], expectedIdentifier: 'com.appshub.bettbox.core.supervisor');
         // Go 最终产物签名完成后才固定 SHA，并在 Flutter 打包前生成清单。
         final coreHash = await Build.prepareMacosCoreIdentity(
           macosIdentityCommand!,
@@ -810,12 +827,10 @@ class BuildCommand extends Command {
         await _getMacosDependencies();
         await _setMacOSImpeller(!compatible);
         await Build.exec(
-          Build.getExecutable('rm -rf Pods Podfile.lock'),
-          workingDirectory: 'macos',
+          Build.getExecutable('flutter pub get --enforce-lockfile'),
         );
-        await Build.exec(Build.getExecutable('flutter pub get'));
         await Build.exec(
-          Build.getExecutable('pod install --repo-update'),
+          Build.getExecutable('pod install --deployment'),
           workingDirectory: 'macos',
         );
         await _buildDistributor(

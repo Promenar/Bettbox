@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import subprocess
 import sys
@@ -124,7 +125,7 @@ class ValidateDesktopTest(unittest.TestCase):
             "digest",
         )
 
-        self.assertEqual(len(plan), 9)
+        self.assertEqual(len(plan), 10)
         self.assertEqual(plan[1].env["GOOS"], "darwin")
         self.assertEqual(plan[1].env["GOARCH"], "arm64")
         self.assertNotIn("GOAMD64", plan[1].env)
@@ -137,10 +138,11 @@ class ValidateDesktopTest(unittest.TestCase):
                 "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore"
             ),
         )
-        self.assertEqual(plan[5].argv, ("pod", "install", "--deployment"))
-        self.assertEqual(plan[6].argv[2], "macos")
-        self.assertEqual(plan[7].argv[:3], ("codesign", "--verify", "--deep"))
-        self.assertTrue(plan[8].capture_output)
+        self.assertIn("scripts/macos_supervisor_artifact.py", plan[5].argv)
+        self.assertEqual(plan[6].argv, ("pod", "install", "--deployment"))
+        self.assertEqual(plan[7].argv[2], "macos")
+        self.assertEqual(plan[8].argv[:3], ("codesign", "--verify", "--deep"))
+        self.assertTrue(plan[9].capture_output)
 
     def test_unsigned_macos_is_explicit_and_rejected_for_windows(self) -> None:
         plan = validate_desktop.command_plan(
@@ -149,9 +151,9 @@ class ValidateDesktopTest(unittest.TestCase):
             "digest",
             unsigned_macos=True,
         )
-        self.assertEqual(len(plan), 8)
+        self.assertEqual(len(plan), 9)
         self.assertEqual(
-            plan[6].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
+            plan[7].env, {"FLUTTER_XCODE_CODE_SIGNING_ALLOWED": "NO"}
         )
         self.assertEqual(plan[-1].argv[:2], ("codesign", "--display"))
         self.assertTrue(plan[-1].capture_output)
@@ -419,6 +421,8 @@ class ValidateDesktopTest(unittest.TestCase):
                     if command.argv[:2] == ("codesign", "--force"):
                         (root / target.core_path).write_bytes(b"FINAL_PUBLIC_ADHOC_CORE")
                         signed_hash = validate_desktop.sha256_file(root / target.core_path)
+                    if "scripts/macos_supervisor_artifact.py" in command.argv:
+                        self.create_public_supervisor(root, target)
                     if command.argv[:3] == ("flutter", "build", "macos"):
                         self.assertIsNotNone(signed_hash)
                         self.assertIn("--dart-define=CORE_SHA256=" + signed_hash, command.argv)
@@ -431,6 +435,7 @@ class ValidateDesktopTest(unittest.TestCase):
                         manifest = root / target.bundle_path / "Contents/Resources/BettboxCoreIdentity.json"
                         manifest.parent.mkdir(parents=True, exist_ok=True)
                         manifest.write_bytes(source)
+                        self.create_public_supervisor(root, target)
                     if command.capture_output:
                         outputs.append(self.core_signature_fixture() if command.argv[-1].endswith("BettboxCore") else "code object is not signed at all")
                     else:
@@ -440,23 +445,36 @@ class ValidateDesktopTest(unittest.TestCase):
                 nonlocal signed_hash
                 self.assertEqual(argv[0], "/usr/bin/codesign")
                 self.assertEqual(kwargs["env"], {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"})
-                self.assertEqual(kwargs["timeout"], 60)
+                self.assertIn(kwargs["timeout"], (60, 120))
                 if argv[1] == "--force":
                     (root / target.core_path).write_bytes(b"FINAL_PUBLIC_ADHOC_CORE")
                     signed_hash = validate_desktop.sha256_file(root / target.core_path)
                 seen.append(tuple(argv))
-                return mock.Mock(stdout=self.core_signature_fixture())
+                if argv[-1].endswith("BettboxCoreSupervisor"):
+                    return mock.Mock(returncode=0, stdout=self.core_signature_fixture().replace(
+                        "Identifier=com.appshub.bettbox.core\n", "Identifier=com.appshub.bettbox.core.supervisor\n"))
+                return mock.Mock(returncode=0, stdout=self.core_signature_fixture())
             with mock.patch.object(validate_desktop, "git_source_state", return_value={"head": "PUBLIC_SAME"}), \
                     mock.patch.object(validate_desktop, "run_commands", side_effect=fake_run), \
                     mock.patch.object(validate_desktop.core_identity_module.subprocess, "run", side_effect=fake_codesign) as native_sign:
                 validate_desktop.execute_build(root, target, unsigned_macos=True)
             self.assertLess(next(i for i, argv in enumerate(seen) if argv[:2] == ("/usr/bin/codesign", "--force")),
                             next(i for i, argv in enumerate(seen) if argv[:3] == ("flutter", "build", "macos")))
-            self.assertEqual(native_sign.call_count, 5)
+            self.assertEqual(native_sign.call_count, 7)
             receipt = json.loads((root / "build/desktop-validation/macos-arm64.json").read_text())
             self.assertEqual(receipt["host_signing_mode"], "unsigned")
             self.assertEqual(receipt["core_identity"]["signingmode"], "adhoc")
             self.assertEqual(receipt["core_identity"]["sha256"], signed_hash)
+
+    def create_public_supervisor(self, root, target):
+        module = validate_desktop.supervisor_artifact_module
+        fields = {"schema": 1, "identifier": module.IDENTIFIER, "signingmode": "adhoc", "cdhash": "a" * 40,
+                  "sha256": hashlib.sha256(b"PUBLIC_SUPERVISOR").hexdigest()}
+        for relative in (module.EXECUTABLE, target.bundle_path / "Contents/MacOS/BettboxCoreSupervisor"):
+            path = root / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(b"PUBLIC_SUPERVISOR")
+        for relative in (module.IDENTITY_PATH, target.bundle_path / "Contents/Resources/BettboxCoreSupervisorIdentity.json"):
+            path = root / relative; path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(fields, sort_keys=True) + "\n")
 
     def test_macos_manifest_tamper_and_packaging_resign_are_rejected(self) -> None:
         target = validate_desktop.TARGETS["macos-arm64"]
@@ -473,7 +491,10 @@ class ValidateDesktopTest(unittest.TestCase):
             bundle.parent.mkdir(parents=True, exist_ok=True)
             source.write_text(json.dumps(identity))
             bundle.write_bytes(source.read_bytes())
-            with mock.patch.object(validate_desktop.core_identity_module, "run_identity_commands", return_value=[None, self.core_signature_fixture()]):
+            self.create_public_supervisor(root, target)
+            with mock.patch.object(validate_desktop.supervisor_artifact_module, "run_commands", return_value=[None, self.core_signature_fixture().replace(
+                    "Identifier=com.appshub.bettbox.core\n", "Identifier=com.appshub.bettbox.core.supervisor\n")]), \
+                 mock.patch.object(validate_desktop.core_identity_module, "run_identity_commands", return_value=[None, self.core_signature_fixture()]):
                 validate_desktop.validate_bundle(root, target, identity)
                 for field, bad in [("identifier", "a.out"), ("schema", True), ("signingmode", "DeveloperID"), ("cdhash", "b" * 40)]:
                     tampered = dict(identity, **{field: bad})

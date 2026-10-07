@@ -162,3 +162,5 @@ macOS supervisor原生模块已纳入 `macos/CoreSupervisor`，当前SDK真实�
 2026-10-08 Runner与真实Go专项：Host/Identity六源、Identity桥接头及窗口通道持有已纳入实际Runner；真实Go Core使用冻结SHA与生产helper/native host完成握手、getIsInit、credit/result和退出，exit0且native确认出生消失，检查时无该夹具残留。公开Core正常/篡改/错误ID矩阵通过，9项Python输出与Core准入测试通过。完整Flutter会话、helper/清单封装、系统代理及有效账户流量另验。证据为 `validation/2026-10-07-three-platform/macos-runner-real-go-validation.json`。
 
 Runner完整Release构建通过，宿主签名关闭，源码与依赖锁均未漂移；Core签名与bundle清单一致。首轮编译成功但因构建中清理空白导致源码漂移被拒绝，冻结后重建通过。宿主未签名且未封装helper，不作为可用发行包或运行身份链证据。
+
+2026-10-08 helper封装：固定arm64生产helper及canonical清单通过SDK编译/签名，源快照前后相等；Xcode复制后源/bundle两个产物及身份核对通过。完整Release构建源码及锁未漂移；独立候选完整开发签名通过，10个framework与最终宿主嵌套严格验签通过，Core/helper签后字节未改变。40项macOS Python、23项桌面Python、156项Flutter和静态分析通过。seal成功清单链接写入经实际红例复现，修后完整流程9测试及独立回审通过。候选仅ad hoc，不是DeveloperID/公证发行；尚未运行完整Flutter新会话或SC，不能称为可用发行版本。共享setup限制已验证arm64，其他架构须独立验收。回执：`validation/2026-10-07-three-platform/macos-helper-bundle-validation.json`。

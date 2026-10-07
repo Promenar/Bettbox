@@ -851,6 +851,58 @@
         ".test/three-platform-release/macos-supervisor-real-go/RESULT.json"
       ],
       "verification": "本机冻结真实Go Core、生产helper/native host，ad hoc seal与getIsInit/EOF收束；无系统代理、有效账户流量或发行签名"
+    },
+    "test-macos-packaging-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-p",
+        "test_*macos*.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "本机固定arm64生产helper/嵌套bundle开发adhoc身份验证；不发布、不公证、不启动系统代理"
+    },
+    "prepare-macos-supervisor": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/macos_supervisor_artifact.py",
+        "--prepare"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": [
+        "libclash/macos/BettboxCoreSupervisor",
+        "libclash/macos/BettboxCoreSupervisorIdentity.json"
+      ],
+      "verification": "本机固定arm64生产helper/嵌套bundle开发adhoc身份验证；不发布、不公证、不启动系统代理"
+    },
+    "seal-macos-candidate": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/seal_macos_candidate.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": [
+        "build/macos-local-candidate/Bettbox.app",
+        "build/macos-local-candidate/seal.json"
+      ],
+      "verification": "本机固定arm64生产helper/嵌套bundle开发adhoc身份验证；不发布、不公证、不启动系统代理"
     }
   },
   "deployment": {
@@ -862,7 +914,7 @@
     "rollback": ""
   },
   "evidence": {
-    "scripts/validate_desktop.py": "77c65af9f2b6577ca6f156452b47e21bf9e8ebcbbd21c406f72093cf39250cf9",
+    "scripts/validate_desktop.py": "4ae7982bf886b46406133ecba712f310b0ff7703724dac78d5c3979ca9ce70a6",
     ".github/workflows/validate-desktop.yaml": "ad83eea5cbb847ccef09045808db62c7cccbcd35de3bbe04aa614855fff7c360",
     "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
     "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
@@ -870,7 +922,7 @@
     "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
     "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd",
     "macos/Podfile": "f2024443bc69a9652010081500a9d8b24c8e483a8d63ca525337c8950ab6d438",
-    "macos/Runner.xcodeproj/project.pbxproj": "b4d80583a8fee619a83064dab80f05fd33f428557f6bf0457eb1b1045d4af0dc",
+    "macos/Runner.xcodeproj/project.pbxproj": "91ff052ebf690c9d52368c4be565466603bb8d9982c8b059c66de7eafa2a6a33",
     "macos/Runner/Release.entitlements": "0672f83103b450e4e0b5b86e42238d9b9ba39af727de43d185f22ec56143cda5",
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
@@ -894,7 +946,7 @@
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
     "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
-    "scripts/tests/test_validate_desktop.py": "35b603bcabd70a1f6bd0f3d2ee573d16aca894d5cba00d26b8d00231fc874471",
+    "scripts/tests/test_validate_desktop.py": "78394c1c8def4afc9af79df2020a4a2dd7e9dbab37d3467a30cad84672b2e512",
     "scripts/tests/test_android_contract.py": "d1cf88bb38cae2f913a7cc78807063637db2eb4164e7df9dce50adb08e6e0e9e",
     "scripts/check_android_regressions.py": "9192077d0b1dc7abb38cc394e645577266dfe109e87dabecef087633316819ae",
     "plugins/proxy/macos/Package.swift": "eb8bd91027c66533c3e5f29b12759721672464922a125fae739f9a59f1313d2d",
@@ -950,8 +1002,8 @@
     "core/androidstartup/state.go": "d8602cdf10b0465a8742e407921399da9090e34bc60a26db64a452f2693969b5",
     "scripts/macos_core_identity.py": "34e6f9b38b657005906eb4c96f219c0c94fba00f948a4bfc551f4d6384ca0118",
     "scripts/tests/test_macos_core_identity.py": "8a6569d5b7da4afd6e11841326e88dc6f5d7d5d21de1401ddd2bc578f50c7303",
-    "setup.dart": "aa6878db793e24de6668afc1c836adc97608fc4f766ea3021701bf725e054fc3",
-    "test/setup_macos_identity_test.dart": "bd6b82fb4eb16ead763830fcc206a549f113f9326a395b3a306a86a40f4e42a7",
+    "setup.dart": "05ef5c07540f1d1c7545d30caf3b8cdb8e7d7642026a0d6b91672df1da2f89a4",
+    "test/setup_macos_identity_test.dart": "949e58b5404a64c170fc6277c3ed010c84815515233919cf3cbb1d968216cb33",
     "core/Clash.Meta/listener/tunnel/tcp.go": "734f9ff2f34c6dfa7c3b7ca1fe10024269f4257c22f426c5240dc5487ed55378",
     "core/Clash.Meta/listener/tunnel/udp.go": "67db4855304aa48e0a6b4cffb32fab44dff213eae8237f064b2baadcf7b87ea4",
     "core/Clash.Meta/listener/tunnel/constructor_test.go": "3115ac86ce476cac4263a62558253a5082ece49bd42a399714c640e6aca3ced6",
@@ -1008,7 +1060,11 @@
     "macos/Runner/MainFlutterWindow.swift": "0f54186750626e31c7b1ff36f3ff6d50274937a84704ddc9afcb7390467e6212",
     "macos/Runner/Runner-Bridging-Header.h": "3882f6fb721fe1b153594020d03ab14ce3e25e36a0a46b11f7c0ceb3238ae6c3",
     "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py": "c93f39325fb30cd4b38bf24b22535a5f694f4a7f7f7525bf6e46e821e3c7f06c",
-    "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1"
+    "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1",
+    "scripts/macos_supervisor_artifact.py": "0b4fdba385f187a36f79ccade6b8031ce070250da2e52308de6641f41e5ee3f4",
+    "scripts/seal_macos_candidate.py": "ca32b55fe2b1dc2540a27d505367340bb9280e833f0327c7fa21244b064e020c",
+    "scripts/tests/test_macos_supervisor_artifact.py": "4f7bdbc758a924008ea9b0ae3771963dbb315bf1cf9e9e078efa70740edc05cc",
+    "scripts/tests/test_seal_macos_candidate.py": "e021d842665b03da0d8e6bf21929c3b5a81d5c1c3c60a35e46e09f91d564eb73"
   },
   "platform_extensions": {
     "android": {
@@ -1045,6 +1101,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "781c0f4eb0978e408ee1ea08200999b84a2ccf3f0548eb584f5ece8d3abaa657"
+    "contract_digest": "6895a0198039c0cee7e4e0a70295e6f20f61652e4695b7b382e3abfae44f87bb"
   }
 }

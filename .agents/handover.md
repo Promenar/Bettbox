@@ -1094,3 +1094,34 @@ Runner窗口持有HostSupervisorFlutterBridge；Host/Identity六Swift源加入Ru
 
 ### HLG
 使用Skill append dry-run/apply追加并重建索引，Goal维持active。
+
+## 2026-10-08T06:57:27+08:00 · macOS生产helper封装及完整bundle开发签名验收
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["release", "packaging", "supervisor", "signing"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: b50233e650c4f5e029b18b65c19adf1489503f6e469b434bff5f8867b27c9d1d
+
+### Summary
+Android/macOS优先交付，iOS保留开发版与发行研究。macOS生产helper与清单已纳入Xcode/共享构建，完整Release构建及完整bundle开发签名验收通过；未将候选标为可用发行。
+
+### Changed
+增加固定arm64/macOS12 helper快照编译工具和签后FD/身份核验、最后提交清单；Xcode复制helper与清单而不重签；桌面验证核对两个产物源/bundle/签名。独立候选先签嵌套叶级Mach-O及10个framework，再签宿主，保留unsigned源App。共享setup准备helper、限制已验证arm64并保留Pod锁/使用deployment。成功清单既有输出拒绝及目录FD排他no-follow发布，不修改系统代理、生产服务或.video_agent。
+
+### Validation
+实际helperSDK编译与固定ad hoc身份成功，15源/头快照前后相等。完整Release构建command/source/locks均true，两产物源/bundle/清单/公开签名匹配；完整候选开发签名、10个framework及host嵌套严格验签通过，Core/helper字节不变。40个macOS工具测试、23个桌面验证测试、156个Flutter全量测试通过，Flutter analyze No issues found。独立审阅发现seal marker链接写入P2，旧实现完整流程红例实际RuntimeError not raised；修后9个seal流程测试通过，独立回审闭合。公开回执 docs/validation/2026-10-07-three-platform/macos-helper-bundle-validation.json；PDEC validate0/execution_ready=true，摘要6895a0198039c0cee7e4e0a70295e6f20f61652e4695b7b382e3abfae44f87bb。
+
+### Next
+用真实Flutter引擎经实际MethodChannel/SupervisorSession验证已封装Core/helper握手、业务、并发Dart child退出与native停止；接入ClashService、结果资源限额及SC事务。Android整包JNI/Service/config owner、正式APK及有效订阅流量；iOS开发版和发行方案研究。
+
+### Risks
+完整bundle仅ad hoc，不是DeveloperID/公证发行；实际ClashService尚未使用新Session，完整Flutter会话、SC与有效业务流量未验收。helper当前只验证arm64，其它Mac架构独立验证。路径式编译/签名不提供同UID硬隔离，双文件发布失败可能留无成功清单binary，调用方须检查退出码/清单。Apple团队、Android有效订阅及付呗商户门店/安全注入仍需外部条件；未执行真实资金或支付部署。
+
+### DIA
+已同步模块README、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC说明、实施计划、registry和公开helper/bundle回执。
+
+### HLG
+通过Skill append dry-run/apply追加并重建索引，Goal维持active。

@@ -1,0 +1,159 @@
+{
+  "bundle_build": {
+    "bundle_bindings": [
+      {
+        "bundled": "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCore",
+        "core_identity": {
+          "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+          "identifier": "com.appshub.bettbox.core",
+          "schema": 1,
+          "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+          "signingmode": "adhoc"
+        },
+        "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+        "source": "libclash/macos/BettboxCore"
+      },
+      {
+        "bundled": "build/macos/Build/Products/Release/Bettbox.app/Contents/MacOS/BettboxCoreSupervisor",
+        "identity": {
+          "cdhash": "cd4ebafffac90a9f77cf067aff73717f89050fbf",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "schema": 1,
+          "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+          "signingmode": "adhoc"
+        },
+        "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+        "source": "libclash/macos/BettboxCoreSupervisor"
+      }
+    ],
+    "commands_succeeded": true,
+    "completed_at": "2026-10-07T22:51:25.011558+00:00",
+    "core_identity": {
+      "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+      "identifier": "com.appshub.bettbox.core",
+      "schema": 1,
+      "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+      "signingmode": "adhoc"
+    },
+    "lock_sha256": {
+      "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
+      "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
+      "macos/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved": "b6f691bab38585211c29413db6f0c7ceb637d4bcc71c4a072e105e9476991d06",
+      "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
+      "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd"
+    },
+    "locks_unchanged": true,
+    "source_unchanged": true,
+    "started_at": "2026-10-07T22:49:51.511299+00:00"
+  },
+  "helper_source_snapshot": {
+    "after": {
+      "source_hashes_after": {
+        "Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+        "Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+        "Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+        "Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+        "Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+        "Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+        "Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+        "Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+        "Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+        "Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+        "Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+        "Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+        "Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+        "Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+        "Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+      },
+      "target": "arm64-apple-macos12"
+    },
+    "before": {
+      "source_hashes_before": {
+        "Bridge.h": "f50079caac79ba6de770ac1649b2718405651d4c2d53ee9c1d4535fd6a4356eb",
+        "Identity/SSIAppleBackend.swift": "1dbcf8bedd2daf378f25b01c29306ecac5c75e46dbbed83dccb4bc892aa37808",
+        "Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+        "Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+        "Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+        "Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+        "Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+        "Owner/SupervisorLifecycle.swift": "6983aa6f274cc1039fd839ee46ee225ad15d5c43823f787d58d74c1c0d68872f",
+        "Owner/SystemBackend.swift": "b9b5a16e8067f79a9af608d1b0f5362e7ea2808da26d1a1223e3cf673934f4d7",
+        "Relay/HelperC.c": "89d6362657d024a8441bee1d37d955e7baf3d686f015cc0ff1e77715c95a5234",
+        "Relay/HelperC.h": "0f5bb6d3592ef55eda2e1a6aa8369081c04ff79a9f86cd0020ec84ea5e845f2b",
+        "Relay/RelayCodec.swift": "e75d4b51686e0a2c0bcf690f942618722036ab666025ecb5a8b28b9ec87e2290",
+        "Relay/RelayMain.swift": "4fff4f6cbddeb9d6f98b2d7a18aa63a4ff7dea84e0af8319dd58b3ccd9afc980",
+        "Relay/SDKMailbox.swift": "ab0976810305094100009a3a0268e42e00ae159b312d4a200018fa15008c8ef3",
+        "Relay/main.swift": "3114a96da1ad8da4df184168d651d215e32fdb2518b52d71f3c1202922f4661f"
+      },
+      "target": "arm64-apple-macos12"
+    },
+    "source_unchanged": true
+  },
+  "remaining": [
+    "真实Flutter引擎SupervisorSession握手/业务/并发child退出",
+    "ClashService联合路由及异步消费者限额",
+    "SC系统代理事务与有效账户流量",
+    "Android整包与正式APK",
+    "iOS开发版及发行研究",
+    "其它macOS架构与DeveloperID/公证条件"
+  ],
+  "review": "独立审阅P2清单链接写入已实际红例复现并修复，独立回审闭合；未发现其它明确P1/P2",
+  "schema": 1,
+  "scope": "arm64 helper生产封装、完整Release构建及完整bundle开发签名；不含Flutter新会话运行、SC或发行资格",
+  "seal": {
+    "artifacts": {
+      "BettboxCore": {
+        "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+        "signingmode": "adhoc"
+      },
+      "BettboxCoreSupervisor": {
+        "cdhash": "cd4ebafffac90a9f77cf067aff73717f89050fbf",
+        "identifier": "com.appshub.bettbox.core.supervisor",
+        "schema": 1,
+        "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+        "signingmode": "adhoc"
+      }
+    },
+    "destination": "build/macos-local-candidate/Bettbox.app",
+    "host_cdhash": "d4701d60faed9d0ed3935fb15582874d69fbaf3a",
+    "host_sha256": "c9bc8f696d745cd160df893557dd433fee5607c0dd7846f5aade5de5e2153f6a",
+    "nested_frameworks": 10,
+    "notarized": false,
+    "passed": true,
+    "schema": 1,
+    "scope": "完整bundle开发签名；不证明应用会话、系统代理或发行资格",
+    "signingmode": "adhoc",
+    "source": "build/macos/Build/Products/Release/Bettbox.app"
+  },
+  "source_hashes": {
+    "macos/Runner.xcodeproj/project.pbxproj": "91ff052ebf690c9d52368c4be565466603bb8d9982c8b059c66de7eafa2a6a33",
+    "scripts/macos_supervisor_artifact.py": "0b4fdba385f187a36f79ccade6b8031ce070250da2e52308de6641f41e5ee3f4",
+    "scripts/seal_macos_candidate.py": "ca32b55fe2b1dc2540a27d505367340bb9280e833f0327c7fa21244b064e020c",
+    "scripts/tests/test_macos_supervisor_artifact.py": "4f7bdbc758a924008ea9b0ae3771963dbb315bf1cf9e9e078efa70740edc05cc",
+    "scripts/tests/test_seal_macos_candidate.py": "e021d842665b03da0d8e6bf21929c3b5a81d5c1c3c60a35e46e09f91d564eb73",
+    "scripts/tests/test_validate_desktop.py": "78394c1c8def4afc9af79df2020a4a2dd7e9dbab37d3467a30cad84672b2e512",
+    "scripts/validate_desktop.py": "4ae7982bf886b46406133ecba712f310b0ff7703724dac78d5c3979ca9ce70a6",
+    "setup.dart": "05ef5c07540f1d1c7545d30caf3b8cdb8e7d7642026a0d6b91672df1da2f89a4",
+    "test/setup_macos_identity_test.dart": "949e58b5404a64c170fc6277c3ed010c84815515233919cf3cbb1d968216cb33"
+  },
+  "tests": {
+    "desktop_python": 23,
+    "flutter": 156,
+    "flutter_analyze": "No issues found",
+    "macos_python": 40,
+    "seal_marker_regression": {
+      "after_passed": 9,
+      "before": {
+        "command": "python3 -m unittest discover -s scripts/tests -p test_seal_macos_candidate.py",
+        "exit_code": 1,
+        "failed_test": "test_full_seal_never_follows_existing_marker_link",
+        "failure": "RuntimeError not raised",
+        "red_observed": true,
+        "source_sha256": "643e3a7afffd48e997d2794315d79ef38b5a7793baf8b02bcefd73d0f801097e"
+      }
+    }
+  }
+}
