@@ -35,7 +35,8 @@ func newClient(srcConn net.Conn, tunnel C.Tunnel, additions []inbound.Addition) 
 
 				left, right := N.Pipe()
 
-				go tunnel.HandleTCPConn(inbound.NewHTTP(dstAddr, srcConn, right, additions...))
+				routeConn, routeMetadata := inbound.NewHTTP(dstAddr, srcConn, right, additions...)
+				startHTTPRoute(tunnel, routeConn, routeMetadata)
 
 				return left, nil
 			},

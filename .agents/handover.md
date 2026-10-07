@@ -691,3 +691,34 @@ CMake imported clash声明IMPORTED_NO_SONAME；APK验证动态段虚拟地址/�
 
 ### HLG
 append dry-run再apply，保留真实设备失败、签名失败与已验证范围。
+
+## 2026-10-08T01:31:54+08:00 · macOS专用HTTP入口实际race与Android修复后设备起停
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "macos", "http", "race", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: f3604df652865ad71d8256d8b22ef03b24ad17484a39f77f00187d95a5f0cacd
+
+### Summary
+用户选择先交付Android/macOS，iOS保留开发版研究。ea2aa0a修复动态链接后完整debug与设备服务起停通过；macOS专用HTTP模块完成实际race，发行目标仍活跃。
+
+### Changed
+集成CredentialBlindLoopback与单请求EOF/watcher状态机，两个默认入口共享路由保留兼容；补default CONNECT认证与InUser回归。PDEC登记本机离线CGO1 HTTP race入口。纠正ignored Android lifecycle回执中泛CONNECTED被误当当前状态的字段，公开回执明确尚未确认系统VPN当前状态。
+
+### Validation
+Android APK SHA7e6c4454cc8d16b03392409377e32532b1ba510d2bb4b9d10be9276227b390cf，实际JNI basename libclash.so、源码/锁/清理通过；模拟器启动应用存活、前台VPNService出现，停止后服务退出及计时清除，未验证真实出口。macOS Go1.26.5 Darwin/arm64 CGO1/GOPROXYoff/GOSUMDBoff/read-only mod -race -count1实际通过23函数，包含17MiB上传/下载、CONNECT/Upgrade/pipeline/EOF/停止不足/default CONNECT认证；独立串行审阅无P1/P2，主控复核实际log与hash。
+
+### Next
+Android Go启动状态/FD修复草稿拟稿，currentConfig并发快照前置必须确认；JNI/Kotlin/Dart契约与实际失败路径随后闭合。macOS owned-child pipe草稿独立审阅发现握手超时准入边界P2，施工仅修复草稿；CGO0不能race的报告纠正，尚未实际编译。
+
+### Risks
+HTTP入口未接线宿主/SC，不证明macOS系统代理可用；原root/setuid共享IPC禁止执行。Android订阅过期、OSVPN当前状态/实际节点流量/正式签名包未验收；nil配置锁重入/失败falsepositive与FD责任尚未修复。Apple DeveloperID、真实商户条件及支付/公开发行仍缺失。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、macOS计划、PDEC与两个公开脱敏回执。
+
+### HLG
+标准append先dry-run再apply；不修改已有事实链。

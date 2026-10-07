@@ -99,3 +99,7 @@ macOS 系统代理事务核心位于 `plugins/proxy/macos/Classes/Core/`，通�
 `core/lib_ios.go` 提供不依赖 Dart VM 的有界 C Action RPC、包流输入/输出与生命周期状态。`core/iosbridge` 将裸 IPv4/IPv6 包注入真实 Mihomo gVisor listener；普通 Android/桌面 listener 入口保持原有行为。状态观察不等待生命周期锁，超时不会强制结束尚未完成的内核操作，调用方不能把停止请求或超时当成停止完成。
 
 Runner 与 Packet Tunnel 工程已接入该内核，NE 网络设置、系统状态与受保护 App Group 快照分别实现。arm64 模拟器完整构建、页面导航及7项原生测试通过；真机签名与系统 VPN 尚未验收。Apple Packet Tunnel 用途限制须结合当前规则代理与监听行为核验，工程可编译不作为分发许可证据。
+
+### macOS 专用 HTTP 入口
+
+Mihomo fork 提供 `NewCredentialBlindLoopback`，仅固定本机临时端口，不读取订阅认证配置；保留目标 Authorization，移除代理认证 Header/Trailer，不提供 SOCKS。连接、内部路由与 EOF watcher 纳入所有权，关闭等待不足返回未完成。默认入口认证与 InUser 归属保持兼容。该模块尚未接入宿主或系统代理，不能据此开放原生认证门禁；匿名管道身份与代次验收单独实施。

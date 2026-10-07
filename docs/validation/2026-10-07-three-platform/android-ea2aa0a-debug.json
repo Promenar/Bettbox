@@ -1,0 +1,20 @@
+{
+  "status": "debug-build-and-service-lifecycle-passed",
+  "source_sha": "ea2aa0aae2d6f20bb1d17260d77a34390dcfd1df",
+  "apk_sha256": "7e6c4454cc8d16b03392409377e32532b1ba510d2bb4b9d10be9276227b390cf",
+  "jni_dependency": "libclash.so",
+  "source_and_locks_unchanged": true,
+  "cleanup_verified": true,
+  "device": "Pixel_7 ARM64 Android API36.1",
+  "device_page_size": 4096,
+  "ui_start_stop_and_foreground_service": true,
+  "os_vpn_current_state_verified": false,
+  "traffic_verified": false,
+  "formal_signing_verified": false,
+  "release_usable": false,
+  "limitations": [
+    "系统VPN dumpsys的CONNECTED可能来自历史事件，不能作当前状态证明",
+    "当前模拟器账号订阅已过期",
+    "Android失败路径、FD与状态契约另待修复验收"
+  ]
+}

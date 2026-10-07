@@ -1,0 +1,36 @@
+{
+  "status": "passed-package-fixtures",
+  "base_sha": "ea2aa0aae2d6f20bb1d17260d77a34390dcfd1df",
+  "operation": "test-macos-blind-http",
+  "command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-race",
+    "-count=1",
+    "-timeout=120s",
+    "github.com/metacubex/mihomo/listener/http"
+  ],
+  "toolchain": "go1.26.5 darwin/arm64",
+  "environment": {
+    "CGO_ENABLED": "1",
+    "GOPROXY": "off",
+    "GOSUMDB": "off"
+  },
+  "test_functions": 23,
+  "fixture_network": "仅任务本地loopback/pipe，路由使用虚构fixture，不访问公网或系统代理",
+  "source_sha256": {
+    "core/Clash.Meta/listener/http/credential_blind.go": "0f7c63ead7ca8122d2b498b406ebad19fd02b77194e21633f267211fc32c4674",
+    "core/Clash.Meta/listener/http/credential_blind_legacy_test.go": "495743fd213d9f1305e0229ae45f3623a6f0df0e12df569848cbf0c0f6ed4873",
+    "core/Clash.Meta/listener/http/credential_blind_request.go": "4d434d8314432df996441d611d2fd371e50721d022bfba9517d623c29b705e17",
+    "core/Clash.Meta/listener/http/credential_blind_request_test.go": "6a28e2cea2abd00d96372686b347ad6cf4cd43ef9736f09715a0b6f274728c67",
+    "core/Clash.Meta/listener/http/credential_blind_test.go": "082f72c95147c11a01b012801df18f2785c14f0d7a2220970e0f6d8cbbb89459",
+    "core/Clash.Meta/listener/http/client.go": "9caf76e6821f2b4b4d34df6e423e66ccb5bff924d16b93ac5e7b16d9d5505b65",
+    "core/Clash.Meta/listener/http/upgrade.go": "03c7e7bffbf82bcd01ac619a662b2fcbc15fdf3edd5b0c6fc5cbd0ad707f0f8e"
+  },
+  "log_sha256": "42d1e37f57a44cce314563ee6689ce3897f4b279c2bd80c050b1b799947ee8c0",
+  "host_integrated": false,
+  "system_proxy_changed": false,
+  "vpn_traffic_verified": false,
+  "runtime_release_usable": false
+}

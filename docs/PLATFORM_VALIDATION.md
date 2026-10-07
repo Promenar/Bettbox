@@ -118,3 +118,9 @@ Wrapper启动JAR经官方SHA核对确认原本为2.10，不能执行发行ZIP校
 候选 `748133a` 真实APK通过ARM64范围、全部原生ELF 16KB与zipalign检查，但精确核心SHA拒绝。生成/复制/merged核心字节一致，core库剥离/App剥离/APK为相同转换产物；真实官方NDK llvm-strip --strip-unneeded可精确复现APK核心SHA，排除缓存旧核心。原始核心无debug段和symtab；库与应用仅对libclash.so设置keepDebugSymbols，保持原始字节与精确SHA验收，不放宽校验。12项契约静态回归通过，完整142项工具测试及修复真实构建独立验证。公开回执 `validation/2026-10-07-three-platform/android-748133a.json`；源码/锁文件未变、退出清理通过。
 
 候选 `9d48a29` 调试 APK 完整构建及精确核心 SHA、ARM64/16KB、来源/锁文件与任务清理通过，实际安装到4096页Pixel_7。邀请真实生成、公开注册网页自动预填并锁定邀请码、商店套餐/周期选择通过；未提交新注册或付款。实际启动 VPN 导致 UnsatisfiedLinkError：JNI 的 DT_NEEDED 包含构建绝对路径，产物检查成功不代表设备可用。CMake 对无 SONAME 核心声明 IMPORTED_NO_SONAME，新增动态依赖 basename 与动态段唯一文件映射门禁；旧 APK 被新门禁实际拒绝。正式构建在安全注入前拒绝系统钥匙串0644，未生成发行APK；系统钥匙串权限检查已修复，项目私钥/回执600、证书锚与 ACL 保持。安全注入预检仅输出ready=true，未记录密码。149项工具回归与独立复核通过，修复真实构建及设备启停仍待验收。macOS专用入口请求状态机22个测试函数已独立静态复核，未集成或执行；owned-child匿名管道为可信IPC候选，尚未接线。
+
+### 2026-10-08 Android 启停与 macOS HTTP 实测
+
+Android `ea2aa0a` 完整 debug 构建通过，APK SHA `7e6c4454cc8d16b03392409377e32532b1ba510d2bb4b9d10be9276227b390cf`；JNI 依赖为 basename `libclash.so`，原动态链接启动崩溃未出现。Pixel_7 实际启动后应用存活，VPNService 为前台；停止后服务退出、计时清除。设备页大小4096；系统 VPN dump 中 CONNECTED 可能是事件历史，未证明当前系统 VPN 或真实出口。账号订阅过期，实际节点流量与 Android 失败路径另验。公开回执为 `docs/validation/2026-10-07-three-platform/android-ea2aa0a-debug.json`。
+
+macOS 专用 HTTP 包在 Go1.26.5 Darwin/arm64、只读依赖锁、GOPROXY/GOSUMDB=off、CGO1 下实际执行 -race -count=1，通过23个测试函数；含17MiB流式上传/下载、CONNECT/Upgrade、pipeline/EOF/停止未完成及默认认证响应和InUser归属。公开回执为 `docs/validation/2026-10-07-three-platform/macos-blind-http-race.json`。仅任务loopback/pipe fixture，无公网/系统代理设置；宿主接线、真实服务出口、匿名管道身份、SC事务恢复与发行签名均未由此验证。

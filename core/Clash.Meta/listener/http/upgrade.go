@@ -27,6 +27,15 @@ func isUpgradeRequest(req *http.Request) bool {
 }
 
 func handleUpgrade(conn net.Conn, request *http.Request, tunnel C.Tunnel, additions ...inbound.Addition) {
+	handleUpgradeContext(context.Background(), false, conn, request, tunnel, additions...)
+}
+
+// 专用入口取消时关闭内部pipe；原入口不净化Trailer且维持原行为。
+func handleUpgradeBlindWithContext(ctx context.Context, conn net.Conn, request *http.Request, tunnel C.Tunnel, additions ...inbound.Addition) {
+	handleUpgradeContext(ctx, true, conn, request, tunnel, additions...)
+}
+
+func handleUpgradeContext(ctx context.Context, blind bool, conn net.Conn, request *http.Request, tunnel C.Tunnel, additions ...inbound.Addition) {
 	defer conn.Close()
 
 	removeProxyHeaders(request.Header)
@@ -43,8 +52,11 @@ func handleUpgrade(conn net.Conn, request *http.Request, tunnel C.Tunnel, additi
 	}
 
 	left, right := N.Pipe()
+	stopCancel := context.AfterFunc(ctx, func() { _ = left.Close(); _ = right.Close() })
+	defer stopCancel()
 
-	go tunnel.HandleTCPConn(inbound.NewHTTP(dstAddr, conn, right, additions...))
+	routeConn, routeMetadata := inbound.NewHTTP(dstAddr, conn, right, additions...)
+	startHTTPRoute(tunnel, routeConn, routeMetadata)
 
 	var bufferedLeft *N.BufferedConn
 	if request.TLS != nil {
@@ -77,6 +89,18 @@ func handleUpgrade(conn net.Conn, request *http.Request, tunnel C.Tunnel, additi
 		return
 	}
 
+	if blind {
+		original := resp
+		resp = new(http.Response)
+		*resp = *original
+		resp.Header = original.Header.Clone()
+		resp.Trailer = nil
+		for key := range resp.Header {
+			if blindAuthField(key) || strings.EqualFold(key, "Trailer") {
+				delete(resp.Header, key)
+			}
+		}
+	}
 	removeProxyHeaders(resp.Header)
 
 	err = resp.Write(conn)
