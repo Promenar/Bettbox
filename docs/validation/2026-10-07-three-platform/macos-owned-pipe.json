@@ -1,0 +1,104 @@
+{
+  "status": "passed",
+  "binary_sha256": "f63ff6e25187cee38ac85d3430a1545408a9698aba232a6e8e06695257098f86",
+  "cases": [
+    {
+      "name": "handshake-and-eof",
+      "passed": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "ack_verified": true,
+      "prefilled_bytes": 0,
+      "forced_termination": false,
+      "cleanup_verified": true,
+      "binary_stable": true
+    },
+    {
+      "name": "invalid-first-frame",
+      "passed": true,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "ack_verified": false,
+      "prefilled_bytes": 0,
+      "forced_termination": false,
+      "cleanup_verified": true,
+      "binary_stable": true
+    },
+    {
+      "name": "wrong-generation",
+      "passed": true,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "ack_verified": true,
+      "prefilled_bytes": 0,
+      "forced_termination": false,
+      "cleanup_verified": true,
+      "binary_stable": true
+    },
+    {
+      "name": "full-control-output",
+      "passed": true,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "ack_verified": false,
+      "prefilled_bytes": 65536,
+      "forced_termination": false,
+      "cleanup_verified": true,
+      "binary_stable": true
+    },
+    {
+      "name": "full-log-output",
+      "passed": true,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "ack_verified": true,
+      "prefilled_bytes": 65536,
+      "forced_termination": false,
+      "cleanup_verified": true,
+      "binary_stable": true
+    }
+  ],
+  "valid_business_actions_sent": 0,
+  "wrong_generation_envelopes_sent": 1,
+  "raw_stdout_or_stderr_retained": false,
+  "native_identity_bridge_verified": false,
+  "system_proxy_changed": false,
+  "race_verified": false,
+  "base_sha": "86db402d1eaa098ace2af29dbe923a7dfd72f053",
+  "source_sha256": {
+    "core/main.go": "32d36738d0d40d24287d49b1c34fbe45686c9463451a1b0340ba5bcfd56b63c0",
+    "core/server.go": "6c9343c89f05d09b69d042ad7468a22f9d455d0bf5f7d2ce8a3ae0b57a6c66cb",
+    "core/action.go": "7377bd79f59b1363465274ec7ecc31c28f47500715be729a28201f938bdd1c9f",
+    "core/owned_session.go": "64a872f63bbd2a5d3f4581d4a7ecad8a269cf47cb7aa3f119b5f8261c677e709",
+    "core/owned_session_test.go": "e0d7b1725bf186f0c9ff7df209837c0384eef253923c47beacbe37972b8d8fa9",
+    "core/owned_pipe_darwin.go": "ec6db74b72a02a348303e42dfff9c627b77ba82787dfd763ca13270a29c55881",
+    "core/owned_pipe_darwin_test.go": "fece3a95ab30db48776da511c0af7e497353943675cf2ab1385f6c81dda5ab34",
+    "core/owned_pipe_other.go": "2826bb1c9311c6bed30b19814b949c821234c382a8940ccc3398e79c942c69c7",
+    "core/Clash.Meta/hub/route/restart.go": "2a068d2b5503a8c75d4483918286ad72de10bc0adf9a848869d7b3eafa2273d5",
+    "core/Clash.Meta/hub/route/owned_pipe_guard.go": "1c20180c7357be9f6534e4439eb87e3a1c481e4c9a6f5d16e746bc1510992d50",
+    "scripts/check_macos_owned_process.py": "2e388478c65f823fe5ba034b3c375708bb227e65d5ccd57cea11fa417442c7e3",
+    "scripts/tests/test_macos_owned_process.py": "f76c58a20ff43c8ddde02c724b4753452f7209a36d2b53d461e59ca9e6baa986"
+  },
+  "protocol_test_functions": 21,
+  "protocol_test_command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-count=1",
+    "-timeout=120s",
+    "-tags",
+    "with_gvisor",
+    "."
+  ],
+  "toolchain": "go1.26.5 darwin/arm64 CGO0",
+  "protocol_test_log_sha256": "0c1f29d0f0fab3e1d72c58207fe0879428edd64e5b68b6a2ca716268080d1780",
+  "limits": [
+    "无race证据",
+    "满stderr只证明无业务动作的当前启动/握手/退出，不证明活跃业务日志背压",
+    "未核验宿主身份桥接/同UID注入/初始化exec FD继承/SC恢复",
+    "未发送有效业务动作，错误代次在dispatch前拒绝",
+    "未接入Dart和系统代理，不是可用发行版"
+  ],
+  "tool_regressions": 4,
+  "artifact_binding": "每次启动前后核对预期SHA、dev/ino/size/mtime；清理异常记录失败，执行前撤销旧passed回执；不替代原生exec身份桥接"
+}

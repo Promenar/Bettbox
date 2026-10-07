@@ -25,6 +25,12 @@ func restartRouter() http.Handler {
 }
 
 func restart(w http.ResponseWriter, r *http.Request) {
+	// 专用会话在响应、读取路径和shutdown之前拒绝内部重启。
+	if ownedPipeMode.Load() {
+		render.Status(r, http.StatusForbidden)
+		render.JSON(w, r, newError("专用控制会话禁止内部重启"))
+		return
+	}
 	// modify from https://github.com/AdguardTeam/AdGuardHome/blob/595484e0b3fb4c457f9bb727a6b94faa78a66c5f/internal/home/controlupdate.go#L108
 	execPath, err := os.Executable()
 	if err != nil {
@@ -46,6 +52,9 @@ func restart(w http.ResponseWriter, r *http.Request) {
 }
 
 func restartExecutable(execPath string) {
+	if ownedPipeMode.Load() {
+		return
+	}
 	var err error
 	executor.Shutdown()
 	if runtime.GOOS == "windows" {

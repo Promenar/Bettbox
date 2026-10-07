@@ -42,3 +42,11 @@
 文件所有权：主控串行集成 core/Clash.Meta/listener/http/credential_blind*.go、client.go、upgrade.go；不接线系统代理、不修改用户网络设置。独立静态审阅无阻断项，实际测试结果单独记录。匿名管道与 Android 启动状态另属独立工作包，不在本入口中放宽信任门禁。
 
 验收：Go 本机执行只读依赖锁、禁用依赖网络的 -race -count=1 HTTP 包测试，覆盖流式大上传/下载、CONNECT、Upgrade、pipeline、EOF、关闭未完成和认证隔离。失败先定位 fixture 或生产实现原因；实际可用与系统代理恢复仍须后续原生集成。回滚仅删除新增入口并还原两个现有文件的本任务补丁。
+
+## owned-child 匿名管道 Go 入口
+
+宿主直接持有 Process.start(normal) 的唯一子进程，使用 stdin/stdout 匿名管道。Go 专用参数 --owned-pipe-v1 仅 Darwin非cgo，标准日志转stderr，控制FD必须为FIFO并核验CLOEXEC。首帧严格HELLO/ACK、4KiB、协议1、正整数代次和共享单调5秒期限；后续10MiB帧绑定代次，解析或发送失败撤销，旧结果不得转交新进程，内部restart在副作用前拒绝。旧UDS/TCP格式保持兼容。
+
+主控所有权：core main/server/action、owned_session/owned_pipe及fixture；Mihomo route restart/owned_pipe_guard。独立审阅两项P2已在候选源码闭合：绝对截止时间必须在ready准入前核对；CGO0普通测试不可标为race。验收先执行离线只读依赖的CGO0普通包测试及route编译；真实产物首帧、满内核管道和exitCode另以captured child验收。宿主身份桥接、Dart代次与SC事务尚未接线，不开放原共享IPC或root/setuid执行。
+
+Go逻辑撤销不等待writer/Close，不代表旧业务合作退出；宿主只有观察真实exitCode后才能宣布停止。真实子进程测试不读用户配置/凭据、不发业务动作、不启用系统代理/TUN，stdout/stderr原文不保留。回滚限定本工作包文件，不覆盖其它平台变更。

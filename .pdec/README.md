@@ -69,3 +69,7 @@ Go核心在库与App打包中保持原始字节；AGP默认strip转换已真实�
 Android APK 门禁还核验动态段地址与文件范围一致、依赖 basename 及 JNI 的 libclash.so 依赖。项目签名文件保持0600，系统钥匙串接受同UID、禁止他人写入的现有权限；安全读取不修改系统ACL。实际149项工具测试通过，设备与正式构建另验。
 
 2026-10-08：test-macos-blind-http 在本机执行新专用 HTTP 包的 -race 测试，固定只读依赖锁及离线依赖缓存；不启用系统代理、不修改网络设置。用户三端开发授权覆盖该 Apple 本机操作，入口失败不扩大网络权限。
+
+2026-10-08：test-macos-owned-pipe 按现有 !cgo 生产tags本机CGO0编译与普通协议fixture验收，离线只读依赖。该命令不使用-race（工具链要求CGO1），不证明宿主身份、内核管道背压或实际退出。
+
+macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内核管道，不读取用户配置或注入认证；仅终止captured child并wait。正式宿主身份接线、业务路由、系统代理与发行签名单独验收。

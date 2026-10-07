@@ -14,13 +14,21 @@ import (
 )
 
 var (
-	conn   net.Conn
-	connMu sync.Mutex
+	conn           io.ReadWriteCloser
+	ownedBroadcast func([]byte)
+	connMu         sync.Mutex
 )
 
 func (result ActionResult) send() {
 	data, err := result.Json()
 	if err != nil {
+		if result.ownedSend != nil {
+			result.ownedSend(nil)
+		}
+		return
+	}
+	if result.ownedSend != nil {
+		result.ownedSend(data)
 		return
 	}
 	send(data)
@@ -38,8 +46,20 @@ func writeFrame(w io.Writer, data []byte) error {
 	frame := make([]byte, 4+len(data))
 	binary.LittleEndian.PutUint32(frame, uint32(len(data)))
 	copy(frame[4:], data)
-	_, err := w.Write(frame)
-	return err
+	for len(frame) > 0 {
+		n, err := w.Write(frame)
+		if n < 0 || n > len(frame) {
+			return io.ErrShortWrite
+		}
+		frame = frame[n:]
+		if err != nil {
+			return err
+		}
+		if n == 0 {
+			return io.ErrNoProgress
+		}
+	}
+	return nil
 }
 
 func readFrame(r io.Reader) ([]byte, error) {
@@ -61,11 +81,17 @@ func readFrame(r io.Reader) ([]byte, error) {
 }
 
 func send(data []byte) {
+	connMu.Lock()
+	if ownedBroadcast != nil {
+		sender := ownedBroadcast
+		connMu.Unlock()
+		sender(data)
+		return
+	}
+	defer connMu.Unlock()
 	if conn == nil {
 		return
 	}
-	connMu.Lock()
-	defer connMu.Unlock()
 	if err := writeFrame(conn, data); err != nil {
 		logError("send error: %v", err)
 	}

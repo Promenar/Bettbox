@@ -124,3 +124,5 @@ Wrapper启动JAR经官方SHA核对确认原本为2.10，不能执行发行ZIP校
 Android `ea2aa0a` 完整 debug 构建通过，APK SHA `7e6c4454cc8d16b03392409377e32532b1ba510d2bb4b9d10be9276227b390cf`；JNI 依赖为 basename `libclash.so`，原动态链接启动崩溃未出现。Pixel_7 实际启动后应用存活，VPNService 为前台；停止后服务退出、计时清除。设备页大小4096；系统 VPN dump 中 CONNECTED 可能是事件历史，未证明当前系统 VPN 或真实出口。账号订阅过期，实际节点流量与 Android 失败路径另验。公开回执为 `docs/validation/2026-10-07-three-platform/android-ea2aa0a-debug.json`。
 
 macOS 专用 HTTP 包在 Go1.26.5 Darwin/arm64、只读依赖锁、GOPROXY/GOSUMDB=off、CGO1 下实际执行 -race -count=1，通过23个测试函数；含17MiB流式上传/下载、CONNECT/Upgrade、pipeline/EOF/停止未完成及默认认证响应和InUser归属。公开回执为 `docs/validation/2026-10-07-three-platform/macos-blind-http-race.json`。仅任务loopback/pipe fixture，无公网/系统代理设置；宿主接线、真实服务出口、匿名管道身份、SC事务恢复与发行签名均未由此验证。
+
+macOS owned-child Go入口实际CGO0普通包测试21函数通过，无race证据；生成真实生产入口fixture产物SHA `f63ff6e25187cee38ac85d3430a1545408a9698aba232a6e8e06695257098f86`。`scripts/check_macos_owned_process.py` 五种真实child场景通过，正常首帧/EOF、错误首帧、错误代次、预填65536字节stdout和stderr均自然退出，未强制终止；无有效业务动作、不保留原始标准流、不修改系统代理。满stderr场景仅证明当前初始化/握手/退出，不是活跃业务日志背压验收；宿主身份桥接、初始化exec FD继承与Dart/SC接线另验。公开回执 `docs/validation/2026-10-07-three-platform/macos-owned-pipe.json`。

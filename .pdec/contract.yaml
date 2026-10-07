@@ -547,6 +547,78 @@
       "timeout_seconds": 300,
       "artifacts": [],
       "verification": "本机Darwin HTTP/CONNECT fixture与race；GOPROXY=off/GOSUMDB=off，CGO=1仅race工具链，不改系统网络，不接线宿主/SC；依赖使用已验证缓存"
+    },
+    "test-macos-owned-pipe": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=120s",
+        "-tags",
+        "with_gvisor",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "CGO0 Darwin真实生产适配器与内存/os.Pipe fixture编译测试，GOPROXY/GOSUMDBoff，只读mod；不代表race或宿主身份/系统代理验收"
+    },
+    "build-macos-owned-fixture": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-tags",
+        "with_gvisor",
+        "-o",
+        "../.test/three-platform-release/core-owned-process",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 300,
+      "artifacts": [
+        ".test/three-platform-release/core-owned-process"
+      ],
+      "verification": "CGO0/GOPROXYoff/GOSUMDBoff本机生产Go入口，仅协议fixture产物，无发行签名或系统代理"
+    },
+    "check-macos-owned-process": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_macos_owned_process.py",
+        "--expected-sha256",
+        "f63ff6e25187cee38ac85d3430a1545408a9698aba232a6e8e06695257098f86"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/three-platform-release/macos-owned-process.json"
+      ],
+      "verification": "固定任务binary真实captured child，公开HELLO/ACK/EOF/错误代次、满stdout/stderr内核管道；无有效业务动作或凭据，不改系统代理，实际exitCode收束"
+    },
+    "test-macos-owned-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "scripts.tests.test_macos_owned_process"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [],
+      "verification": "公开临时文件与mock验证产物字节/身份漂移、清理异常收束与旧passed回执撤销，不启动真实进程"
     }
   },
   "deployment": {
@@ -618,7 +690,19 @@
     "core/Clash.Meta/listener/http/upgrade.go": "03c7e7bffbf82bcd01ac619a662b2fcbc15fdf3edd5b0c6fc5cbd0ad707f0f8e",
     "core/Clash.Meta/listener/http/client.go": "9caf76e6821f2b4b4d34df6e423e66ccb5bff924d16b93ac5e7b16d9d5505b65",
     "core/Clash.Meta/listener/http/credential_blind_request.go": "4d434d8314432df996441d611d2fd371e50721d022bfba9517d623c29b705e17",
-    "core/Clash.Meta/listener/http/credential_blind_legacy_test.go": "495743fd213d9f1305e0229ae45f3623a6f0df0e12df569848cbf0c0f6ed4873"
+    "core/Clash.Meta/listener/http/credential_blind_legacy_test.go": "495743fd213d9f1305e0229ae45f3623a6f0df0e12df569848cbf0c0f6ed4873",
+    "core/server.go": "6c9343c89f05d09b69d042ad7468a22f9d455d0bf5f7d2ce8a3ae0b57a6c66cb",
+    "core/action.go": "7377bd79f59b1363465274ec7ecc31c28f47500715be729a28201f938bdd1c9f",
+    "core/owned_pipe_other.go": "2826bb1c9311c6bed30b19814b949c821234c382a8940ccc3398e79c942c69c7",
+    "core/owned_session_test.go": "e0d7b1725bf186f0c9ff7df209837c0384eef253923c47beacbe37972b8d8fa9",
+    "core/owned_pipe_darwin_test.go": "fece3a95ab30db48776da511c0af7e497353943675cf2ab1385f6c81dda5ab34",
+    "core/owned_session.go": "64a872f63bbd2a5d3f4581d4a7ecad8a269cf47cb7aa3f119b5f8261c677e709",
+    "core/owned_pipe_darwin.go": "ec6db74b72a02a348303e42dfff9c627b77ba82787dfd763ca13270a29c55881",
+    "core/main.go": "32d36738d0d40d24287d49b1c34fbe45686c9463451a1b0340ba5bcfd56b63c0",
+    "core/Clash.Meta/hub/route/restart.go": "2a068d2b5503a8c75d4483918286ad72de10bc0adf9a848869d7b3eafa2273d5",
+    "core/Clash.Meta/hub/route/owned_pipe_guard.go": "1c20180c7357be9f6534e4439eb87e3a1c481e4c9a6f5d16e746bc1510992d50",
+    "scripts/check_macos_owned_process.py": "2e388478c65f823fe5ba034b3c375708bb227e65d5ccd57cea11fa417442c7e3",
+    "scripts/tests/test_macos_owned_process.py": "f76c58a20ff43c8ddde02c724b4753452f7209a36d2b53d461e59ca9e6baa986"
   },
   "platform_extensions": {
     "android": {
@@ -655,6 +739,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "7c556a7bb87f8d0d8996e53603a02ff55923332b86350c8e3dd76afb446866ee"
+    "contract_digest": "dd9e29f19d626c6de472a721ca26bc0bbc64c5d8b7f13d866a59e6a97b6e4c5d"
   }
 }

@@ -1,4 +1,6 @@
 ## 2026-10-08
+- 增加macOS owned-child Go匿名管道入口、单调握手期限与代次隔离；21项普通协议测试及5项真实child退出fixture通过，原生身份和Dart/系统代理接线尚未完成。
+
 
 - 新增 macOS 专用无代理凭据解析 HTTP/CONNECT 入口与23项实际race测试，包含大文件、EOF、pipeline、停止证据及默认入口认证回归；宿主与系统代理尚未接线。
 - Android ea2aa0a 调试APK动态依赖与模拟器起停通过；真实流量和失败路径单独验收，未标记发行可用。

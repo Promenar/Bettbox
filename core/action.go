@@ -13,6 +13,9 @@ type Action struct {
 }
 
 type ActionResult struct {
+	// 仅owned请求携带绑定的发送函数；不会进入JSON。
+	ownedSend func([]byte)
+
 	Id     string      `json:"id"`
 	Method Method      `json:"method"`
 	Data   interface{} `json:"data"`

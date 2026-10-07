@@ -722,3 +722,34 @@ HTTP入口未接线宿主/SC，不证明macOS系统代理可用；原root/setuid
 
 ### HLG
 标准append先dry-run再apply；不修改已有事实链。
+
+## 2026-10-08T01:44:45+08:00 · macOS owned-child Go入口与真实匿名管道退出验收
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["macos", "ipc", "owned-child", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 49a4574146d866a04a0feeb37a9028acdab54a4e639a3dc3edb61f7afda5bbba
+
+### Summary
+Android/macOS发行目标活跃，iOS开发研究。macOS Go owned-child入口实际集成并编译，协议及真实captured child公开fixture通过，不是应用发行完成。
+
+### Changed
+Darwin !cgo専用--owned-pipe-v1、FIFO+CLOEXEC、stdout保存和日志stderr、严格HELLO/ACK共享单调期限、代次结果、发送失败撤销及内部restart前置拒绝，旧UDS/TCP兼容。新增真实child脚本外部SHA+文件身份绑定、每次启动前后复核、独立失败清理和旧passed撤销。
+
+### Validation
+Go1.26.5 Darwin/arm64 CGO0离线只读依赖普通test21函数通过；无race证据。真实core fixture SHA f63ff6e25187cee38ac85d3430a1545408a9698aba232a6e8e06695257098f86。5种实际child正常/错误首帧/错误代次/满stdout/满stderr公开fixture自然退出，code符合预期；4个工具回归通过。独立审阅握手超时P2、脚本产物绑定P2及异常清理P2已闭合，实际重跑5场景source stable/cleanup verified。
+
+### Next
+实现可信产物/native child身份桥接、Dart唯一Process/代次与SC事务接线后再做系统代理全路径。Android启动候选fd0兼容P1已在草稿修复、独立复核，9fixture未运行；先修State共享读写和回调关闭等待图，再JNI/Kotlin/Dart truthful completion/FD/GlobalRef链。
+
+### Risks
+满stderr只是无业务动作的当前初始化/握手/EOF路径，不代表活跃业务日志背压；同UID并发exec身份、初始化exec FD继承、native bridge与整个App未验证。没有有效业务动作、系统代理/TUN/用户凭据；不执行原共享IPC/root/setuid。Android正式APK/失败路径/真实出口与macOS签名/实际代理、真实支付未验收。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、macOS计划、PDEC、公开脱敏回执。
+
+### HLG
+标准append dry-run再apply，保留完整真实与未验证边界。
