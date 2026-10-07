@@ -14,6 +14,7 @@ import macos_core_identity as identity
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path("build/macos/Build/Products/Release/Bettbox.app")
 DESTINATION = Path("build/macos-local-candidate/Bettbox.app")
+PROBE_DESTINATION = Path("build/macos-flutter-supervisor/Bettbox.app")
 ENV = {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}
 MAGIC = {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca", b"\xca\xfe\xba\xbf", b"\xbf\xba\xfe\xca"}
 
@@ -99,8 +100,10 @@ def artifact(app, name, identifier):
     return fields
 
 
-def seal(root=ROOT):
-    source = root / SOURCE; destination = root / DESTINATION
+def seal(root=ROOT, destination_relative=DESTINATION):
+    if destination_relative not in (DESTINATION, PROBE_DESTINATION):
+        raise RuntimeError("候选目标目录不符")
+    source = root / SOURCE; destination = root / destination_relative
     checked_tree(source)
     # build父目录必须是项目内实际目录；不覆盖既有候选。
     identity.public_parents(root, source.parent)
@@ -132,8 +135,11 @@ def seal(root=ROOT):
     info = plistlib.loads((destination / "Contents/Info.plist").read_bytes())
     if info.get("CFBundleIdentifier") != "com.appshub.bettbox" or info.get("CFBundleExecutable") != "Bettbox":
         raise RuntimeError("宿主固定bundle身份不符")
-    tool(["/usr/bin/codesign", "--force", "--sign", "-", "--identifier", "com.appshub.bettbox",
-          "--entitlements", str(root / "macos/Runner/Release.entitlements"), str(destination)])
+    host_argv = ["/usr/bin/codesign", "--force", "--sign", "-", "--identifier", "com.appshub.bettbox"]
+    # 探针不使用账户或钥匙串；ad hoc宿主不能携带受限钥匙串权利。
+    if destination_relative != PROBE_DESTINATION:
+        host_argv += ["--entitlements", str(root / "macos/Runner/Release.entitlements")]
+    tool(host_argv + [str(destination)])
     tool(["/usr/bin/codesign", "--verify", "--deep", "--strict", str(destination)])
     host_signature = tool(["/usr/bin/codesign", "-d", "--verbose=4", str(destination)]).stderr.decode("utf-8", errors="strict")
     if [line for line in host_signature.splitlines() if line.startswith("Identifier=")] != ["Identifier=com.appshub.bettbox"]:
@@ -149,18 +155,22 @@ def seal(root=ROOT):
     if after != baseline or source_after != baseline or digest(source / "Contents/MacOS/Bettbox") != source_host:
         raise RuntimeError("签名期间固定产物或原宿主漂移")
     report = {"schema": 1, "passed": True, "signingmode": "adhoc", "notarized": False,
-              "source": SOURCE.as_posix(), "destination": DESTINATION.as_posix(),
+              "source": SOURCE.as_posix(), "destination": destination_relative.as_posix(),
               "nested_frameworks": len(frameworks), "artifacts": after,
               "host_sha256": digest(destination / "Contents/MacOS/Bettbox"),
               "host_cdhash": host_identity["cdhash"],
+              "entitlement_profile": "probe-none" if destination_relative == PROBE_DESTINATION else "release",
               "scope": "完整bundle开发签名；不证明应用会话、系统代理或发行资格"}
     publish_report(destination.parent, report)
     return report
 
 
 if __name__ == "__main__":
-    argparse.ArgumentParser(description="固定本机macOS候选开发签名").parse_args()
+    parser = argparse.ArgumentParser(description="固定本机macOS候选开发签名")
+    parser.add_argument("--probe", action="store_true")
+    arguments = parser.parse_args()
     try:
-        seal(); print("MACOS_CANDIDATE_SEAL_PASS")
+        seal(destination_relative=PROBE_DESTINATION if arguments.probe else DESTINATION)
+        print("MACOS_CANDIDATE_SEAL_PASS")
     except (RuntimeError, OSError, ValueError, subprocess.SubprocessError):
         print("MACOS_CANDIDATE_SEAL_FAIL"); raise SystemExit(1)

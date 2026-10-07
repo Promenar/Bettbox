@@ -164,3 +164,7 @@ macOS supervisor原生模块已纳入 `macos/CoreSupervisor`，当前SDK真实�
 Runner完整Release构建通过，宿主签名关闭，源码与依赖锁均未漂移；Core签名与bundle清单一致。首轮编译成功但因构建中清理空白导致源码漂移被拒绝，冻结后重建通过。宿主未签名且未封装helper，不作为可用发行包或运行身份链证据。
 
 2026-10-08 helper封装：固定arm64生产helper及canonical清单通过SDK编译/签名，源快照前后相等；Xcode复制后源/bundle两个产物及身份核对通过。完整Release构建源码及锁未漂移；独立候选完整开发签名通过，10个framework与最终宿主嵌套严格验签通过，Core/helper签后字节未改变。40项macOS Python、23项桌面Python、156项Flutter和静态分析通过。seal成功清单链接写入经实际红例复现，修后完整流程9测试及独立回审通过。候选仅ad hoc，不是DeveloperID/公证发行；尚未运行完整Flutter新会话或SC，不能称为可用发行版本。共享setup限制已验证arm64，其他架构须独立验收。回执：`validation/2026-10-07-three-platform/macos-helper-bundle-validation.json`。
+
+真实Flutter探针入口为 `integration_test/macos_supervisor_probe.dart`，通过生产MethodChannel、Session、helper与固定真实Go Core连续完成两代getIsInit。每代16个公开true子进程分别确认exit和双管道EOF；Session停止确认helper exit0、控制EOF与native出生消失，最终宿主exit0。未确认所有者保留且禁止新代次。驱动明确冻结两个探针输入摘要，独立签名候选只用于探针，正常App按完整文件摘要恢复。50项macOS工具测试、158项Flutter测试与静态分析通过；回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。
+
+探针ad hoc签名不携带entitlements，不加载账户、配置或系统代理。正常候选保留Release钥匙串权利；实际系统AMFI曾拒绝带受限entitlements的ad hoc探针，即使严格验签通过。ClashService、SC事务、Keychain冷启动及有效订阅流量尚待联合验收；完整可分发应用尚未交付。

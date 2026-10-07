@@ -32,4 +32,8 @@ relay使用nonblocking poll，每次读取只填当前帧所需字节；stdout�
 
 Runner工程已纳入Host/Identity源码及固定通道，真实Go Core与生产helper/native host独立进程链已验证；helper打包与最终宿主开发签名已验收；ClashService路由及SC消费尚未接入。应用验证需在相同冻结版本确认完整签名seal、真实动作/结果、IOSink背压与退出、系统代理事务和账户有效流量。Android继续整包JNI/Service/配置所有者接线与正式APK验收；iOS保留开发版及发行方案研究。
 
-封装验收：生产helper快照编译、签后FD核验、Xcode复制和最终bundle源/锁一致通过；Core/helper先签与清单绑定，10个framework及宿主开发seal按内到外完成。成功清单链接写入红例失败后修复为排他no-follow发布并经独立回审。下一关键路径为真实Flutter引擎Session、并发Dart child退出及完整ClashService/SC路由；不以整包签名代替运行证据。
+封装验收：生产helper快照编译、签后FD核验、Xcode复制和最终bundle源/锁一致通过；Core/helper先签与清单绑定，10个framework及宿主开发seal按内到外完成。成功清单链接写入红例失败后修复为排他no-follow发布并经独立回审。下一关键路径为完整ClashService/SC路由与安全存储签名；不以整包签名代替运行证据。
+
+真实Flutter探针入口为 `integration_test/macos_supervisor_probe.dart`，通过生产MethodChannel、Session、helper与固定真实Go Core连续完成两代getIsInit。每代16个公开true子进程分别确认exit和双管道EOF；Session停止确认helper exit0、控制EOF与native出生消失，最终宿主exit0。未确认所有者保留且禁止新代次。驱动明确冻结两个探针输入摘要，独立签名候选只用于探针，正常App按完整文件摘要恢复。50项macOS工具测试、158项Flutter测试与静态分析通过；回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。
+
+探针ad hoc签名不携带entitlements，不加载账户、配置或系统代理。正常候选保留Release钥匙串权利；实际系统AMFI曾拒绝带受限entitlements的ad hoc探针，即使严格验签通过。ClashService、SC事务、Keychain冷启动及有效订阅流量尚待联合验收；完整可分发应用尚未交付。

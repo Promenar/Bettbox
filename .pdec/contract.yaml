@@ -903,6 +903,27 @@
         "build/macos-local-candidate/seal.json"
       ],
       "verification": "本机固定arm64生产helper/嵌套bundle开发adhoc身份验证；不发布、不公证、不启动系统代理"
+    },
+    "probe-macos-flutter-supervisor": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_macos_flutter_supervisor.py",
+        "--output-name",
+        "run-20261008-engine",
+        "run-20261008-engine-entitlements",
+        "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+        "--expected-helper-sha256",
+        "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 1050,
+      "artifacts": [
+        ".test/three-platform-release/macos-flutter-supervisor/run-20261008-engine-entitlements/RESULT.json",
+        "build/macos-flutter-supervisor/Bettbox.app"
+      ]
     }
   },
   "deployment": {
@@ -1062,9 +1083,14 @@
     "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py": "c93f39325fb30cd4b38bf24b22535a5f694f4a7f7f7525bf6e46e821e3c7f06c",
     "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1",
     "scripts/macos_supervisor_artifact.py": "0b4fdba385f187a36f79ccade6b8031ce070250da2e52308de6641f41e5ee3f4",
-    "scripts/seal_macos_candidate.py": "ca32b55fe2b1dc2540a27d505367340bb9280e833f0327c7fa21244b064e020c",
+    "scripts/seal_macos_candidate.py": "769631ad70e0816cf3592ffd9bf4aed6f5700ae63809a09960e2da356e11b53d",
     "scripts/tests/test_macos_supervisor_artifact.py": "4f7bdbc758a924008ea9b0ae3771963dbb315bf1cf9e9e078efa70740edc05cc",
-    "scripts/tests/test_seal_macos_candidate.py": "e021d842665b03da0d8e6bf21929c3b5a81d5c1c3c60a35e46e09f91d564eb73"
+    "scripts/tests/test_seal_macos_candidate.py": "88ce12c96f7df792a4f166c4111c652e086854d8b2535382497e81f95387488d",
+    "scripts/check_macos_flutter_supervisor.py": "2273e582a54a4bab5b4f485628c83f441c05e0590037397debf812de1432bb28",
+    "scripts/tests/test_macos_flutter_supervisor.py": "0c716db1caf247daeaff971a4c517ffa87f7026a8e3270a357b10600d1f46062",
+    "integration_test/macos_supervisor_probe.dart": "16b9be905360033f18bf7cf96b21590b5d65d88386fa420146a7d0ff22b8b7fd",
+    "integration_test/probe_contract.dart": "2b224770259d6ea055380d41410e1c2a90d992cff76925ad5c3459f53457bb90",
+    "test/probe_contract_test.dart": "366fef79d952be639192601811e639f5d2ab996fcad2160c26b3b7b32c67805e"
   },
   "platform_extensions": {
     "android": {
@@ -1101,6 +1127,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "6895a0198039c0cee7e4e0a70295e6f20f61652e4695b7b382e3abfae44f87bb"
+    "contract_digest": "c3b3796f4542663dae78a5973ebae6a8c209873ad4ec9bb6b04a52a030600181"
   }
 }

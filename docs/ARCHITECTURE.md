@@ -146,6 +146,10 @@ StopListenerChecked使用各资源真实重建锁，覆盖ordinary、inbound和T
 
 `scripts/check_macos_supervisor.py` 编译实际生产helper并运行身份/owner/relay/host验证。公开签名夹具通过真实宿主ABI和生产helper交换framed消息并确认停止；它的Core不是Mihomo，也不验证完整Flutter应用或系统代理。来源和实际执行证据见 `validation/2026-10-07-three-platform/macos-supervisor-integration-validation.json`。
 
-真实Mihomo专用入口已与生产helper/native host完成签名身份链、HELLO/ACK、`getIsInit`及EOF退出验证，native确认本代出生消失；这项独立App验证不覆盖完整Flutter会话或业务流量。回执为 `validation/2026-10-07-three-platform/macos-runner-real-go-validation.json`。
+真实Mihomo专用入口已与生产helper/native host完成签名身份链、HELLO/ACK、`getIsInit`及EOF退出验证，native确认本代出生消失；这项独立App验证不覆盖应用主流程或业务流量。回执为 `validation/2026-10-07-three-platform/macos-runner-real-go-validation.json`。
 
 macOS arm64生产helper通过当前SDK编译、固定ad hoc签名后复制入App，复制阶段不重签；源/bundle字节与清单/公开签名共同核验。本机候选封装先签嵌套叶级Mach-O与framework，最终签宿主并严格核验完整bundle，保留unsigned源App作为构建证据。候选位于 `build/macos-local-candidate/Bettbox.app`，不是DeveloperID或公证发行；共享setup只允许已验证arm64，使用锁定Pod依赖并准备helper。
+
+真实Flutter探针入口为 `integration_test/macos_supervisor_probe.dart`，通过生产MethodChannel、Session、helper与固定真实Go Core连续完成两代getIsInit。每代16个公开true子进程分别确认exit和双管道EOF；Session停止确认helper exit0、控制EOF与native出生消失，最终宿主exit0。未确认所有者保留且禁止新代次。驱动明确冻结两个探针输入摘要，独立签名候选只用于探针，正常App按完整文件摘要恢复。50项macOS工具测试、158项Flutter测试与静态分析通过；回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。
+
+探针ad hoc签名不携带entitlements，不加载账户、配置或系统代理。正常候选保留Release钥匙串权利；实际系统AMFI曾拒绝带受限entitlements的ad hoc探针，即使严格验签通过。ClashService、SC事务、Keychain冷启动及有效订阅流量尚待联合验收；完整可分发应用尚未交付。

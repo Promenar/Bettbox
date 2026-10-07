@@ -126,5 +126,23 @@ class AdmissionTests(unittest.TestCase):
             self.assertTrue(marker["passed"])
             self.assertEqual((source / "Contents/MacOS/Bettbox").read_bytes(), original)
 
+    def test_probe_only_omits_restricted_entitlement(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.source_bundle(root)
+            with patch.object(seal, "tool", side_effect=self.fake_signer) as tool:
+                report = seal.seal(root, seal.PROBE_DESTINATION)
+            host_calls = [call.args[0] for call in tool.call_args_list
+                          if "--identifier" in call.args[0]]
+            self.assertEqual(len(host_calls), 1)
+            self.assertNotIn("--entitlements", host_calls[0])
+            self.assertEqual(report["entitlement_profile"], "probe-none")
+
+    def test_arbitrary_candidate_destination_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.source_bundle(root)
+            with patch.object(seal, "tool") as tool:
+                with self.assertRaises(RuntimeError): seal.seal(root, Path("build/arbitrary.app"))
+                tool.assert_not_called()
+
 
 if __name__ == "__main__": unittest.main()

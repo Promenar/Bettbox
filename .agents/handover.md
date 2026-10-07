@@ -1125,3 +1125,34 @@ Android/macOS优先交付，iOS保留开发版与发行研究。macOS生产helpe
 
 ### HLG
 通过Skill append dry-run/apply追加并重建索引，Goal维持active。
+
+## 2026-10-08T07:15:22+08:00 · macOS真实Flutter两代生产会话及并发child退出验收
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["release", "supervisor", "flutter", "signing"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 83248e8a9a1da4d71cb493f217c032c9ee9dffcfdf8645d35c3a42247e60aff0
+
+### Summary
+Android/macOS优先交付，iOS保留开发版及发行研究。真实Flutter独立入口经生产MethodChannel/Session/helper/Go Core完成两代getIsInit与32个公开child退出，未交付完整可用发行。
+
+### Changed
+新增独立探针、严格五键回包与固定标记解析器、真实构建/运行驱动；正常App完整摘要恢复、两个探针输入目录FD无链接冻结。探针独立固定签名目标不携带entitlements，正常候选保留Release钥匙串权利。未改变系统代理、账户、生产服务或.video_agent。
+
+### Validation
+158项Flutter全量测试、Flutter analyze No issues found、50项macOS工具测试通过。实际两代READY/RESULT/STOP与唯一PASS、宿主exit0；32个child逐个exit与双EOF，native确认Core出生消失。source/locks/probe-inputs/original-restored均true，检查probe路径进程0。独立审阅P2未跟踪输入漂移缺口已修复并回审；探针entitlement最小修复范围回审通过。回执 docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json。
+
+### Next
+接入ClashService与有界结果消费者、原生SC事务；验证正式应用Keychain签名冷启动。Android JNI/Service/config所有者与正式APK、有效订阅流量继续；iOS开发版和发行研究。
+
+### Risks
+首个带Release权利ad hoc探针严格验签通过但host第一标记前exit-9，AMFI日志确认adhoc signed及restricted entitlements；仅探针省略权利后运行通过。正常candidate仍非已验收可启动发行版，无DeveloperID/公证。未验证ClashService、SC、账户有效流量或真实资金；Apple团队、有效订阅、支付商商户门店及安全注入仍需外部条件。
+
+### DIA
+已同步架构、平台验收、模块README、CHANGELOG、PDEC说明、registry与实施计划及公开回执。
+
+### HLG
+以结构化append dry-run/apply追加；目标保持active，待后续主流程与平台交付。

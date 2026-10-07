@@ -1,5 +1,12 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — macOS真实Flutter会话验证
+
+- 新增独立Flutter探针，真实生产helper/Go Core连续两代getIsInit与32个公开child退出验收通过；正常App、源码和锁保持一致。
+- 独立审阅闭合未跟踪探针输入摘要缺口，新增严格标记与链接/漂移回归。
+- 系统AMFI拒绝带受限entitlements的ad hoc探针；仅探针签名省略权利，正常应用Keychain和发行签名独立验收。
+
+
 ## 2026-10-08
 
 - 将arm64生产helper及身份清单接入Xcode和共享构建入口；完整Release构建、10个framework与宿主最终开发签名/嵌套严格验签通过。成功清单链接写入缺口已建立红例并修复；40项macOS工具、23项桌面工具及156项Flutter测试、静态分析通过。完整Flutter新会话、系统代理及发行资格另验。

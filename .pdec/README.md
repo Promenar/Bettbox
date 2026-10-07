@@ -95,4 +95,6 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 
 `test-supervisor-real-go` 使用固定任务产物及预登记SHA，冻结真实Go字节后签名并经生产helper/native host验证getIsInit与退出；不启动系统代理，不等同完整Flutter验收。输出目录已存在时拒绝覆盖。Runner源码与桥接头已纳入编译输入；Debug身份不用于生产链验收。
 
-`prepare-macos-supervisor` 编译固定arm64 helper生产源快照，签名后刷新FD绑定并最后发布身份清单；macOS完整验证在Flutter之前执行该步骤，Xcode仅复制已签产物。`seal-macos-candidate` 保留源App并在独立目录制作最终ad hoc候选，由内到外签嵌套框架与宿主，保持Core/helper字节；已有App或seal.json拒绝，清单排他no-follow发布。`test-macos-packaging-tools`覆盖固定身份、字节漂移、链接/特殊文件及发布失败。三者不修改系统代理、不公证、不发布。完整Flutter新会话运行另验；共享setup不删除Pod锁，当前helper打包仅覆盖arm64。
+`prepare-macos-supervisor` 编译固定arm64 helper生产源快照，签名后刷新FD绑定并最后发布身份清单；macOS完整验证在Flutter之前执行该步骤，Xcode仅复制已签产物。`seal-macos-candidate` 保留源App并在独立目录制作最终ad hoc候选，由内到外签嵌套框架与宿主，保持Core/helper字节；已有App或seal.json拒绝，清单排他no-follow发布。`test-macos-packaging-tools`覆盖固定身份、字节漂移、链接/特殊文件及发布失败。三者不修改系统代理、不公证、不发布。独立Flutter新会话已验收，应用主流程另验；共享setup不删除Pod锁，当前helper打包仅覆盖arm64。
+
+`probe-macos-flutter-supervisor` 在固定独立入口构建真实Flutter引擎，绑定两个探针输入摘要及预登记Core/helper摘要，连续运行两代getIsInit与每代16个公开child；退出、双管道EOF及native停止均确认后才通过。原正常App完整文件摘要恢复，源码和锁核验纳入成功条件；未知owner保留，不强杀、不创建新代次。固定探针候选采用无entitlements的ad hoc签名。正常候选保留Release钥匙串权利，严格验签不能证明AMFI允许启动；其签名与安全存储另验。实际两代通过回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。

@@ -1,0 +1,104 @@
+{
+  "execution": {
+    "cancel_sent": false,
+    "classification": "ACCEPTED",
+    "host_exit": 0,
+    "host_locator": 98738,
+    "markers": [
+      "BETTBOX_PROBE_READY_1",
+      "BETTBOX_PROBE_RESULT_1",
+      "BETTBOX_PROBE_STOP_1",
+      "BETTBOX_PROBE_READY_2",
+      "BETTBOX_PROBE_RESULT_2",
+      "BETTBOX_PROBE_STOP_2",
+      "BETTBOX_PROBE_PASS"
+    ],
+    "owner_retained_unknown": false
+  },
+  "input_artifacts": {
+    "BettboxCore": {
+      "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+      "identifier": "com.appshub.bettbox.core",
+      "schema": 1,
+      "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+      "signingmode": "adhoc"
+    },
+    "BettboxCoreSupervisor": {
+      "cdhash": "cd4ebafffac90a9f77cf067aff73717f89050fbf",
+      "identifier": "com.appshub.bettbox.core.supervisor",
+      "schema": 1,
+      "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+      "signingmode": "adhoc"
+    }
+  },
+  "limitations": [
+    "未接入ClashService或SC事务",
+    "未加载账户或配置，未验证有效订阅流量",
+    "探针无entitlements；正常候选保留受限Keychain权利，其ad hoc启动/持久化未验收",
+    "无Developer ID或公证发行"
+  ],
+  "locks_unchanged": true,
+  "negative_launch": {
+    "amfi_restricted_entitlements_on_adhoc": true,
+    "host_exit": -9,
+    "markers": [],
+    "scope": "系统日志只输出固定诊断词；未记录原始日志",
+    "signature_verify_passed": true
+  },
+  "original_host_sha256": "f1946550ae467f11fe6902e08799aeefab833005f2e9b1e9446870d53ba6fa9f",
+  "original_restored": true,
+  "passed": true,
+  "probe_input_sha256": {
+    "integration_test/macos_supervisor_probe.dart": "16b9be905360033f18bf7cf96b21590b5d65d88386fa420146a7d0ff22b8b7fd",
+    "integration_test/probe_contract.dart": "2b224770259d6ea055380d41410e1c2a90d992cff76925ad5c3459f53457bb90"
+  },
+  "probe_inputs_unchanged": true,
+  "probe_path_process_count_at_inspection": 0,
+  "review": {
+    "probe_entitlements_scope": "独立回审无新增P1/P2",
+    "untracked_probe_input_hash_gap": "已修复并独立回审"
+  },
+  "schema": 1,
+  "scope": "真实Flutter两代getIsInit和32个公开child退出；不含ClashService、账户流量或SC",
+  "seal": {
+    "artifacts": {
+      "BettboxCore": {
+        "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+        "signingmode": "adhoc"
+      },
+      "BettboxCoreSupervisor": {
+        "cdhash": "cd4ebafffac90a9f77cf067aff73717f89050fbf",
+        "identifier": "com.appshub.bettbox.core.supervisor",
+        "schema": 1,
+        "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+        "signingmode": "adhoc"
+      }
+    },
+    "destination": "build/macos-flutter-supervisor/Bettbox.app",
+    "entitlement_profile": "probe-none",
+    "host_cdhash": "2152a5a7b2a9fc1e0ed5f305bd570f354a3a9df6",
+    "host_sha256": "f410f4f2a02d0bb1214c3ce740d0a4fc136f2257f021588a0866fb3f9ccb436f",
+    "nested_frameworks": 10,
+    "notarized": false,
+    "passed": true,
+    "schema": 1,
+    "scope": "完整bundle开发签名；不证明应用会话、系统代理或发行资格",
+    "signingmode": "adhoc",
+    "source": "build/macos/Build/Products/Release/Bettbox.app"
+  },
+  "source_sha256": {
+    "integration_test/macos_supervisor_probe.dart": "16b9be905360033f18bf7cf96b21590b5d65d88386fa420146a7d0ff22b8b7fd",
+    "integration_test/probe_contract.dart": "2b224770259d6ea055380d41410e1c2a90d992cff76925ad5c3459f53457bb90",
+    "scripts/check_macos_flutter_supervisor.py": "2273e582a54a4bab5b4f485628c83f441c05e0590037397debf812de1432bb28",
+    "scripts/seal_macos_candidate.py": "769631ad70e0816cf3592ffd9bf4aed6f5700ae63809a09960e2da356e11b53d"
+  },
+  "source_unchanged": true,
+  "tests": {
+    "flutter_analyze": "No issues found",
+    "flutter_full": 158,
+    "macos_tools": 50
+  }
+}

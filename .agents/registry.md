@@ -37,3 +37,5 @@
 - docs/validation/2026-10-07-three-platform/macos-runner-real-go-validation.json — Runner冻结Release构建、真实Go签名链与退出验证；完整应用另验
 
 - docs/validation/2026-10-07-three-platform/macos-helper-bundle-validation.json — 生产helper封装、完整Release构建、嵌套开发签名和清单发布回归
+
+- docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json — 真实Flutter两代Session、32个公开child退出、完整App恢复及ad hoc entitlement拒绝边界
