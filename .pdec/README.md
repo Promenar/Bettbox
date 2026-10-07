@@ -81,3 +81,7 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 `test-android-preflight` 覆盖整个生产 `androidstartup` 包，含资源提交、FD采纳责任、回调准入和首次关闭错误保存的15个新增fixture。完整Android adapter尚未接入这些资源helper，CGO1普通宿主race不代替Android JNI或设备验收。
 
 `test-macos-build-identity` 与 `test-macos-setup-identity` 验证共享最终签名入口和打包参数。macOS core 固定使用系统 codesign ad hoc 签名后重新绑定文件，verify/display期间保持新产物稳定；Xcode宿主的关闭签名选项不跳过此步骤。实际副本签名与独立验签通过，完整bundle和发行资格另验。临时JVM/native身份fixture仅登记于运行时契约，不将忽略目录输入作为持久构建依赖。
+
+## 隧道构造输入回归
+
+`test-tunnel-constructor` 在本机core目录离线运行生产TCP/UDP构造器race测试，目标与绑定器均为公开虚构夹具，无系统代理、账户或公网调用。该回归只确认无效目标零绑定及合法绑定错误保留，不构成Android/iOS/macOS发行或完整原生生命周期验收。

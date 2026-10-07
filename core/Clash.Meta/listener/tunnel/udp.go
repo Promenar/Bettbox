@@ -36,14 +36,15 @@ func (l *PacketConn) Close() error {
 }
 
 func NewUDP(addr, target, proxy string, lc C.InboundListenConfig, tunnel C.Tunnel, additions ...inbound.Addition) (*PacketConn, error) {
-	l, err := lc.ListenPacket(context.Background(), "udp", addr)
-	if err != nil {
-		return nil, err
-	}
-
+	// 无效目标在任何绑定前拒绝，避免错误路径遗失已创建socket。
 	targetAddr := socks5.ParseAddr(target)
 	if targetAddr == nil {
 		return nil, fmt.Errorf("invalid target address %s", target)
+	}
+
+	l, err := lc.ListenPacket(context.Background(), "udp", addr)
+	if err != nil {
+		return nil, err
 	}
 
 	sl := &PacketConn{

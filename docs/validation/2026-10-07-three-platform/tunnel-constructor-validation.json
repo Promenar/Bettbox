@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "实际生产TCP/UDP constructor；虚构目标和计数绑定器，无实际socket/配置/公网",
+  "before_exit": 1,
+  "before_failed_subcases": [
+    "TestInvalidTargetNeverBinds/TCP",
+    "TestInvalidTargetNeverBinds/UDP"
+  ],
+  "after_exit": 0,
+  "race": true,
+  "test_functions": 2,
+  "after_source_sha256": {
+    "core/Clash.Meta/listener/tunnel/tcp.go": "734f9ff2f34c6dfa7c3b7ca1fe10024269f4257c22f426c5240dc5487ed55378",
+    "core/Clash.Meta/listener/tunnel/udp.go": "67db4855304aa48e0a6b4cffb32fab44dff213eae8237f064b2baadcf7b87ea4",
+    "core/Clash.Meta/listener/tunnel/constructor_test.go": "3115ac86ce476cac4263a62558253a5082ece49bd42a399714c640e6aca3ced6"
+  },
+  "independent_review": "未发现P1/P2，合法绑定路径与调用者合同未改变",
+  "limitations": [
+    "零绑定次数证明输入副作用边界，不直接测量FD泄漏",
+    "不证明其它listener构造错误、Close排空、系统VPN或真实节点流量"
+  ]
+}

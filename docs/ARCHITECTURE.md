@@ -129,3 +129,5 @@ macOS Go核心提供独占子进程匿名管道入口 `--owned-pipe-v1`。固定
 当前Dart运行时的全局退出线程可能回收同宿主内非Dart登记的child，实际短时夹具已复现。因此新增原生POSIX child owner不能仅以“不向Dart交PID”承诺唯一wait/reap。生产接线必须统一回收，或把Core放入没有竞争reaper的固定可信父进程；宿主身份、Core父属、匿名管道及退出事实分别验证。隔离Swift宿主fixture只能证明自己的执行范围。当前客户端仍使用既有Dart Process路径，新的原生生命周期链尚未集成。
 
 Android 配置与启停目标使用同一operation Mutex及独立配置journal；已开始的同步写入不能随请求取消而丢失归属。未确认副作用完成时保留恢复状态，只有实际Applied派生options可进入启动。候选helper的30项JVM验证已通过；同步JNI和所有配置写入口接线尚未实施，当前客户端不能视为已采用此合同。
+
+TCP/UDP隧道构造器在任何端口绑定前校验目标地址，无效目标不创建socket；合法目标的绑定及错误传递保持原接口。此输入副作用边界已有生产构造器race回归，监听器整体Close、provider及运行状态确认独立验收。

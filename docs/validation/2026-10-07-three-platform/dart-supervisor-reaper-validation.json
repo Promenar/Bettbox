@@ -1,0 +1,27 @@
+{
+  "scope": "固定短时true/sleep1与无Dart helper；无核心/签名/身份/管道业务/SC",
+  "source_sha256": {
+    ".test/three-platform-release/dart-supervisor-reaper-probe/probe.c": "db6bd09f6337bdb1cdf576eb54dcfa0efe4333063dd1f288c096c2a3dce9d508",
+    ".test/three-platform-release/dart-supervisor-reaper-probe/probe.dart": "17b9d30502753bd27b65c0d2f0d1e9d0247894c41b5e70f7c9b4e2e9bc20f2fc",
+    ".test/three-platform-release/macos-owned-launch-design/OwnedLaunchBridge.c": "b5fede1f4a15790c5a5e36572bea7d2f0c09260262e725b03e69e47e8a5d234f",
+    ".test/three-platform-release/macos-owned-launch-design/OwnedLaunchBridge.h": "2e62e65662a693f80882fea681b9e06e7b30a6c1f60e451af00b05ddf1bad943"
+  },
+  "compile_exit": 0,
+  "run_exit": 0,
+  "result": {
+    "native_spawned": true,
+    "unreaped_child_retained": true,
+    "exact_child_reaped": true,
+    "helper_exit": 0,
+    "registered_exit": 0,
+    "passed": true
+  },
+  "passed": true,
+  "schema": 1,
+  "status": "passed",
+  "limitations": [
+    "固定Chelper与true/sleep1只证明短时父属隔离；未验证实际Swift supervisor",
+    "没有签名、SDK身份链、Go HELLO/relay或SC系统代理验收",
+    "没有强杀/业务阻塞/故障关闭验收"
+  ]
+}

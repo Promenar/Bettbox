@@ -939,3 +939,34 @@ fake backend不能证明系统VPN、JNI、provider/listener；所有正式安装
 
 ### HLG
 通过标准append记录实际候选验收与未完成边界。
+
+## 2026-10-08T04:53:48+08:00 · 隧道构造预检修复与macOS辅助进程隔离实测
+
+type: development
+scope: ["Bettbox", "Android", "macOS"]
+status: done
+tags: ["release", "native", "regression"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 471faa42e5af65c566bf2ee98c6e173b5312fec01c472bc5770542da89350d5c
+
+### Summary
+TCP/UDP构造无效目标的绑定副作用已修复并真实race验收；macOS固定Chelper短时父属隔离真实验证通过。
+
+### Changed
+实际tcp.go/udp.go先ParseAddr后Listen，新增生产constructor_test；PDEC登记离线race入口并绑定三源。公开脱敏回执与架构/平台/版本/PDEC说明同步。
+
+### Validation
+旧实际构造两个无效目标子用例失败exit1；修复后两函数race exit0，独立审阅无P1/P2。固定Dart/C helper compile0/run0，两次WNOWAIT保留native true，waitpid exact child/exit0，Dart sleep1和helper均exit0。
+
+### Next
+Android StopListenerChecked候选完成独立审阅并实际验证，资源真实合同后同步JNI/Dart原子接线；macOS owned listener候选配置invalid状态问题修复，supervisor生产实现与签名/SDK/relay接线。
+
+### Risks
+构造fixture证明零绑定边界，非实际FD计量；最小C helper不证明Swift supervisor/签名/业务/SC；正式安装包、有效节点和真实支付仍未完成。用户iOS保留开发版决策持续有效。
+
+### DIA
+已同步架构、平台验收、版本、实施计划及PDEC说明。
+
+### HLG
+使用标准append登记实际修复、分层验证与后续候选风险。

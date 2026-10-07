@@ -144,3 +144,7 @@ macOS native身份候选使用当前SDK编译通过，9项fake生命周期测试
 macOS 回收兼容性：本机 Dart 3.12.2（revision `d684a576a6aa954ae107a03b2b4e1d61c3bebe93`）官方源码确认退出线程使用 `wait()`，可能回收非Dart登记的child。固定native true与Dart sleep1的真实夹具复现 WNOWAIT ECHILD，两个短时进程退出且Dart登记进程exit0；“不把Core PID交给Dart”不能保证native唯一reaper。POSIX spawn桥经当前SDK clang严格compile-only通过，无spawn；在关闭此生产兼容问题前，纯Swift身份fixture不代表Flutter宿主验收。公开回执 `validation/2026-10-07-three-platform/dart-native-reaper-validation.json`，官方固定源链接见回执。
 
 Android 配置协调候选已通过30个实际JVM场景（23个生命周期场景加7个配置场景），包括配置操作与启停串行、取消后真实配置版本保留但不启动、Entered失败粘性恢复、APPLY_ONLY独立权限和options复制。证据来自生产helper与fake backend，未验证Android服务、Go/JNI、监听器/provider实际完成；公开回执 `validation/2026-10-07-three-platform/android-config-coordinator-validation.json`。
+
+TCP/UDP隧道目标预检：生产构造器回归在修复前两个无效目标子用例失败，修复后 `go test -mod=readonly -race -count=1 -timeout=60s github.com/metacubex/mihomo/listener/tunnel` 通过。验证无效目标零绑定、合法目标绑定一次并保留错误；不直接测量真实FD泄漏。公开回执 `validation/2026-10-07-three-platform/tunnel-constructor-validation.json`。
+
+macOS无Dart辅助进程最小隔离：Dart持有固定C helper，同时有登记的sleep1；helper通过冻结spawn桥创建固定true，250ms后两次WNOWAIT保留child，指定waitpid真实退出0，helper及Dart登记进程均退出0。仅证明该短时父属与回收隔离，不包含Swift supervisor、签名/SDK身份、业务relay或SC。公开回执 `validation/2026-10-07-three-platform/dart-supervisor-reaper-validation.json`。

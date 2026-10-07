@@ -39,14 +39,15 @@ func (l *Listener) handleTCP(conn net.Conn, tunnel C.Tunnel, additions ...inboun
 }
 
 func New(addr, target, proxy string, lc C.InboundListenConfig, tunnel C.Tunnel, additions ...inbound.Addition) (*Listener, error) {
-	l, err := lc.Listen(context.Background(), "tcp", addr)
-	if err != nil {
-		return nil, err
-	}
-
+	// 无效目标在任何绑定前拒绝，避免错误路径遗失已创建socket。
 	targetAddr := socks5.ParseAddr(target)
 	if targetAddr == nil {
 		return nil, fmt.Errorf("invalid target address %s", target)
+	}
+
+	l, err := lc.Listen(context.Background(), "tcp", addr)
+	if err != nil {
+		return nil, err
 	}
 
 	rl := &Listener{
