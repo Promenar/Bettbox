@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "partial",
+  "native_sdk": {
+    "compile_exit": 0,
+    "fake_tests": 9,
+    "run_exit": 0,
+    "forced_assertion_exit": 1,
+    "source_sha256": {
+      "IdentityLifecycle.swift": "588c5eb2671ecbfe875504b2bb5e623af3f4cc06d3a9f077dc15f9fe7026bdc2",
+      "HeldPublicFile.swift": "4f1700462178abc47b947ef1ac74421942a4d61b46147c19e7b055129ca80f06",
+      "AppleIdentityBackend.swift": "065f45b51a65192f31d69b4b7d8a61cdcd8a7126eb4f3f07e546fd67de4fedcb",
+      "IdentityFixtures.swift": "2b58f31fd87f3d12a44d98a3b20dca0a32fa06c746ffcf1d80538c0e8371d750",
+      "main.swift": "8a5e857c2f5dc78d59d6efc0d4cfeaeafd11a900530700e62f29bdaa90a7324d",
+      "NativeIdentityBridge.h": "e6704582d0aa8b7fd8537afc25c79a7c1586be08321a870d2629ad93a79707b0"
+    }
+  },
+  "owned_group_probe": {
+    "status": "passed",
+    "scope": "固定公开工具进程组；无凭据、无网络或业务动作",
+    "wnowait_success_reap": true,
+    "leader_absent": true,
+    "child_absent": true,
+    "owned_group_absent": true,
+    "timeout_primary_preserved": true,
+    "cleanup_secondary_empty": true
+  },
+  "executor_mock_tests": 22,
+  "real_host_fixture": {
+    "status": "failed",
+    "category": "launch",
+    "secondary": [
+      "cleanup_failed"
+    ],
+    "candidate_manifest_sha256": "b1d7aa4f353d59379f81ae6caa4ff9a329fe519ecbe44d93976c5906f6b2e529"
+  },
+  "foundation_group_probe": {
+    "schema": 1,
+    "category": "group_child_led",
+    "child_exit_confirmed": true
+  },
+  "limitations": [
+    "9项生命周期测试仅fake；不证明真实SDK guest认证通过",
+    "真实宿主通过编译签名后在进程组准入失败；未发送HELLO或业务动作",
+    "Foundation实测创建child独立组；现有外层组watchdog不能证明覆盖该child",
+    "Dart/系统代理/完整App和发行签名未验收"
+  ]
+}

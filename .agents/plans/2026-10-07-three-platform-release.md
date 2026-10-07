@@ -78,3 +78,9 @@ Android启动修复前关闭跨平台State数据竞争：state包提供 `Snapsho
 资源基础helper已独立集成并通过race，Android平台adapter须与Boolean JNI、保留原PFD和唯一进程owner共同接线。coordinator使用短意图锁先登记epoch，再由operation Mutex串行实际JNI；取消排队/许可/绑定不能丢弃已开始JNI的所有权。Core stop=false或原PFD关闭不确定时保留恢复状态并拒绝新start。后台bootstrap、restart沿用用户token，不能通过新token覆盖停止意图。
 
 macOS 固定核心身份使用最终签名后重新绑定的文件；合法codesign inode置换不按外部漂移误拒。宿主必须核验 sealed身份清单、固定core持FD摘要与SDK静态/动态Unique，CLI CDHash不充当SDK Unique。当前最终签名真实fixture通过，native身份候选的SDK编译/真实guest仍单独验收；Dart管道与SC事务接线保持同代次所有权。
+
+## Android 配置排空与 macOS child 创建合同
+
+Android联合候选的Go/JNI/Service/Dart必须原子集成。开始/停止意图需先登记generation，配置写入、副作用完成与TUN启停由同一所有者串行；异步配置任务的token检查不足以证明旧任务已停止，必须明确实际排空与超时保留恢复状态。真实JVM23场景和Go20函数已通过，平台编译与有效流量不可据此豁免。
+
+macOS真实签名宿主准入因Foundation child独立进程组失败。不得删除guard直接运行；固定child创建、管道继承、wait/reap与超时回收须形成独占合同并独立审阅。SDK身份候选已编译，9项fake及执行器22mock不能替代真实guest认证。

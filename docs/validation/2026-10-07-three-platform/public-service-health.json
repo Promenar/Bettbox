@@ -1,0 +1,31 @@
+{
+  "checked_at_utc": "2026-10-07T19:16:25.581160+00:00",
+  "mode": "read-only-public-no-auth",
+  "endpoints": [
+    {
+      "url": "https://cloud.bingcn.site/",
+      "http_status": 200,
+      "https_verified": true,
+      "redirected": false
+    },
+    {
+      "url": "https://cloud.bingcn.site/codecenter",
+      "http_status": 200,
+      "https_verified": true,
+      "redirected": false
+    },
+    {
+      "url": "https://api.bingcn.site/api/v1/guest/comm/config",
+      "http_status": 200,
+      "https_verified": true,
+      "redirected": false,
+      "config_object": true,
+      "app_url": "https://cloud.bingcn.site",
+      "download_configured": {
+        "android_download_url": false,
+        "macos_download_url": false,
+        "windows_download_url": false
+      }
+    }
+  ]
+}

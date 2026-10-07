@@ -846,3 +846,34 @@ Android实际backend候选补smart、bootstrap token、权限回调与Service/JN
 
 ### HLG
 使用标准append dry-run/apply，记录真实失败与通过，保留候选和实际边界。
+
+## 2026-10-08T04:01:36+08:00 · Android旧回调修复实测与macOS独立child分组取证
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "macos", "native", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: b99d4a7e24fb0f03ac7425269957eac4b16e892e0817d1267a7e699fb6d7fc0f
+
+### Summary
+Android/macOS优先发行，iOS开发研究，目标活跃；生产helper验证推进，完整发行尚未完成。
+
+### Changed
+Android联合候选旧Doze回调携captured lease，登记与Mutex入场同时核对；静态接线fixture更新为ClosePublished。修正候选报告：既有JNI附着失败abort。实际客户端尚未应用38文件overlay。
+
+### Validation
+旧Doze生产JVM helper真实失败，窄修后离线Kotlin2.1编译/23协调场景/权限stamp均0；20 Go helper及静态接线函数CGO1 race通过，其中1项仅文本。独立审阅两个P2闭合。macOS native SDK编译、9fake和强制失败检测通过；执行器22mock、真实owned组超时/清理探针通过。真实签名host失败category launch/cleanup_failed，未发送HELLO。Foundation固定sleep1探针实际child独立组且自然exit0。公开根/admin/guestconfig TLS HTTP200，下载地址未配置。
+
+### Next
+Android配置JNI必须同步实际完成并与start/stop同nativeMutex，堵住legacy FFI/IPC旁路，Dart generation与UI真实状态一起原子接线。macOS固定POSIX child创建、管道/未reap owner/退出回收设计后再真实host身份与HELLO；再接Dart及SC。两个有界设计子Agent正在ignored目录准备，不改变actual源。
+
+### Risks
+JVM coroutine1.6.4是compiler POM夹具非App解析证据；helper不代表真实Android系统/JNI/流量。真实Mac guest未验收，外层host组不能证明覆盖Foundation独立core，失败保留。Android旧配置goroutine超时仍可能执行，token检查不能排空；不得局部部署。账号订阅有效性、Apple发行身份、支付商户/门店安全注入待外部条件。无正式APK/完整新App或DMG、真实付款或公开发布。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、实施计划和3份公开脱敏回执；无实际架构修改，ARCHITECTURE无需改变。持久PDEC恢复f0b8ebe输入并validated execution_ready无漂移。
+
+### HLG
+标准append dry-run/apply保存真实失败、通过及设计任务边界，不覆盖旧记录。

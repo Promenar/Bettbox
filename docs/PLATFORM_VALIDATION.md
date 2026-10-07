@@ -136,3 +136,7 @@ Android 启停基础：实际 `androidstartup` 包含15个新增资源/回调测
 2026-10-08 macOS 最终 core 身份：真实系统 codesign 正常替换 inode 的动作先被旧检查实际拒绝；修正签名与验签时序后，公开 fixture 独立验签、最终 SHA/CDHash 清单绑定通过，输入二进制未变。34项 Python 回归及3项 Dart setup测试通过；当前完整App/DMG、Keychain、宿主/guest身份和系统代理尚未由此验收。公开回执 `validation/2026-10-07-three-platform/macos-core-final-identity.json`。
 
 Android 协调候选的15个场景已使用离线 Kotlin 2.1.0 缓存编译并在JVM实际运行通过，覆盖许可/绑定撤销、已进入JNI所有权、迟到成功清理、停止失败保留、原FD关闭不确定、bootstrap/restart和旧服务身份。夹具使用编译器POM依赖的coroutines 1.6.4，未核对App最终解析版本；候选尚未接入Android实际后台服务，smart行为未实现。公开回执 `validation/2026-10-07-three-platform/android-coordinator-jvm.json`。
+
+Android 联合候选已补 smart、权限请求归属和 Service lease，尚未接入实际客户端。旧 Doze 回调在同一 Service 被新 lease 复用时影响新连接的问题，经生产 JVM helper 修复前失败、修复后通过；23 个协调场景和权限/stamp夹具使用离线 Kotlin 2.1.0 编译运行通过。20 个 Go helper/静态接线测试经 CGO1 race通过，其中1项仅检查源码接线；编译器夹具 coroutines 1.6.4 不代表App最终解析版本。JNI既有线程附着失败会abort，不能宣称所有失败均返回false。Dart配置排空、真实AndroidBackend/JNI/系统VPN及节点流量另验。公开回执 `validation/2026-10-07-three-platform/android-backend-helper-validation.json`。
+
+macOS native身份候选使用当前SDK编译通过，9项fake生命周期测试及强制断言失败检测通过。执行器22项mock与真实owned进程组超时清理探针通过；真实签名宿主/core候选在launch准入失败，并保留cleanup_failed，未发送HELLO。独立固定sleep探针实际确认Foundation Process为child建立独立进程组且该探针child自然exit0；不能用宿主组watchdog证明覆盖core。宿主/core身份与匿名管道验收须在明确child创建/回收合同后执行。公开回执 `validation/2026-10-07-three-platform/macos-native-launch-validation.json`。

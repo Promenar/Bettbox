@@ -2,6 +2,9 @@
 
 ## 2026-10-08
 
+- Android 联合候选修复旧Doze回调跨lease影响新连接的问题；23个JVM协调场景、权限归属夹具与20个Go helper/静态接线race测试通过，实际Android/Dart整包接线另验。
+- macOS native身份候选SDK编译与9项fake通过；真实launch暴露Foundation独立child进程组，创建/回收合同进入专门诊断，未标记真实guest或完整发行通过。
+
 - macOS core 使用固定 ad hoc 身份最终签名，签名后的文件重新绑定，验签与摘要期间拒绝漂移；共享打包入口和bundle验证核对身份清单，真实签名及34项Python回归通过。完整App、宿主身份与发行资格另验。
 - Android协调候选15个JVM生命周期场景编译执行通过，实际Service/JNI整包接线和smart行为尚待完成。
 

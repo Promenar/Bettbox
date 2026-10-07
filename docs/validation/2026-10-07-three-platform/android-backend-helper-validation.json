@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "冻结候选生产helper；不是实际Android系统、JNI或流量验收",
+  "manifest_sha256": "52eff7ed6fec83584f0af24d7363b0c4fc6e60c517640195563516c844ff4be0",
+  "doze_before_failure_reproduced": true,
+  "kotlin": {
+    "version": "2.1.0",
+    "compile_exit": 0,
+    "coordinator_scenarios": 23,
+    "coordinator_exit": 0,
+    "ownership_exit": 0,
+    "source_sha256": {
+      "AndroidNativeOperations.kt": "947e0e3733af0a91e5ec788998bbb6017a17988ddbdc63ae3bf63f3a37789664",
+      "NativePermissionRegistry.kt": "28a2617a3c7c24a203a6db7835dbd8c07b93bb0c117db5264834976417cb0b03",
+      "NativeServiceAttachment.kt": "a523f256eb30521759b6669712110e89196a1fbb08c25f4edb61c73d5b624e9d",
+      "AndroidNativeOperationsFixture.kt": "d1177e3d7704def123c3fb8138f0d7f3d30ee561882c5ebef490906098ccea38",
+      "NativeBackendOwnershipFixture.kt": "8512ce391156f6d6ce8f99981930fb257d0ceddd593c1b2bb12d377ff9b5ad9a"
+    },
+    "coroutines_fixture_version": "1.6.4",
+    "app_resolved_version_verified": false
+  },
+  "go": {
+    "race_exit": 0,
+    "test_functions": 20,
+    "static_adapter_tests": 1,
+    "source_sha256": {
+      "lib_android.go": "baac6f9e2431cd14881988579a388da5219191698e22951e6fcb5557c398ea3a",
+      "androidstartup/adapter_contract_test.go": "fb6869746f0076805de866560a0aa179582b548e041d6002c2eced21aa95f105",
+      "androidstartup/callback_gate_test.go": "ecbc7102963453231f6819ad10aabf5201cc029c2b5ea03fccd5d1834c80176f",
+      "androidstartup/state_test.go": "bd8ccf395a321409d4a0fae174e459cda157c9d6746812623485969be57690e9",
+      "androidstartup/protect.go": "27f4726d39f5f052cdbe8b3de81fc038bfd2d6516e932e1b9a0009b412defac4",
+      "androidstartup/callback_gate.go": "4fc01cbfcbbb53d203513a83a6cbc3bb45f854b448006261714f034e141ab7cd",
+      "androidstartup/state.go": "a27c258472c8364cc6cfbdb983726daa15d49c5e237e7b8e32b661a096b6e7df",
+      "androidstartup/protect_test.go": "2d8b5da59b1ddaad4b2979f991321068210832f062d69d797b57d8593727c5f1",
+      "Clash.Meta/listener/sing_tun/server.go": "1f4e68b69ef7c40bbccf710569cc0c9edcb83a76c5066a06c53266b7e2629f30"
+    }
+  },
+  "independent_review": "两个P2已闭合；JNI既有线程附着失败abort已在候选报告纠正",
+  "limitations": [
+    "尚未应用38文件联合overlay",
+    "Dart generation/配置排空未接线",
+    "未编译生成头/JNI/Android实际backend",
+    "未验证系统VPN/有效节点流量"
+  ]
+}
