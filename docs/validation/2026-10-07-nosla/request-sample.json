@@ -1,0 +1,65 @@
+{
+  "concurrency": 4,
+  "requests": [
+    {
+      "status": 200,
+      "seconds": 0.565,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 1.054,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 1.056,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 1.057,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.574,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.595,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.576,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.58,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.559,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.595,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.581,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "status": 200,
+      "seconds": 0.579,
+      "app_url": "https://cloud.bingcn.site"
+    }
+  ]
+}

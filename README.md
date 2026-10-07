@@ -9,6 +9,8 @@
 
 **Bettbox 是一款使用Mihomo(Clash Meta)内核、基于FlClash早期版本进行重构的、多平台网络调试及规则分流客户端**
 
+商业版 Xboard 的主机、域名、Cloudflare 配置与运维验收见 [服务端部署说明](docs/SERVER_DEPLOYMENT.md)。
+
 秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。设计目标: 前台流畅丝滑、后台省电无感，致力于成为体验更好、以少量资源消耗即可持续稳定运行的 Mihomo 客户端
 
 Bettbox意为: Better Experience, Out of the box，更好的体验，亦开箱可用

@@ -1,0 +1,50 @@
+{
+  "target": "216.23.116.56",
+  "snapshot_sha256": "8429b7d83c8a4dedc9244323340b8c36040326dca9b43e4290d4e11149cc58f4",
+  "snapshot_tables": 34,
+  "snapshot_files": 35,
+  "prestart_exact_match": true,
+  "runtime": [
+    {
+      "name": "xboard-test-xboard-1",
+      "image_id": "sha256:896e4926e0d7f18d223d58770590c74ab6f05ecb21f1b74ef5357ed20f44c676",
+      "status": "running",
+      "oom": false,
+      "restarts": 0,
+      "started_at": "2026-10-07T09:36:27.329862295Z",
+      "memory_limit_bytes": 805306368
+    },
+    {
+      "name": "xboard-test-edge-1",
+      "image_id": "sha256:2051bb5b0a1e4845c4ca868d69f9d2dfa421bd5752c63cea9a937375894f6b55",
+      "status": "running",
+      "oom": false,
+      "restarts": 0,
+      "started_at": "2026-10-07T09:23:36.941135969Z",
+      "memory_limit_bytes": 134217728
+    },
+    {
+      "name": "sub-mihomo",
+      "image_id": "sha256:19e2642914ba72a90b40edfe47fbab7fbdf820125fe7a2e7786a3c693ef7cb1f",
+      "status": "running",
+      "oom": false,
+      "restarts": 0,
+      "started_at": "2026-10-07T09:36:28.34184463Z",
+      "memory_limit_bytes": 134217728
+    }
+  ],
+  "table_differences": [
+    {
+      "table": "v2_settings",
+      "source_count": 35,
+      "target_count": 35
+    }
+  ],
+  "integrity": "ok",
+  "changed_setting_names": [
+    "app_url"
+  ],
+  "memory_snapshot": "               total        used        free      shared  buff/cache   available\nMem:             929         703          97           0         276         225\nSwap:           2047         538        1509\n",
+  "container_stats": "xboard-test-xboard-1 349.8MiB / 768MiB 2.83%\nsub-mihomo 23.62MiB / 128MiB 0.01%\nxboard-test-edge-1 24.19MiB / 128MiB 0.02%\n",
+  "checked_at_epoch": 1791366307
+}

@@ -1,0 +1,223 @@
+{
+  "checked_at": "2026-10-07T09:50:45.020728+00:00",
+  "checked_from": "Tencent source via SSH",
+  "destination_ip": "216.23.116.56",
+  "checks": [
+    {
+      "host": "cloud.bingcn.site",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE1"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:20 2027 GMT",
+      "sha256": "ac871d83e6640257a4f02e583f18477633053371159a456d7e80c614a3f97195"
+    },
+    {
+      "host": "cloud.bingcn.site",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE1"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:20 2027 GMT",
+      "sha256": "ac871d83e6640257a4f02e583f18477633053371159a456d7e80c614a3f97195"
+    },
+    {
+      "host": "api.bingcn.site",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE2"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:15 2027 GMT",
+      "sha256": "777ac35d879a33c2c6f093597585549425769f3bcbd26728fb0232a8be6bd1e4"
+    },
+    {
+      "host": "api.bingcn.site",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE2"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:15 2027 GMT",
+      "sha256": "777ac35d879a33c2c6f093597585549425769f3bcbd26728fb0232a8be6bd1e4"
+    },
+    {
+      "host": "origin.bingcn.site",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE2"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:21 2027 GMT",
+      "sha256": "14bb6f3fec4a3a3b34fb44c30a58d2327a3936da8185f2962d17ab548932693d"
+    },
+    {
+      "host": "origin.bingcn.site",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE2"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:21 2027 GMT",
+      "sha256": "14bb6f3fec4a3a3b34fb44c30a58d2327a3936da8185f2962d17ab548932693d"
+    },
+    {
+      "host": "cloud.microsoftnexushub.top",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE1"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:15 2027 GMT",
+      "sha256": "a31a4286b2009834795af4882c26d1fb54d7217a0309e06e380f4606acdea1cc"
+    },
+    {
+      "host": "cloud.microsoftnexushub.top",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE1"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:15 2027 GMT",
+      "sha256": "a31a4286b2009834795af4882c26d1fb54d7217a0309e06e380f4606acdea1cc"
+    }
+  ]
+}

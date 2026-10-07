@@ -89,4 +89,5 @@ app.*.map.json
 !/docs/ARCHITECTURE.md
 !/docs/CHANGELOG.md
 !/docs/PLATFORM_VALIDATION.md
+!/docs/SERVER_DEPLOYMENT.md
 !/.pdec/README.md

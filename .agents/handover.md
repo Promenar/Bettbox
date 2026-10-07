@@ -228,3 +228,33 @@ Windows run 35716722203（https://github.com/Promenar/Bettbox/actions/runs/35716
 
 ### HLG
 使用 append dry-run/apply 追加最终构建证据、前序并发风险勘误与用户暂停边界，重建索引；continuity=waiting，等待用户恢复指令。
+
+## 2026-10-07T17:56:04+08:00 · Xboard 全量迁移至 NoSLA 与 Cloudflare 域名切换
+
+type: maintenance
+scope: ["Bettbox", "xboard", "server", "cloudflare"]
+status: done
+tags: ["migration", "nosla", "dns", "tls", "backup", "validation"]
+continuity: none
+record-fingerprint: 92845fea2386f66c9fe63bf62b3cb4f5036016be6030481484c72e5185b0e458
+
+### Summary
+按用户明确授权将 Xboard、SQLite/Redis、CloudBridgeRelay、主题补丁、Caddy 与订阅辅助 Mihomo 从腾讯云170.106.143.23迁至 NoSLA216.23.116.56。四条相关 A 记录切换完成，业务入口无需 Vercel；客户端平台开发保持原暂停边界。
+
+### Changed
+在 NoSLA 安装官方 Docker/Compose及2GiB swap，导入源确切镜像。源业务冻结后传输最终归档并比对 SHA256；app_url改为https://cloud.bingcn.site，引导池包含API与兼容域名；Caddy公开可信证书覆盖443/8443，CF仅相关主机名使用严格TLS。Xboard最终768MiB/CPU1，三类Horizon队列上限1；代理端口仅回环。源Xboard/Mihomo停止且restart=no，旧Caddy可信8443仅转发新主机，保留回滚备份与已通过caddy validate的回滚模板。官方cf CLI和本机cf-xboard入口配置完成，复用SSH临时加载既有DNS令牌，未新增OAuth授权。
+
+### Validation
+34张表内容及35个绑定资源启动前摘要全部一致；4用户、2套餐、2订单、133节点保留，运行后仅app_url设置发生预期差异，SQLite integrity_check=ok。Redis RDB恢复325未过期key、保存ok；Horizon运行，最终3容器OOM=false/restart=0。24公网网页/API/引导请求200，源站独立8项TLS从腾讯云固定目标IP/SNI验证全部可信；两入口既有账户真实订阅200且含proxies。4并发12API请求全200，中位0.5805秒、最大1.057秒。浏览器注册页显示邮箱/密码/邀请码。主控复核独立审阅建议，纠正边缘/源站证书证据口径、Redis回滚保存顺序、固定上游/SNI/Host和旧证书续期边界；独立复核无新增阻断。证据存于docs/validation/2026-10-07-nosla。
+
+### Next
+保留旧主机与备份用于回滚；过渡转发在观察期确认后另行退役。新平台注册、签名、安装包、VPN及发布不在本迁移范围，保持用户原暂停要求。
+
+### Risks
+NoSLA物理内存929MiB且已使用swap；512MiB初始启动曾OOM/超时，调整重建后恢复。未完成生产容量验收或完整回滚演练；回滚不能仅恢复DNS，源443仍由其他项目占用，须最新数据回传+可信8443源站+相关CF Origin Rules。旧复制证书有效至2027-01-05且不自动续期，回滚当天需复验。API备用与主站同主机，没有主机级高可用。没有提交注册、真实付款/邮件/提现或设备VPN。
+
+### DIA
+已同步README、ARCHITECTURE、CHANGELOG、PRD历史部署指向、SERVER_DEPLOYMENT、bootstrap配置快照、registry、实施计划和脱敏验收证据；没有修改客户端代码。
+
+### HLG
+通过append dry-run/apply追加迁移事实与验收边界并重建索引；原邀请平台工作流的waiting/暂停记录保持不变。

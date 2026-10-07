@@ -1,0 +1,30 @@
+[
+  {
+    "name": "api.bingcn.site",
+    "type": "A",
+    "content": "216.23.116.56",
+    "proxied": true,
+    "ttl": 1
+  },
+  {
+    "name": "cloud.bingcn.site",
+    "type": "A",
+    "content": "216.23.116.56",
+    "proxied": true,
+    "ttl": 1
+  },
+  {
+    "name": "origin.bingcn.site",
+    "type": "A",
+    "content": "216.23.116.56",
+    "proxied": false,
+    "ttl": 1
+  },
+  {
+    "name": "cloud.microsoftnexushub.top",
+    "type": "A",
+    "content": "216.23.116.56",
+    "proxied": true,
+    "ttl": 1
+  }
+]

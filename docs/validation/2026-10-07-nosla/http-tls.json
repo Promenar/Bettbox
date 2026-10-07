@@ -1,0 +1,377 @@
+{
+  "checked_at": "2026-10-07T09:40:38.988071+00:00",
+  "origin": "216.23.116.56",
+  "public": [
+    {
+      "url": "https://cloud.bingcn.site/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://cloud.bingcn.site/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://cloud.bingcn.site/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://cloud.bingcn.site:8443/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://cloud.bingcn.site:8443/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://cloud.bingcn.site:8443/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://api.bingcn.site/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://api.bingcn.site/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://api.bingcn.site/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://api.bingcn.site:8443/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://api.bingcn.site:8443/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://api.bingcn.site:8443/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://origin.bingcn.site/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://origin.bingcn.site/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://origin.bingcn.site/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://origin.bingcn.site:8443/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://origin.bingcn.site:8443/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://origin.bingcn.site:8443/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://cloud.microsoftnexushub.top/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://cloud.microsoftnexushub.top/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://cloud.microsoftnexushub.top/",
+      "status": 200,
+      "exit_code": 0
+    },
+    {
+      "url": "https://cloud.microsoftnexushub.top:8443/api/v1/guest/comm/config",
+      "status": 200,
+      "exit_code": 0,
+      "app_url": "https://cloud.bingcn.site"
+    },
+    {
+      "url": "https://cloud.microsoftnexushub.top:8443/bootstrap.json",
+      "status": 200,
+      "exit_code": 0,
+      "api_domains": [
+        "https://api.bingcn.site",
+        "https://cloud.microsoftnexushub.top:8443"
+      ]
+    },
+    {
+      "url": "https://cloud.microsoftnexushub.top:8443/",
+      "status": 200,
+      "exit_code": 0
+    }
+  ],
+  "certificates": [
+    {
+      "host": "cloud.bingcn.site",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Google Trust Services"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "WE1"
+          ]
+        ]
+      ],
+      "expires": "Dec 31 04:13:01 2026 GMT"
+    },
+    {
+      "host": "cloud.bingcn.site",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Google Trust Services"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "WE1"
+          ]
+        ]
+      ],
+      "expires": "Dec 31 04:13:01 2026 GMT"
+    },
+    {
+      "host": "api.bingcn.site",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Google Trust Services"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "WE1"
+          ]
+        ]
+      ],
+      "expires": "Dec 31 04:13:01 2026 GMT"
+    },
+    {
+      "host": "api.bingcn.site",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Google Trust Services"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "WE1"
+          ]
+        ]
+      ],
+      "expires": "Dec 31 04:13:01 2026 GMT"
+    },
+    {
+      "host": "origin.bingcn.site",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE2"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:21 2027 GMT"
+    },
+    {
+      "host": "origin.bingcn.site",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Let's Encrypt"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "YE2"
+          ]
+        ]
+      ],
+      "expires": "Jan  5 08:25:21 2027 GMT"
+    },
+    {
+      "host": "cloud.microsoftnexushub.top",
+      "port": 443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Google Trust Services"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "WE1"
+          ]
+        ]
+      ],
+      "expires": "Nov 26 09:29:54 2026 GMT"
+    },
+    {
+      "host": "cloud.microsoftnexushub.top",
+      "port": 8443,
+      "verified": true,
+      "issuer": [
+        [
+          [
+            "countryName",
+            "US"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Google Trust Services"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "WE1"
+          ]
+        ]
+      ],
+      "expires": "Nov 26 09:29:54 2026 GMT"
+    }
+  ],
+  "certificate_scope_note": "本机网络观察包含 Cloudflare 边缘证书；直接源站信任证据见 origin-tls.json。"
+}
