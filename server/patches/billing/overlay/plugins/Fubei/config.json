@@ -1,0 +1,16 @@
+{
+    "name": "付呗候选支付",
+    "code": "fubei",
+    "type": "payment",
+    "version": "0.1.0",
+    "description": "默认禁用的聚合二维码支付候选，上线前需完成到账事务与返佣幂等验收",
+    "author": "Bettbox",
+    "config": {
+        "enabled": {
+            "type": "boolean",
+            "label": "启用候选支付",
+            "description": "默认禁用；完成服务器验收后才能显式启用",
+            "default": false
+        }
+    }
+}

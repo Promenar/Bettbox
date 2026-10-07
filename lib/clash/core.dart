@@ -15,10 +15,13 @@ import 'package:path/path.dart';
 class ClashCore {
   static ClashCore? _instance;
   late ClashHandlerInterface clashInterface;
+  SetupParams? _iosSetup;
 
   ClashCore._internal() {
     if (system.isAndroid) {
       clashInterface = clashLib!;
+    } else if (system.isIOS) {
+      clashInterface = iosClash;
     } else {
       clashInterface = clashService!;
     }
@@ -33,13 +36,18 @@ class ClashCore {
     return clashInterface.preload();
   }
 
-  static Future<void> initGeo() async {
-    final homePath = await appPath.homeDirPath;
+  static Future<void> initGeo({String? directory}) async {
+    final homePath = directory ?? await appPath.homeDirPath;
     final homeDir = Directory(homePath);
     if (!await homeDir.exists()) {
       await homeDir.create(recursive: true);
     }
-    const geoFileNameList = [mmdbFileName, geoSiteFileName, asnFileName, bundleMRSFileName];
+    const geoFileNameList = [
+      mmdbFileName,
+      geoSiteFileName,
+      asnFileName,
+      bundleMRSFileName,
+    ];
     try {
       for (final geoFileName in geoFileNameList) {
         final geoFile = File(join(homePath, geoFileName));
@@ -48,6 +56,7 @@ class ClashCore {
         await geoFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
       }
     } catch (e) {
+      if (system.isIOS) throw const IOSCoreException('Geo 资源准备失败');
       exit(0);
     }
   }
@@ -59,7 +68,10 @@ class ClashCore {
     } else {
       clashCore.stopLog();
     }
-    final homeDirPath = await appPath.homeDirPath;
+    final homeDirPath = system.isIOS
+        ? await iosClash.offlineHome()
+        : await appPath.homeDirPath;
+    if (system.isIOS) await initGeo(directory: homeDirPath);
     return await clashInterface.init(
       InitParams(homeDir: homeDirPath, version: globalState.appState.version),
     );
@@ -87,7 +99,48 @@ class ClashCore {
     return await clashInterface.updateConfig(updateParams);
   }
 
+  Future<IOSSnapshotInputs> getIOSSnapshotInputs() async {
+    final setup = _iosSetup;
+    if (setup == null) throw const IOSCoreException('离线配置尚未完成');
+    return IOSSnapshotInputs.collect(setup, await iosClash.offlineHome());
+  }
+
   Future<String> setupConfig(SetupParams setupParams) async {
+    if (system.isIOS) {
+      _iosSetup = null;
+      final status = await iosClash.refreshStatus();
+      if (status.connected || status.transitioning) {
+        throw const IOSCoreException('离线配置需要系统隧道已停止');
+      }
+      final inputs = await IOSSnapshotInputs.collect(
+        setupParams,
+        await appPath.homeDirPath,
+      );
+      final home = await iosClash.offlineHome();
+      final root = await Directory(home).resolveSymbolicLinks();
+      for (final resource in inputs.resources) {
+        final destination = File(join(root, resource['path']!));
+        var parent = root;
+        for (final part in split(dirname(resource['path']!))) {
+          if (part == '.') continue;
+          parent = join(parent, part);
+          final type = await FileSystemEntity.type(parent, followLinks: false);
+          if (type == FileSystemEntityType.notFound) {
+            await Directory(parent).create();
+          } else if (type != FileSystemEntityType.directory) {
+            throw const IOSCoreException('离线资源目录类型无效');
+          }
+        }
+        if (await FileSystemEntity.isLink(destination.path)) {
+          throw const IOSCoreException('离线资源存在符号链接');
+        }
+        await File(resource['sourcePath']!).copy(destination.path);
+      }
+      final message = await clashInterface.setupConfig(inputs.setup);
+      if (message.isNotEmpty) throw const IOSCoreException('配置预检失败');
+      _iosSetup = inputs.setup;
+      return '';
+    }
     return await clashInterface.setupConfig(setupParams);
   }
 
@@ -132,18 +185,21 @@ class ClashCore {
           return GroupTypeExtension.valueList.contains(proxy?['type']);
         }),
       ];
-      final groupsRaw = groupNames.map((groupName) {
-        final proxyData = allProxies[groupName] as Map?;
-        if (proxyData == null) return null;
-        final group = Map<String, dynamic>.from(
-          proxyData.cast<String, dynamic>(),
-        );
-        group['all'] = ((group['all'] ?? []) as List)
-            .map((name) => allProxies[name])
-            .whereType<Map<String, dynamic>>()
-            .toList();
-        return group;
-      }).whereType<Map<String, dynamic>>().toList();
+      final groupsRaw = groupNames
+          .map((groupName) {
+            final proxyData = allProxies[groupName] as Map?;
+            if (proxyData == null) return null;
+            final group = Map<String, dynamic>.from(
+              proxyData.cast<String, dynamic>(),
+            );
+            group['all'] = ((group['all'] ?? []) as List)
+                .map((name) => allProxies[name])
+                .whereType<Map<String, dynamic>>()
+                .toList();
+            return group;
+          })
+          .whereType<Map<String, dynamic>>()
+          .toList();
       return groupsRaw.map((e) => Group.fromJson(e)).toList();
     });
   }
@@ -267,9 +323,15 @@ class ClashCore {
     }
   }
 
-  Future<Map<String, dynamic>> getConfig(String id, {String? ageSecretKey}) async {
+  Future<Map<String, dynamic>> getConfig(
+    String id, {
+    String? ageSecretKey,
+  }) async {
     final profilePath = await appPath.getProfilePath(id);
-    final res = await clashInterface.getConfig(profilePath, ageSecretKey: ageSecretKey);
+    final res = await clashInterface.getConfig(
+      profilePath,
+      ageSecretKey: ageSecretKey,
+    );
     if (res.isSuccess) {
       return res.data as Map<String, dynamic>;
     } else {

@@ -32,6 +32,7 @@ import 'views/profiles/override_profile.dart';
 
 class AppController {
   int? lastProfileModified;
+  StreamSubscription<IOSVpnStatus>? _iosStatusSubscription;
 
   final BuildContext context;
   final WidgetRef _ref;
@@ -40,6 +41,7 @@ class AppController {
   Timer? _wakelockSyncTimer;
   Completer<void>? _exitLock;
   final Lock _coreLifecycleLock = Lock(reentrant: true);
+  final IOSUserStopIntent _iosUserStopIntent = IOSUserStopIntent();
   int _backgroundLoadVersion = 0;
 
   int _updateGroupsRetryCount = 0;
@@ -128,14 +130,33 @@ class AppController {
     bool setupConfig = true,
     bool refreshData = true,
   }) async {
+    final userStopEpoch = _iosUserStopIntent.capture();
+    int? iosStartGeneration;
+    void checkIOSStart() {
+      if (!system.isIOS) return;
+      _iosUserStopIntent.check(userStopEpoch);
+      final generation = iosStartGeneration;
+      if (generation != null) iosClash.checkPendingStart(generation);
+    }
+
     commonPrint.log('restart core');
     _invalidateCoreReads();
 
-    final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
+    final wasRunning = system.isIOS
+        ? (await iosClash.refreshStatus()).connected
+        : _ref.read(runTimeProvider.notifier).isStart;
+    checkIOSStart();
     final keepVpnService = system.isAndroid;
     if (wasRunning) {
       await globalState.handleStop(!keepVpnService);
       _ref.read(runTimeProvider.notifier).value = null;
+    }
+    // 原生内部 stop 成功后才能创建新代次，用户停止 epoch 不受内部 stop 影响。
+    checkIOSStart();
+    if (system.isIOS && wasRunning) {
+      // 已排队的用户停止也优先于后来进入重启函数的操作。
+      _iosUserStopIntent.ensureStartAllowed();
+      iosStartGeneration = iosClash.beginPendingStart();
     }
     if (system.isAndroid) {
       await clashCore.closeConnections();
@@ -148,35 +169,55 @@ class AppController {
       await clashService!.reStart();
     }
     await _initCore();
+    checkIOSStart();
 
-    final configured = setupConfig ? await _setupCoreConfig() : false;
+    final configured = (setupConfig || system.isIOS)
+        ? await _setupCoreConfig()
+        : false;
+    checkIOSStart();
     if (refreshData && configured) {
       await updateGroups();
+      checkIOSStart();
       await updateProviders();
+      checkIOSStart();
     }
 
     if (wasRunning) {
-      await globalState.handleStart([
-        updateRunTime,
-        updateTraffic,
-      ], !keepVpnService);
+      await globalState.handleStart(
+        [updateRunTime, updateTraffic],
+        !keepVpnService,
+        iosStartGeneration,
+      );
+      checkIOSStart();
       _scheduleCheckIpRefresh();
       _backgroundLoad();
     }
   }
 
   Future<void> updateStatus(bool isStart) {
-    return _coreLifecycleLock.synchronized(() => _updateStatus(isStart));
+    // 必须在等生命周期锁之前登记用户意图；后续阶段只检查既有代次。
+    if (system.isIOS && isStart) _iosUserStopIntent.requestStart();
+    final iosStartGeneration = system.isIOS && isStart
+        ? iosClash.beginPendingStart()
+        : null;
+    if (system.isIOS && !isStart) {
+      _iosUserStopIntent.cancel();
+      iosClash.cancelPendingStart();
+    }
+    return _coreLifecycleLock.synchronized(
+      () => _updateStatus(isStart, iosStartGeneration),
+    );
   }
 
-  Future<void> _updateStatus(bool isStart) async {
+  Future<void> _updateStatus(bool isStart, int? iosStartGeneration) async {
     if (isStart) {
-      await _fastStart();
+      await _fastStart(iosStartGeneration);
       if (globalState.isStart && !_ref.read(runTimeProvider.notifier).isStart) {
         _ref.read(runTimeProvider.notifier).value = 0;
       }
     } else {
-      await globalState.handleStop();
+      // 用户停止已在排队前取消旧代次，执行时不得取消排在后面的新启动。
+      await globalState.handleStop(true, false);
       clashCore.resetTraffic();
       _ref.read(trafficsProvider.notifier).clear();
       _ref.read(totalTrafficProvider.notifier).value = Traffic();
@@ -185,13 +226,43 @@ class AppController {
     }
   }
 
-  Future<void> _fastStart() async {
+  Future<void> _fastStart(int? iosStartGeneration) async {
     final currentProfile = _ref.read(currentProfileProvider);
     if (currentProfile == null) {
       commonPrint.log('Fast start aborted: No active profile configured.');
       return;
     }
 
+    if (system.isIOS) {
+      final generation = iosStartGeneration;
+      if (generation == null) throw const IOSCoreException('启动代次缺失');
+      final status = await iosClash.startStage(
+        generation,
+        iosClash.refreshStatus,
+      );
+      if (status.connected) {
+        globalState.applyIOSVpnStatus(status);
+        await updateRunTime();
+        return;
+      }
+      if (status.transitioning) throw const IOSCoreException('系统正在切换隧道');
+      // 离线配置用于预检；运行配置与资源通过不可变快照交给扩展。
+      if (await iosClash.startStage(generation, () => _quickSetupConfig()) !=
+          true) {
+        return;
+      }
+      await globalState.handleStart(
+        [updateRunTime, updateTraffic],
+        true,
+        generation,
+      );
+      iosClash.checkPendingStart(generation);
+      await updateRunTime();
+      _scheduleCheckIpRefresh();
+      await updateProviders();
+      _backgroundLoad();
+      return;
+    }
     final patchConfig = _ref.read(patchClashConfigProvider);
     final isDesktop = system.isDesktop;
 
@@ -344,6 +415,7 @@ class AppController {
     );
     final message = await clashCore.setupConfig(params);
     if (message.isNotEmpty) {
+      if (system.isIOS) throw const IOSCoreException('配置预检失败');
       commonPrint.log('[Core] Setup config failed: $message');
       throw message;
     }
@@ -367,6 +439,11 @@ class AppController {
   Future<void> updateRunTime() async {
     if (globalState.backgroundMode.value) return;
     final startTime = globalState.startTime;
+    if (system.isIOS && iosClash.status.connected && startTime == null) {
+      // 系统未提供 connectedDate 时只保留连接标记，不制造开始时间。
+      _ref.read(runTimeProvider.notifier).value = 0;
+      return;
+    }
     if (startTime == null) {
       if (_ref.read(runTimeProvider) != null) {
         _ref.read(runTimeProvider.notifier).value = null;
@@ -388,8 +465,9 @@ class AppController {
 
   Future<bool> _shouldUpdateDashboardTick() async {
     if (system.isDesktop) {
-      final isPinned =
-          _ref.read(windowSettingProvider.select((s) => s.isPinned));
+      final isPinned = _ref.read(
+        windowSettingProvider.select((s) => s.isPinned),
+      );
       if (isPinned) return true;
       if (await window?.isVisible == false) return false;
       if (await window?.isMinimized == true) return false;
@@ -489,9 +567,9 @@ class AppController {
     _updatingProfileIds.add(profile.id);
     try {
       final newProfile = await profile.update(validate: validate);
-      _ref.read(profilesProvider.notifier).setProfile(
-            newProfile.copyWith(isUpdating: false),
-          );
+      _ref
+          .read(profilesProvider.notifier)
+          .setProfile(newProfile.copyWith(isUpdating: false));
       if (profile.id == _ref.read(currentProfileIdProvider)) {
         applyProfileDebounce(silence: true);
       }
@@ -593,6 +671,10 @@ class AppController {
   }
 
   Future<void> _updateClashConfig() async {
+    if (system.isIOS) {
+      await _restartCore();
+      return;
+    }
     final updateParams = _ref.read(updateParamsProvider);
     final tunResult = await _requestAdmin(updateParams.tun.enable);
     if (tunResult.isError) return;
@@ -640,12 +722,20 @@ class AppController {
   Future<void> setupClashConfig() {
     return _coreLifecycleLock.synchronized(() async {
       await safeRun(() async {
-        await _setupCoreConfig();
+        if (system.isIOS && (await iosClash.refreshStatus()).connected) {
+          await _restartCore();
+        } else {
+          await _setupCoreConfig();
+        }
       }, needLoading: false);
     });
   }
 
   Future<void> _applyProfile() async {
+    if (system.isIOS && (await iosClash.refreshStatus()).connected) {
+      await _restartCore();
+      return;
+    }
     _invalidateCoreReads();
     _ref.read(delayDataSourceProvider.notifier).value = {};
     unawaited(clashCore.requestGc());
@@ -1005,7 +1095,18 @@ class AppController {
     }
   }
 
+  void disposeIOSStateObserver() {
+    unawaited(_iosStatusSubscription?.cancel());
+    _iosStatusSubscription = null;
+  }
+
   Future<void> handleExit() async {
+    if (system.isIOS) {
+      // 应用退到后台不能结束系统持有的隧道。
+      await globalState.handleBackground();
+      await savePreferences();
+      return;
+    }
     if (_exitLock != null) {
       return _exitLock!.future;
     }
@@ -1146,6 +1247,11 @@ class AppController {
   }
 
   Future<void> _initCore() async {
+    if (system.isIOS) {
+      final status = await iosClash.refreshStatus();
+      globalState.applyIOSVpnStatus(status);
+      if (status.connected || status.transitioning) return;
+    }
     final isInit = await clashCore.isInit;
     if (!isInit) {
       await clashCore.init();
@@ -1247,19 +1353,49 @@ class AppController {
 
     await updateTray(true);
 
-    await _initCore();
-    try {
-      await _initStatus();
-    } catch (e) {
-      commonPrint.log('_initStatus failed, falling back to basic startup: $e');
+    if (system.isIOS) {
+      await _iosStatusSubscription?.cancel();
+      _iosStatusSubscription = iosClash.statuses.listen((status) {
+        globalState.applyIOSVpnStatus(status);
+        _ref.read(runTimeProvider.notifier).value =
+            globalState.appState.runTime;
+        if (status.connected && !globalState.backgroundMode.value) {
+          unawaited(
+            globalState.startUpdateTasks([updateRunTime, updateTraffic]),
+          );
+        }
+      });
+    }
+    var iosCoreAvailable = true;
+    if (system.isIOS) {
       try {
-        await applyProfile(silence: true);
-      } catch (e2) {
-        commonPrint.log('Fallback applyProfile also failed: $e2');
+        await _initCore();
+      } on IOSCoreException {
+        iosCoreAvailable = false;
+        globalState.showNotifier(appLocalizations.checkError);
+      }
+    } else {
+      await _initCore();
+    }
+    try {
+      if (iosCoreAvailable) await _initStatus();
+    } catch (e) {
+      if (system.isIOS) {
+        iosCoreAvailable = false;
+        globalState.showNotifier(appLocalizations.checkError);
+      } else {
+        commonPrint.log(
+          '_initStatus failed, falling back to basic startup: $e',
+        );
+        try {
+          await applyProfile(silence: true);
+        } catch (e2) {
+          commonPrint.log('Fallback applyProfile also failed: $e2');
+        }
       }
     }
 
-    await updateGroups();
+    if (iosCoreAvailable) await updateGroups();
 
     autoLaunch?.updateStatus(_ref.read(appSettingProvider).autoLaunch);
     autoUpdateProfiles();
@@ -1293,6 +1429,18 @@ class AppController {
   }
 
   Future<void> _initStatus() async {
+    if (system.isIOS) {
+      await globalState.syncIOSVpnState();
+      _ref.read(runTimeProvider.notifier).value = globalState.appState.runTime;
+      if (iosClash.status.connected || iosClash.status.transitioning) return;
+      if (_ref.read(currentProfileProvider) != null &&
+          _ref.read(appSettingProvider).autoRun) {
+        await updateStatus(true);
+      } else {
+        await applyProfile();
+      }
+      return;
+    }
     if (system.isAndroid) {
       await globalState.updateStartTime();
       if (globalState.isStart && _ref.read(runTimeProvider) == null) {
@@ -1473,8 +1621,9 @@ class AppController {
         ageSecretKey: ageSecretKey,
       ).update();
       if (globalState.navigatorKey.currentState?.canPop() ?? false) {
-        globalState.navigatorKey.currentState
-            ?.popUntil((route) => route.isFirst);
+        globalState.navigatorKey.currentState?.popUntil(
+          (route) => route.isFirst,
+        );
       }
       toProfiles();
       await addProfile(profile);
@@ -2348,8 +2497,6 @@ class AppController {
     // Ensure current profile exists
     _ensureCurrentProfile(profiles);
   }
-
-
 
   Future<T?> safeRun<T>(
     FutureOr<T> Function() futureFunction, {

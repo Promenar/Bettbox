@@ -319,3 +319,158 @@ Flutter全量106项测试通过、另4项实际IO重定向回归通过；flutter
 
 ### HLG
 结构化追加本记录，Goal保持active，继续自主推进。
+
+## 2026-10-07T19:31:21+08:00 · 三端原生核心验收与服务端候选来源核验
+
+type: development
+scope: ["Bettbox"]
+status: in_progress
+tags: ["release", "ios", "android", "billing", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: a33080106f2dc07ac98704c4abaeb0c6ccf7d6bc1eb1f7874b8979c8e941125c
+
+### Summary
+Goal保持active，未交付可用发行版。原生核心、实际SDK类型检查及候选审阅推进；正式签名、真机和真实支付验收未完成。
+
+### Changed
+生成ios Runner与PacketTunnel原生工程、共享配置快照和内嵌Mihomo C ABI。主控修复停止回调独立截止时间、完整资源集合校验、实际复制预算和控制消息门禁，补原生测试。Android构建使用独立Gradle目录与归属核验；服务端付呗和SQLite计费候选经独立审阅，按线上订单源码重基。用户.video_agent不纳入任务。
+
+### Validation
+iOS完整核心设备/模拟器arm64 XCFramework v2构建成功，Clang/Swift模块导入通过，集成Go race测试通过。Shared3+PacketTunnel真实Simulator SDK Swift类型检查通过，C.char桥类型修复；Runner及新增原生测试未执行。主控Android构建脚本22项测试通过，真实构建核心完成但Gradle插件解析失败，锁文件和来源无漂移、任务进程清理核实；未生成APK。早期付呗117项真实隔离PHP fixture通过，但最新ledger接线及重基候选不复用该证据。
+
+### Next
+冻结Dart iOS接入后独立审阅、全量Flutter回归、Runner/扩展编译与原生测试；服务端重基并修apply提交后故障回滚和outbox失败公平退避，再运行隔离SQLite与实际Laravel路径；稳定Mac候选重建并完成登录/VPN；完成发行签名与下载入口。
+
+### Risks
+Android DNS 100.100.100.100对两个Gradle域名A查询返回RPZ NXDOMAIN；公开DNS原域名TLS制品200仅只读诊断，任务级解析绕过待用户答复，未修改DNS。正式Android keystore、Apple团队及真机连接、商户门店权限与安全秘密引用待答复。线上3个订单源码与本地来源hash不符，已取得安全扫描后的公开差异，不能跳过hash应用旧候选。付呗保持禁用，无生产迁移或资金操作。
+
+### DIA
+已同步PLATFORM_VALIDATION、ARCHITECTURE、iOS README、PDEC README和registry；ios/Vendor二进制不提交。服务端候选文档持续随重基同步。
+
+### HLG
+使用append dry-run/apply记录可恢复事实。未改写既有记录；Goal持续推进，外部条件不伪装验收通过。
+
+## 2026-10-07T20:47:13+08:00 · 正式 Android 签名创建、iOS 模拟器应用与 Laravel 集成验收
+
+type: development
+scope: ["Bettbox"]
+status: in_progress
+tags: ["release", "android", "ios", "billing", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: e9f002ab11536a8ea6b8c16ab5c6f01de1fde41a7d3236869082927757fce881
+
+### Summary
+用户授权无既有发行密钥，正式 Android PKCS12 密钥已实际创建，密码安全注入登录钥匙串，未生成正式 APK。iOS 完整 arm64 模拟器应用编译、安装、启动及未登录首页到登录、注册导航通过。真实 Laravel 隔离集成通过。
+
+### Changed
+Android 密钥目录0700、文件0600，公开证书SHA256为6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82；签名环境模块读取安全存储并校验身份，11项测试通过。iOS Pods最低15、SDK libresolv链接、arm64模拟器排除x86_64及Extension嵌入阶段修复。Laravel夹具使用真实Kernel及服务，隔离空库和精确镜像。
+
+### Validation
+共享Flutter135项测试通过，analyze无问题。ios-simulator-build.json passed且source_unchanged=true，VPN及发行签名未验证。billing-laravel-receipt-05ab3a3ac465496d8707db25074f0c94.json passed、source_unchanged=true、cleanup_verified=true；认证/插件发现/网关网络为显式夹具。Android实际官方JavaTLS通过，但Gradle help阶段DNS租约到期失败，源码及锁文件未变、owned进程清理通过。
+
+### Next
+修复Android任务连接方法：仅loopback透明HTTPS CONNECT代理，严格9官方域名443，原TLS证书校验、原TTL、bounded owned进程/socket/thread，纯测试及独立审阅后更新PDEC再实际网络/构建。完成原生XCTest、macOS稳定构建与设备业务验证。
+
+### Risks
+无Android APK或三端发行包；无Apple团队/真机VPN证据，无真实付呗付款或生产交易改造。历史macOS候选构建来源漂移，不作为发行验收。任务代理仅临时构建传输，禁止系统DNS/全局代理/新源。密钥不可丢失，备份及正式签名APK待验收。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、SIGNING-POLICY及iOS说明；任务连接改造文档待实现验收后同步。
+
+### HLG
+结构化append先dry-run再apply；本记录保留当前实测来源及后续，不将候选标为正式发行。
+
+## 2026-10-07T21:17:45+08:00 · iOS原生七项通过与Android Gradle启动参数定位
+
+type: development
+scope: ["Bettbox"]
+status: in_progress
+tags: ["ios", "android", "macos", "validation", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 1f0b34dccb456f2134f6d1c61d0ac2adcb2a68b7ef919af8762cc4bfe6de5776
+
+### Summary
+iOS原生RunnerTests七项实际通过，51个原生输入文件哈希未变；模拟器登录/注册导航及空表单提示已验证。Android任务CONNECT实际官方TLS与224116304字节Gradle8.14完整发行包下载成功，help在实际JVM缓存门禁失败，无APK。
+
+### Changed
+修正原生测试使用SDK的destinationNetworkPrefixLength字段和Data读取try。桌面来源冻结增加未跟踪字节、POSIX目录句柄及Windowsreparse检查，19项测试通过且独立审阅闭合静态P2。任务代理HTTP绕过P2已修、55项测试及独立复审通过；安全Gradle诊断和JVM早注入正在实现。
+
+### Validation
+ios-native-tests-r2.xcresult实际passed7/failed0/skipped0，ios-native-tests.json与ios-native-source-r2.json保存事实。Androidreceipt failed phase gradle-help/source_unchanged与locks_unchanged为true，proxy及Gradle清理验证成功，六条默认TLS探测通过，含MavenTTL11/GithubTTL13的新连接。NoSLA三容器运行、Xboard约337MiB/768MiB，Dart/浏览器UA公开配置HTTP200。
+
+### Next
+任务受控JAVA_TOOL_OPTIONS仅由公开flags生成，启动时设置DNS闭包/security单等号追加及proxy，不继承用户旧值；实际Gradle与Java需逐九个官方host证明directDNS被拒绝，再独立复审/PDEC登记/网络help。门禁通过后接正式签名、发行APK、设备安装。macOS权限/代理与iOS IAP须独立施工验收。
+
+### Risks
+Gradle8.14公开源码将java.security.properties及jdk.net.hosts.file视为mutable，在build阶段才设置；实际缓存guard失败支持启动时点不足，但尚未确认具体哪个缓存项失败。当前Mac候选core为用户755无setuid，发行代码现有整体core提权与IPC缺鉴权、代理所有权恢复及假启动显示均未修复。Apple团队、真机VPN、真实支付仍未验收。Windows回退不声称句柄竞态隔离。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、PDEC说明及三端计划的实际状态和Mac风险。
+
+### HLG
+按结构化append dry-run/apply追加原始事实链；不将编译/模拟器/隔离交易提升为可用发行。
+
+## 2026-10-07T21:40:51+08:00 · Android正式签名接线通过与Apple用途边界复核
+
+type: development
+scope: ["Bettbox", "Android", "iOS", "macOS"]
+status: partial
+tags: ["three-platform-release", "android-signing", "network-dependency", "apple-networkextension"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 18d45267efe8a9c2338cba0ebac50c9b4f03bad0c6104ac39b40c98c7770b957
+
+### Summary
+正式Android身份已创建，正式APK签名接线已应用并独立审阅通过；当前没有实际APK发行交付。Android早期JVM网络门禁已通过，Kotlin资源请求失败于HTTP503；iOS发行用途边界需要重新决策。
+
+### Changed
+四文件签名草稿补丁SHA20ed3bf13fe05d918c1f826b7170ffa0ce920291b603aa30dff15d49182bd56a按匹配基线应用。新增platform_extensions.android_release，validator --release校验准确操作；密码仅注入APK进程，正文丢弃，正式单证书锚与最终制品摘要校验。未修改或重建本机签名身份。
+
+### Validation
+主控实际57项builder/contract/signing测试通过，日志.test/three-platform-release/android-release-integration-tests.log；独立review无实质P1/P2。统一PDEC与release扩展验证通过，摘要113e680d463a788ff869f5ac64ea3c675f5d02e10fcf337a83b4781b9da93bb5。实际Android网络gate已退出：Gradle缓存/白名单/proxy guard通过，HTTP503来源尚不能区分官方源或任务proxy；来源/锁无漂移、owned Gradle清理verified。
+
+### Next
+网络工作包仅两文件补固定代理自产503类别计数并分离有界relay与解析容量，冻结后独立审阅和主控实际网络验证，再正式APK/AVD验收。macOS代理事务方案先只读设计，TUN需受限fd broker。等待用户对iOS专用VPN功能收缩或暂缓发行路线的选择，Android/macOS独立工作继续。
+
+### Risks
+未生成/验签/安装正式APK；Apple团队/DeveloperID/真机、真实支付与商户安全注入仍为外部条件。主控核对TN3120官方说明与实际源码：iOS捕获后DIRECT/逐连接proxy出口及any:53存在用途兼容风险，不能依据编译推定可发行；TN3134 direct DeveloperID的PacketTunnel须system extension，不能复制iOS appex。未进行真实资金、系统代理/提权或生产支付操作。
+
+### DIA
+已同步SIGNING-POLICY、.pdec/README、PLATFORM_VALIDATION、ARCHITECTURE、CHANGELOG及三端计划。
+
+### HLG
+通过HLG append先dry-run再apply记录；索引由工具重建。
+
+## 2026-10-07T21:47:07+08:00 · Android官方依赖容量与签名集成冻结，交付优先Android和macOS
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["three-platform-release", "android-network", "release-priority"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 7b90a3bada6cd2bbf9f3c0798d7c8aa42d8c89c0a3b35e68d0ad5f2bc8f852f5
+
+### Summary
+用户确认先交付Android、macOS，iOS保留开发版并研究发行方案；没有授权收缩为专用VPN。Android网络容量与签名接线冻结，可进入候选提交及实际依赖门禁。
+
+### Changed
+任务CONNECT使用32relay+6解析/TCP连接slot、queue12，slot在relay前释放，等待与上游共用绝对阶段deadline；固定代理自产503事件与零值摘要进入history，授权白名单、默认TLS和原始TTL保持。macOS系统代理设计为SCPreferences串行事务与有证据的所有权恢复，设计未实施或执行系统配置。
+
+### Validation
+主控实际90项网络、builder、contract和签名测试通过，日志.test/three-platform-release/android-network-signing-integrated-tests.log。独立review冻结两文件无新P1/P2；network SHA d8b76205602d30703e266c763fdba45d2b8784e7590085c900e727fbb8ba8a31，test SHA c336c9a4fd9fd7cc118091a540f82f4551ddb1c46f8884a21644dda703978622。统一PDEC通过，摘要7d194a24bff3a0f20672572b2fd6837ccd338f74d668d48fd8ae9cf2c6d73660；git diff --check通过，任务新增源95文件私钥/长literal-secret模式扫描无命中，不输出值。
+
+### Next
+提交推送本任务基础候选，排除.video_agent与忽略的密钥/Vendor/测试产物，再在相同源码冻结下执行一次官方依赖门禁，按固定事件计数定位503，成功后正式APK及AVD。macOS系统代理事务与受限TUN broker仍需实施，真实支付与登录/连接全路径独立验收。
+
+### Risks
+90项为mock/本机socket测试，不能代替外网/正式APK/真实VPN。32relay并非永不超载，16MiB仅逻辑转发buffer而非进程RSS。此前HTTP503来源未确认，零诊断计数本身不证明源站健康。正式Apple签名、用户设备和支付商安全配置仍需外部条件。
+
+### DIA
+已同步平台验证、签名策略、PDEC说明、三端计划、架构及CHANGELOG的当前范围与验收状态。
+
+### HLG
+标准append dry-run后apply记录，索引由工具生成。

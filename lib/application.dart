@@ -39,6 +39,7 @@ class ApplicationState extends ConsumerState<Application>
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
       TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
       TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
       TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
@@ -97,7 +98,7 @@ class ApplicationState extends ConsumerState<Application>
     }
     await globalState.appController.init();
     try {
-      await ExternalControl.start();
+      if (system.isDesktop) await ExternalControl.start();
     } catch (e) {
       commonPrint.log('ExternalControl start failed: $e');
     }
@@ -192,16 +193,15 @@ class ApplicationState extends ConsumerState<Application>
   /// SaaS 受管订阅自更新（F-SUB-5）：前台每 6h 拉齐面板数据与订阅内容。
   /// 未登录态由 refreshSubscriptionCycle 内部直接返回（登出冻结）。
   void _managedSubscriptionTask() {
-    _managedSubscriptionTimer = Timer.periodic(
-      const Duration(hours: 6),
-      (_) async {
-        try {
-          await ref
-              .read(xboardSessionProvider.notifier)
-              .refreshSubscriptionCycle(force: true);
-        } catch (_) {}
-      },
-    );
+    _managedSubscriptionTimer = Timer.periodic(const Duration(hours: 6), (
+      _,
+    ) async {
+      try {
+        await ref
+            .read(xboardSessionProvider.notifier)
+            .refreshSubscriptionCycle(force: true);
+      } catch (_) {}
+    });
   }
 
   Widget _buildPlatformState(Widget child) {
@@ -214,6 +214,7 @@ class ApplicationState extends ConsumerState<Application>
         ),
       );
     }
+    if (system.isIOS) return child;
     return AndroidManager(
       child: TileManager(child: SmartAutoStopManager(child: child)),
     );
@@ -333,14 +334,15 @@ class ApplicationState extends ConsumerState<Application>
 
   @override
   void dispose() {
+    if (system.isIOS) globalState.appController.disposeIOSStateObserver();
     globalState.backgroundMode.removeListener(_syncAutoUpdateTasks);
     WidgetsBinding.instance.removeObserver(this);
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();
     _autoUpdateProfilesTaskTimer?.cancel();
     _managedSubscriptionTimer?.cancel();
-    ExternalControl.stop();
-    if (!system.isAndroid && !globalState.isExiting) {
+    if (system.isDesktop) ExternalControl.stop();
+    if (system.isDesktop && !globalState.isExiting) {
       unawaited(globalState.appController.handleExit());
     }
     super.dispose();

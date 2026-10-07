@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:bett_box/common/system.dart';
 import 'package:bett_box/common/app_localizations.dart';
 import 'package:bett_box/views/dashboard/widgets/widgets.dart';
 import 'package:bett_box/widgets/widgets.dart';
@@ -15,20 +14,21 @@ enum SupportPlatform {
   Windows,
   MacOS,
   Linux,
-  Android;
+  Android,
+  IOS;
 
   static SupportPlatform get currentPlatform {
-    if (system.isWindows) {
-      return SupportPlatform.Windows;
-    } else if (system.isMacOS) {
-      return SupportPlatform.MacOS;
-    } else if (Platform.isLinux) {
-      return SupportPlatform.Linux;
-    } else if (system.isAndroid) {
-      return SupportPlatform.Android;
-    }
-    throw 'invalid platform';
+    return forOperatingSystem(Platform.operatingSystem);
   }
+
+  static SupportPlatform forOperatingSystem(String name) => switch (name) {
+    'windows' => Windows,
+    'macos' => MacOS,
+    'linux' => Linux,
+    'android' => Android,
+    'ios' => IOS,
+    _ => throw UnsupportedError('平台不受支持'),
+  };
 }
 
 const desktopPlatforms = [

@@ -6,8 +6,8 @@
   },
   "status": "approved",
   "approval": {
-    "reference": ".pdec/README.md#授权与适用范围；2026-09-22 Bettbox 当前任务用户明确允许开发配置按需调整并要求继续跨平台适配，仅登记同范围桌面开发验证",
-    "contract_digest": "bfb1f88e94052d617f5b6d07f0fe982521d70e094e3e460ee36677d388758bc6"
+    "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
+    "contract_digest": "7d194a24bff3a0f20672572b2fd6837ccd338f74d668d48fd8ae9cf2c6d73660"
   },
   "targets": {
     "local-mac": {
@@ -54,6 +54,427 @@
       "artifacts": [
         "build/windows/x64/runner/Release"
       ]
+    },
+    "test-flutter": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 1200,
+      "artifacts": []
+    },
+    "restore-flutter": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "pub",
+        "get",
+        "--enforce-lockfile"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": []
+    },
+    "test-ios-bridge": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-tags",
+        "with_gvisor",
+        "./iosbridge"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": []
+    },
+    "analyze-flutter": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "analyze"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": []
+    },
+    "prepare-ios-project": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "create",
+        "--platforms=ios",
+        "--no-pub",
+        "--project-name=bettbox",
+        "--org=com.appshub",
+        ".test/ios-template"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/ios-template/ios"
+      ],
+      "cross_compile": "Xcode iOS 工程模板，仅生成工程，不签名或打包",
+      "verification": "只导入新 ios/ 工程；后续模拟器编译及真机独立验收"
+    },
+    "test-build-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-p",
+        "test_build_android.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "test-android-contract": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-p",
+        "test_android_contract.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "build-ios-core": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/build_ios_core.py",
+        "--output",
+        "build/ios-core-candidate-v2"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 1800,
+      "artifacts": [
+        "build/ios-core-candidate-v2/BettboxCore.xcframework"
+      ],
+      "cross_compile": "Go c-archive 与 Xcode 分别生成 iPhoneOS/Simulator arm64",
+      "verification": "实际Clang/Swift模块导入、源码前后一致及制品哈希；系统VPN另验"
+    },
+    "test-fubei-isolated": {
+      "executor": "local-mac",
+      "target_os": "linux",
+      "target_arch": "x86_64",
+      "argv": [
+        "python3",
+        "server/tests/fubei/run_isolated.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [
+        ".test/three-platform-release/fubei-receipt.json"
+      ],
+      "cross_compile": "SSH传输公开fixture，NoSLA现有镜像的Linux PHP隔离执行，非交叉编译",
+      "verification": "禁网/只读/64MiB容器，无业务库或凭据挂载，实际PHP测试与来源hash"
+    },
+    "test-billing-isolated": {
+      "executor": "local-mac",
+      "target_os": "linux",
+      "target_arch": "x86_64",
+      "argv": [
+        "python3",
+        "server/tests/billing/run_isolated.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [
+        ".test/three-platform-release/billing-receipt.json"
+      ],
+      "cross_compile": "SSH 上传公开候选源码，NoSLA 现有 PHP 镜像执行一次性 SQLite 多进程测试，非交叉编译",
+      "verification": "128MiB 禁网/只读容器，独立测试工作目录，无业务数据库或凭据挂载，源码漂移与清理复核"
+    },
+    "build-ios-simulator": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "build",
+        "ios",
+        "--simulator",
+        "--debug",
+        "--no-pub"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 1800,
+      "artifacts": [
+        "build/ios/iphonesimulator/Runner.app"
+      ],
+      "cross_compile": "Xcode iOS Simulator SDK，本机 arm64 模拟器无发布签名",
+      "verification": "Runner/PacketTunnel 实际 Swift/Flutter 编译及嵌入，系统 VPN 另行真机验收"
+    },
+    "typecheck-ios-native": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/typecheck_ios_native.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/three-platform-release/ios-native-typecheck.json"
+      ],
+      "cross_compile": "Xcode iOS Simulator SDK 对原生共享代码和隧道扩展做真实 Swift 类型检查",
+      "verification": "SDK 类型检查，只验证编译契约，不运行 VPN 或签名"
+    },
+    "test-billing-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "server/tests/billing",
+        "-p",
+        "test_isolated.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "test-billing-apply": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "server/tests/billing/test_apply.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "create-android-signing": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/create_android_signing.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "2026-10-07 用户明确允许创建本机正式Android签名身份；密钥位于用户保护目录，密码仅登录钥匙串，不上传或发布"
+    },
+    "test-android-signing": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-p",
+        "test_android_signing.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "test-android-network": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "scripts.tests.test_build_android",
+        "scripts.tests.test_android_dependency_network",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "test-laravel-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "server/tests/billing",
+        "-p",
+        "test_laravel_isolated.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "test-laravel-isolated": {
+      "executor": "local-mac",
+      "target_os": "linux",
+      "target_arch": "x86_64",
+      "argv": [
+        "python3",
+        "server/tests/billing/run_laravel_isolated.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "cross_compile": "SSH传输精确公开白名单，NoSLA既有镜像内Laravel框架，非交叉编译",
+      "verification": "禁网只读128MiB容器，空SQLite与临时环境，真实Kernel/Eloquent；支付transport与认证明确stub，不挂生产数据或配置"
+    },
+    "test-android-release-signing": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/tests/test_android_release_signing.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "boot-ios-simulator": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "DCDCC7A9-90AB-4DC3-8F69-451E0FEA0624"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "cross_compile": "已构建arm64 Simulator包安装/运行，不重新编译",
+      "verification": "已有iPhone17模拟器，已编译同来源候选，真实UI与进程检查，不是真机VPN或发布签名"
+    },
+    "install-ios-simulator": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "xcrun",
+        "simctl",
+        "install",
+        "DCDCC7A9-90AB-4DC3-8F69-451E0FEA0624",
+        "build/ios/iphonesimulator/Runner.app"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "cross_compile": "已构建arm64 Simulator包安装/运行，不重新编译",
+      "verification": "已有iPhone17模拟器，已编译同来源候选，真实UI与进程检查，不是真机VPN或发布签名"
+    },
+    "launch-ios-simulator": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "xcrun",
+        "simctl",
+        "launch",
+        "DCDCC7A9-90AB-4DC3-8F69-451E0FEA0624",
+        "com.appshub.bettbox"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "cross_compile": "已构建arm64 Simulator包安装/运行，不重新编译",
+      "verification": "已有iPhone17模拟器，已编译同来源候选，真实UI与进程检查，不是真机VPN或发布签名"
+    },
+    "test-ios-native": {
+      "executor": "local-mac",
+      "target_os": "ios",
+      "target_arch": "arm64",
+      "argv": [
+        "xcodebuild",
+        "test",
+        "-workspace",
+        "ios/Runner.xcworkspace",
+        "-scheme",
+        "Runner",
+        "-configuration",
+        "Debug",
+        "-destination",
+        "platform=iOS Simulator,id=DCDCC7A9-90AB-4DC3-8F69-451E0FEA0624",
+        "-only-testing:RunnerTests",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-resultBundlePath",
+        ".test/three-platform-release/ios-native-tests-r2.xcresult"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 1200,
+      "artifacts": [
+        ".test/three-platform-release/ios-native-tests-r2.xcresult"
+      ],
+      "verification": "XcodeBuildMCP test_sim执行当前工作树原生单元测试，结果不作为真机VPN或发行签名证据"
+    },
+    "test-desktop-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "scripts.tests.test_validate_desktop"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "来源冻结和现有桌面编译入口纯单元测试，不执行原生构建"
     }
   },
   "deployment": {
@@ -65,7 +486,7 @@
     "rollback": ""
   },
   "evidence": {
-    "scripts/validate_desktop.py": "9e3709f55edae4456a27e5f50eccbeb2e7343afa49a4d8a139613829befeed63",
+    "scripts/validate_desktop.py": "ee8a0276a6b86f3b60879de56a6d2cb3a56bd49f1ce0459d2fec6080ee3d0b16",
     ".github/workflows/validate-desktop.yaml": "ad83eea5cbb847ccef09045808db62c7cccbcd35de3bbe04aa614855fff7c360",
     "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
     "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
@@ -77,6 +498,60 @@
     "macos/Runner/Release.entitlements": "0672f83103b450e4e0b5b86e42238d9b9ba39af727de43d185f22ec56143cda5",
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
-    ".gitattributes": "7dae69874619d7772fdd8bf50006fc9b220ece7d0842028a36fe77e8311828cb"
+    ".gitattributes": "7dae69874619d7772fdd8bf50006fc9b220ece7d0842028a36fe77e8311828cb",
+    "scripts/build_android.py": "088a23051e1d4fde926ce1427e0ee2fc571b5acafe1fc3b9e823d2e7483ee453",
+    "scripts/validate_android_contract.py": "4cf1b60519f443d7cef737ab0f7d4224f4a94668c93dd81d3112aed5edef89af",
+    "scripts/build_ios_core.py": "5649d3ef7a05195ffdb9c57d4b4fedcee47e5460a292eb5c18aa10b229739e48",
+    "server/tests/fubei/run_isolated.py": "22b22ac0883a22ebd08753d2bf13cb5091acba3af3c2c4416ce727698c6fd21d",
+    "server/tests/billing/run_isolated.py": "76d92353dbc76cf109fe5673e17e44cf6bb238433f67fabde92454b06a90f659",
+    "server/tests/billing/test_isolated.py": "c6d4e61f5f2e1f0a767b81186953b437dc7ff554b01fb976af1c5e09cf8cfc23",
+    "scripts/typecheck_ios_native.py": "987380cf5474504718b8eebaf090eea225c8a9d67e066aa7b71f0dc349d6d3de",
+    "scripts/create_android_signing.py": "1049c4c4596209af41098c8412adc44fb433b188b678f1734b3c079c1fde5dc4",
+    "scripts/tests/test_android_signing.py": "b5a62cd93941e2ceb26c3bc96bbf4c7fef852f14bb5c0c9f8f6a5d90e387780f",
+    "scripts/android_dependency_network.py": "d8b76205602d30703e266c763fdba45d2b8784e7590085c900e727fbb8ba8a31",
+    "scripts/tests/test_build_android.py": "c236d08baa86040a93be4e2e007edf2880f8e5634a87d5e620ee8d963de226ec",
+    "scripts/tests/test_android_dependency_network.py": "c336c9a4fd9fd7cc118091a540f82f4551ddb1c46f8884a21644dda703978622",
+    "server/tests/billing/run_laravel_isolated.py": "3055aaca6f7e363f2904136f476d2fed6ba2a229855df71f88a4cda9c671519e",
+    "server/tests/billing/test_laravel_isolated.py": "be8a3b73c96b17ca06ff2c519c26dc1b89ac995d7ba0e1719536635e4944e1ad",
+    "server/tests/billing/laravel_check.php": "374ba5cc6e041f85af3e8513421d871b0f62e050f6113b9d99e255c9ce4c4a83",
+    "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
+    "scripts/android_release_signing.py": "fc327f29903e629173639478811b1925b0272a17ef6813a11bff69aa23046728",
+    "scripts/tests/test_android_release_signing.py": "6b6f4cc74d99f6da53d7ea8fb6ed917667d633d643b4dba6a7d8c56afb88cd06",
+    "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
+    "scripts/tests/test_validate_desktop.py": "a4a92f58f31f4ff364be8bd087903519793630ff31bf034381b5f4ea7cbcf837",
+    "scripts/tests/test_android_contract.py": "d1c63546276ffbe667cb35c5cb1d65b9ace8aef85a416719f4e9953399479a43"
+  },
+  "platform_extensions": {
+    "android": {
+      "executor": "local-mac",
+      "target_os": "android",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/build_android.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 2700,
+      "artifacts": [
+        "build/app/outputs/flutter-apk/app-debug.apk"
+      ]
+    },
+    "android_release": {
+      "executor": "local-mac",
+      "target_os": "android",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/build_android.py",
+        "--execute",
+        "--release"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 2700,
+      "artifacts": [
+        "build/app/outputs/flutter-apk/app-release.apk"
+      ]
+    }
   }
 }

@@ -10,10 +10,13 @@ val localProperties = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
-val mStoreFile = file("keystore.jks")
-val mStorePassword: String? = localProperties.getProperty("storePassword")
-val mKeyAlias: String? = localProperties.getProperty("keyAlias")
-val mKeyPassword: String? = localProperties.getProperty("keyPassword")
+// 本机发行凭据由任务执行器从登录钥匙串注入，不将密码写入项目配置。
+val mStoreFile = file(
+    System.getenv("BETTBOX_ANDROID_STORE_FILE") ?: localProperties.getProperty("storeFile") ?: "keystore.jks"
+)
+val mStorePassword: String? = System.getenv("BETTBOX_ANDROID_STORE_PASSWORD") ?: localProperties.getProperty("storePassword")
+val mKeyAlias: String? = System.getenv("BETTBOX_ANDROID_KEY_ALIAS") ?: localProperties.getProperty("keyAlias")
+val mKeyPassword: String? = System.getenv("BETTBOX_ANDROID_KEY_PASSWORD") ?: localProperties.getProperty("keyPassword")
 val hasReleaseSigningConfig = mStoreFile.isFile &&
     !mStorePassword.isNullOrBlank() &&
     !mKeyAlias.isNullOrBlank() &&
@@ -27,7 +30,7 @@ gradle.taskGraph.whenReady {
     }
     if (hasReleaseTask && !hasReleaseSigningConfig) {
         throw GradleException(
-            "正式 release 任务需要有效的 keystore.jks 文件及非空的 " +
+            "正式 release 任务需要有效的 keystore 文件及非空的 " +
                 "storePassword、keyAlias、keyPassword 配置；禁止使用 debug 签名发行。"
         )
     }

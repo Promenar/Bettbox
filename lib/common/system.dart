@@ -33,6 +33,8 @@ class System {
 
   bool get isAndroid => Platform.isAndroid;
 
+  bool get isIOS => Platform.isIOS;
+
   bool get isLinux => Platform.isLinux;
 
   Future<int> get version async {
@@ -41,6 +43,11 @@ class System {
       'macos' => (deviceInfo as MacOsDeviceInfo).majorVersion,
       'android' => (deviceInfo as AndroidDeviceInfo).version.sdkInt,
       'windows' => (deviceInfo as WindowsDeviceInfo).majorVersion,
+      'ios' =>
+        int.tryParse(
+              (deviceInfo as IosDeviceInfo).systemVersion.split('.').first,
+            ) ??
+            0,
       String() => 0,
     };
   }
@@ -76,7 +83,7 @@ class System {
   }
 
   Future<AuthorizeCode> authorizeCore() async {
-    if (system.isAndroid) return AuthorizeCode.none;
+    if (system.isAndroid || system.isIOS) return AuthorizeCode.none;
 
     if (await checkIsAdmin()) return AuthorizeCode.none;
 
@@ -184,6 +191,7 @@ class System {
   }
 
   Future<void> exit() async {
+    if (system.isIOS) return;
     if (system.isAndroid) await SystemNavigator.pop();
     await window?.close();
   }

@@ -14,6 +14,7 @@ import os
 import platform
 import re
 import shutil
+import stat
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -97,6 +98,65 @@ LOCK_FILES = (
     Path("macos/Podfile.lock"),
     Path("macos/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved"),
 )
+
+SOURCE_SCOPE = (
+    "lib", "core", "macos", "windows", "services/helper", "plugins",
+    "assets", "arb", "scripts", "pubspec.yaml", "pubspec.lock",
+)
+
+
+def checked_source_parents(root: Path, path: Path) -> dict[str, tuple[int, ...]]:
+    """Windows 回退核对 reparse point；这不等同 POSIX 目录句柄隔离。"""
+    snapshot = {}
+    for parent in (path, *path.parents):
+        if parent == root:
+            break
+        info = parent.lstat()
+        attributes = getattr(info, "st_file_attributes", 0)
+        if stat.S_ISLNK(info.st_mode) or attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+            raise RuntimeError("源码输入包含链接或 reparse point")
+        snapshot[str(parent)] = (info.st_dev, info.st_ino, info.st_mode, attributes)
+    return snapshot
+
+
+def source_file_hash(root: Path, name: str) -> str | None:
+    """冻结构建输入字节；拒绝链接及读取期间变化，不读取签名配置。"""
+    relative = Path(name)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise RuntimeError("源码输入路径越界")
+    if relative.name.startswith(".env") or relative.name == "local.properties" or \
+            relative.suffix.lower() in (".jks", ".keystore", ".pem", ".key", ".p12", ".pfx"):
+        return None
+    # 支持 dir_fd 的平台逐层打开目录，避免父目录链接替换使读取越界。
+    parent_snapshot = None
+    if os.open in os.supports_dir_fd:
+        directory = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            for part in relative.parts[:-1]:
+                child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+                os.close(directory)
+                directory = child
+            descriptor = os.open(relative.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+        finally:
+            os.close(directory)
+    else:
+        path = root / relative
+        parent_snapshot = checked_source_parents(root, path)
+        descriptor = os.open(path, os.O_RDONLY)
+    with os.fdopen(descriptor, "rb") as stream:
+        before = os.fstat(stream.fileno())
+        if not stat.S_ISREG(before.st_mode):
+            raise RuntimeError("源码输入不是普通文件")
+        digest = hashlib.sha256()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+        after = os.fstat(stream.fileno())
+        identity = lambda value: (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_mode)
+        if identity(before) != identity(after) or identity(after) != identity((root / relative).lstat()):
+            raise RuntimeError("源码输入在冻结期间发生变化")
+        if parent_snapshot is not None and parent_snapshot != checked_source_parents(root, root / relative):
+            raise RuntimeError("源码父路径在冻结期间发生变化")
+    return digest.hexdigest()
 
 
 @dataclass(frozen=True)
@@ -482,11 +542,37 @@ def git_source_state(root: Path) -> dict[str, object]:
         stderr=subprocess.STDOUT,
     ).stdout
     status = [line for line in status_output.splitlines() if line]
+    listed = subprocess.run(
+        ("git", "ls-files", "--cached", "--others", "--exclude-standard", "-z", "--", *SOURCE_SCOPE),
+        cwd=root, env=environment, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    ).stdout.decode("utf-8").split("\0")
+    hashes = {}
+    for name in sorted(set(filter(None, listed))):
+        path = root / name
+        if not path.exists() and not path.is_symlink():
+            hashes[name] = None
+        elif path.is_symlink():
+            raise RuntimeError("源码输入包含符号链接")
+        elif path.is_dir():
+            # gitlink 的工作树必须独立展开，不能只记录目录名。
+            nested = subprocess.run(
+                ("git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"),
+                cwd=path, env=environment, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            ).stdout.decode("utf-8").split("\0")
+            for item in sorted(set(filter(None, nested))):
+                relative = f"{name}/{item}"
+                nested_path = root / relative
+                hashes[relative] = (source_file_hash(root, relative)
+                                    if nested_path.exists() or nested_path.is_symlink() else None)
+        else:
+            hashes[name] = source_file_hash(root, name)
     return {
         "head": head,
         "dirty": bool(status),
         "status": status,
         "tracked_diff_sha256": hashlib.sha256(diff).hexdigest(),
+        "source_sha256": hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest(),
+        "source_file_count": len(hashes),
     }
 
 

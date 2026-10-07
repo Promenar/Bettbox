@@ -2,14 +2,14 @@
 
 ## 目标与验收
 
-用户授权恢复平台开发，主控持续推进三端和 NoSLA 服务端适配，交付可安装、可登录、可购买、可获取订阅和实际连接的发行包。业务代码保持共享；邀请归属、返佣与余额由 Xboard 计算。Android 使用自有渠道 APK，macOS 使用安装应用，iOS 使用 Packet Tunnel 与 Apple IAP。正式发布必须具备对应签名和权限，模拟验证不替代真实支付或 VPN。
+主控优先交付 Android、macOS 与 NoSLA 服务端适配，发行包需可安装、可登录、可购买、可获取订阅和实际连接。iOS 保留开发版并研究发行方案，发行不作为当前交付门禁；用户已明确选择此范围。业务代码保持共享；邀请归属、返佣与余额由 Xboard 计算。Android 使用自有渠道 APK，macOS 使用安装应用；正式发布必须具备对应签名和权限，模拟验证不替代真实支付或 VPN。
 
 ## 当前事实与开放条件
 
-- Flutter 3.44.9；Android/macOS 原生工程存在，iOS 主工程不存在。
+- Flutter 3.44.9；Android/macOS/iOS 原生工程存在；iOS arm64 模拟器应用已编译并启动，真机隧道尚未验收。
 - 本机 Android 工具链和 iOS 27 模拟器可用；Apple Development 身份存在，团队及 Network Extension 权限未确认。
 - NoSLA Xboard 已迁移；API 主入口 api.bingcn.site，邀请网页 cloud.bingcn.site，旧入口保留兼容。
-- 已安装插件不含付呗；商户号、门店号、通道开通情况待用户补齐，接口密钥不得进入模型或客户端。
+- 付呗插件与订单事务补丁为本地候选，真实 Laravel/SQLite 隔离集成已通过，未部署或启用生产付款；商户号、门店号、通道开通情况待用户补齐，接口密钥不得进入模型或客户端。
 - Android/iPhone 真机连接待用户准备；Windows 原生开发不在三端目标内。
 - 用户目录 .video_agent 不属于本任务，保持原状。
 
@@ -41,3 +41,16 @@
 - 服务端：单元与隔离数据库测试、重复/乱序/伪造回调、金额和订单绑定、并发幂等、拒绝跨账户入账。
 
 各入口在执行前登记并 validate PDEC；主控按实际结果补充命令与证据，不填造已通过状态。
+
+## Android 官方依赖连接验收
+
+任务仅使用用户授权的九个官方依赖主机与 Cloudflare DoH。连接代理监听127.0.0.1随机端口，只接受白名单host:443的CONNECT，透明转发TLS字节；Java保留原站SNI和默认证书校验。每次上游连接使用原始CNAME/地址最短TTL，TTL0仅用于当前查询对应的一次连接且不缓存，过期回答有界重新解析；已建立的TCP不因DNS缓存到期中断。
+
+只向wrapper与实际Gradle JVM注入任务代理参数，hosts限制为localhost闭包，禁止系统解析回退。禁止系统DNS、Tailscale、全局hosts、全局代理和非官方依赖变化；pub/Go不使用该代理。实现由Android网络工作包独占四个脚本/测试文件，独立审阅后主控登记PDEC、冻结来源，先Java TLS与Gradle help，再APK。清理须验证owned socket/thread/child与Gradle进程退出，回执不保留签名URL或响应正文。
+
+## macOS 权限与状态修复门禁
+
+原生审阅确认现有 root/setuid 整体内核路径缺少调用者鉴权，不能作为安全 TUN 发行实现。下一工作包须定义受限提权接口、连接方身份、配置与文件边界及失败回滚；未完成前不执行该提权路径。启动状态仅在监听与必要权限真实确认后提交，普通代理与TUN分别确认。系统代理操作串行、核对返回码，保存本应用持有的配置并且仅在当前值匹配时恢复，不能无条件清除既有PAC/bypass。Apple Development候选和DeveloperID公证发行分开验证，核验嵌套签名及core签名前后关系。
+
+
+macOS TUN 架构采用前需完成 Apple 用途约束核验：TN3134 中直接 Developer ID 分发的 Packet Tunnel 必须为系统扩展，应用扩展仅限 App Store；TN3120 限制将所声明的流量通过其它接口代理转发，以及在 Packet Tunnel 内托管网络监听器。当前 Mihomo 规则代理与本地监听行为须逐项比对，不以 iOS 工程可编译推定 Apple 分发适用。受限 fd broker 作为 macOS 独立候选；最终方案、团队权限和真实数据流验收均待确认。依据：[TN3134](https://developer.apple.com/documentation/technotes/tn3134-network-extension-provider-deployment)、[TN3120](https://developer.apple.com/documentation/technotes/tn3120-expected-use-cases-for-network-extension-packet-tunnel-providers)。

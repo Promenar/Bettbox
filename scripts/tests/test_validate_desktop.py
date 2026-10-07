@@ -19,6 +19,62 @@ SPEC.loader.exec_module(validate_desktop)
 
 
 class ValidateDesktopTest(unittest.TestCase):
+    def test_windows_reparse_point_rejected_before_file_open(self) -> None:
+        info = mock.Mock(st_mode=0o100644, st_file_attributes=0x400)
+        with mock.patch.object(validate_desktop.os, "supports_dir_fd", set()), \
+                mock.patch.object(Path, "lstat", return_value=info), \
+                mock.patch.object(validate_desktop.os, "open") as opened:
+            with self.assertRaisesRegex(RuntimeError, "reparse point"):
+                validate_desktop.source_file_hash(Path("repo"), "lib/input.dart")
+        opened.assert_not_called()
+
+    def test_windows_parent_change_during_read_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "lib").mkdir()
+            (root / "lib/input.dart").write_text("fixture")
+            with mock.patch.object(validate_desktop.os, "supports_dir_fd", set()), \
+                    mock.patch.object(validate_desktop, "checked_source_parents", side_effect=[{"parent": (1,)}, {"parent": (2,)}]):
+                with self.assertRaisesRegex(RuntimeError, "源码父路径"):
+                    validate_desktop.source_file_hash(root, "lib/input.dart")
+
+    def test_same_untracked_path_content_change_invalidates_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(("git", "init", "-q"), cwd=root, check=True)
+            subprocess.run(("git", "-c", "user.name=构建测试", "-c", "user.email=fixture@example.invalid",
+                            "commit", "--allow-empty", "-qm", "夹具"), cwd=root, check=True)
+            (root / "lib").mkdir()
+            source = root / "lib/new.dart"
+            source.write_text("first")
+            (root / ".video_agent").mkdir()
+            (root / ".video_agent/private").write_text("不属于构建")
+            before = validate_desktop.git_source_state(root)
+            source.write_text("other")
+            after = validate_desktop.git_source_state(root)
+            self.assertEqual(before["status"], after["status"])
+            self.assertEqual(before["tracked_diff_sha256"], after["tracked_diff_sha256"])
+            self.assertNotEqual(before["source_sha256"], after["source_sha256"])
+            self.assertEqual(before["source_file_count"], 1)
+
+    def test_source_links_and_parent_links_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "lib").mkdir()
+            (root / "outside").mkdir()
+            (root / "outside/input.dart").write_text("fixture")
+            (root / "lib/link.dart").symlink_to(root / "outside/input.dart")
+            (root / "lib/parent").symlink_to(root / "outside", target_is_directory=True)
+            for name in ("lib/link.dart", "lib/parent/input.dart"):
+                with self.subTest(name=name), self.assertRaises((OSError, RuntimeError)):
+                    validate_desktop.source_file_hash(root, name)
+
+    def test_signing_material_is_excluded_before_open(self) -> None:
+        with mock.patch.object(validate_desktop.os, "open") as opened:
+            self.assertIsNone(validate_desktop.source_file_hash(Path("repo"), "macos/private.p12"))
+            self.assertIsNone(validate_desktop.source_file_hash(Path("repo"), "plugins/.env"))
+        opened.assert_not_called()
+
     def test_flutter_first_start_logs_do_not_replace_machine_version(self) -> None:
         machine = json.dumps({"frameworkVersion": "3.44.9", "dartSdkVersion": "3.12.2"})
         self.assertEqual(validate_desktop.parse_flutter_version(machine), "3.44.9")

@@ -8,9 +8,9 @@ Bettbox 使用 Flutter。页面、Riverpod 状态、Xboard API、邀请分享及
 
 | 能力 | Android | macOS / Windows | iOS |
 | --- | --- | --- | --- |
-| 邀请链接、二维码、收益 | 共享 Flutter 实现 | 共享 Flutter 实现 | 可复用业务/UI，尚无原生主工程 |
+| 邀请链接、二维码、收益 | 共享 Flutter 实现 | 共享 Flutter 实现 | 共享业务/UI；模拟器应用编译与未登录页面已验证 |
 | 跳转型收银 | 嵌入式 WebView，并提供浏览器入口 | 系统浏览器 | 按 PRD 接 Apple IAP，不能沿用桌面收银作为完成方案 |
-| 内核运行 | 原生动态库与 VPNService | 独立 core 进程和平台服务 | 需 Packet Tunnel 与独立内核桥接 |
+| 内核运行 | 原生动态库与 VPNService | 独立 core 进程和平台服务 | 独立 Packet Tunnel 与内嵌核心候选，真机待验收 |
 | 系统集成 | Android 权限及生命周期 | Keychain/安全存储、托盘、代理、TUN、安装服务 | App Group、签名、隧道权限、后台生命周期 |
 
 ## 本机开发环境与分工
@@ -21,7 +21,7 @@ Bettbox 使用 Flutter。页面、Riverpod 状态、Xboard API、邀请分享及
 
 Android 的 Nexara_API_31、Nexara_API_35 和 Pixel_7 是共享主机上的多系统版本测试设备，前两个由 Nexara 兼容性验证使用，Pixel_7 的当前镜像为 API 36.1。日常开发共用一个 AVD，兼容性回归才切换版本；不按项目数量新建模拟器，不删除其他项目仍引用的设备。关闭的 AVD 只占磁盘。
 
-iOS 27.0（24A434）ARM64 运行时已通过 Xcode 官方下载入口安装，下载约 8.05GB，运行时文件约占 7.5GiB。iPhone 17 的 simctl bootstatus 验证通过，Flutter 识别为受支持的 iOS 模拟器；验证后已关闭设备以释放运行资源。Xcode 自动生成的机型配置共用这份运行时，日常使用一个 iPhone 模拟器即可。Bettbox 尚无 iOS 主工程，模拟器环境不能替代 Packet Tunnel、项目签名与真机 VPN 验收。
+iOS 27.0（24A434）ARM64 运行时已通过 Xcode 官方下载入口安装，下载约 8.05GB，运行时文件约占 7.5GiB。iPhone 17 的 simctl bootstatus 验证通过，Flutter 识别为受支持的 iOS 模拟器；当前已安装并启动 Bettbox 候选应用，未登录首页及登录入口可操作。Xcode 自动生成的机型配置共用这份运行时，日常使用一个 iPhone 模拟器即可。Bettbox 已生成 iOS Runner 工程，Packet Tunnel 与宿主桥接正在集成；模拟器环境不能替代项目签名与真机 VPN 验收。
 
 ## 已落地的平台差异
 
@@ -62,7 +62,7 @@ python3 scripts/run_xboard_invite_check.py \
 
 ## iOS 工程工作包
 
-用户已有 iPhone，开发者团队尚未准备好。当前仓库没有 `ios/` 主工程，且 `ClashCore()` 的非 Android 路径依赖桌面服务；不能仅生成 Flutter Runner 就视为完成移植。
+用户已有 iPhone，开发者团队尚未准备好。仓库已生成 `ios/` Runner 工程，宿主与 Packet Tunnel 正在集成；共享 `ClashCore()` 已接入 iOS C ABI 与系统 VPN 桥接；完整应用编译和真机 VPN 仍按独立门禁验收。
 
 1. 复用并扩展既有 `ClashHandlerInterface`，保持 Android/桌面实现行为，为 iOS 提供独立的连接、停止、状态、日志和统计实现；不能复用桌面进程启动方式。逐项检查本地插件：tray_manager、window_ext、proxy 属于桌面能力，需要保持平台隔离；flutter_qjs 和 code_forge 已声明 iOS 支持，仍需与主工程一并构建验证。
 2. 建立 Runner 与 Packet Tunnel Extension，通过 App Group 交换必要配置；认证值使用可明确授权共享的 Keychain，不能把订阅凭据写入普通共享偏好。
@@ -71,3 +71,29 @@ python3 scripts/run_xboard_invite_check.py \
 5. 按 PRD 对接 IAP 商品映射及服务端交易校验、入账和返佣；再进行商店构建与分发验收。
 
 前两项可独立准备，隧道签名与真机 VPN 属于后续验收条件。没有可运行的 Packet Tunnel 与签名证据时不标记 iOS 已支持。
+
+## 三端发行目标的当前验收边界
+
+共享网络安全基础候选 `93f82e2` 已推送，106 项 Flutter 全量测试与额外4项实际 IO 重定向测试通过，静态检查通过。Android release 签名与内核缺失门禁已纳入该候选；正式 Android keystore 已按用户授权在本机创建，签名 APK 尚未构建验收。
+
+完整 iOS Mihomo C ABI 已编译为设备与模拟器 arm64 XCFramework，并通过两套 SDK 的 Clang/Swift 模块导入检查。原生包流适配的真实 listener、并发停止、RPC 取消与 DNS 初始化测试通过 `go test -mod=readonly -race -tags with_gvisor ./iosbridge`。静态库回执保留 `vpn_ready:false`，尚未验证系统 PacketTunnel、签名、设备数据流和资源预算。
+
+macOS 当前工作树编译生成169.3MB应用，实际启动及未登录首页、账户、登录页和NoSLA套餐读取正常。构建期间并行源码变化使来源一致性检查拒绝通过，须稳定后重建；这份应用不是已验收发行包。
+
+付呗候选的原始回调表单与金额 token 修复通过117项真实PHP隔离测试，执行容器禁网、只读、64MiB且无业务数据/凭据挂载。此证据不包含官方支付请求、真实付款、完整数据库事务或返佣并发验收。插件保持禁用，事务补丁与快照接线独立审阅和验证后才能决定启用。
+
+原生 Shared 与 PacketTunnel 已通过 iOS Simulator SDK 的真实 Swift 类型检查，发现的 C 指针桥接类型问题已修复。审阅发现的独立停止截止时间、快照完整文件集合/实际复制预算与单在途控制消息均已修复，RunnerTests 7项原生测试已在模拟器实际运行通过，51个原生输入文件来源无漂移；Runner arm64 模拟器完整应用已实际编译通过并安装启动，未登录首页和登录/注册导航另行记录，真机 VPN 未验收。Android 构建曾完成核心生成但失败于 Gradle 插件解析；实际 DNS 100.100.100.100 返回 RPZ NXDOMAIN。用户已授权仅在项目构建中解析官方依赖，任务专用解析与 TLS/Gradle 门禁正在验收，未修改系统 DNS。
+
+服务端事务候选核验发现线上3个来源文件包含既有订单防护和余额抵扣后的佣金基数行为，不能直接应用本地基线补丁；候选按线上来源重基。SQLite 并发执行器仅传输17个明确公开文件，使用128MiB禁网容器和一次性数据库，无生产库或秘密挂载；实际多进程事务、负手续费拒绝、幂等返佣及 outbox 恢复已通过，来源无漂移且资源清理验证通过。真实 Laravel 集成已在精确镜像的禁网隔离容器中通过，来源无漂移且资源清理验证通过。测试经过 HTTP Kernel、真实订单服务、同步队列、返佣命令与持久 outbox；认证、插件发现和支付网络传输为明确夹具，不覆盖生产认证、真实付款或该夹具中的并发。
+
+Android 正式发行密钥已在本机创建，密码位于登录钥匙串，密钥目录0700、文件0600。公开证书 SHA256 为 `6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82`；后续版本必须使用同一身份。正式 APK 的签名、安装及业务全路径仍待构建验收。
+
+正式签名构建接线通过独立审阅，57项构建、契约及签名测试通过；`--release` 使用单独批准的 Android 扩展，计划模式不读凭据，签名密码只进入 APK 构建进程，生成后校验证书锚与单一 signer。测试为受控 mock，不作为实际 APK 实签或安装证据。
+
+完整 iOS 模拟器应用构建使用当前工作树，来源检查通过；Pods 最低系统版本对齐 iOS 15、Runner 与 PacketTunnel 链接 SDK libresolv，模拟器候选仅包含 arm64。模拟器不支持系统 VPN，编译和页面操作不作为真机隧道、商店签名或可分发版本证据。最新共享 Flutter 135 项测试通过，静态检查无问题。
+
+Android 官方依赖使用仅任务的 loopback CONNECT 代理，90项网络、构建、契约及签名集成测试及独立审阅通过；32条转发与6条解析/连接分别有界限流，回执记录代理自产拒绝计数。实际 Java TLS、官方重定向与 Gradle 8.14 下载通过；早期 JVM 参数注入后，Gradle 已进入插件配置，不再报 DNS 缓存门禁错误。最新实际失败为 Kotlin 依赖解析（annotations:13.0、kotlin-gradle-plugin-idea:2.2.20），正在定位具体上游错误。来源与锁文件无漂移，任务 Gradle 进程清理已验证；实际 APK 及签名尚未验收。
+
+macOS 发行审阅确认尚需修复：当前 TUN 提权把整个 core 设为 root/setuid，IPC 入口缺少调用者鉴权；监听成功与系统代理操作返回值尚未完整约束连接显示，代理清理没有本应用配置所有权快照。桌面来源冻结已加入构建输入实际字节哈希，包含未跟踪源码并排除秘密文件；19项测试通过，独立审阅确认该来源冻结补丁无新增P1/P2；Windows回退拒绝reparse point并在读取后核对父路径，句柄级竞态防护尚未在Windows验证。正式 Apple 签名路径还需要身份校验与签名前后制品关系，现有 ad hoc 验收不能替代正式签名。
+
+iOS 发行存在用途兼容风险：当前捕获流量交给 Mihomo 后仍允许 DIRECT 回退与逐连接代理，DNS 缺省捕获 `any:53`；这与 Apple TN3120 的 Packet Tunnel 用途限制冲突，不能按当前实现判定发行验收通过。未发现扩展托管外部代理服务器的证据。用户已确认优先交付 Android、macOS，iOS 保留开发版并研究发行方案；未授权收缩节点协议或完整代理功能。macOS 保留现有规则代理功能时，受限 utun fd broker 优先于套用该 Packet Tunnel 路径。依据：[Apple TN3120](https://developer.apple.com/documentation/technotes/tn3120-expected-use-cases-for-network-extension-packet-tunnel-providers)；直接 Developer ID 的 Network Extension 分发形式另见 [TN3134](https://developer.apple.com/documentation/technotes/tn3134-network-extension-provider-deployment)。

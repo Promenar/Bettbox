@@ -156,6 +156,34 @@ func checkTunName(tunName string) (ok bool) {
 }
 
 func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Listener, err error) {
+	return newListener(options, tunnel, nil, additions...)
+}
+
+// NewWithTun 使用调用方提供的包流，不创建系统设备、不写入系统路由或 DNS。
+// 该入口接管 injected 的关闭责任，包括初始化失败的路径。
+func NewWithTun(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, additions ...inbound.Addition) (*Listener, error) {
+	if injected == nil {
+		return nil, E.New("注入包流不能为空")
+	}
+	if _, ok := tunnel.(P.Tunnel); !ok {
+		_ = injected.Close()
+		return nil, E.New("注入包流需要有效的 Mihomo tunnel")
+	}
+	options.Stack = C.TunGvisor
+	options.AutoRoute = false
+	options.AutoRedirect = false
+	options.AutoDetectInterface = false
+	options.FileDescriptor = 0
+	options.GSO = false
+	options.Device = "packet-flow"
+	l, err := newListener(options, tunnel, injected, additions...)
+	if err != nil {
+		_ = injected.Close()
+	}
+	return l, err
+}
+
+func newListener(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, additions ...inbound.Addition) (l *Listener, err error) {
 	if len(additions) == 0 {
 		additions = []inbound.Addition{
 			inbound.WithInName("DEFAULT-TUN"),
@@ -171,7 +199,7 @@ func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Lis
 		options.AutoRedirect = false
 	}
 	tunName := options.Device
-	if options.FileDescriptor == 0 && (tunName == "" || !checkTunName(tunName)) {
+	if injected == nil && options.FileDescriptor == 0 && (tunName == "" || !checkTunName(tunName)) {
 		tunName = CalculateInterfaceName(InterfaceName)
 		options.Device = tunName
 	}
@@ -492,15 +520,21 @@ func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Lis
 
 	}
 
-	tunIf, err := tunNew(tunOptions)
-	if err != nil {
-		err = E.Cause(err, "configure tun interface")
-		return
+	tunIf := injected
+	if tunIf == nil {
+		tunIf, err = tunNew(tunOptions)
+		if err != nil {
+			err = E.Cause(err, "configure tun interface")
+			return
+		}
 	}
+	l.tunIf = tunIf
 
-	l.dnsServerIp = dnsServerIp
-	// after tun.New sing-tun has set DNS to TUN interface
-	resolver.AddSystemDnsBlacklist(dnsServerIp...)
+	if injected == nil {
+		l.dnsServerIp = dnsServerIp
+		// after tun.New sing-tun has set DNS to TUN interface
+		resolver.AddSystemDnsBlacklist(dnsServerIp...)
+	}
 
 	stackOptions := tun.StackOptions{
 		Context:                ctx,
@@ -513,7 +547,7 @@ func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Lis
 		Logger:                 log.SingLogger,
 		ForwarderBindInterface: forwarderBindInterface,
 		InterfaceFinder:        interfaceFinder,
-		EnforceBindInterface:   EnforceBindInterface,
+		EnforceBindInterface:   injected == nil && EnforceBindInterface,
 	}
 	l.tunIf = tunIf
 
@@ -522,11 +556,11 @@ func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Lis
 		return
 	}
 
+	l.tunStack = tunStack
 	err = tunStack.Start()
 	if err != nil {
 		return
 	}
-	l.tunStack = tunStack
 
 	if l.autoRedirect != nil {
 		if len(l.options.RouteAddressSet) > 0 && len(l.routeAddressSet) == 0 {

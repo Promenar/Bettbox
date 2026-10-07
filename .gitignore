@@ -42,8 +42,13 @@ migrate_working_dir/
 /specs/
 /dist/
 .test/
-# Unsupported generated iOS platform
-/ios/
+# iOS 核心二进制由锁定源码生成，原生工程随源码同步
+/ios/Vendor/
+!/ios/README.md
+!/core/iosbridge/README.md
+!/server/plugins/Fubei/README.md
+!/server/patches/billing/README.md
+!/server/patches/billing/PLAN.md
 
 # Xcode project-local SwiftPM state; keep the workspace Package.resolved
 /macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/

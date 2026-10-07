@@ -101,6 +101,7 @@ Future<void> _runApp() async {
 
 @pragma('vm:entry-point')
 Future<void> _service(List<String> flags) async {
+  if (!system.isAndroid) return;
   globalState.isService = true;
   WidgetsFlutterBinding.ensureInitialized();
   await globalState.init();
@@ -317,8 +318,8 @@ class _VpnListenerWithService with VpnListener {
   const _VpnListenerWithService({
     required Function(String dns) onDnsChanged,
     required Function() onNetworkChanged,
-  })  : _onDnsChanged = onDnsChanged,
-        _onNetworkChanged = onNetworkChanged;
+  }) : _onDnsChanged = onDnsChanged,
+       _onNetworkChanged = onNetworkChanged;
 
   @override
   void onDnsChanged(String dns) {

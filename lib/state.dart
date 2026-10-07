@@ -12,8 +12,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
-import 'package:bett_box/xboard/node_packager.dart'
-    as xboard_node_packager;
+import 'package:bett_box/xboard/node_packager.dart' as xboard_node_packager;
 
 import 'package:bett_box/widgets/dialog.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +63,9 @@ class GlobalState {
   final Lock _scriptEvaluateLock = Lock();
   bool isInit = false;
 
-  bool get isStart => startTime != null && startTime!.isBeforeNow;
+  bool get isStart => system.isIOS
+      ? iosClash.status.connected
+      : startTime != null && startTime!.isBeforeNow;
 
   AppController get appController => _appController!;
 
@@ -127,7 +128,8 @@ class GlobalState {
     if (system.isAndroid) {
       _isAndroidTV = await app.isAndroidTV();
     }
-    config = await preferences.getConfig() ??
+    config =
+        await preferences.getConfig() ??
         Config(
           themeProps: defaultThemeProps,
           patchClashConfig: system.isAndroid
@@ -238,7 +240,31 @@ class GlobalState {
     _syncVpnState();
   }
 
+  Future<void> syncIOSVpnState() async {
+    if (!system.isIOS) return;
+    applyIOSVpnStatus(await iosClash.refreshStatus());
+  }
+
+  void applyIOSVpnStatus(IOSVpnStatus status) {
+    // 连接计时只来自 NE 的真实 connectedDate，accepted 不参与状态推导。
+    startTime = status.connected ? status.connectedAt : null;
+    appState = appState.copyWith(
+      runTime: !status.connected
+          ? null
+          : startTime == null
+          ? 0
+          : DateTime.now().difference(startTime!).inMilliseconds,
+    );
+    if (!status.connected) stopUpdateTasks();
+  }
+
   Future<void> _syncVpnState() async {
+    if (system.isIOS) {
+      try {
+        await syncIOSVpnState();
+      } catch (_) {}
+      return;
+    }
     if (!system.isAndroid) return;
     try {
       final actuallyRunning = await service?.getStatus() ?? false;
@@ -302,7 +328,43 @@ class GlobalState {
   Future<void> handleStart([
     UpdateTasks? tasks,
     bool includeVpnService = true,
+    int? iosStartGeneration,
   ]) async {
+    if (system.isIOS) {
+      final generation = iosStartGeneration;
+      if (generation == null) throw const IOSCoreException('启动代次缺失');
+      final inputs = await iosClash.startStage(
+        generation,
+        clashCore.getIOSSnapshotInputs,
+      );
+      final setup = inputs.setup;
+      final tun = setup.config['tun'] as Map? ?? {};
+      final routes = List<String>.from(tun['route-address'] as List? ?? []);
+      final excluded = List<String>.from(
+        tun['route-exclude-address'] as List? ?? [],
+      );
+      await iosClash.startSnapshot(inputs, getCoreState(), {
+        'mtu': tun['mtu'] ?? 1480,
+        'capacity': 256,
+        'ipv4Address': '198.18.0.1/30',
+        'ipv6Address': setup.config['ipv6'] == true
+            ? 'fdfe:dcba:9876::1/126'
+            : '',
+        'dnsServers': ['198.18.0.2'],
+        'includeRoutes': routes.where((route) => !route.contains(':')).toList(),
+        'includeRoutes6': routes.where((route) => route.contains(':')).toList(),
+        'excludeRoutes': excluded
+            .where((route) => !route.contains(':'))
+            .toList(),
+        'excludeRoutes6': excluded
+            .where((route) => route.contains(':'))
+            .toList(),
+      }, generation: generation);
+      iosClash.checkPendingStart(generation);
+      applyIOSVpnStatus(iosClash.status);
+      if (iosClash.status.connected) await startUpdateTasks(tasks);
+      return;
+    }
     startTime ??= DateTime.now();
     if (system.isAndroid && isService) {
       await clashLibHandler?.startListener();
@@ -322,6 +384,10 @@ class GlobalState {
   }
 
   Future updateStartTime() async {
+    if (system.isIOS) {
+      await syncIOSVpnState();
+      return;
+    }
     startTime = await clashLib?.getRunTime();
   }
 
@@ -341,7 +407,15 @@ class GlobalState {
     }
   }
 
-  Future handleStop([bool includeVpnService = true]) async {
+  Future handleStop([
+    bool includeVpnService = true,
+    bool cancelIOSPendingStart = true,
+  ]) async {
+    if (system.isIOS) {
+      await iosClash.stopVpn(cancelPending: cancelIOSPendingStart);
+      applyIOSVpnStatus(iosClash.status);
+      return;
+    }
     startTime = null;
     if (system.isAndroid && isService) {
       await clashLibHandler?.stopListener();
@@ -472,10 +546,7 @@ class GlobalState {
                       color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: const [
-                        BoxShadow(
-                          blurRadius: 10,
-                          color: Colors.black12,
-                        ),
+                        BoxShadow(blurRadius: 10, color: Colors.black12),
                       ],
                     ),
                     child: const Column(
@@ -575,14 +646,16 @@ class GlobalState {
 
     final realPatchConfig = patchConfig.copyWith(
       dns: patchConfig.dns.copyWith(
-        fakeIpRangeV6:
-            patchConfig.dns.effectiveFakeIpRangeV6(ipv6Enabled: patchConfig.ipv6),
+        fakeIpRangeV6: patchConfig.dns.effectiveFakeIpRangeV6(
+          ipv6Enabled: patchConfig.ipv6,
+        ),
       ),
       tun: patchConfig.tun.getRealTun(
         config.networkProps.bypassPrivateRoute,
         fakeIpRange: patchConfig.dns.fakeIpRange,
-        fakeIpRangeV6:
-            patchConfig.dns.effectiveFakeIpRangeV6(ipv6Enabled: patchConfig.ipv6),
+        fakeIpRangeV6: patchConfig.dns.effectiveFakeIpRangeV6(
+          ipv6Enabled: patchConfig.ipv6,
+        ),
         bypassPrivateRouteAddress:
             config.networkProps.realBypassPrivateRouteAddress,
       ),
@@ -634,14 +707,40 @@ class GlobalState {
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
     rawConfig['tun']['route-exclude-address'] =
         realPatchConfig.tun.routeExcludeAddress;
-    rawConfig['tun']['auto-route'] = !system.isAndroid;
-    rawConfig['tun']['auto-detect-interface'] = !system.isAndroid;
+    rawConfig['tun']['auto-route'] = system.isDesktop;
+    rawConfig['tun']['auto-detect-interface'] = system.isDesktop;
     rawConfig['tun']['strict-route'] = realPatchConfig.tun.strictRoute;
     rawConfig['tun']['endpoint-independent-nat'] =
         realPatchConfig.tun.endpointIndependentNat;
     rawConfig['tun']['disable-icmp-forwarding'] =
         realPatchConfig.tun.disableIcmpForwarding;
     rawConfig['tun']['mtu'] = realPatchConfig.tun.mtu;
+    if (system.isIOS) {
+      for (final key in [
+        'external-controller',
+        'external-ui',
+        'external-ui-url',
+        'secret',
+      ]) {
+        rawConfig.remove(key);
+      }
+      // iOS 数据通路仅由 Network Extension 持有，离线核心不打开监听端口。
+      for (final key in [
+        'port',
+        'socks-port',
+        'mixed-port',
+        'redir-port',
+        'tproxy-port',
+      ]) {
+        rawConfig[key] = 0;
+      }
+      rawConfig['allow-lan'] = false;
+      rawConfig['find-process-mode'] = 'off';
+      rawConfig['log-level'] = 'silent';
+      rawConfig['tun']['enable'] = false;
+      rawConfig['tun']['dns-hijack'] = ['any:53'];
+    }
+
     rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
     rawConfig['geodata-mode'] = false;
     if (rawConfig['sniffer']?['sniff'] != null) {
@@ -747,15 +846,16 @@ class GlobalState {
       }
     }
 
+    if (system.isIOS) rawConfig['dns'].remove('listen');
     if (system.isAndroid && rawConfig['dns']['listen'] != null) {
       final listen = rawConfig['dns']['listen'] as String;
       if (listen.endsWith(':53')) {
         rawConfig['dns']['listen'] = listen.replaceAll(':53', ':10053');
       }
-      final noProviders = rawConfig['proxy-providers'] == null &&
+      final noProviders =
+          rawConfig['proxy-providers'] == null &&
           rawConfig['rule-providers'] == null;
-      final proxyServerNameserver =
-          rawConfig['dns']['proxy-server-nameserver'];
+      final proxyServerNameserver = rawConfig['dns']['proxy-server-nameserver'];
       final hasLocalProxyServerNameserver = switch (proxyServerNameserver) {
         List list => list.any((e) => e.toString().startsWith('127.0.0.1')),
         String str => str.startsWith('127.0.0.1'),
@@ -777,7 +877,7 @@ class GlobalState {
       final ntp = realPatchConfig.ntp;
       rawConfig['ntp'] = ntp.toJson();
     }
-    if (system.isAndroid) {
+    if (system.isAndroid || system.isIOS) {
       rawConfig['ntp']['write-to-system'] = false;
     }
     if (rawConfig['sniffer'] == null) {
@@ -902,7 +1002,8 @@ class GlobalState {
       rawConfig.remove('rule');
     }
 
-    final scriptActive = config.scriptProps.currentScript != null &&
+    final scriptActive =
+        config.scriptProps.currentScript != null &&
         targetProfile.useScriptOverride;
 
     final overrideData = targetProfile.overrideData;
@@ -1066,8 +1167,7 @@ class DashboardRefreshManager {
     }
 
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    if (lifecycleState != null &&
-        lifecycleState != AppLifecycleState.resumed) {
+    if (lifecycleState != null && lifecycleState != AppLifecycleState.resumed) {
       return false;
     }
     return true;
@@ -1143,9 +1243,7 @@ class DetectionState {
   void toggleIpPrivacy() {
     _isIpMasked = !_isIpMasked;
     if (_rawIpInfo != null) {
-      state.value = state.value.copyWith(
-        ipInfo: _maskIpInfo(_rawIpInfo),
-      );
+      state.value = state.value.copyWith(ipInfo: _maskIpInfo(_rawIpInfo));
     }
   }
 
@@ -1226,8 +1324,9 @@ class DetectionState {
     state.value = state.value.copyWith(
       isLoading: false,
       ipInfo: _maskIpInfo(_rawIpInfo),
-      errorMessage:
-          _rawIpInfo != null ? null : appLocalizations.tryManualRefresh,
+      errorMessage: _rawIpInfo != null
+          ? null
+          : appLocalizations.tryManualRefresh,
     );
   }
 

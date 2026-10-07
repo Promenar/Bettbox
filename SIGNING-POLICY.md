@@ -37,3 +37,14 @@ If a security breach, unauthorized commit, or private key compromise (related to
 1. Maintainers will immediately revoke any exposed tokens.
 2. If malicious code was signed, maintainers will immediately contact the SignPath Foundation to request the revocation of the code signing certificate.
 3. An advisory will be published on the GitHub repository to notify users.
+
+
+## Android 本机发行签名
+
+Android 使用持续沿用的发行 keystore，区别于 Windows 的 SignPath 流程。用户已明确允许在本机创建正式身份。`scripts/create_android_signing.py` 默认只展示计划，显式执行后将 PKCS12 密钥与公开证书摘要保存在用户保护目录，目录0700、密钥0600；密码保存在登录钥匙串。脚本拒绝覆盖既有密钥或钥匙串身份，不输出密码或私钥。
+
+构建执行器从安全引用读取密码后仅注入构建进程的 `BETTBOX_ANDROID_STORE_PASSWORD` 和 `BETTBOX_ANDROID_KEY_PASSWORD`；文件路径及别名分别为 `BETTBOX_ANDROID_STORE_FILE`、`BETTBOX_ANDROID_KEY_ALIAS`。禁止把实际值放进命令文本、日志、Git或项目 local.properties。缺少正式配置的 release 任务必须中止，debug签名不得充当发行身份。密钥创建不等于已完成APK签名、安装或发行；具体证书、APK验签和版本连续性由发行回执证明。
+
+2026-10-07 本机正式 Android 身份创建通过。公开证书 SHA256：`6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82`。失败创建不会删除已有钥匙串记录；回执未完成时保留身份并标记待核对。私钥和密码不纳入仓库。
+
+`scripts/build_android.py --execute --release` 在正式扩展批准后读取本机签名身份，密码只进入 Flutter APK 构建进程，并在结束后清除临时环境引用。该步骤的工具正文不进入诊断、回执或日志；验签过程不使用密码。成功回执必须包含固定证书摘要、单一 signer、APK 前后摘要一致、核心及16KiB校验和来源无漂移。`signature_verified` 不表示业务发行已验收，`release_verified` 保持为 false，直至安装和实际功能验收另有完整证据。

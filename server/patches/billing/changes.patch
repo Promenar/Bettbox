@@ -1,0 +1,1353 @@
+--- a/app/Console/Commands/CheckCommission.php
++++ b/app/Console/Commands/CheckCommission.php
+@@ -60,70 +60,24 @@
+ 
+     public function autoPayCommission()
+     {
+-        $orders = Order::where('commission_status', 1)
+-            ->where('invite_user_id', '!=', NULL)
+-            ->get();
++        $orders = Order::where('commission_status', 1)->whereNotNull('invite_user_id')->get();
+         foreach ($orders as $order) {
+-            try{
+-                DB::beginTransaction();
+-                if (!$this->payHandle($order->invite_user_id, $order)) {
+-                    DB::rollBack();
+-                    continue;
+-                }
+-                $order->commission_status = 2;
+-                if (!$order->save()) {
+-                    DB::rollBack();
+-                    continue;
+-                }
+-                DB::commit();
+-            } catch (\Exception $e){
+-                DB::rollBack();
+-                throw $e;
++            try {
++                $this->payHandle($order->invite_user_id, $order);
++            } catch (\Throwable $e) {
++                \App\Services\Billing\Atomic::review(DB::connection(), (int)$order->id, 'commission_failed', '佣金事务未完成，需人工核对或修复后重试');
+             }
+         }
+     }
+ 
+     public function payHandle($inviteUserId, Order $order)
+     {
+-        $level = 3;
+-        if ((int)admin_setting('commission_distribution_enable', 0)) {
+-            $commissionShareLevels = [
+-                0 => (int)admin_setting('commission_distribution_l1'),
+-                1 => (int)admin_setting('commission_distribution_l2'),
+-                2 => (int)admin_setting('commission_distribution_l3')
+-            ];
+-        } else {
+-            $commissionShareLevels = [
+-                0 => 100
+-            ];
+-        }
+-        for ($l = 0; $l < $level; $l++) {
+-            $inviter = User::find($inviteUserId);
+-            if (!$inviter) continue;
+-            if (!isset($commissionShareLevels[$l])) continue;
+-            $commissionBalance = $order->commission_balance * ($commissionShareLevels[$l] / 100);
+-            if (!$commissionBalance) continue;
+-            if ((int)admin_setting('withdraw_close_enable', 0)) {
+-                $inviter->increment('balance', $commissionBalance);
+-            } else {
+-                $inviter->increment('commission_balance', $commissionBalance);
+-            }
+-            if (!$inviter->save()) {
+-                DB::rollBack();
+-                return false;
+-            }
+-            CommissionLog::create([
+-                'invite_user_id' => $inviteUserId,
+-                'user_id' => $order->user_id,
+-                'trade_no' => $order->trade_no,
+-                'order_amount' => $order->total_amount,
+-                'get_amount' => $commissionBalance
+-            ]);
+-            $inviteUserId = $inviter->invite_user_id;
+-            // update order actual commission balance
+-            $order->actual_commission_balance = $order->actual_commission_balance + $commissionBalance;
+-        }
+-        return true;
++        $shares = (int)admin_setting('commission_distribution_enable', 0)
++            ? [0=>(int)admin_setting('commission_distribution_l1'),1=>(int)admin_setting('commission_distribution_l2'),2=>(int)admin_setting('commission_distribution_l3')]
++            : [0=>100];
++        // 受益人只采用事务内重读的订单字段，忽略陈旧调用参数。
++        $ok = \App\Services\Billing\Atomic::commission(DB::connection(), (int)$order->id, $shares, (bool)admin_setting('withdraw_close_enable', 0));
++        $order->refresh();
++        return $ok;
+     }
+-
+ }
+--- a/app/Console/Commands/CheckOrder.php
++++ b/app/Console/Commands/CheckOrder.php
+@@ -49,5 +49,6 @@
+             ->each(function ($order) {
+                 OrderHandleJob::dispatch($order->trade_no);
+             });
++        \App\Services\Billing\Outbox::drain();
+     }
+ }
+--- a/app/Http/Controllers/V1/Guest/PaymentController.php
++++ b/app/Http/Controllers/V1/Guest/PaymentController.php
+@@ -23,7 +23,7 @@
+                 return $this->fail([422, 'verify error']);
+             }
+             HookManager::call('payment.notify.verified', $verify);
+-            if (!$this->handle($verify['trade_no'], $verify['callback_no'])) {
++            if (!$this->handle($verify['trade_no'], $verify['callback_no'], ($verify['billing_transitioned'] ?? false) === true)) {
+                 return $this->fail([400, 'handle error']);
+             }
+             return (isset($verify['custom_result']) ? $verify['custom_result'] : 'success');
+@@ -33,20 +33,18 @@
+         }
+     }
+ 
+-    private function handle($tradeNo, $callbackNo)
++    private function handle($tradeNo, $callbackNo, bool $alreadyTransitioned = false)
+     {
+         $order = Order::where('trade_no', $tradeNo)->first();
+         if (!$order) {
+-            return $this->fail([400202, 'order is not found']);
++            return false;
+         }
+-        if ($order->status !== Order::STATUS_PENDING)
+-            return true;
+         $orderService = new OrderService($order);
+         if (!$orderService->paid($callbackNo)) {
+             return false;
+         }
+ 
+-        HookManager::call('payment.notify.success', $order);
++        // 到账成功钩子由持久 outbox 交付，不能依赖本请求的首次开通是否成功。
+         return true;
+     }
+ }
+--- a/app/Http/Controllers/V1/User/OrderController.php
++++ b/app/Http/Controllers/V1/User/OrderController.php
+@@ -130,9 +130,9 @@
+             return $this->fail([400, __('Order amount is invalid')]);
+         }
+         // free process
+-        if ($order->total_amount <= 0) {
++        if ($order->total_amount == 0) {
+             $orderService = new OrderService($order);
+-            if (!$orderService->paid($order->trade_no))
++            if (!$orderService->paid($order->trade_no, 'free'))
+                 return $this->fail([400, '支付失败']);
+             return response([
+                 'type' => -1,
+@@ -144,13 +144,26 @@
+             return $this->fail([400, __('Payment method is not available')]);
+         }
+         $paymentService = new PaymentService($payment->payment, $payment->id);
+-        $order->handling_amount = NULL;
+-        if ($payment->handling_fee_fixed || $payment->handling_fee_percent) {
+-            $order->handling_amount = (int) round(($order->total_amount * ($payment->handling_fee_percent / 100)) + $payment->handling_fee_fixed);
+-        }
+-        $order->payment_id = $method;
+-        if (!$order->save())
+-            return $this->fail([400, __('Request failed, please try again later')]);
++        $order = \App\Services\Billing\Atomic::run(DB::connection(), function ($db) use ($order, $payment, $method) {
++            $fresh = Order::find($order->id);
++            if (!$fresh || (int)$fresh->status !== Order::STATUS_PENDING) throw new \App\Exceptions\ApiException('订单已付款或取消');
++            if ($fresh->total_amount == 0) throw new \App\Exceptions\ApiException('订单应付金额无效，请重新确认');
++            $handling = NULL;
++            if ($payment->handling_fee_fixed || $payment->handling_fee_percent) {
++                $handling = (int)round(($fresh->total_amount * ($payment->handling_fee_percent / 100)) + $payment->handling_fee_fixed);
++            }
++            $fresh->handling_amount = $handling;
++            $fresh->payment_id = $method;
++            // 返回而非抛异常，使核对记录提交，并由外层禁止调用支付网关。
++            if (!\App\Services\Billing\Atomic::guardAmountsInside($db,$fresh)) return null;
++            $attempt = $db->selectOne('SELECT * FROM v2_payment_attempt WHERE order_id=? AND status=0 ORDER BY id DESC LIMIT 1', [$fresh->id]);
++            if ($attempt && ($payment->payment !== 'Fubei' || (int)$attempt->payment_id !== (int)$method || (int)$attempt->expected_cents !== (int)$fresh->total_amount + (int)$handling)) {
++                throw new \App\Exceptions\ApiException('存在未完成付呗尝试，先核对或关闭平台订单后切换支付');
++            }
++            if (!$fresh->save()) throw new \App\Exceptions\ApiException('订单支付配置保存失败');
++            return $fresh;
++        });
++        if (!$order) return $this->fail([400, '订单金额无效，请人工核对']);
+         $result = $paymentService->pay([
+             'trade_no' => $tradeNo,
+             'total_amount' => isset($order->handling_amount) ? ($order->total_amount + $order->handling_amount) : $order->total_amount,
+--- a/app/Http/Controllers/V2/Admin/OrderController.php
++++ b/app/Http/Controllers/V2/Admin/OrderController.php
+@@ -151,7 +151,7 @@
+             return $this->fail([400, '只能对待支付的订单进行操作']);
+ 
+         $orderService = new OrderService($order);
+-        if (!$orderService->paid('manual_operation')) {
++        if (!$orderService->paid('manual_operation', 'manual')) {
+             return $this->fail([500, '更新失败']);
+         }
+         return $this->success(true);
+--- a/app/Jobs/OrderHandleJob.php
++++ b/app/Jobs/OrderHandleJob.php
+@@ -36,6 +36,7 @@
+      */
+     public function handle()
+     {
++        \App\Services\Billing\Atomic::open(app('db')->connection(), $this->tradeNo, function ($fresh) {
+         $order = Order::where('trade_no', $this->tradeNo)->first();
+         if (!$order) return;
+         $orderService = new OrderService($order);
+@@ -50,5 +51,7 @@
+                 $orderService->open();
+                 break;
+         }
++        });
++        \App\Services\Billing\Outbox::order($this->tradeNo);
+     }
+ }
+--- /dev/null
++++ b/app/Services/Billing/Atomic.php
+@@ -0,0 +1,227 @@
++<?php
++
++namespace App\Services\Billing;
++
++final class Atomic
++{
++    public static function run($db, callable $action)
++    {
++        if ($db->getDriverName() !== 'sqlite') throw new \RuntimeException('计费候选仅支持已验收的 SQLite 目标');
++        return $db->transaction(function () use ($db, $action) {
++            // 必须先写后读：SQLite 的 lockForUpdate 不能替代此写锁获取步骤。
++            if ($db->affectingStatement('UPDATE v2_billing_mutex SET revision=revision+1 WHERE id=1') !== 1) {
++                throw new \RuntimeException('计费事务迁移未完成');
++            }
++            return $action($db);
++        }, 5);
++    }
++
++    public static function paid($db, int $id, string $callback, string $source, ?callable $transition = null): bool
++    {
++        if (!in_array($source, ['legacy', 'free', 'manual'], true) || $callback === '') return false;
++        $transitioned = false;
++        $result = self::run($db, function ($db) use ($id, $callback, $source, &$transitioned) {
++            $transitioned = false;
++            $order = $db->selectOne('SELECT * FROM v2_order WHERE id=?', [$id]);
++            if (!$order) return false;
++            if (!self::guardAmountsInside($db,$order)) return false;
++            if ((int) $order->status === 2) {
++                if ($source === 'legacy') self::reviewInside($db, $id, 'cancelled_payment', '取消后收到付款，待人工核对');
++                return false;
++            }
++            if ((int) $order->status !== 0) return in_array((int) $order->status, [1, 3], true) && $order->callback_no === $callback;
++            if ($source === 'free' && (string) $order->total_amount !== '0') return false;
++            $changed = $db->affectingStatement('UPDATE v2_order SET status=1,callback_no=?,paid_at=?,updated_at=? WHERE id=? AND status=0', [$callback, time(), time(), $id]) === 1;
++            if ($changed && $source === 'legacy') self::enqueueInside($db,$id);
++            $transitioned = $changed;
++            return $changed;
++        });
++        if ($result && $transitioned && $transition) $transition();
++        return $result;
++    }
++
++    public static function cancel($db, int $id, callable $refund, ?callable $before = null, ?callable $transition = null): bool
++    {
++        return self::run($db, function ($db) use ($id, $refund, $before, $transition) {
++            $order = $db->selectOne('SELECT * FROM v2_order WHERE id=?', [$id]);
++            if (!$order) return false;
++            if ((int) $order->status === 2) return true;
++            if ((int) $order->status !== 0) return false;
++            if ($before) $before();
++            if ($db->affectingStatement('UPDATE v2_order SET status=2,updated_at=? WHERE id=? AND status=0', [time(), $id]) !== 1) return false;
++            if ((int) ($order->balance_amount ?? 0) > 0 && !$refund($order)) throw new \RuntimeException('取消订单余额退回失败');
++            if ($transition) $transition();
++            return true;
++        });
++    }
++
++    public static function open($db, string $tradeNo, callable $action): void
++    {
++        self::run($db, function ($db) use ($tradeNo, $action) {
++            $order = $db->selectOne('SELECT * FROM v2_order WHERE trade_no=?', [$tradeNo]);
++            if ($order && in_array((int) $order->status, [0, 1], true) && self::guardAmountsInside($db,$order)) $action($order);
++        });
++    }
++
++    public static function guardAmountsInside($db,$order): bool
++    {
++        // 调用方必须持有同一连接的写事务；不抛异常，确保核对证据随事务提交。
++        if ($order->total_amount < 0 || ($order->handling_amount ?? 0) < 0) {
++            self::reviewInside($db,(int)$order->id,'negative_order_amount','订单金额或手续费为负数，拒绝到账和开通，保留原始证据待人工核对');
++            return false;
++        }
++        return true;
++    }
++
++    public static function review($db, int $id, string $category, string $reason): void
++    {
++        self::run($db, fn($db) => self::reviewInside($db, $id, $category, $reason));
++    }
++
++    public static function commission($db, int $id, array $shares, bool $toBalance): bool
++    {
++        foreach ($shares as $level => $share) {
++            if (!is_int($level) || $level < 0 || $level > 2 || !is_int($share) || $share < 0 || $share > 100) throw new \InvalidArgumentException('佣金层级比例不合法');
++        }
++        return self::run($db, function ($db) use ($id,$shares,$toBalance) {
++            $order = $db->selectOne('SELECT * FROM v2_order WHERE id=?', [$id]);
++            if (!$order) return false;
++            if ((int)$order->commission_status === 2) return true;
++            if ((int)$order->commission_status !== 1 || (int)$order->status !== 3) return false;
++            if ($db->selectOne('SELECT id FROM v2_commission_log WHERE trade_no=? AND order_id IS NULL LIMIT 1', [$order->trade_no])) throw new \RuntimeException('历史佣金证据需人工核对');
++            $base = $order->commission_balance;
++            if (!preg_match('/^(0|[1-9][0-9]{0,9})$/D',(string)$base) || (int)$base > 1000000000) throw new \RuntimeException('佣金基数不是合法整数分');
++            $seen = [(int)$order->user_id => true];
++            $beneficiary = $order->invite_user_id;
++            $total = 0;
++            for ($level = 0; $level < 3 && isset($shares[$level]); $level++) {
++                $user = $db->selectOne('SELECT id,invite_user_id FROM v2_user WHERE id=?', [$beneficiary]);
++                if (!$user) break;
++                if (isset($seen[$user->id])) throw new \RuntimeException('循环邀请拒绝重复受益人');
++                $seen[$user->id] = true;
++                $product = (int)$base * $shares[$level];
++                if ($product % 100 !== 0) throw new \RuntimeException('佣金存在非整数分，需确认舍入政策');
++                $amount = intdiv($product,100);
++                if ($amount > 0) {
++                    $db->insert('INSERT INTO v2_commission_log(invite_user_id,user_id,trade_no,order_amount,get_amount,created_at,updated_at,order_id,level) VALUES(?,?,?,?,?,?,?,?,?)', [$user->id,$order->user_id,$order->trade_no,$order->total_amount,$amount,time(),time(),$id,$level]);
++                    $column = $toBalance ? 'balance' : 'commission_balance';
++                    if ($db->affectingStatement('UPDATE v2_user SET ' . $column . '=' . $column . '+?,updated_at=? WHERE id=?', [$amount,time(),$user->id]) !== 1) throw new \RuntimeException('佣金余额保存失败');
++                    $total += $amount;
++                }
++                $beneficiary = $user->invite_user_id;
++            }
++            return $db->affectingStatement('UPDATE v2_order SET commission_status=2,actual_commission_balance=COALESCE(actual_commission_balance,0)+?,updated_at=? WHERE id=? AND commission_status=1', [$total,time(),$id]) === 1;
++        });
++    }
++
++    private static function reviewInside($db, int $id, string $category, string $reason): void
++    {
++        $db->insert('INSERT OR IGNORE INTO v2_billing_review(order_id,category,reason,created_at) VALUES(?,?,?,?)', [$id, $category, $reason, time()]);
++    }
++
++    public static function attempt($db, int $orderId, array $snapshot): object
++    {
++        foreach (['payment_id','merchant_id','store_id','expected_cents'] as $key) {
++            if (!isset($snapshot[$key]) || !preg_match('/^[1-9][0-9]{0,10}$/D', (string) $snapshot[$key])) throw new \InvalidArgumentException('付呗快照必需编号或金额缺失');
++        }
++        if ((int)$snapshot['expected_cents'] > 1000000000) throw new \InvalidArgumentException('付呗快照金额超出范围');
++        if (!is_string($snapshot['secret_ref'] ?? null) || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/D',$snapshot['secret_ref'])) throw new \InvalidArgumentException('付呗快照密钥引用未配置');
++        if (!isset($snapshot['identity_mode'], $snapshot['identity_key']) || !in_array($snapshot['identity_mode'], ['merchant','vendor'], true)
++            || !preg_match('/^[a-zA-Z0-9_-]{1,32}$/D', $snapshot['identity_key'])) throw new \InvalidArgumentException('付呗快照身份不合法');
++        $result = self::run($db, function ($db) use ($orderId, $snapshot) {
++            $order = $db->selectOne('SELECT * FROM v2_order WHERE id=?', [$orderId]);
++            if ($order && !self::guardAmountsInside($db,$order)) return null;
++            if (!$order || (int) $order->status !== 0 || (int) $order->payment_id !== (int) $snapshot['payment_id']
++                || (int) $order->total_amount + (int) ($order->handling_amount ?? 0) !== (int) $snapshot['expected_cents']) throw new \RuntimeException('付呗快照与当前订单不匹配');
++            $scope = hash('sha256', json_encode([$snapshot['identity_mode'],$snapshot['identity_key'],(string)$snapshot['merchant_id']]));
++            $previous = $db->selectOne('SELECT * FROM v2_payment_attempt WHERE order_id=? AND status=0 ORDER BY id DESC LIMIT 1', [$orderId]);
++            if ($previous) {
++                foreach (['payment_id','merchant_id','store_id','expected_cents'] as $key) {
++                    if ((string) $previous->$key !== (string) $snapshot[$key]) throw new \RuntimeException('存在不同快照的未完成尝试，先人工核对或关闭平台订单');
++                }
++                if ($previous->provider_scope !== $scope || $previous->secret_ref !== $snapshot['secret_ref']) throw new \RuntimeException('未完成尝试身份或密钥引用冲突');
++                return $previous;
++            }
++            $external = bin2hex(random_bytes(16));
++            $db->insert('INSERT INTO v2_payment_attempt(order_id,payment_id,external_no,identity_mode,identity_key,provider_scope,merchant_id,store_id,expected_cents,secret_ref,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,0,?)', [$orderId,$snapshot['payment_id'],$external,$snapshot['identity_mode'],$snapshot['identity_key'],$scope,$snapshot['merchant_id'],$snapshot['store_id'],$snapshot['expected_cents'],$snapshot['secret_ref'],time()]);
++            return $db->selectOne('SELECT * FROM v2_payment_attempt WHERE external_no=?', [$external]);
++        });
++        if (!$result) throw new \RuntimeException('订单金额无效，拒绝付呗下单并等待人工核对');
++        return $result;
++    }
++
++    public static function settleAttempt($db, string $external, string $providerNo, string $scope, int $merchant, int $store, int $cents, ?callable $transition = null): bool
++    {
++        if (!preg_match('/^[a-zA-Z0-9_-]{1,32}$/D', $providerNo)) return false;
++        $transitioned = false;
++        $result = self::run($db, function ($db) use ($external,$providerNo,$scope,$merchant,$store,$cents,&$transitioned) {
++            $transitioned = false;
++            $attempt = $db->selectOne('SELECT * FROM v2_payment_attempt WHERE external_no=?', [$external]);
++            if (!$attempt || $attempt->provider_scope !== $scope || (int)$attempt->merchant_id !== $merchant || (int)$attempt->store_id !== $store || (int)$attempt->expected_cents !== $cents) return false;
++            if ($attempt->provider_no !== null && $attempt->provider_no !== $providerNo) return false;
++            $order = $db->selectOne('SELECT * FROM v2_order WHERE id=?', [$attempt->order_id]);
++            if (!$order) return false;
++            if (!self::guardAmountsInside($db,$order)) {
++                if ((int)$attempt->status===0) {
++                    // 已验签的平台流水仍保存为人工核对证据，不开通或修正原始金额。
++                    $db->affectingStatement('UPDATE v2_payment_attempt SET provider_no=COALESCE(provider_no,?),status=2 WHERE id=? AND status=0',[$providerNo,$attempt->id]);
++                }
++                return false;
++            }
++            if ((int)$attempt->status === 1) return in_array((int)$order->status,[1,3],true) && $order->callback_no === $providerNo;
++            if ((int)$attempt->status !== 0) return false;
++            $db->affectingStatement('UPDATE v2_payment_attempt SET provider_no=? WHERE id=? AND provider_no IS NULL', [$providerNo,$attempt->id]);
++            if ((int)$order->status !== 0 || (int)$order->payment_id !== (int)$attempt->payment_id) {
++                $db->affectingStatement('UPDATE v2_payment_attempt SET status=2 WHERE id=?', [$attempt->id]);
++                self::reviewInside($db,(int)$order->id,'attempt_conflict','收到付款但订单状态或归属冲突，待人工核对');
++                return false;
++            }
++            if ($db->affectingStatement('UPDATE v2_order SET status=1,callback_no=?,paid_at=?,updated_at=? WHERE id=? AND status=0', [$providerNo,time(),time(),$order->id]) !== 1) throw new \RuntimeException('到账 CAS 失败');
++            $db->affectingStatement('UPDATE v2_payment_attempt SET status=1 WHERE id=? AND status=0', [$attempt->id]);
++            self::enqueueInside($db,(int)$order->id);
++            $transitioned = true;
++            return true;
++        });
++        if ($result && $transitioned && $transition) $transition();
++        return $result;
++    }
++
++    private static function enqueueInside($db,int $orderId): void
++    {
++        $eventId = hash('sha256','payment.notify.success:' . $orderId);
++        $db->insert('INSERT OR IGNORE INTO v2_billing_outbox(event_id,order_id,event_type,created_at) VALUES(?,?,?,?)',[$eventId,$orderId,'payment.notify.success',time()]);
++    }
++
++    public static function pending($db,int $limit=100): array
++    {
++        if ($limit<1 || $limit>100) throw new \InvalidArgumentException('事件领取批量超出范围');
++        // 先挑最早可交付时间；失败事件退避后不占据下一批，永久失败不会饿死新事件。
++        return $db->select('SELECT e.order_id FROM v2_billing_outbox e JOIN v2_order o ON o.id=e.order_id WHERE e.delivered_at IS NULL AND e.lease_until<=? AND o.status=3 ORDER BY e.lease_until,e.created_at,e.event_id LIMIT ' . $limit,[time()]);
++    }
++
++    public static function deliver($db,int $orderId,callable $consumer): bool
++    {
++        $claim = self::run($db,function($db) use ($orderId) {
++            $order = $db->selectOne('SELECT status FROM v2_order WHERE id=?',[$orderId]);
++            if (!$order || (int)$order->status !== 3) return null;
++            $event = $db->selectOne('SELECT * FROM v2_billing_outbox WHERE order_id=? AND delivered_at IS NULL AND lease_until<=?',[$orderId,time()]);
++            if (!$event) return null;
++            $token=bin2hex(random_bytes(16));
++            if ($db->affectingStatement('UPDATE v2_billing_outbox SET lease_token=?,lease_until=?,attempts=attempts+1 WHERE event_id=? AND delivered_at IS NULL AND lease_until<=?',[$token,time()+60,$event->event_id,time()])!==1) return null;
++            $event->lease_token=$token;
++            $event->attempts=(int)$event->attempts+1;
++            return $event;
++        });
++        if (!$claim) return false;
++        try {
++            // 数据库外交付；消费者必须按稳定 event_id 幂等，失败和崩溃允许重复交付。
++            $consumer($claim->event_id,(int)$claim->order_id);
++            return self::run($db,fn($db)=>$db->affectingStatement('UPDATE v2_billing_outbox SET delivered_at=?,lease_until=0,lease_token=NULL WHERE event_id=? AND lease_token=? AND delivered_at IS NULL',[time(),$claim->event_id,$claim->lease_token])===1);
++        } catch (\Throwable $e) {
++            // 可重试失败按30秒指数退避，封顶1小时；租约token仍需CAS核对。
++            $retryAt=time()+min(3600,30*(2**min(7,$claim->attempts-1)));
++            self::run($db,fn($db)=>$db->affectingStatement('UPDATE v2_billing_outbox SET lease_until=?,lease_token=NULL WHERE event_id=? AND lease_token=? AND delivered_at IS NULL',[$retryAt,$claim->event_id,$claim->lease_token]));
++            throw $e;
++        }
++    }
++}
+--- /dev/null
++++ b/app/Services/Billing/Outbox.php
+@@ -0,0 +1,38 @@
++<?php
++
++namespace App\Services\Billing;
++
++use App\Models\Order;
++use App\Services\Plugin\HookManager;
++use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Facades\Log;
++
++final class Outbox
++{
++    public static function order(string $tradeNo): void
++    {
++        $order=Order::where('trade_no',$tradeNo)->first();
++        if ($order) self::deliver((int)$order->id);
++    }
++
++    public static function drain(): void
++    {
++        $pending=Atomic::pending(DB::connection());
++        foreach ($pending as $event) self::deliver((int)$event->order_id);
++    }
++
++    private static function deliver(int $id): void
++    {
++        try {
++            Atomic::deliver(DB::connection(),$id,function(string $eventId,int $orderId) {
++                $order=Order::find($orderId);
++                if (!$order) throw new \RuntimeException('到账事件订单不存在');
++                // 保留旧钩子的 Order 参数形状，使用非持久 relation 携带稳定事件编号。
++                $order->setRelation('billing_event',(object)['id'=>$eventId]);
++                HookManager::call('payment.notify.success',$order);
++            });
++        } catch (\Throwable $e) {
++            Log::warning('到账事件交付失败，等待恢复',['order_id'=>$id]);
++        }
++    }
++}
+--- a/app/Services/OrderService.php
++++ b/app/Services/OrderService.php
+@@ -27,6 +27,8 @@
+     ];
+     public $order;
+     public $user;
++
++    public bool $paymentTransitioned = false;
+ 
+     public function __construct(Order $order)
+     {
+@@ -70,7 +72,7 @@
+         $planService->validatePurchase($user, $period);
+         HookManager::call('order.create.before', [$user, $plan, $period, $couponCode]);
+ 
+-        return DB::transaction(function () use ($user, $plan, $period, $couponCode, $userService) {
++        return \App\Services\Billing\Atomic::run(DB::connection(), function () use ($user, $plan, $period, $couponCode, $userService) {
+             $user = User::lockForUpdate()->find($user->id);
+             if (!$user) {
+                 throw new ApiException(__('The user does not exist'));
+@@ -119,11 +121,14 @@
+ 
+     public function open(): void
+     {
+-        $openedOrder = DB::transaction(function () {
++        $openedOrder = \App\Services\Billing\Atomic::run(DB::connection(), function () {
+             $order = $this->lockCurrentOrderWhenStatus(Order::STATUS_PROCESSING);
+             if (!$order) {
+                 return null;
+             }
++
++            // 必须在套餐、钩子、余额和流量处理之前拒绝历史负数订单。
++            if (!\App\Services\Billing\Atomic::guardAmountsInside(DB::connection(),$order)) return null;
+ 
+             $plan = Plan::find($order->plan_id);
+             if (!$plan) {
+@@ -323,35 +328,16 @@
+         }
+     }
+ 
+-    public function paid(string $callbackNo)
+-    {
++    public function paid(string $callbackNo, string $source = 'legacy')
++    {
++        $this->paymentTransitioned = false;
++        if (!\App\Services\Billing\Atomic::paid(DB::connection(), (int)$this->order->id, $callbackNo, $source, function () { $this->paymentTransitioned = true; })) return false;
++        $this->order->refresh();
+         try {
+-            [$order, $shouldDispatch] = DB::transaction(function () use ($callbackNo) {
+-                $order = $this->lockCurrentOrder();
+-                if (!$order) {
+-                    throw new \RuntimeException('Order not found.');
+-                }
+-                if ((int) $order->status !== Order::STATUS_PENDING) {
+-                    return [$order, false];
+-                }
+-
+-                $order->status = Order::STATUS_PROCESSING;
+-                $order->paid_at = time();
+-                $order->callback_no = $callbackNo;
+-                if (!$order->save()) {
+-                    throw new \RuntimeException('Failed to save order status.');
+-                }
+-
+-                return [$order, true];
+-            });
+-
+-            $this->order = $order;
+-
+-            if ($shouldDispatch) {
+-                OrderHandleJob::dispatchSync($order->trade_no);
+-            }
+-        } catch (\Exception $e) {
+-            Log::error($e);
++            OrderHandleJob::dispatchSync($this->order->trade_no);
++        } catch (\Throwable $e) {
++            // 已到账状态保留为 PROCESSING，由 check:order 补偿，失败不可宣称开通成功。
++            Log::error('订单开通失败，等待补偿', ['order_id' => $this->order->id]);
+             return false;
+         }
+         return true;
+@@ -360,37 +346,18 @@
+     public function cancel(): bool
+     {
+         try {
+-            $cancelledOrder = DB::transaction(function () {
+-                $order = $this->lockCurrentOrderWhenStatus(Order::STATUS_PENDING);
+-                if (!$order) {
+-                    return null;
+-                }
+-
+-                HookManager::call('order.cancel.before', $order);
+-
+-                $order->status = Order::STATUS_CANCELLED;
+-                if (!$order->save()) {
+-                    throw new \RuntimeException('Failed to save order status.');
+-                }
+-                if ($order->balance_amount) {
+-                    $userService = new UserService();
+-                    if (!$userService->addBalance($order->user_id, $order->balance_amount)) {
+-                        throw new \RuntimeException('Failed to add balance.');
+-                    }
+-                }
+-
+-                return $order;
+-            });
+-
+-            if (!$cancelledOrder) {
+-                return false;
+-            }
+-
+-            $this->order = $cancelledOrder;
+-            HookManager::call('order.cancel.after', $cancelledOrder);
+-            return true;
+-        } catch (\Exception $e) {
+-            Log::error($e);
++            $transitioned = false;
++            $ok = \App\Services\Billing\Atomic::cancel(DB::connection(), (int)$this->order->id, function ($fresh) {
++                return app(UserService::class)->addBalance((int)$fresh->user_id, (int)$fresh->balance_amount);
++            }, function () {
++                $this->order->refresh();
++                HookManager::call('order.cancel.before', $this->order);
++            }, function () use (&$transitioned) { $transitioned = true; });
++            $this->order->refresh();
++            if ($ok && $transitioned) HookManager::call('order.cancel.after', $this->order);
++            return $ok;
++        } catch (\Throwable $e) {
++            Log::error('订单取消事务失败', ['order_id' => $this->order->id]);
+             return false;
+         }
+     }
+--- /dev/null
++++ b/database/migrations/2026_10_07_000001_add_billing_atomicity.php
+@@ -0,0 +1,35 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration {
++    public function up(): void
++    {
++        if (DB::connection()->getDriverName() !== 'sqlite') throw new RuntimeException('候选迁移仅接受 SQLite');
++        foreach (['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'] as $table) {
++            if (Schema::hasTable($table)) throw new RuntimeException('计费表已存在，请核对迁移来源');
++        }
++        if (Schema::hasColumn('v2_commission_log','order_id') || Schema::hasColumn('v2_commission_log','level')) throw new RuntimeException('佣金列已存在，请核对迁移来源');
++        DB::unprepared(file_get_contents(__DIR__ . '/billing_atomic_schema.sql'));
++    }
++
++    public function down(): void
++    {
++        if (DB::table('v2_payment_attempt')->exists() || DB::table('v2_billing_review')->exists()
++            || DB::table('v2_billing_outbox')->exists()
++            || DB::table('v2_commission_log')->whereNotNull('order_id')->exists()) {
++            throw new RuntimeException('已有新增财务证据，禁止破坏性回滚，请保留表并人工对账');
++        }
++        Schema::table('v2_commission_log', function (Blueprint $table) {
++            $table->dropUnique('billing_commission_order_level');
++            $table->dropColumn(['order_id','level']);
++        });
++        Schema::drop('v2_payment_attempt');
++        Schema::drop('v2_billing_review');
++        Schema::drop('v2_billing_outbox');
++        Schema::drop('v2_billing_mutex');
++    }
++};
+--- /dev/null
++++ b/database/migrations/billing_atomic_schema.sql
+@@ -0,0 +1,55 @@
++CREATE TABLE v2_billing_mutex(id INTEGER PRIMARY KEY CHECK(id=1),revision INTEGER NOT NULL DEFAULT 0);
++INSERT INTO v2_billing_mutex(id,revision) VALUES(1,0);
++CREATE TABLE v2_payment_attempt(
++ id INTEGER PRIMARY KEY AUTOINCREMENT,
++ order_id INTEGER NOT NULL REFERENCES v2_order(id),
++ payment_id INTEGER NOT NULL REFERENCES v2_payment(id),
++ external_no TEXT NOT NULL UNIQUE CHECK(length(external_no)=32),
++ identity_mode TEXT NOT NULL CHECK(identity_mode IN ('merchant','vendor')),
++ identity_key TEXT NOT NULL,
++ secret_ref TEXT NOT NULL,
++ provider_scope TEXT NOT NULL,
++ merchant_id INTEGER NOT NULL CHECK(merchant_id>0),
++ store_id INTEGER NOT NULL CHECK(store_id>0),
++ expected_cents INTEGER NOT NULL CHECK(typeof(expected_cents)='integer' AND expected_cents>0 AND expected_cents<=1000000000),
++ provider_no TEXT NULL,
++ status INTEGER NOT NULL DEFAULT 0 CHECK(status IN (0,1,2)),
++ created_at INTEGER NOT NULL,
++ UNIQUE(provider_scope,provider_no)
++);
++CREATE INDEX billing_attempt_order ON v2_payment_attempt(order_id,status);
++CREATE UNIQUE INDEX billing_attempt_one_pending ON v2_payment_attempt(order_id) WHERE status=0;
++CREATE TRIGGER billing_attempt_immutable BEFORE UPDATE ON v2_payment_attempt
++ WHEN NEW.order_id IS NOT OLD.order_id OR NEW.payment_id IS NOT OLD.payment_id
++ OR NEW.external_no IS NOT OLD.external_no OR NEW.identity_mode IS NOT OLD.identity_mode
++ OR NEW.identity_key IS NOT OLD.identity_key OR NEW.provider_scope IS NOT OLD.provider_scope
++ OR NEW.secret_ref IS NOT OLD.secret_ref
++ OR NEW.merchant_id IS NOT OLD.merchant_id OR NEW.store_id IS NOT OLD.store_id
++ OR NEW.expected_cents IS NOT OLD.expected_cents OR NEW.created_at IS NOT OLD.created_at
++ OR (OLD.provider_no IS NOT NULL AND NEW.provider_no IS NOT OLD.provider_no)
++ OR (OLD.status IN (1,2) AND NEW.status IS NOT OLD.status)
++ BEGIN SELECT RAISE(ABORT,'immutable payment attempt'); END;
++CREATE TRIGGER billing_attempt_no_delete BEFORE DELETE ON v2_payment_attempt
++ BEGIN SELECT RAISE(ABORT,'payment evidence cannot be deleted'); END;
++CREATE TABLE v2_billing_review(
++ id INTEGER PRIMARY KEY AUTOINCREMENT,
++ order_id INTEGER NOT NULL REFERENCES v2_order(id),
++ category TEXT NOT NULL,
++ reason TEXT NOT NULL,
++ created_at INTEGER NOT NULL,
++ UNIQUE(order_id,category)
++);
++CREATE TABLE v2_billing_outbox(
++ event_id TEXT PRIMARY KEY,
++ order_id INTEGER NOT NULL REFERENCES v2_order(id),
++ event_type TEXT NOT NULL CHECK(event_type='payment.notify.success'),
++ created_at INTEGER NOT NULL,
++ attempts INTEGER NOT NULL DEFAULT 0,
++ lease_until INTEGER NOT NULL DEFAULT 0,
++ lease_token TEXT NULL,
++ delivered_at INTEGER NULL,
++ UNIQUE(order_id,event_type)
++);
++ALTER TABLE v2_commission_log ADD COLUMN order_id INTEGER NULL REFERENCES v2_order(id);
++ALTER TABLE v2_commission_log ADD COLUMN level INTEGER NULL CHECK(level IS NULL OR level BETWEEN 0 AND 2);
++CREATE UNIQUE INDEX billing_commission_order_level ON v2_commission_log(order_id,level);
+--- /dev/null
++++ b/plugins/Fubei/Amount.php
+@@ -0,0 +1,44 @@
++<?php
++
++namespace Plugin\Fubei;
++
++final class Amount
++{
++    public const MAX_CENTS = 1000000000;
++
++    public static function cents(mixed $value, bool $allowZero = false): int
++    {
++        if (is_int($value)) {
++            $text = (string) $value;
++        } elseif (is_string($value)) {
++            $text = $value;
++        } else {
++            throw new \InvalidArgumentException('分金额必须为整数');
++        }
++        if (!preg_match('/^(0|[1-9][0-9]{0,9})$/D', $text)) {
++            throw new \InvalidArgumentException('分金额格式不合法');
++        }
++        $cents = (int) $text;
++        if ($cents > self::MAX_CENTS || $cents < ($allowZero ? 0 : 1)) {
++            throw new \InvalidArgumentException('分金额超出支持范围');
++        }
++        return $cents;
++    }
++
++    public static function toYuan(mixed $value): string
++    {
++        $cents = self::cents($value);
++        return intdiv($cents, 100) . '.' . str_pad((string) ($cents % 100), 2, '0', STR_PAD_LEFT);
++    }
++
++    public static function fromYuan(mixed $value): int
++    {
++        if (is_int($value)) {
++            $value = (string) $value;
++        }
++        if (!is_string($value) || !preg_match('/^(0|[1-9][0-9]{0,7})(?:\.([0-9]{1,2}))?$/D', $value, $matches)) {
++            throw new \InvalidArgumentException('元金额必须为至多两位小数的非负十进制数');
++        }
++        return self::cents((int) $matches[1] * 100 + (int) str_pad($matches[2] ?? '', 2, '0'));
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/Client.php
+@@ -0,0 +1,150 @@
++<?php
++
++namespace Plugin\Fubei;
++
++final class Client
++{
++    private $transport;
++    private array $config;
++    private string $secret;
++
++    public function __construct(array $config, string $secret, ?callable $transport = null)
++    {
++        self::identity($config);
++        self::httpsUrl($config['gateway'] ?? '', $config['gateway_hosts'] ?? '');
++        if ($secret === '') {
++            throw new \InvalidArgumentException('付呗服务器密钥未配置');
++        }
++        $this->config = $config;
++        $this->secret = $secret;
++        $this->transport = $transport ?? [self::class, 'send'];
++    }
++
++    public static function identity(array $config): array
++    {
++        $mode = $config['identity_mode'] ?? '';
++        $field = match ($mode) {
++            'merchant' => 'app_id',
++            'vendor' => 'vendor_sn',
++            default => throw new \InvalidArgumentException('付呗接入身份未配置'),
++        };
++        $identity = $config[$field] ?? '';
++        if (!is_string($identity) || !preg_match('/^[a-zA-Z0-9_-]{1,32}$/D', $identity)
++            || !empty($config[$field === 'app_id' ? 'vendor_sn' : 'app_id'])) {
++            throw new \InvalidArgumentException('付呗接入标识必须按身份二选一');
++        }
++        // 商户级请求不发送 merchant_id，但仍需配置用于校对回调 uid。
++        foreach (['merchant_id', 'store_id'] as $key) {
++            if (!preg_match('/^[1-9][0-9]{0,10}$/D', (string) ($config[$key] ?? ''))) {
++                throw new \InvalidArgumentException('付呗商户或门店编号未配置');
++            }
++        }
++        return [$field => $identity];
++    }
++
++    public static function httpsUrl(mixed $url, mixed $allowedHosts): string
++    {
++        if (!is_string($url) || !is_string($allowedHosts) || preg_match('/[\x00-\x20\x7f\\\\]/', $url)) {
++            throw new \InvalidArgumentException('支付地址格式不合法');
++        }
++        $parts = parse_url($url);
++        $host = strtolower($parts['host'] ?? '');
++        $allowed = array_filter(array_map('trim', explode(',', strtolower($allowedHosts))));
++        if (!$parts || ($parts['scheme'] ?? '') !== 'https' || isset($parts['user']) || isset($parts['pass'])
++            || isset($parts['fragment']) || (isset($parts['port']) && $parts['port'] !== 443)
++            || !preg_match('/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/D', $host)
++            || !in_array($host, $allowed, true)) {
++            throw new \InvalidArgumentException('支付地址不在明确配置的 HTTPS 主机白名单中');
++        }
++        return $url;
++    }
++
++    public function createQr(array $order): string
++    {
++        $tradeNo = $order['trade_no'] ?? '';
++        if (!is_string($tradeNo) || !preg_match('/^[a-zA-Z0-9_-]{1,32}$/D', $tradeNo)) {
++            throw new \InvalidArgumentException('外部订单号格式不合法');
++        }
++        $notify = $order['notify_url'] ?? '';
++        self::httpsUrl($notify, $this->config['notify_hosts'] ?? '');
++        if (strlen($notify) > 255 || isset(parse_url($notify)['query'])) {
++            throw new \InvalidArgumentException('回调地址必须不含查询参数且不超过255字节');
++        }
++        $expiry = $this->config['expired_time'] ?? 600;
++        if (!preg_match('/^[1-9][0-9]{0,3}$/D', (string) $expiry) || (int) $expiry > 1800) {
++            throw new \InvalidArgumentException('二维码有效期必须为1至1800秒');
++        }
++        $biz = [
++            'merchant_order_sn' => $tradeNo,
++            'store_id' => (int) $this->config['store_id'],
++            'expired_time' => (int) $expiry,
++            'notify_url' => $notify,
++            'body' => '订阅订单',
++        ];
++        if ($this->config['identity_mode'] === 'vendor') {
++            $biz['merchant_id'] = (int) $this->config['merchant_id'];
++        }
++        // 金额按精确十进制数字写入 JSON，避免 float 序列化改变小数。
++        $bizJson = json_encode($biz, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
++        $bizJson = substr($bizJson, 0, -1) . ',"total_amount":' . Amount::toYuan($order['total_amount'] ?? null) . '}';
++        $request = self::identity($this->config) + [
++            'method' => 'fbpay.fixed.qrcode.create',
++            'format' => 'json',
++            'sign_method' => 'md5',
++            'version' => '1.0',
++            'nonce' => bin2hex(random_bytes(16)),
++            'biz_content' => $bizJson,
++        ];
++        $request['sign'] = Signature::sign($request, $this->secret);
++        $raw = ($this->transport)($this->config['gateway'], json_encode($request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
++        if (!is_string($raw) || strlen($raw) > 1048576) {
++            throw new \RuntimeException('付呗响应格式或长度不合法');
++        }
++        $response = json_decode($raw, true, 32, JSON_THROW_ON_ERROR);
++        if (!is_array($response) || !in_array($response['result_code'] ?? null, [200, '200'], true)) {
++            throw new \RuntimeException('付呗未接受下单，请核对订单后处理');
++        }
++        $data = $response['data'] ?? null;
++        if (!is_string($data)) {
++            throw new \RuntimeException('付呗响应业务参数格式不合法');
++        }
++        $data = json_decode($data, true, 32, JSON_THROW_ON_ERROR);
++        if (!is_array($data) || ($data['merchant_order_sn'] ?? null) !== $tradeNo) {
++            throw new \RuntimeException('付呗响应订单号不匹配');
++        }
++        return self::httpsUrl($data['qrcode_url'] ?? '', $this->config['payment_hosts'] ?? '');
++    }
++
++    private static function send(string $url, string $body): string
++    {
++        if (!function_exists('curl_init')) {
++            throw new \RuntimeException('服务器缺少 cURL 扩展');
++        }
++        $handle = curl_init($url);
++        $response = '';
++        curl_setopt_array($handle, [
++            CURLOPT_POST => true,
++            CURLOPT_POSTFIELDS => $body,
++            CURLOPT_HTTPHEADER => ['Content-Type: application/json; charset=utf-8'],
++            CURLOPT_FOLLOWLOCATION => false,
++            CURLOPT_CONNECTTIMEOUT => 5,
++            CURLOPT_TIMEOUT => 15,
++            CURLOPT_SSL_VERIFYPEER => true,
++            CURLOPT_SSL_VERIFYHOST => 2,
++            CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
++            CURLOPT_WRITEFUNCTION => static function ($curl, string $chunk) use (&$response): int {
++                if (strlen($response) + strlen($chunk) > 1048576) return 0;
++                $response .= $chunk;
++                return strlen($chunk);
++            },
++        ]);
++        $ok = curl_exec($handle);
++        $status = curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
++        curl_close($handle);
++        if ($ok === false || $status !== 200) {
++            // 不回显网关响应、请求正文或底层错误，避免泄露配置与签名。
++            throw new \RuntimeException('付呗请求失败或结果未知，请核对原订单');
++        }
++        return $response;
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/JsonAmount.php
+@@ -0,0 +1,81 @@
++<?php
++
++namespace Plugin\Fubei;
++
++final class JsonAmount
++{
++    public static function yuanToken(string $json): string
++    {
++        // 先验证完整 JSON 语法；金额只读取原始 token，不使用解码后的 float。
++        $decoded = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
++        if (!is_array($decoded) || !str_starts_with(ltrim($json), '{')) {
++            throw new \InvalidArgumentException('付呗业务参数必须为 JSON 对象');
++        }
++        $position = strpos($json, '{') + 1;
++        $seen = [];
++        $amount = null;
++        $length = strlen($json);
++        while ($position < $length) {
++            self::whitespace($json, $position);
++            if ($json[$position] === '}') break;
++            $keyStart = $position;
++            self::stringEnd($json, $position);
++            $key = json_decode(substr($json, $keyStart, $position - $keyStart), true, 2, JSON_THROW_ON_ERROR);
++            if (isset($seen[$key])) throw new \InvalidArgumentException('付呗业务参数重复字段');
++            $seen[$key] = true;
++            self::whitespace($json, $position);
++            $position++; // 完整 JSON 已验证，此处为冒号。
++            self::whitespace($json, $position);
++            $start = $position;
++            self::valueEnd($json, $position);
++            $token = trim(substr($json, $start, $position - $start));
++            if ($key === 'total_amount') {
++                // 字符串金额只接受直接十进制字符；不接受转义、指数或超过两位的小数。
++                if (str_starts_with($token, '"')) {
++                    if (str_contains($token, '\\')) throw new \InvalidArgumentException('金额字符串不得使用转义');
++                    $token = substr($token, 1, -1);
++                }
++                Amount::fromYuan($token);
++                $amount = $token;
++            }
++            self::whitespace($json, $position);
++            if ($json[$position] === '}') break;
++            $position++;
++        }
++        if ($amount === null) throw new \InvalidArgumentException('付呗通知缺少原始金额');
++        return $amount;
++    }
++
++    private static function whitespace(string $json, int &$position): void
++    {
++        while (isset($json[$position]) && str_contains(" \t\r\n", $json[$position])) $position++;
++    }
++
++    private static function stringEnd(string $json, int &$position): void
++    {
++        if (($json[$position] ?? '') !== '"') throw new \InvalidArgumentException('JSON 字段格式不合法');
++        $position++;
++        while (isset($json[$position])) {
++            $character = $json[$position++];
++            if ($character === '\\') { $position++; continue; }
++            if ($character === '"') return;
++        }
++        throw new \InvalidArgumentException('JSON 字符串未结束');
++    }
++
++    private static function valueEnd(string $json, int &$position): void
++    {
++        $depth = 0;
++        while (isset($json[$position])) {
++            $character = $json[$position];
++            if ($character === '"') { self::stringEnd($json, $position); continue; }
++            if ($character === '{' || $character === '[') { $depth++; $position++; continue; }
++            if ($character === '}' || $character === ']') {
++                if ($depth === 0) return;
++                $depth--; $position++; continue;
++            }
++            if ($character === ',' && $depth === 0) return;
++            $position++;
++        }
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/Notification.php
+@@ -0,0 +1,63 @@
++<?php
++
++namespace Plugin\Fubei;
++
++final class Notification
++{
++    public static function decode(array $params, string $secret): array
++    {
++        if (!Signature::verify($params, $secret) || !in_array($params['result_code'] ?? null, [200, '200'], true)
++            || !is_string($params['data'] ?? null) || strlen($params['data']) > 1048576
++            || !is_string($params['result_message'] ?? null)) {
++            throw new \InvalidArgumentException('付呗通知未通过验签或成功状态校验');
++        }
++        $data = json_decode($params['data'], true, 32, JSON_THROW_ON_ERROR);
++        if (!is_array($data) || ($data['order_status'] ?? null) !== 'SUCCESS') {
++            throw new \InvalidArgumentException('付呗订单未支付成功');
++        }
++        $data['total_amount'] = JsonAmount::yuanToken($params['data']);
++        foreach (['merchant_order_sn', 'order_sn'] as $key) {
++            if (!is_string($data[$key] ?? null) || !preg_match('/^[a-zA-Z0-9_-]{1,32}$/D', $data[$key])) {
++                throw new \InvalidArgumentException('付呗通知订单标识不合法');
++            }
++        }
++        return $data;
++    }
++
++    public static function validate(array $data, array $order, array $config): array
++    {
++        Client::identity($config);
++        if (($data['order_status'] ?? null) !== 'SUCCESS' || !isset($data['merchant_order_sn'], $data['order_sn'])) {
++            throw new \InvalidArgumentException('付呗订单成功字段缺失');
++        }
++        foreach (['uid' => 'merchant_id', 'store_id' => 'store_id'] as $field => $key) {
++            if (!isset($data[$field]) || (string) $data[$field] !== (string) $config[$key]) {
++                throw new \InvalidArgumentException('付呗通知商户或门店不匹配');
++            }
++        }
++        if (!in_array($data['pay_type'] ?? null, ['wxpay', 'alipay'], true)
++            || ($order['trade_no'] ?? null) !== $data['merchant_order_sn']
++            || !isset($config['id'], $order['payment_id'])
++            || !preg_match('/^[1-9][0-9]*$/D', (string) $config['id'])
++            || (string) $config['id'] !== (string) $order['payment_id']) {
++            throw new \InvalidArgumentException('付呗通知订单或支付归属不匹配');
++        }
++        $expected = Amount::cents($order['total_amount'] ?? null)
++            + Amount::cents($order['handling_amount'] ?? 0, true);
++        if (Amount::fromYuan($data['total_amount'] ?? null) !== Amount::cents($expected)) {
++            throw new \InvalidArgumentException('付呗通知金额不匹配');
++        }
++        $status = $order['status'] ?? null;
++        if (!in_array($status, [0, 1, 3, '0', '1', '3'], true)) {
++            throw new \InvalidArgumentException('订单状态不允许接收付款');
++        }
++        if ((int) $status !== 0 && ($order['callback_no'] ?? null) !== $data['order_sn']) {
++            throw new \InvalidArgumentException('重复通知支付流水不匹配');
++        }
++        return [
++            'trade_no' => $data['merchant_order_sn'],
++            'callback_no' => $data['order_sn'],
++            'custom_result' => 'success',
++        ];
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/Plugin.php
+@@ -0,0 +1,148 @@
++<?php
++
++namespace Plugin\Fubei;
++
++use App\Contracts\PaymentInterface;
++use App\Exceptions\ApiException;
++use App\Models\Order;
++use App\Models\Payment;
++use App\Services\Plugin\AbstractPlugin;
++
++require_once __DIR__ . '/Signature.php';
++require_once __DIR__ . '/Amount.php';
++require_once __DIR__ . '/Client.php';
++require_once __DIR__ . '/Notification.php';
++require_once __DIR__ . '/RawNotification.php';
++require_once __DIR__ . '/JsonAmount.php';
++
++class Plugin extends AbstractPlugin implements PaymentInterface
++{
++    public function boot(): void
++    {
++        $this->filter('available_payment_methods', function (array $methods): array {
++            // 插件管理器与支付方式均需显式启用，候选默认不暴露支付入口。
++            if ($this->getConfig('enabled', false) === true) {
++                $methods['Fubei'] = ['name' => '付呗', 'icon' => '💳', 'plugin_code' => $this->getPluginCode(), 'type' => 'plugin'];
++            }
++            return $methods;
++        });
++    }
++
++    public function form(): array
++    {
++        $fields = [
++            'enabled' => ['启用候选支付', '服务器并发到账和返佣验收通过后才允许启用'],
++            'identity_mode' => ['接入身份', 'merchant 为商户级，vendor 为服务商级'],
++            'app_id' => ['商户开放平台标识', '商户级填写，与 vendor_sn 二选一'],
++            'vendor_sn' => ['服务商开放平台标识', '服务商级填写，与 app_id 二选一'],
++            'merchant_id' => ['付呗商户编号', '两种身份均需配置用于回调归属核对，商户级下单不发送此字段'],
++            'store_id' => ['付呗门店编号', '必须属于配置的商户'],
++            'secret_ref' => ['服务器密钥引用', '只填写服务器安全配置中的引用名，禁止填写密钥原文'],
++            'gateway' => ['付呗 HTTPS 网关', '由官方确认，完整 URL；不自动选择网关'],
++            'gateway_hosts' => ['网关主机白名单', '精确域名，逗号分隔；不支持通配符或 IP'],
++            'payment_hosts' => ['支付二维码主机白名单', '官方确认的精确支付域名，逗号分隔'],
++            'notify_hosts' => ['回调主机白名单', '已验证可达的 HTTPS 回调域名，逗号分隔'],
++            'expired_time' => ['二维码有效秒数', '1 至 1800，默认 600'],
++        ];
++        $form = [];
++        foreach ($fields as $key => [$label, $description]) {
++            $form[$key] = ['type' => $key === 'enabled' ? 'boolean' : 'string', 'label' => $label, 'description' => $description,
++                'default' => $key === 'enabled' ? false : ($key === 'expired_time' ? '600' : '')];
++        }
++        return $form;
++    }
++
++    public function pay($order): array
++    {
++        try {
++            $this->requireEnabled();
++            $this->requireBilling();
++            $internal = Order::where('trade_no', $order['trade_no'] ?? '')->first();
++            if (!$internal || (string)$internal->payment_id !== (string)$this->getConfig('id')) throw new \RuntimeException('订单支付归属不匹配');
++            $attempt = \App\Services\Billing\Atomic::attempt(app('db')->connection(), (int)$internal->id, $this->snapshot($order['total_amount'] ?? null));
++            $order['trade_no'] = $attempt->external_no;
++            $client = $this->client();
++            return ['type' => 0, 'data' => $client->createQr($order)];
++        } catch (\Throwable $e) {
++            // 上层会记录异常，因此不带入密钥、签名、请求或响应正文。
++            throw new ApiException('付呗支付未完成，请检查服务器配置并核对原订单');
++        }
++    }
++
++    public function notify($params): array|bool
++    {
++        try {
++            $this->requireEnabled();
++            $this->requireBilling();
++            $request = request();
++            $params = RawNotification::parse($request->getContent(), $request->headers->get('Content-Type', ''), $request->getMethod());
++            $db = app('db')->connection();
++            // 仅用未认证的有界订单标识定位快照；任何到账字段均在快照密钥验签后使用。
++            $routing = json_decode($params['data'],true,32,JSON_THROW_ON_ERROR);
++            $external = is_array($routing) ? ($routing['merchant_order_sn'] ?? null) : null;
++            if (!is_string($external) || !preg_match('/^[a-f0-9]{32}$/D',$external)) return false;
++            $attempt = $db->selectOne('SELECT * FROM v2_payment_attempt WHERE external_no=?', [$external]);
++            if (!$attempt || (string)$attempt->payment_id !== (string)$this->getConfig('id')) return false;
++            $data = Notification::decode($params,$this->secret($attempt->secret_ref));
++            $scope = hash('sha256',json_encode([$attempt->identity_mode,$attempt->identity_key,(string)$attempt->merchant_id]));
++            if ($scope !== $attempt->provider_scope || (string)($data['uid'] ?? '') !== (string)$attempt->merchant_id || (string)($data['store_id'] ?? '') !== (string)$attempt->store_id
++                || !in_array($data['pay_type'] ?? null,['wxpay','alipay'],true)) return false;
++            $transitioned = false;
++            if (!\App\Services\Billing\Atomic::settleAttempt($db,$attempt->external_no,$data['order_sn'],$scope,(int)$attempt->merchant_id,(int)$attempt->store_id,Amount::fromYuan($data['total_amount']),function () use (&$transitioned) { $transitioned = true; })) return false;
++            $internal = Order::find($attempt->order_id);
++            if (!$internal) return false;
++            // 已在 SQLite 写事务内到账；通用控制器复用同流水完成开通或补偿。
++            return ['trade_no'=>$internal->trade_no,'callback_no'=>$data['order_sn'],'custom_result'=>'success','billing_transitioned'=>$transitioned];
++        } catch (\Throwable $e) {
++            return false;
++        }
++    }
++
++    private function requireEnabled(): void
++    {
++        if ($this->getConfig('enabled', false) !== true || !in_array($this->getConfig('enable', false), [true, 1, '1'], true)) {
++            throw new \RuntimeException('付呗候选支付未启用');
++        }
++        $payment = Payment::find($this->getConfig('id'));
++        if (!$payment || !$payment->enable || $payment->payment !== 'Fubei'
++            || !is_string($this->getConfig('uuid')) || $payment->uuid !== $this->getConfig('uuid')) {
++            throw new \RuntimeException('付呗支付配置归属不匹配');
++        }
++    }
++
++    private function requireBilling(): void
++    {
++        if (!class_exists(\App\Services\Billing\Atomic::class)) throw new \RuntimeException('付呗账务事务服务未安装');
++        $db = app('db')->connection();
++        if ($db->getDriverName() !== 'sqlite') throw new \RuntimeException('付呗账务数据库目标未验收');
++        // 查询不存在的表会抛异常并失败关闭，不创建、不迁移、不回退。
++        if (!$db->selectOne('SELECT id FROM v2_billing_mutex WHERE id=1')) throw new \RuntimeException('付呗账务迁移未完成');
++        $db->selectOne('SELECT id FROM v2_payment_attempt LIMIT 1');
++    }
++
++    private function snapshot(mixed $cents): array
++    {
++        $identity = Client::identity($this->getConfig());
++        return ['payment_id'=>$this->getConfig('id'),'identity_mode'=>$this->getConfig('identity_mode'),
++            'identity_key'=>array_values($identity)[0],'merchant_id'=>$this->getConfig('merchant_id'),
++            'store_id'=>$this->getConfig('store_id'),'expected_cents'=>Amount::cents($cents),'secret_ref'=>$this->getConfig('secret_ref')];
++    }
++
++    private function secret(?string $reference = null): string
++    {
++        $reference = $reference ?? $this->getConfig('secret_ref', '');
++        if (!is_string($reference) || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/D', $reference)) {
++            throw new \RuntimeException('服务器密钥引用未配置');
++        }
++        $secret = config('payments.fubei.secrets.' . $reference);
++        if (!is_string($secret) || $secret === '') {
++            throw new \RuntimeException('服务器密钥不可用');
++        }
++        return $secret;
++    }
++
++    protected function client(): Client
++    {
++        return new Client($this->getConfig(), $this->secret());
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/README.md
+@@ -0,0 +1,47 @@
++# 付呗候选支付插件
++
++本目录交付适配 Xboard `PaymentInterface` 的候选源码。插件安装默认禁用，插件全局与支付方式配置的 `enabled` 均默认 false。Bettbox 桌面和 Android 复用 checkout `type=0` 二维码及订单轮询；iOS 使用 Apple IAP。
++
++## 配置契约
++
++管理员需确认商户聚合码配置完成，并在支付方式后台配置：
++
++- `identity_mode`：`merchant` 或 `vendor`；对应 `app_id` 或 `vendor_sn` 二选一。
++- `merchant_id`、`store_id`：均必填用于回调身份核对。服务商级下单发送商户编号，商户级下单不发送。
++- `gateway`：官方确认的 HTTPS 网关；`gateway_hosts` 为网关精确主机白名单。
++- `payment_hosts`、`notify_hosts`：官方支付二维码主机和本方回调主机精确白名单，逗号分隔，不支持通配符、IP、非443端口、用户信息或片段。
++- `secret_ref`：服务器密钥引用名称。服务器需安全提供 `config('payments.fubei.secrets.<引用名称>')`，后台仅存引用，不存密钥原文。该服务器配置适配尚待部署方完成，本插件不读取环境文件、不回显或记录秘密。
++- `expired_time`：二维码有效秒数，1至1800，默认600。
++- `enabled`：候选默认 false；Xboard 支付方式自身的 `enable` 也必须有效。
++
++聚合码前置包括备案阿里域名解析至付呗、认证服务号与授权域名、支付宝应用与回调配置、门店微信配置。具体开通情况未知，不能以已获得开放平台标识代替开通证据。主机白名单属于管理员信任配置；基础设施仍需限制 DNS 与出站访问，避免被允许域名错误解析至内部服务。
++
++密钥轮换必须使用新的 `secret_ref`，不得覆盖原引用指向的密钥值；保留所有未完成尝试对应的旧引用以及回调路由 UUID、支付方式归属与启用状态，直到平台关单或人工核对完成。回调使用尝试快照而非当前支付配置，改变 app_id、merchant_id、store_id 或当前引用不会把旧通知错误验签为新身份。未完成尝试禁止通过轮换配置再次下单；候选不自动查单或换号。
++
++## 上线阻断与幂等边界
++
++插件从 Symfony 原始请求正文解析 POST 表单，不使用已被 TrimStrings 或 ConvertEmptyStringsToNull 变换的 input；限制正文为1 MiB、字段数32，拒绝重复字段、数组字段和异常编码。JSON 顶层字段重复也拒绝；金额从原始 data 的 total_amount token 提取，仅接受直接十进制整数或最多两位小数，不接受指数、长小数和金额字符串转义，禁止 float 金额参与校验。Web 入口仍需配置请求正文大小限制，避免框架处理超大请求。
++
++插件通过账务 Atomic 服务创建不可变支付尝试，平台使用32位 external_no，Xboard 原36位 trade_no 保持不变。回调只用未认证的有界外部号定位尝试，再使用快照的安全 secret_ref、身份、商户与门店核对原始签名和归属，由 SQLite 事务核对快照应收金额、商户、门店、平台流水及订单状态；只有事务到账后返回原订单号交给通用开通流程。未安装账务服务、未执行迁移或数据库目标未经适配时失败关闭，不回退到无快照付款。
++
++**插件尚不具备生产上线条件。** SQLite 计费候选位于 server/patches/billing，源码、迁移、回滚及独立进程测试尚待主控运行和独立审阅。插件保持默认禁用。真正 Laravel checkout、模型、队列、钩子、套餐与返佣及生产数据库仍需集成验收；独立 PDO 测试不等于这些平台行为已经验证。
++
++网络结果未知时复用同一尝试且先核对平台订单，不生成新外部号；本候选没有自动查单或关闭平台订单机制。已有未完成尝试不允许切换支付配置或应收金额，需人工核对或安全关闭平台订单后处理。取消后付款或重复流水冲突不能自动开通，保留人工核对证据。到账事务同时持久化 payment.notify.success outbox；开通失败时事件保留，开通完成后由订单任务及每分钟 check:order 恢复交付。钩子保持 Order 参数形状，通过非持久 relation `$order->billing_event->id` 提供稳定事件ID。消费者必须按该ID幂等；进程崩溃、租约过期和部分钩子成功会重复交付，只有至少一次交付语义，不能承诺跨系统 exactly-once。旧消费者的幂等改造与真实框架验收尚待完成。
++
++## 验证
++
++纯测试入口，不依赖 Laravel、不发网络请求、不读真实配置：
++
++```sh
++php server/tests/fubei/run.php
++```
++
++真实 SQLite 独立连接并发测试、Xboard 安装发现/启用生命周期、通用到账/佣金集成、官方下单响应及人工小额扫码验收均为待项。测试代码中的密钥是公开虚构 fixture，只用于规则测试。
++
++## 官方规则来源
++
++- [开发者必读](https://www.yuque.com/51fubei/openapi/qao4q1)：HTTPS JSON 请求、公共参数、ASCII 排序与 MD5 大写签名；网关由商务或技术提供。
++- [聚合码支付](https://www.yuque.com/51fubei/openapi/payment_qrcodepay)：`fbpay.fixed.qrcode.create`、元金额、门店、二维码有效期与 qrcode_url。
++- [支付回调](https://www.yuque.com/51fubei/openapi/callback_ordercallback)：POST 表单、原始 data 签名、order_sn、uid、total_amount、SUCCESS 与最多26次通知。
++
++规则核对日期：2026-10-07。请求响应 data 按文档 String 处理，不混用旧版 GitBook 字段。官方商户配置和生产行为需部署前核验。
+--- /dev/null
++++ b/plugins/Fubei/RawNotification.php
+@@ -0,0 +1,36 @@
++<?php
++
++namespace Plugin\Fubei;
++
++final class RawNotification
++{
++    public static function parse(string $body, string $contentType, string $method): array
++    {
++        if ($method !== 'POST' || !preg_match('/^application\/x-www-form-urlencoded(?:\s*;\s*charset\s*=\s*utf-8)?$/iD', trim($contentType))
++            || $body === '' || strlen($body) > 1048576) {
++            throw new \InvalidArgumentException('付呗原始通知请求格式不合法');
++        }
++        $fields = explode('&', $body);
++        if (count($fields) > 32) throw new \InvalidArgumentException('付呗通知字段过多');
++        $params = [];
++        foreach ($fields as $field) {
++            if (!str_contains($field, '=')) throw new \InvalidArgumentException('付呗通知表单字段不合法');
++            [$key, $value] = explode('=', $field, 2);
++            foreach ([$key, $value] as $encoded) {
++                if (preg_match('/%(?![a-fA-F0-9]{2})/', $encoded)) throw new \InvalidArgumentException('付呗通知百分号编码不合法');
++            }
++            $key = urldecode($key);
++            $value = urldecode($value);
++            if (!preg_match('/^[a-zA-Z0-9_]+$/D', $key) || array_key_exists($key, $params)
++                || !preg_match('//u', $value)) {
++                throw new \InvalidArgumentException('付呗通知重复字段或字符编码不合法');
++            }
++            // 不使用 parse_str 或 request->input，避免字段覆盖、TrimStrings 与空值转换。
++            $params[$key] = $value;
++        }
++        foreach (['sign', 'data', 'result_code', 'result_message'] as $required) {
++            if (!array_key_exists($required, $params)) throw new \InvalidArgumentException('付呗通知必需字段缺失');
++        }
++        return $params;
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/Signature.php
+@@ -0,0 +1,37 @@
++<?php
++
++namespace Plugin\Fubei;
++
++final class Signature
++{
++    public static function sign(array $parameters, string $secret): string
++    {
++        if ($secret === '') {
++            throw new \InvalidArgumentException('付呗密钥未配置');
++        }
++        unset($parameters['sign']);
++        ksort($parameters, SORT_STRING);
++        $parts = [];
++        foreach ($parameters as $key => $value) {
++            if (!is_string($key) || !preg_match('/^[a-zA-Z0-9_]+$/D', $key) || (!is_string($value) && !is_int($value))) {
++                throw new \InvalidArgumentException('付呗签名参数格式不合法');
++            }
++            // 保留原始参数值；不得对 data 或 biz_content 重新编码、解码或转义。
++            $parts[] = $key . '=' . $value;
++        }
++        return strtoupper(md5(implode('&', $parts) . $secret));
++    }
++
++    public static function verify(array $parameters, string $secret): bool
++    {
++        $provided = $parameters['sign'] ?? null;
++        if (!is_string($provided) || !preg_match('/^[A-F0-9]{32}$/D', $provided)) {
++            return false;
++        }
++        try {
++            return hash_equals(self::sign($parameters, $secret), $provided);
++        } catch (\InvalidArgumentException $e) {
++            return false;
++        }
++    }
++}
+--- /dev/null
++++ b/plugins/Fubei/config.json
+@@ -0,0 +1,16 @@
++{
++    "name": "付呗候选支付",
++    "code": "fubei",
++    "type": "payment",
++    "version": "0.1.0",
++    "description": "默认禁用的聚合二维码支付候选，上线前需完成到账事务与返佣幂等验收",
++    "author": "Bettbox",
++    "config": {
++        "enabled": {
++            "type": "boolean",
++            "label": "启用候选支付",
++            "description": "默认禁用；完成服务器验收后才能显式启用",
++            "default": false
++        }
++    }
++}

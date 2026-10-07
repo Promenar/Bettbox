@@ -1,0 +1,9 @@
+{
+  "secret": "public-fixture-secret-not-a-credential",
+  "params": {
+    "data": "{\"order_sn\":\"FBTEST202610070001\",\"merchant_order_sn\":\"ORDER202610070001\",\"order_status\":\"SUCCESS\",\"pay_type\":\"wxpay\",\"total_amount\":12.34,\"uid\":123456,\"store_id\":789012,\"attach\":\"测试&=中文\"}",
+    "result_code": "200",
+    "result_message": "成功",
+    "sign": "50BDF7E6EBF0DCA10C2C0F8DBA7F9449"
+  }
+}

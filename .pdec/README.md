@@ -2,6 +2,8 @@
 
 ## 授权与适用范围
 
+2026-10-07 用户明确授权环境就绪后自主完成 Android、iOS、macOS 开发调试、服务端适配和可用发行交付，本机负责三端开发。登记本机 `test-flutter` 操作（`flutter test`）；具体新增移动构建与设备联调入口在实施时登记，不把既有桌面编译授权当成移动端验收证据。原始支付凭据、签名私钥不得进入源码、日志或 Agent 输入。
+
 用户在 Bettbox 邀请返利和跨平台适配任务中已允许“可配置项开发阶段允许按需调整”，并要求“继续……完成后续内容”。本契约在该项目开发授权内记录桌面编译、必要依赖恢复与验证；不扩大到生产部署、正式签名、商店上传、服务端资金操作或新的自托管执行主机。用户已说明有 iPhone，但 Apple Developer 团队尚未准备好。
 
 ## 工程与执行位置
@@ -30,8 +32,24 @@ macOS 当前验证操作为显式关闭 Xcode 签名的编译：保留正式 Key
 
 ## 平台范围与回滚
 
-只登记 macOS arm64、Windows x86_64 原生编译，不把一次架构构建外推到 macOS Intel 或 Windows arm64。iOS 需要独立 Packet Tunnel 工程、内核桥接、App Group、签名和 IAP 验证，尚未登记可执行构建操作。
+登记本机 macOS arm64、iOS arm64 核心构建及共享测试；Windows x86_64 保留既有 CI。Android arm64 本机开发构建使用项目扩展，不把一次架构结果外推到其它架构。iOS 系统 Packet Tunnel、App Group、签名和 IAP 验证独立于静态库编译。
 
 开发候选通过 GitHub artifacts 或本机文件交付，不传送到生产服务。生产目标、健康检查和发布回滚均未启用。回退本任务提交即可恢复客户端与构建配置，既有 tag 发版入口持续保留。面板的只读/隔离集成测试属于既有服务诊断，不通过此契约授权真实用户或资金变更。
 
 变更范围为构建脚本、验证 workflow、契约及相关项目文档；客户端差异与测试另见 `docs/PLATFORM_VALIDATION.md`。执行前运行用户级 PDEC `validate --root`，要求 `execution_ready=true`；契约所引用的脚本或锁文件变化后需重新核对授权范围和摘要。
+
+## Android 平台扩展
+
+统一 PDEC 校验器的操作平台枚举尚未包含 Android。`contract.yaml` 的 `platform_extensions.android` 保留真实 Android arm64 目标；统一批准摘要覆盖该字段。`scripts/validate_android_contract.py` 先调用已安装的统一校验器，再严格核对本机主机、目标、命令、产物与超时范围。
+
+`build_android.py --execute` 强制执行两级校验，并将批准摘要写入回执；统一校验器位置通过 `BETTBOX_PDEC_VALIDATOR` 或 `--framework-validator` 提供。本机用户明确授权三端调试，执行主机为 Apple Silicon Mac。默认生成 debug APK；显式 `--release` 使用 `platform_extensions.android_release`，项目验证器以 `--release` 核验准确命令、产物与2700秒预算。密码只注入 APK 构建进程，工具正文丢弃，生成后必须核验单一正式证书、核心、原生库对齐和来源；安装与业务发行验收独立完成。
+
+Android 每次构建采用独立 Gradle 用户目录，总体预算 2700 秒，子进程超时后进行仅限本任务的终止核验。不能证明进程归属或退出时记录失败。源码、锁文件、核心和 APK 哈希及退出证据位于 `.test/android-build/receipt.json`，该目录不提交。
+
+## iOS 与服务端隔离验收入口
+
+`typecheck-ios-native` 使用实际 Simulator SDK 检查共享原生代码及 PacketTunnel 类型；`build-ios-simulator` 验证 Runner 和扩展完整构建。两者不签名或证明系统 VPN 可用。核心 XCFramework 由锁定源码产生，放入 ios/Vendor，二进制不进入 Git。
+
+`test-billing-isolated` 通过既有 SSH 身份传输精确公开 fixture 清单，在 NoSLA 当前 PHP 镜像的128MiB禁网只读容器内执行多进程 SQLite 验收。仅一次性工作目录可写；源码、清理和镜像身份纳入回执。该入口不挂载业务数据库、配置或环境秘密，也不启动真实收款。
+
+原生iOS测试入口为`test-ios-native`：在已有iPhone17 arm64模拟器上执行RunnerTests，结果不外推真机VPN。Android官方网络入口使用任务loopback CONNECT，32条有界转发与6条解析/连接并发分离，排队12，逻辑转发缓冲上限16MiB；回执包含固定代理拒绝计数，不能用零计数单独判定官方源健康。当前90项网络、构建、契约及签名测试和独立审阅通过，实际依赖门禁另行验收；不修改系统代理或DNS。桌面源码冻结纳入未跟踪输入字节，macOS使用目录句柄拒绝链接；Windows回退检查reparse point，实际Windows句柄竞态行为未验收。
