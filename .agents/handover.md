@@ -598,3 +598,34 @@ android/core/build.gradle.kts遵循Flutter公开target-platform映射ABI过滤�
 
 ### HLG
 使用append dry-run后apply，只追加事实链。
+
+## 2026-10-08T00:02:09+08:00 · Android真实APK ABI拒绝与应用过滤候选
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android-wrapper", "official-dependencies", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 9a0141767c8bae206ef7e9e06902f0a77c21f538baf1befde96cb532a5c1f765
+
+### Summary
+Android/macOS发行优先、iOS保留开发版研究。真实候选b6d7a58编译APK成功，最终ABI验收拒绝额外ARM32/x64插件库；不能作为可发行产物。
+
+### Changed
+App按公开target-platform过滤打包ABI，split-per-abi由Flutter负责App过滤，core过滤保持。PDEC、平台文档、CHANGELOG和三端计划同步。macOS计划纳入专用HTTP入口、Trailer隔离及双方进程身份核验前置，现有absent门禁不放宽。
+
+### Validation
+真实12个ARM64库ELF/16KB LOAD检查通过；源码/锁文件未变，网络/Gradle清理通过。App过滤静态回归修复前失败、修复后通过；独立复审发现split P2已修复并闭合。141项工具测试通过，实际修复打包待验。Mac主控复核HTTP认证解析、Trailer EOF与Dart共享UDS首连接源码；未读真实凭据或操作系统代理。
+
+### Next
+冻结打包修复候选并完整debug构建；APK最终验证通过后安装Pixel_7、业务路径验收，再正式签名。macOS专用入口与原生可信传输定约后串行实施并独立审阅，TUN独立推进。
+
+### Risks
+当前生成APK被最终门禁拒绝，不能交付。真实分ABI打包、16KB设备、系统代理/Keychain/VPN与真实支付待验。Mac专用入口/原生传输尚未实现；unknown不能直接伪造absent。
+
+### DIA
+已同步平台验证、CHANGELOG、PDEC README/契约与两份平台实施计划。
+
+### HLG
+append dry-run后apply，保留两次实际失败回执与候选来源。

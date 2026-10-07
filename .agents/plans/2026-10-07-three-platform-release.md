@@ -58,3 +58,5 @@ macOS TUN 架构采用前需完成 Apple 用途约束核验：TN3134 中直接 D
 ## Android 原生目标契约
 
 执行入口仅生成ARM64核心并向Flutter传入 `android-arm64`。core库按相同公开 `target-platform` 属性映射NDK ABI过滤，显式未知/空目标拒绝，未传目标保留默认。多ABI构建须分别生成对应核心及头文件；缺失检查不放宽。文件所有权限于android/core/build.gradle.kts与工具契约回归；独立审阅后更新PDEC输入摘要，冻结候选并执行完整debug构建。验收包含CMake实际配置目标、核心/APK ABI、16KB产物、源码锁文件不变与任务进程退出；通过后再安装已有Pixel_7，实际设备页大小4096需单独披露。
+
+App在显式目标且非split-per-abi时覆盖Flutter默认全ABI过滤，split模式由Flutter管理应用过滤，core库始终遵循显式目标。实际候选APK生成与12个ARM64库ELF/16KB检查通过，但含额外架构插件库被最终验证拒绝；修复的实际打包内容独立验收。

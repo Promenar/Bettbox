@@ -53,6 +53,15 @@ class AndroidContractTest(unittest.TestCase):
         self.assertIn('abiFilters.addAll(requestedNativeAbis)', source)
         self.assertIn('GradleException', source)
 
+    def test_app_packaging_filters_explicit_target_after_flutter_defaults(self):
+        root = Path(__file__).resolve().parents[2]
+        source = (root / 'android/app/build.gradle.kts').read_text()
+        self.assertIn('providers.gradleProperty("target-platform")', source)
+        self.assertIn('abiFilters.clear()', source)
+        self.assertIn('providers.gradleProperty("split-per-abi")', source)
+        self.assertIn('requestedNativeAbis != null && !splitPerAbi', source)
+        self.assertIn('abiFilters.addAll(requestedNativeAbis)', source)
+
     def test_wrapper_distribution_and_bootstrap_match_official_checksums(self):
         root = Path(__file__).resolve().parents[2]
         wrapper = root / 'android/gradle/wrapper'

@@ -36,6 +36,18 @@ gradle.taskGraph.whenReady {
     }
 }
 
+// 原生模块遵循 Flutter 传入的目标，避免为未生成核心的 ABI 启动 CMake。
+val nativePlatformAbis = mapOf(
+    "android-arm" to "armeabi-v7a",
+    "android-arm64" to "arm64-v8a",
+    "android-x64" to "x86_64",
+)
+val requestedNativeAbis = providers.gradleProperty("target-platform").orNull?.split(",")?.map { target ->
+    nativePlatformAbis[target] ?: throw GradleException("不支持的 Flutter 原生目标：$target")
+}?.distinct()
+val splitPerAbi = providers.gradleProperty("split-per-abi").orNull?.toBoolean() ?: false
+
+
 android {
     namespace = "com.appshub.bettbox"
     compileSdk = 36
@@ -56,6 +68,13 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Flutter 默认包含所有支持 ABI，显式任务目标必须覆盖打包过滤。
+        if (requestedNativeAbis != null && !splitPerAbi) {
+            ndk {
+                abiFilters.clear()
+                abiFilters.addAll(requestedNativeAbis)
+            }
+        }
     }
 
     signingConfigs {

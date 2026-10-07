@@ -28,3 +28,9 @@
 已有 macOS 应用尚未包含事务核心，为 ad hoc 候选，嵌套签名检查失败。本机仅确认 Apple Development 身份，Developer ID 发行证书缺失；本地开发签名、Keychain、正式签名/公证和业务连接必须分别验收。
 
 公开SDK认证能力已只读核验：macOS15+公开HTTPUser/HTTPSUser/SOCKSUser键仅能保守识别认证线索，缺失不能证明无认证；Keychain精确搜索无结果也不能证明服务所有认证存储为空。适配器须先收敛可证明的服务接管范围，不能把fake.absent直接用于任意真实服务。
+
+## 专用入口与控制信任候选
+
+现有事务的absent门禁保持，真实适配实施前先验证独立专用入口的凭据隔离与可信控制能力，再裁定unknown服务接管契约；不伪造absence。当前HTTP即便无认证器仍解析代理认证并生成用户名日志/metadata，SOCKS5密码方法可进入AlwaysValid。专用HTTP/CONNECT入口须绑定127.0.0.1:0、隔离订阅配置，认证解析前删除代理认证字段且不生成inUser。普通HTTP/Upgrade输出请求与输入Trailer必须分离，丢弃输出Trailer，拒绝声明的代理认证Trailer；CONNECT拒绝正文/Trailer。目标站Authorization保留。首包只拥有HTTP/HTTPS，SOCKS须持久/运行未启用，PAC/WPAD只拥有启用位并保全未知URL。
+
+原生UDS处理frame前核验双方UID、peer audit token/PID和预期代码身份，并绑定应用本次实际启动的core；使用私有0700目录、0600socket、拒绝链接和TCP降级。能力绑定可信连接、代次及真实监听，断线退出即失效。当前Dart首连接不具备此证明，单一能力字段不能替代身份核验。真实SDK、签名及进程生命周期策略须在实施前定约并独立审阅。所有权按入口、生命周期、原生传输、SC后端、Dart接线串行交接。验收使用虚构认证标记覆盖普通/CONNECT/Upgrade、Trailer EOF、原认证不变、伪造首连接/错误PID/旧代次/断线及未知配置键保全；不读取真实凭据。专用入口与传输尚未实现，TUN独立推进。

@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-07T15:42:51.747516+00:00",
+  "finished_at": "2026-10-07T15:56:44.387341+00:00",
+  "target": "android-arm64-debug",
+  "status": "failed",
+  "phase": "android-debug-build",
+  "failure_reason": "APK 原生库为空或包含非 arm64 ABI",
+  "gradle_help_verified": true,
+  "distribution_zip": {
+    "reused": true,
+    "source": "project-task-gradle-home",
+    "bytes": 224116304,
+    "sha256": "efe9a3d147d948d7528a9887fa35abcf24ca1a43ad06439996490f77569b02d1"
+  },
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "candidate_sha": "b6d7a58",
+  "cleanup_verified": true,
+  "network_renewal_stopped": true,
+  "apk_compiled": true,
+  "apk_acceptance_passed": false
+}
