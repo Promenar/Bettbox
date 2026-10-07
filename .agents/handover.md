@@ -1001,3 +1001,34 @@ Go cap不是Apple认证，Checked nil不是连接/线程/全stack关闭；Mac资
 
 ### HLG
 通过标准append登记当前实际源码与下一关键路径，未改长期规则或用户文件。
+
+## 2026-10-08T05:34:52+08:00 · macOS supervisor原生模块与真实签名SDK链验收
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["release", "macos", "supervisor", "identity"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 9ff2f16cade117e4537bee98103be1e2a0ad30b2bdee695b47f13fd197e47555
+
+### Summary
+已将固定SDK身份链和唯一子进程owner及回归入口纳入实际macos/CoreSupervisor；公开独立签名App的真实host/helper/Core矩阵通过。Android/macOS优先交付、iOS保留开发与发行研究的用户范围持续有效；Goal未完成。
+
+### Changed
+增加12份native/fixture源码、macos/CoreSupervisor/README.md、scripts/check_macos_supervisor.py及4项Python测试，PDEC登记两实际操作；同步架构、平台、CHANGELOG、计划和两份公开脱敏回执。生产Runner/Dart/SC尚未接入，不改变既有客户端启动路径。
+
+### Validation
+当前实际SDK arm64 macOS12编译8步全部exit0；23项authority fake、owner fake、真实true/sleep子进程回收通过，4项Python测试通过，源码前后SHA相等。Core在后续SDK期间变化与kernel读取跨deadline两P2均实际红失败后修复并独立回审。真实签名fixture4矩阵pass：正常链exit0、manifest篡改/Core移除签名/helper错误ID三负例70，内部错locator及退出guest拒绝；仅公开EOF Core无Mihomo业务。输出重复/半行P2红两失败、修后4通过，执行签名与baseline分别记录。实际Identity源SHA与fixture一致；执行后无匹配fixture进程；canonical PDEC5e056d2c...validate0、execution_ready=true。
+
+### Next
+固定生产身份发行器、跨实例有界SDK worker及非阻塞relay接线；Dart helper Process/opaque handle与SC事务联合集成，保留唯一Core reaper。Android同步JNI与配置资源owner/Dart真实联合适配，正式APK和Mac发行候选的有效订阅出口验收；iOS开发版与发行研究。
+
+### Risks
+没有可用发行包完成声明。签名fixture为独立ad hoc App，Core只等EOF；未证明真实Mihomo relay、Flutter/SC、TUN、DeveloperID公证或同UID硬隔离。外部强杀/后代/未捕获spawn窗口另验。Android有效订阅、Apple团队与支付商商户/门店安全注入仍需外部条件，未执行真实资金或支付部署。用户.video_agent目录未读取修改或提交。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、PDEC说明、模块README、三端实施计划及公开native/signed SDK回执。
+
+### HLG
+通过Skill append dry-run与apply追加，保留原始事实链，生成索引；任务持续推进。

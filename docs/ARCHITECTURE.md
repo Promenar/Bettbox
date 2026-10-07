@@ -137,3 +137,9 @@ TCP/UDP隧道构造器在任何端口绑定前校验目标地址，无效目标�
 Darwin owned pipe现已安装私有会话capability，提供固定空参数的ownedHttpStart/Stop/Get。专用入口只绑定127.0.0.1随机端口，generation与单调listenerEpoch共同标识；配置生命周期先确认关闭入口，再同步实际配置处理。成功init不会清除shutdown或配置拒绝后的失效状态，只有有效setup/update可恢复准入。legacy传输不能获得capability；Go准入不等于Apple身份认证，Dart/supervisor/SDK/SC接线尚未完成。
 
 StopListenerChecked使用各资源真实重建锁，覆盖ordinary、inbound和TCP/UDP tunnel登记资源。Close失败或panic返回固定失败并保留归属，继续其它关闭；只在真实nil后清引用。此API未替换默认StopListener，也不能证明连接排空或完整VPN stack退出；Android平台所有者仍需撤销重建入场后消费。
+
+### macOS supervisor 原生模块
+
+`macos/CoreSupervisor` 包含 Security/内核身份链与串行子进程生命周期实现。身份提交前在所有SDK检查结束后重读宿主、helper和Core的stamp，再检查原生代次；生命周期提交proof前重新核对原5秒预算。Core由无Dart的helper独占创建/回收的接线尚未完成，本目录目前由固定测试入口编译使用，不改变客户端现有启动路径。
+
+`scripts/check_macos_supervisor.py` 验证实际SDK编译、23项身份fake、生产owner fake和公开true/sleep实际回收，绑定源码前后SHA。生产身份发行器、host/helper opaque handle、非阻塞业务relay、Dart和SC消费者必须联合接线；这些模块的验证不能代替真实签名guest或系统代理发行验收。

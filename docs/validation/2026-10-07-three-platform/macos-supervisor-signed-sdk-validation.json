@@ -1,0 +1,219 @@
+{
+  "cases": {
+    "core-signature-tamper": {
+      "baseline_signed_artifacts": {
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "schema": 1,
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "schema": 1,
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "classification": "REJECTED",
+      "execution_artifacts": {
+        "Bettbox": {
+          "cdhash": "3d3092a1b2e55150d7e30234cb1d1dc2f4731d9f",
+          "identifier": "com.appshub.bettbox",
+          "sha256": "f5295c218ff2310b5a7d036323c2f9b587b910d6fcbdeacf14655d9874e92eda",
+          "signingmode": "adhoc"
+        },
+        "BettboxCore": {
+          "cdhash": null,
+          "identifier": null,
+          "sha256": "0289301d347bc59e1fa5a6c1dbf7cb25a5a08a489e08ad679471eceea201be2d",
+          "signingmode": "unsigned"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "exit": 70,
+      "expected": "REJECTED",
+      "flags": [
+        "FIXTURE_REJECTED"
+      ],
+      "passed": true
+    },
+    "helper-wrong-id": {
+      "baseline_signed_artifacts": {
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "schema": 1,
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "schema": 1,
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "classification": "REJECTED",
+      "execution_artifacts": {
+        "Bettbox": {
+          "cdhash": "81f2331681962cdf4fee5437e1b4a1a20f5823d8",
+          "identifier": "com.appshub.bettbox",
+          "sha256": "fd42f68da73dd0a3883a58d0fe4ef55aebb90130a1961bf27035190f0b4cfb18",
+          "signingmode": "adhoc"
+        },
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "c4ccac771616b057b42620edd12bff4988d3a622",
+          "identifier": "com.appshub.bettbox.fixture.wrong",
+          "sha256": "af891b8bf25419bb69e12cba1664650ce62544c45f341986f87b16cf968682fd",
+          "signingmode": "adhoc"
+        }
+      },
+      "exit": 70,
+      "expected": "REJECTED",
+      "flags": [
+        "FIXTURE_REJECTED"
+      ],
+      "passed": true
+    },
+    "manifest-tamper": {
+      "baseline_signed_artifacts": {
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "schema": 1,
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "schema": 1,
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "classification": "REJECTED",
+      "execution_artifacts": {
+        "Bettbox": {
+          "cdhash": "3d3092a1b2e55150d7e30234cb1d1dc2f4731d9f",
+          "identifier": "com.appshub.bettbox",
+          "sha256": "f5295c218ff2310b5a7d036323c2f9b587b910d6fcbdeacf14655d9874e92eda",
+          "signingmode": "adhoc"
+        },
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "exit": 70,
+      "expected": "REJECTED",
+      "flags": [
+        "FIXTURE_REJECTED"
+      ],
+      "passed": true
+    },
+    "positive": {
+      "baseline_signed_artifacts": {
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "schema": 1,
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "schema": 1,
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "classification": "ACCEPTED",
+      "execution_artifacts": {
+        "Bettbox": {
+          "cdhash": "3d3092a1b2e55150d7e30234cb1d1dc2f4731d9f",
+          "identifier": "com.appshub.bettbox",
+          "sha256": "f5295c218ff2310b5a7d036323c2f9b587b910d6fcbdeacf14655d9874e92eda",
+          "signingmode": "adhoc"
+        },
+        "BettboxCore": {
+          "cdhash": "332455a73875d48cded6150630ae01c53df23631",
+          "identifier": "com.appshub.bettbox.core",
+          "sha256": "6c2169137d3bc73d97a78dc3e398e4ccef8827d87deae19d0c80d4a623cfea1f",
+          "signingmode": "adhoc"
+        },
+        "BettboxCoreSupervisor": {
+          "cdhash": "01d9c8ee7c4fd64d14f7f77c5caf7453efaa61ac",
+          "identifier": "com.appshub.bettbox.core.supervisor",
+          "sha256": "fc0b740864c250245b6dd7a2855097ccf6573d74dbf12742e77dc2b9341b95f5",
+          "signingmode": "adhoc"
+        }
+      },
+      "exit": 0,
+      "expected": "ACCEPTED",
+      "flags": [
+        "CHAIN_OK",
+        "EXITED_GUEST_REJECTED",
+        "FIXTURE_OK"
+      ],
+      "passed": true
+    }
+  },
+  "execution": "ACTUAL_FIXTURE",
+  "fixture_sources": {
+    "CleanupSnapshot.c": "e54a2d56efe08b3498c052fc8117bf8309651952cef511182b8d993dd00c52c6",
+    "Core.c": "201ead3ec18b221c54fa335112977b5abf0d9160d3040d1ca31e1edd23de5a0e",
+    "FixtureBridge.c": "6d14942a51c0a77ebe8065571005c599e5309b104287061e54cf614b453d8a76",
+    "FixtureBridge.h": "d02d18c7933ff436043d133683541be3eb754b88978a305be5ca190c6f44e3fd",
+    "main.swift": "a47b7d64e597b36f5b6f0761c996004c69adbc6194fbc012f2f66fa931417710",
+    "runner.py": "dbcab8b951d772abc618f7d91017d7bf27ac98e3196faad88c032cac79339a31"
+  },
+  "passed": true,
+  "sdk_version": "27.0",
+  "source_hashes": {
+    "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "32b4226d3d0965eb9a91f83b98e1626f70799e52435335d395ae9eabffdbee77",
+    "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+    "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+    "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5"
+  },
+  "validated_at": "2026-10-07T21:34:05.612939+00:00",
+  "scope": "公开独立App实际Security SDK host/helper/Core链；Core只等EOF不含Mihomo业务",
+  "source_unchanged": true,
+  "actual_identity_sources_equal": true,
+  "matching_fixture_processes": 0,
+  "client_integrated": false,
+  "system_proxy_changed": false,
+  "developer_id_signed": false,
+  "notarized": false,
+  "parser_regression": {
+    "before_exit": 1,
+    "before_failed": 2,
+    "after_exit": 0,
+    "cases": 4
+  },
+  "independent_review": "身份模块、runner与修复均经未参与施工的原生审阅者串行回审"
+}

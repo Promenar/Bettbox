@@ -150,3 +150,7 @@ TCP/UDP隧道目标预检：生产构造器回归在修复前两个无效目标�
 macOS无Dart辅助进程最小隔离：Dart持有固定C helper，同时有登记的sleep1；helper通过冻结spawn桥创建固定true，250ms后两次WNOWAIT保留child，指定waitpid真实退出0，helper及Dart登记进程均退出0。仅证明该短时父属与回收隔离，不包含Swift supervisor、签名/SDK身份、业务relay或SC。公开回执 `validation/2026-10-07-three-platform/dart-supervisor-reaper-validation.json`。
 
 实际Go集成验收：专用owned入口与既有main包回归在CGO0、with_gvisor下通过；候选36项含14个专用入口场景。两个配置失效绕过序列旧helper实际失败，修复后通过；HTTP现有23项加2项实际Endpoint/accept故障验证经race通过。Checked关闭旧Stop遗漏inbound已实际复现，5项生产API包含真实HTTP/TCP/UDP socket关闭，经当前工作树race通过。回执 `validation/2026-10-07-three-platform/owned-listener-close-validation.json` 绑定格式化后实际13源；不是Dart/JNI/SC或平台流量验收。
+
+macOS supervisor原生模块已纳入 `macos/CoreSupervisor`，当前SDK真实编译、23项identity fake、owner fake及公开true/sleep子进程回收通过。两项P2（后续SDK期间Core变化、kernel读取跨启动截止）均真实红测试失败后修复并经独立回审，4项验证器Python测试通过。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-native-validation.json` 绑定当前实际12源；真实签名guest、生产身份发行器、非阻塞relay、Dart/SC与App接线尚未由此验证。
+
+真实签名SDK链矩阵通过：公开独立App中的host/helper/Core两角色context、bind和recheck成功；错误定位值及已退出guest拒绝，manifest篡改、Core签名移除、helper错误ID三负例固定exit70。正常链helper精确WNOWAIT/reap后exit0，执行器记录身份的资源清理未报未解决错误，执行后无匹配fixture进程。公开回执 `validation/2026-10-07-three-platform/macos-supervisor-signed-sdk-validation.json` 区分签名基线和执行产物；实际Identity源码SHA与项目一致。Core仅为公开等EOF程序，不是Mihomo业务；没有Dart/SC/relay/DeveloperID公证验收。

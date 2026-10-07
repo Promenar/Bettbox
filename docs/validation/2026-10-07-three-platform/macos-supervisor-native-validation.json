@@ -1,0 +1,79 @@
+{
+  "scope": "macos-supervisor-native-modules",
+  "status": "passed",
+  "source_hashes": {
+    "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+    "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "32b4226d3d0965eb9a91f83b98e1626f70799e52435335d395ae9eabffdbee77",
+    "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+    "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+    "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+    "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+    "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "5fbf9fea28e94c2cd25e5fdcea0d797559122e7478387f01300b8aa8a81072ea",
+    "macos/CoreSupervisor/Owner/SystemBackend.swift": "8635be1e1fe09901543ce763cab98d335036a75c79a3361ee3ca1298df52961b",
+    "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b",
+    "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+    "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+    "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2"
+  },
+  "steps": [
+    {
+      "step": "c-syntax",
+      "exit_code": 0
+    },
+    {
+      "step": "c-object",
+      "exit_code": 0
+    },
+    {
+      "step": "identity-compile",
+      "exit_code": 0
+    },
+    {
+      "step": "identity-run",
+      "exit_code": 0
+    },
+    {
+      "step": "owner-fake-compile",
+      "exit_code": 0
+    },
+    {
+      "step": "owner-fake-run",
+      "exit_code": 0
+    },
+    {
+      "step": "owner-process-compile",
+      "exit_code": 0
+    },
+    {
+      "step": "owner-process-run",
+      "exit_code": 0
+    }
+  ],
+  "signed_guest_verified": false,
+  "client_integrated": false,
+  "system_proxy_changed": false,
+  "sdk": "MacOSX27.0.sdk",
+  "source_unchanged": true,
+  "validated_at": "2026-10-07T21:25:25.210806+00:00",
+  "python_tool_tests": 4,
+  "before_after": {
+    "identity": {
+      "before_compile_exit": 0,
+      "before_run_exit": 1,
+      "after_compile_exit": 0,
+      "after_run_exit": 0,
+      "cases": 23
+    },
+    "owner_deadline": {
+      "before_compile_exit": 0,
+      "before_run_exit": -5,
+      "after_compile_exit": 0,
+      "after_run_exit": 0
+    }
+  },
+  "independent_review": "两项P2修复与验证器经未参与施工的原生审阅者串行回审通过",
+  "verifier_source_hashes": {
+    "scripts/check_macos_supervisor.py": "88376af3837d2a562d50b4256a730fb2a538cc69c8d5e8332fe71bd53ec61cf4",
+    "scripts/tests/test_check_macos_supervisor.py": "5a08d1de4290068ce533be8e7e3066b41b41e74a1abc9940225bf3519c3b1fdd"
+  }
+}

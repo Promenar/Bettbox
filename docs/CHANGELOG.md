@@ -2,6 +2,10 @@
 
 ## 2026-10-08
 
+- macOS公开独立签名host/helper/Core的真实Security SDK矩阵通过；正常两角色链与错误locator/退出guest、三项静态篡改拒绝分别验证，执行签名SHA与基线独立记录。Mihomo业务、Dart/SC和发行签名另验。
+
+- 纳入macOS supervisor原生身份与独占回收模块及可重复验证入口；身份提交前整链stamp与启动期限缺口均已失败复现并修复。实际SDK编译、23项身份fake、owner fake及公开true/sleep回收通过，客户端与签名进程链另验。
+
 - 集成macOS Go专用入口的私有会话能力、端点代次与配置失效门禁；36项main回归及25项HTTP race通过，宿主/系统代理仍待接线。
 - 增加StopListenerChecked资源关闭API，错误保留对象并继续其他关闭；5项含真实loopbacksocket的race通过，Android平台消费者另验。
 

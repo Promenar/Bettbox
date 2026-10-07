@@ -87,3 +87,6 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 `test-tunnel-constructor` 在本机core目录离线运行生产TCP/UDP构造器race测试，目标与绑定器均为公开虚构夹具，无系统代理、账户或公网调用。该回归只确认无效目标零绑定及合法绑定错误保留，不构成Android/iOS/macOS发行或完整原生生命周期验收。
 
 `test-listener-close` 使用离线CGO1 race验证已登记资源关闭事实；`test-macos-owned-pipe` 使用CGO0/with_gvisor验证实际Go专用控制入口，`test-macos-blind-http` 使用CGO1 race验证专用HTTP及Endpoint。三类证据分开，不把Go capability或Close nil升级为宿主身份、系统代理或完整VPN退出证明。
+# macOS supervisor 模块验证
+
+`test-macos-supervisor` 在本机 macOS arm64 运行 `python3 scripts/check_macos_supervisor.py --execute`；`test-macos-supervisor-tools` 检查验证器来源绑定和fixture构建隔离。固定生产源码位于 `macos/CoreSupervisor`，工具编译当前SDK并运行authority/owner fake与公开true/sleep child。不签名、不修改系统代理，不表示客户端接线或发行包完成。

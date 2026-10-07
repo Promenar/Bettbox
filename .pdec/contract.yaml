@@ -722,6 +722,40 @@
       "timeout_seconds": 180,
       "artifacts": [],
       "verification": "五个生产检查式关闭场景含真实loopbacksocket；仅Close返回证据，不证明Android全部stack/VPN关闭"
+    },
+    "test-macos-supervisor": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_macos_supervisor.py",
+        "--execute"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": [],
+      "verification": "实际SDK编译、生产原生状态机与公开子进程fixture；不包含客户端、真实签名guest或系统代理"
+    },
+    "test-macos-supervisor-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-p",
+        "test_check_macos_supervisor.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "实际SDK编译、生产原生状态机与公开子进程fixture；不包含客户端、真实签名guest或系统代理"
     }
   },
   "deployment": {
@@ -834,7 +868,21 @@
     "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b",
     "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
     "core/common.go": "b19ab65b8f5d0e84d611148be7f624891aed40d9dfcc86814bd7d433dd66195e",
-    "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec"
+    "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
+    "scripts/check_macos_supervisor.py": "88376af3837d2a562d50b4256a730fb2a538cc69c8d5e8332fe71bd53ec61cf4",
+    "scripts/tests/test_check_macos_supervisor.py": "5a08d1de4290068ce533be8e7e3066b41b41e74a1abc9940225bf3519c3b1fdd",
+    "macos/CoreSupervisor/Owner/SupervisorLifecycle.swift": "5fbf9fea28e94c2cd25e5fdcea0d797559122e7478387f01300b8aa8a81072ea",
+    "macos/CoreSupervisor/Owner/SystemBackend.swift": "8635be1e1fe09901543ce763cab98d335036a75c79a3361ee3ca1298df52961b",
+    "macos/CoreSupervisor/Owner/OwnedBackend.h": "f0c7409d061aba424e703b00622f32aed7f2f24ac9efa269cf3ce1956f58ca66",
+    "macos/CoreSupervisor/Owner/OwnedBackend.c": "762635c7173f7161976a4ef2287e9f70e5966b1e59b664c1e5e402ad77b81f6b",
+    "macos/CoreSupervisor/Identity/SSIAppleBackend.swift": "32b4226d3d0965eb9a91f83b98e1626f70799e52435335d395ae9eabffdbee77",
+    "macos/CoreSupervisor/Identity/SSIFile.swift": "60356bb4478419ce2ca8b67e7402bf9cebe4a902adc600007dfd9f636cb2c5a5",
+    "macos/CoreSupervisor/Identity/SSIAuthority.swift": "48ae3466069d1181b71d3f53e21d41fc04dfdb83de0b9d4effa30e39c663af37",
+    "macos/CoreSupervisor/Identity/SSIBridge.h": "7f487b0a4f404c6afd93844be827097527e09f431d05cb07e945c4c1a68ff008",
+    "macos/CoreSupervisor/Tests/OwnerTests.swift": "bb75e86fe457a7f5bb1527d1269706a478956167634d8bdedff970fd9b271f03",
+    "macos/CoreSupervisor/Tests/PublicProcessFixture.swift": "5a53ff4bfb2d9e5cdf0e539a8498761a041beea810df15fbea0350b8951000a2",
+    "macos/CoreSupervisor/Tests/SSIFixtures.swift": "cc9875cae0de2de36de7849615fe82e4d78158ab253756079c504bb84dec2eef",
+    "macos/CoreSupervisor/Tests/main.swift": "ddf5b42738b6c8a6af56d3f1ba9b13b29093672919b4267cf03c1cbef714fa7b"
   },
   "platform_extensions": {
     "android": {
@@ -871,6 +919,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "01b8c165f4b12afeb202e061b481cd41a087f05a3a1c05b4f8a5825632c6d5dc"
+    "contract_digest": "5e056d2c7c396637595d0748b96a8487d88dce044b7c56a4f83f86188ccd0a1f"
   }
 }
