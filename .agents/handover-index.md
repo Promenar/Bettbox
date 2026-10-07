@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T00:02:09+08:00
+> generated_at: 2026-10-08T00:23:47+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T00:02:09+08:00 | partial | ["Bettbox"] | Android真实APK ABI拒绝与应用过滤候选 | `.agents/handover.md` · `2026-10-08T00:02:09+08:00` · `fp:9a0141767c` |
+| three-platform-release | resume | 2026-10-08T00:23:47+08:00 | partial | ["Bettbox"] | Android核心strip来源复现与macOS入口草稿复核 | `.agents/handover.md` · `2026-10-08T00:23:47+08:00` · `fp:b4b7ca2748` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T00:23:47+08:00 | iso | partial | resume | ["Bettbox"] | ["android-wrapper", "official-dependencies", "release"] | Android核心strip来源复现与macOS入口草稿复核 | `.agents/handover.md` · `2026-10-08T00:23:47+08:00` · `fp:b4b7ca2748` |
 | 2026-10-08T00:02:09+08:00 | iso | partial | resume | ["Bettbox"] | ["android-wrapper", "official-dependencies", "release"] | Android真实APK ABI拒绝与应用过滤候选 | `.agents/handover.md` · `2026-10-08T00:02:09+08:00` · `fp:9a0141767c` |
 | 2026-10-07T23:42:27+08:00 | iso | partial | resume | ["Bettbox"] | ["android-wrapper", "official-dependencies", "release"] | Android实际依赖门禁通过与原生ABI目标修复 | `.agents/handover.md` · `2026-10-07T23:42:27+08:00` · `fp:5559e207e6` |
 | 2026-10-07T23:24:04+08:00 | iso | partial | resume | ["Bettbox"] | ["android-wrapper", "official-dependencies", "release"] | 官方Android依赖、Wrapper与ZIP预置候选冻结 | `.agents/handover.md` · `2026-10-07T23:24:04+08:00` · `fp:5f808f406d` |

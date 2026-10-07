@@ -62,6 +62,12 @@ class AndroidContractTest(unittest.TestCase):
         self.assertIn('requestedNativeAbis != null && !splitPerAbi', source)
         self.assertIn('abiFilters.addAll(requestedNativeAbis)', source)
 
+    def test_generated_go_core_is_preserved_at_library_and_app_packaging(self):
+        root = Path(__file__).resolve().parents[2]
+        for module in ('core', 'app'):
+            source = (root / f'android/{module}/build.gradle.kts').read_text()
+            self.assertIn('keepDebugSymbols.add("**/libclash.so")', source)
+
     def test_wrapper_distribution_and_bootstrap_match_official_checksums(self):
         root = Path(__file__).resolve().parents[2]
         wrapper = root / 'android/gradle/wrapper'

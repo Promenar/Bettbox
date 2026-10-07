@@ -1,0 +1,41 @@
+{
+  "started_at": "2026-10-07T16:02:45.742841+00:00",
+  "finished_at": "2026-10-07T16:15:04.964781+00:00",
+  "target": "android-arm64-debug",
+  "status": "failed",
+  "phase": "android-debug-build",
+  "failure_reason": "APK 内核心与已生成核心的 SHA256 不一致",
+  "gradle_help_verified": true,
+  "distribution_zip": {
+    "reused": true,
+    "source": "project-task-gradle-home",
+    "bytes": 224116304,
+    "sha256": "efe9a3d147d948d7528a9887fa35abcf24ca1a43ad06439996490f77569b02d1"
+  },
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "candidate_sha": "748133a",
+  "cleanup_verified": true,
+  "network_closed": true,
+  "strip_reproduction": {
+    "strip_exit_code": 0,
+    "source_sha256": "3424a4ab9090a642ea4f9030d5bb6ceca601e8a9e99da4c2be85b17b984927a6",
+    "stripped_sha256": "2b0133fdcf9deb9930fcbf577052fdf8012f8352ae278f5e08699e04adfac0e5",
+    "apk_core_sha256": "2b0133fdcf9deb9930fcbf577052fdf8012f8352ae278f5e08699e04adfac0e5",
+    "official_strip_reproduces_apk": true
+  },
+  "core_section_facts": [
+    {
+      "file": "libclash.so",
+      "debug_section_count": 0,
+      "symtab_present": false,
+      "go_build_id_present": true
+    },
+    {
+      "file": "android-748133a-llvm-stripped.so",
+      "debug_section_count": 0,
+      "symtab_present": false,
+      "go_build_id_present": true
+    }
+  ]
+}

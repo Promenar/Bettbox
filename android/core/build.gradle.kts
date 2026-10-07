@@ -37,6 +37,13 @@ android {
         }
     }
 
+    packaging {
+        jniLibs {
+            // 库模块和应用模块均禁止再次变换已核验的Go核心字节。
+            keepDebugSymbols.add("**/libclash.so")
+        }
+    }
+
     sourceSets {
         getByName("main") {
             jniLibs.srcDirs("src/main/jniLibs")

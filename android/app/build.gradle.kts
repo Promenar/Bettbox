@@ -104,6 +104,8 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = true
+            // Go核心已去除调试信息，保留字节以进行精确来源核验。
+            keepDebugSymbols.add("**/libclash.so")
         }
     }
 

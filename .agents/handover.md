@@ -629,3 +629,34 @@ App按公开target-platform过滤打包ABI，split-per-abi由Flutter负责App过
 
 ### HLG
 append dry-run后apply，保留两次实际失败回执与候选来源。
+
+## 2026-10-08T00:23:47+08:00 · Android核心strip来源复现与macOS入口草稿复核
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android-wrapper", "official-dependencies", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: b4b7ca274813e561be39f1b3eadfdb09d135f309979324d1193bfbf82807470d
+
+### Summary
+发行优先Android/macOS；iOS保留开发版研究。真实748133a APK通过ABI/ELF16KB/zipalign，精确核心SHA拒绝。
+
+### Changed
+Android库与应用对libclash.so使用keepDebugSymbols保持已去调试信息Go核心原字节；精确SHA校验不放宽。PDEC摘要和文档同步。macOS施工仅在独立.test目录生成专用HTTP入口与11项测试草稿，未集成项目源码或真实配置。
+
+### Validation
+真实NDK llvm-strip --strip-unneeded输出SHA精确复现APK；各复制/merged核心相同，debug段及symtab均无。静态回归修复前失败修复后12契约测试通过；142工具测试通过，独立审阅无P1/P2。真实来源/锁文件不变、网络与Gradle退出通过。Mac独立草稿审阅发现内部HTTP/Upgrade路由未纳入停止证据P1及客户端EOF取消缺失P2，修复草稿已冻结、13个测试函数待运行；已有pipeline字节时的EOF监测边界保留，最终独立复审未完成，未编译测试。公开Android回执docs/validation/2026-10-07-three-platform/android-748133a.json。客户端主/备用guest config以Dart UA公开HTTP200、数据对象验证，未读取或输出任何凭据。
+
+### Next
+冻结保留核心候选并完整debug构建，确认库/App/APK均原SHA，通过后Pixel_7设备验收与正式签名。Mac修复草稿复审后再PDEC定约、真实编译race和原认证回归；IPC/SC能力不能提前接线。
+
+### Risks
+当前APK最终来源门禁失败，不能交付。Mac未集成、两项草稿问题待闭合，现有absent门禁保持。真实系统代理、Keychain、TUN/设备VPN、支付与正式发行未验收。
+
+### DIA
+已同步平台验证、CHANGELOG、PDEC和三端计划；独立草稿报告保留临时目录。
+
+### HLG
+使用append dry-run后apply，保留候选失败与根因复现事实。
