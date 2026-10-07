@@ -1,0 +1,29 @@
+{
+  "scope": "Android quickStart 前置短路",
+  "source_sha256": {
+    "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
+    "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e",
+    "core/lib_android.go": "e581e6443009ee6b7f59aa2c7b74a2000570798efffd58efdc414c6b2e446a62"
+  },
+  "before": {
+    "kind": "旧调用顺序等价薄包装器",
+    "exit_code": 1,
+    "failed_cases": [
+      "初始化失败",
+      "状态失败"
+    ],
+    "log_sha256": "2788e6d75c9ececac0955d6616d0536f36d9df3f2514a1ad05bda2a852b9fd71"
+  },
+  "after": {
+    "exit_code": 0,
+    "race": true,
+    "subcases": 4,
+    "log_sha256": "73d7c1eef09312aa6655d3baa237b40e94dcc22bdda33516d9d860698c827bf8"
+  },
+  "independent_review": "未发现P1/P2",
+  "limits": [
+    "尚未Android原生编译",
+    "唯一发送调用点不证明真实bridge投递",
+    "不证明VPN/流量/跨引擎取消"
+  ]
+}

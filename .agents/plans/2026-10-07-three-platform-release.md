@@ -70,3 +70,7 @@ JNI 动态依赖验收要求 basename libclash.so，并验证 PT_DYNAMIC 与 PT_
 Android启动修复前关闭跨平台State数据竞争：state包提供 `Snapshot() State` 深拷贝读取和 `ApplyJSON([]byte) error` 原子更新，私有RWMutex保护当前值，保留有效JSON部分更新与未知字段兼容；畸形JSON固定错误且不得提交部分字段。AccessControl指针/列表与BypassDomain复制保留nil/空列表区别。调用者不得直接持有共享可变状态。
 
 主控独占 core/state 与其fixture、hub.go/action.go 的更新回传、Android options/profile读取和iOS profile读取；不改业务字段/平台隧道协议，不扩展网络/权限。先以旧等价薄包装器运行失败回归，再实现同步快照，Go CGO1 -race ./state；Go owned入口普通编译回归用于共享接口，Android/iOS原生编译另由后续候选验收。错误结果采用固定信息，不返回JSON内容。独立复核后统一DIA/HLG。
+
+## Android 启停与快速配置合同
+
+快速配置前置 helper 独立集成：初始化和状态错误立即短路，原生 adapter 唯一发送点；旧等价顺序先失败、生产 helper 后通过。启动候选的 Go/JNI/Kotlin/Dart 必须整包接线，避免把保留原 ParcelFD 的借用合同与 detachFd 混用。候选构造失败路径必须保留部分 listener 的关闭错误和所有权，关闭未确认时拒绝下一次启动。纯 helper 通过不证明系统 VPN 或有效节点流量。

@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T01:52:48+08:00
+> generated_at: 2026-10-08T02:17:21+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T01:52:48+08:00 | partial | ["Bettbox"] | 客户端State原子快照与共享接口回归 | `.agents/handover.md` · `2026-10-08T01:52:48+08:00` · `fp:a4c0e15a8d` |
+| three-platform-release | resume | 2026-10-08T02:17:21+08:00 | partial | ["Bettbox"] | Android快速配置失败短路与启停候选审阅 | `.agents/handover.md` · `2026-10-08T02:17:21+08:00` · `fp:f9fccc7898` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T02:17:21+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "startup", "race", "release"] | Android快速配置失败短路与启停候选审阅 | `.agents/handover.md` · `2026-10-08T02:17:21+08:00` · `fp:f9fccc7898` |
 | 2026-10-08T01:52:48+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "ios", "state", "race", "release"] | 客户端State原子快照与共享接口回归 | `.agents/handover.md` · `2026-10-08T01:52:48+08:00` · `fp:a4c0e15a8d` |
 | 2026-10-08T01:44:45+08:00 | iso | partial | resume | ["Bettbox"] | ["macos", "ipc", "owned-child", "release"] | macOS owned-child Go入口与真实匿名管道退出验收 | `.agents/handover.md` · `2026-10-08T01:44:45+08:00` · `fp:49a4574146` |
 | 2026-10-08T01:31:54+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "macos", "http", "race", "release"] | macOS专用HTTP入口实际race与Android修复后设备起停 | `.agents/handover.md` · `2026-10-08T01:31:54+08:00` · `fp:f3604df652` |

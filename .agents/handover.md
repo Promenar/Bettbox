@@ -784,3 +784,34 @@ Android quickStart/void setState仍忽略State错误，完整快速启动错误�
 
 ### HLG
 标准append dry-run/apply；保留先失败后通过与实际平台边界。
+
+## 2026-10-08T02:17:21+08:00 · Android快速配置失败短路与启停候选审阅
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "startup", "race", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: f9fccc7898e24827ac6a315f5c48edeea9b35c182c5d309f916b1bc52b276e27
+
+### Summary
+用户选择Android/macOS优先交付，iOS保留开发研究；目标活跃。实际quickStart预检失败短路完成，原生启停整包仍待集成。
+
+### Changed
+新增生产androidstartup.QuickStart；actual Android adapter唯一SendToPort，init/state失败固定错误不调用setup。保留setup原有返回合同，不改变JNI ABI。
+
+### Validation
+旧调用顺序等价薄包装器CGO1 race实际失败两项短路场景；生产helper四个子场景通过。独立只读审阅无P1/P2；唯一发送调用点不证明实际bridge投递。公开回执android-quick-start.json；PDEC有效。
+
+### Next
+Android startup候选独立审阅发现P1：采纳FD后的构造失败忽略Close错误并丢失部分listener，使State错误允许新start。作者仅草稿修复，需独立复核真实constructor/adapter路径后整包接Go/JNI/Kotlin/Dart，再原生构建。JNI/原PFD候选另有界施工；macOSnative身份/签名绑定/系统代理接线待实施。
+
+### Risks
+Go纯helper不证明Android编译或系统VPN；当前设备账户订阅过期，实际节点流量与正式APK未验证。macOS代理/TUN/发行签名与真实商户支付待验；无生产付款或公开发布。callback gate排空不证明底层stack完整停止。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、三端计划、PDEC及公开脱敏回执。
+
+### HLG
+标准append dry-run/apply，保留实测与候选边界。

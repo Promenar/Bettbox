@@ -5,6 +5,7 @@ package main
 import "C"
 import (
 	"context"
+	"core/androidstartup"
 	bridge "core/dart-bridge"
 	"core/platform"
 	"core/state"
@@ -245,12 +246,12 @@ func quickStart(initParamsChar *C.char, paramsChar *C.char, stateParamsChar *C.c
 	bytes := []byte(C.GoString(paramsChar))
 	stateParams := C.GoString(stateParamsChar)
 	go func() {
-		res := handleInitClash(paramsString)
-		if res == false {
-			bridge.SendToPort(i, "init error")
-		}
-		handleSetState(stateParams)
-		bridge.SendToPort(i, handleSetupConfig(bytes))
+		result := androidstartup.QuickStart(
+			func() bool { return handleInitClash(paramsString) },
+			func() error { return handleSetState(stateParams) },
+			func() string { return handleSetupConfig(bytes) },
+		)
+		bridge.SendToPort(i, result)
 	}()
 }
 

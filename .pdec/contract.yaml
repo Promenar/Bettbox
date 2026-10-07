@@ -637,6 +637,23 @@
       "timeout_seconds": 180,
       "artifacts": [],
       "verification": "状态快照公开fixture；CGO1/GOPROXYoff/GOSUMDBoff；畸形JSON原子拒绝、深复制与并发读写，不启动业务核心/网络"
+    },
+    "test-android-preflight": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=120s",
+        "./androidstartup"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 150,
+      "artifacts": []
     }
   },
   "deployment": {
@@ -726,8 +743,10 @@
     "core/state/snapshot_test.go": "0eef91b22dacc03cfeb2a4d0fa15f54f22d4778aef6d1eefb83517be3c02318c",
     "core/hub.go": "109a06c96a424caac84c574087374b2eaa6a9675e06727598a388d3961f0511c",
     "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
-    "core/lib_android.go": "d6f75e073666f90e5a59e67c7332246e8b4b1017832606b09898e397e1676e5e",
-    "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac"
+    "core/lib_android.go": "e581e6443009ee6b7f59aa2c7b74a2000570798efffd58efdc414c6b2e446a62",
+    "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
+    "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
+    "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e"
   },
   "platform_extensions": {
     "android": {
@@ -764,6 +783,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "bca8958881e2ea3f59f61f46d16b7dbbe22f3c674ff29c2b8e2cd4c708351886"
+    "contract_digest": "d31b8d96cfc1ace2d20e1e34acb1bfa3cb1f5dd8fa26691ef61babb94bc5aecb"
   }
 }
