@@ -54,3 +54,7 @@
 
 
 macOS TUN 架构采用前需完成 Apple 用途约束核验：TN3134 中直接 Developer ID 分发的 Packet Tunnel 必须为系统扩展，应用扩展仅限 App Store；TN3120 限制将所声明的流量通过其它接口代理转发，以及在 Packet Tunnel 内托管网络监听器。当前 Mihomo 规则代理与本地监听行为须逐项比对，不以 iOS 工程可编译推定 Apple 分发适用。受限 fd broker 作为 macOS 独立候选；最终方案、团队权限和真实数据流验收均待确认。依据：[TN3134](https://developer.apple.com/documentation/technotes/tn3134-network-extension-provider-deployment)、[TN3120](https://developer.apple.com/documentation/technotes/tn3120-expected-use-cases-for-network-extension-packet-tunnel-providers)。
+
+## Android 原生目标契约
+
+执行入口仅生成ARM64核心并向Flutter传入 `android-arm64`。core库按相同公开 `target-platform` 属性映射NDK ABI过滤，显式未知/空目标拒绝，未传目标保留默认。多ABI构建须分别生成对应核心及头文件；缺失检查不放宽。文件所有权限于android/core/build.gradle.kts与工具契约回归；独立审阅后更新PDEC输入摘要，冻结候选并执行完整debug构建。验收包含CMake实际配置目标、核心/APK ABI、16KB产物、源码锁文件不变与任务进程退出；通过后再安装已有Pixel_7，实际设备页大小4096需单独披露。

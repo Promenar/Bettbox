@@ -43,6 +43,16 @@ class AndroidContractTest(unittest.TestCase):
         self.assertIn("ext.kotlin_version = '1.3.50'", source)
         self.assertIn('org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version', source)
 
+    def test_native_core_filters_follow_explicit_flutter_target(self):
+        root = Path(__file__).resolve().parents[2]
+        source = (root / 'android/core/build.gradle.kts').read_text()
+        self.assertIn('providers.gradleProperty("target-platform")', source)
+        self.assertIn('"android-arm64" to "arm64-v8a"', source)
+        self.assertIn('"android-arm" to "armeabi-v7a"', source)
+        self.assertIn('"android-x64" to "x86_64"', source)
+        self.assertIn('abiFilters.addAll(requestedNativeAbis)', source)
+        self.assertIn('GradleException', source)
+
     def test_wrapper_distribution_and_bootstrap_match_official_checksums(self):
         root = Path(__file__).resolve().parents[2]
         wrapper = root / 'android/gradle/wrapper'

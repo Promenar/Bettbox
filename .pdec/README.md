@@ -52,10 +52,12 @@ Android 每次构建采用独立 Gradle 用户目录，总体预算 2700 秒，�
 
 `test-billing-isolated` 通过既有 SSH 身份传输精确公开 fixture 清单，在 NoSLA 当前 PHP 镜像的128MiB禁网只读容器内执行多进程 SQLite 验收。仅一次性工作目录可写；源码、清理和镜像身份纳入回执。该入口不挂载业务数据库、配置或环境秘密，也不启动真实收款。
 
-原生iOS测试入口为`test-ios-native`：在已有iPhone17 arm64模拟器上执行RunnerTests，结果不外推真机VPN。Android官方网络入口使用任务loopback CONNECT，32条有界转发与6条解析/连接并发分离，排队12，逻辑转发缓冲上限16MiB；回执包含固定代理拒绝计数，不能用零计数单独判定官方源健康。当前139项网络、构建、契约及签名测试通过，历史版本隔离复现确认两项缺陷修复，实际依赖门禁另行验收；不修改系统代理或DNS。桌面源码冻结纳入未跟踪输入字节，macOS使用目录句柄拒绝链接；Windows回退检查reparse point，实际Windows句柄竞态行为未验收。
+原生iOS测试入口为`test-ios-native`：在已有iPhone17 arm64模拟器上执行RunnerTests，结果不外推真机VPN。Android官方网络入口使用任务loopback CONNECT，32条有界转发与6条解析/连接并发分离，排队12，逻辑转发缓冲上限16MiB；回执包含固定代理拒绝计数，不能用零计数单独判定官方源健康。当前140项网络、构建、契约及签名测试通过，历史版本隔离复现确认两项缺陷修复，实际依赖门禁另行验收；不修改系统代理或DNS。桌面源码冻结纳入未跟踪输入字节，macOS使用目录句柄拒绝链接；Windows回退检查reparse point，实际Windows句柄竞态行为未验收。
 
 `test-android-regressions` 只对固定公开历史候选与当前实现做回环/mock对照，不发送进程信号。`test-macos-proxy-core` 在本机运行无外部依赖 Swift package 的23项事务测试，输出位于忽略的任务构建目录，不访问真实系统代理。
 
 Java候选发现使用公开ucomm，只同UID的java候选查询内核身份；它是发现线索，不授予信号权限。源外目标诊断只有固定枚举，不保留hostname/headers。QJS仓库使用Google和Maven Central，保留现有依赖版本；Wrapper的8.14-all发行ZIP固定官方SHA256。
 
 `test-android-distribution-cache` 验证项目内官方发行ZIP独立预置，包含33项无网络夹具。实际构建TLS门禁通过后才预置，SHA和副本稳定性校验通过后仍执行Gradle JVM门禁。源码包括4个Wrapper文件，其8.14 JAR与发行ZIP各自固定官方SHA；预置不复制Maven/编译缓存，也不改变9host授权。
+
+ARM64实际构建已通过官方ZIP复用、Gradle help/JVM门禁与退出清理，APK失败根因是core模块未继承Flutter目标ABI；其build.gradle.kts纳入PDEC输入证据，目标过滤修复的完整构建独立验收。

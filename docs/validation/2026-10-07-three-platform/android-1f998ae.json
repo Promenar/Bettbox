@@ -1,0 +1,46 @@
+{
+  "started_at": "2026-10-07T15:24:51.045365+00:00",
+  "finished_at": "2026-10-07T15:36:48.057366+00:00",
+  "target": "android-arm64-debug",
+  "status": "failed",
+  "phase": "android-debug-build",
+  "failure_reason": "工具执行失败：flutter，退出码 1；安全摘要：{\"categories\": [\"SDK或原生工具链失败\"], \"tasks\": [\":core:configureCMakeDebug\"], \"dependencies\": [], \"locations\": [], \"unknown_hosts\": [], \"exceptions\": []}",
+  "safe_failure_summary": {
+    "categories": [
+      "SDK或原生工具链失败"
+    ],
+    "tasks": [
+      ":core:configureCMakeDebug"
+    ],
+    "dependencies": [],
+    "locations": [],
+    "unknown_hosts": [],
+    "exceptions": []
+  },
+  "gradle_help_verified": true,
+  "distribution_zip": {
+    "reused": true,
+    "source": "project-task-gradle-home",
+    "bytes": 224116304,
+    "sha256": "efe9a3d147d948d7528a9887fa35abcf24ca1a43ad06439996490f77569b02d1"
+  },
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "candidate_sha": "1f998ae",
+  "cleanup_verified": true,
+  "network_renewal_stopped": true,
+  "observed_jvm_facts": [
+    {
+      "main_class": "org.gradle.launcher.daemon.bootstrap.GradleDaemon",
+      "kernel_comm_java": true,
+      "owned_home_argument": true,
+      "java_entry_matches": true
+    },
+    {
+      "main_class": "org.jetbrains.kotlin.daemon.KotlinCompileDaemon",
+      "kernel_comm_java": true,
+      "owned_home_argument": true,
+      "java_entry_matches": true
+    }
+  ]
+}

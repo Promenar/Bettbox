@@ -567,3 +567,34 @@ QJS仓库只Google/Maven Central，AGP3.5.0/KGP1.3.50不变。未知CONNECT诊�
 
 ### HLG
 标准dry-run/apply追加与工具重建索引。
+
+## 2026-10-07T23:42:27+08:00 · Android实际依赖门禁通过与原生ABI目标修复
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android-wrapper", "official-dependencies", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 5559e207e68b6aa6bc729ba6599301229ec8564ec7bdd245a10c159c83b8cd01
+
+### Summary
+发行优先Android/macOS，iOS保留开发版研究发行。候选1f998ae真实debug构建通过官方ZIP预置、Gradle help/JVM门禁，APK在core CMake配置失败。
+
+### Changed
+android/core/build.gradle.kts遵循Flutter公开target-platform映射ABI过滤，未知目标拒绝、未指定保留默认，缺核心检查保持；PDEC输入证据和计划同步。
+
+### Validation
+真实CMake stderr明确缺少armeabi-v7a/libclash.so，入口仅生成ARM64。静态回归修复前失败、修复后通过，完整140项工具测试通过；独立审阅无P1/P2。实际Gradle/Kotlin JVM的ucomm、Java入口、任务参数核验，未覆盖worker。真实清理与源码/锁文件不变验证通过，公开回执docs/validation/2026-10-07-three-platform/android-1f998ae.json。Pixel_7启动完成、页大小4096。
+
+### Next
+冻结ABI修复候选，完整debug构建验证CMake任务和最终APK，通过后模拟器业务验收与正式签名构建。推进macOS真实系统代理适配、权限代理与状态修复。
+
+### Risks
+尚无可交付APK；静态ABI回归不是完整构建证据。模拟器4KB页不能证明16KB设备行为。macOS签名/系统代理/TUN、真实支付和设备VPN仍待验收。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、PDEC README/契约及三端计划。
+
+### HLG
+使用append dry-run后apply，只追加事实链。
