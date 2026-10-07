@@ -7,6 +7,8 @@ library;
 
 import 'package:dio/dio.dart';
 
+import 'url_policy.dart';
+
 /// 引导源文档（§6.3 子集：域名池切换所需字段；公告/地域目录后续里程碑消费）。
 class XboardBootstrapDoc {
   const XboardBootstrapDoc({
@@ -18,7 +20,7 @@ class XboardBootstrapDoc {
     this.regionCatalogRaw = const [],
   });
 
-  /// 当前有效 API 域名列表（https/http 绝对地址，去重保序）。
+  /// 当前有效 API 域名列表（HTTPS 根地址，去重保序）。
   final List<String> apiDomains;
   final List<String> bootstrapSources;
   final String dnsTxtHint;
@@ -33,8 +35,8 @@ class XboardBootstrapDoc {
     if (list is! List || list.isEmpty) return null;
     final domains = <String>[];
     for (final entry in list) {
-      final url = entry?.toString().trim() ?? '';
-      if (_isHttpUrl(url) && !domains.contains(url)) {
+      final url = entry is String ? normalizePanelOrigin(entry) : null;
+      if (url != null && !domains.contains(url)) {
         domains.add(url);
       }
     }
@@ -44,8 +46,8 @@ class XboardBootstrapDoc {
     final rawSources = json['bootstrap_sources'];
     if (rawSources is List) {
       for (final entry in rawSources) {
-        final url = entry?.toString().trim() ?? '';
-        if (_isHttpUrl(url) && !sources.contains(url)) {
+        final url = entry is String ? publicHttpsUri(entry)?.toString() : null;
+        if (url != null && !sources.contains(url)) {
           sources.add(url);
         }
       }
@@ -63,9 +65,6 @@ class XboardBootstrapDoc {
       regionCatalogRaw: catalogRaw is List ? catalogRaw : const [],
     );
   }
-
-  static bool _isHttpUrl(String s) =>
-      s.startsWith('http://') || s.startsWith('https://');
 }
 
 /// 引导源拉取：按顺序尝试 [sources]，全部失败返回 null（错误只记入 [onError]）。
@@ -81,10 +80,16 @@ class XboardBootstrapClient {
     void Function(String source, Object error)? onError,
   }) async {
     for (final source in sources) {
+      final uri = publicHttpsUri(source);
+      if (uri == null) {
+        onError?.call('invalid source', 'unsafe HTTPS source');
+        continue;
+      }
       try {
         final response = await _dio.getUri<dynamic>(
-          Uri.parse(source),
+          uri,
           options: Options(
+            followRedirects: false,
             connectTimeout: timeout,
             receiveTimeout: timeout,
             validateStatus: (_) => true,
@@ -101,8 +106,8 @@ class XboardBootstrapClient {
           continue;
         }
         return doc;
-      } catch (error) {
-        onError?.call(source, error);
+      } catch (_) {
+        onError?.call(source, 'bootstrap connection failure');
       }
     }
     return null;

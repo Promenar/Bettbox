@@ -24,19 +24,23 @@ class _FakeAdapter implements HttpClientAdapter {
 }
 
 ResponseBody _ok(String jsonFragment) => ResponseBody.fromString(
-      '{"status":"success","message":"操作成功","data":$jsonFragment,"error":null}',
-      200,
-      headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
-    );
+  '{"status":"success","message":"操作成功","data":$jsonFragment,"error":null}',
+  200,
+  headers: {
+    Headers.contentTypeHeader: [Headers.jsonContentType],
+  },
+);
 
 void main() {
   group('XboardApiClient', () {
     test('成功响应解析 data', () async {
       final client = XboardApiClient(
         domainManager: XboardDomainManager(),
-        dio: Dio()..httpClientAdapter = _FakeAdapter(
-          (options) => _ok('{"token":"t","auth_data":"Bearer x","is_admin":false}'),
-        ),
+        dio: Dio()
+          ..httpClientAdapter = _FakeAdapter(
+            (options) =>
+                _ok('{"token":"t","auth_data":"Bearer x","is_admin":false}'),
+          ),
       );
       final result = await client.post<Map<String, dynamic>>(
         '/passport/auth/login',
@@ -51,13 +55,16 @@ void main() {
       final manager = XboardDomainManager();
       final client = XboardApiClient(
         domainManager: manager,
-        dio: Dio()..httpClientAdapter = _FakeAdapter(
-          (options) => ResponseBody.fromString(
-            '{"status":"fail","message":"邮箱验证码有误","data":null,"error":null}',
-            200,
-            headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+        dio: Dio()
+          ..httpClientAdapter = _FakeAdapter(
+            (options) => ResponseBody.fromString(
+              '{"status":"fail","message":"邮箱验证码有误","data":null,"error":null}',
+              200,
+              headers: {
+                Headers.contentTypeHeader: [Headers.jsonContentType],
+              },
+            ),
           ),
-        ),
       );
       await expectLater(
         client.get<void>('/user/info'),
@@ -73,13 +80,16 @@ void main() {
     test('无 status 变体按失败处理', () async {
       final client = XboardApiClient(
         domainManager: XboardDomainManager(),
-        dio: Dio()..httpClientAdapter = _FakeAdapter(
-          (options) => ResponseBody.fromString(
-            '{"message":"套餐周期参数有误"}',
-            200,
-            headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+        dio: Dio()
+          ..httpClientAdapter = _FakeAdapter(
+            (options) => ResponseBody.fromString(
+              '{"message":"套餐周期参数有误"}',
+              200,
+              headers: {
+                Headers.contentTypeHeader: [Headers.jsonContentType],
+              },
+            ),
           ),
-        ),
       );
       await expectLater(
         client.post<void>('/user/order/save', body: {}),
@@ -90,13 +100,16 @@ void main() {
     test('401/403 归类为 auth', () async {
       final client = XboardApiClient(
         domainManager: XboardDomainManager(),
-        dio: Dio()..httpClientAdapter = _FakeAdapter(
-          (options) => ResponseBody.fromString(
-            '{"status":"fail","message":"token is error","data":null,"error":null}',
-            403,
-            headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+        dio: Dio()
+          ..httpClientAdapter = _FakeAdapter(
+            (options) => ResponseBody.fromString(
+              '{"status":"fail","message":"token is error","data":null,"error":null}',
+              403,
+              headers: {
+                Headers.contentTypeHeader: [Headers.jsonContentType],
+              },
+            ),
           ),
-        ),
       );
       await expectLater(
         client.get<String>('/user/resetSecurity'),
@@ -112,17 +125,22 @@ void main() {
       );
       final client = XboardApiClient(
         domainManager: manager,
-        dio: Dio()..httpClientAdapter = _FakeAdapter(
-          (options) => throw DioException.connectionError(
-            requestOptions: options,
-            reason: 'refused',
+        dio: Dio()
+          ..httpClientAdapter = _FakeAdapter(
+            (options) => throw DioException.connectionError(
+              requestOptions: options,
+              reason: 'refused',
+            ),
           ),
-        ),
       );
       await expectLater(
         client.get<void>('/guest/comm/config'),
         throwsA(
-          isA<XboardException>().having((e) => e.isConnection, 'isConnection', isTrue),
+          isA<XboardException>().having(
+            (e) => e.isConnection,
+            'isConnection',
+            isTrue,
+          ),
         ),
       );
       expect(manager.activeFailureCount, 1);
@@ -139,13 +157,73 @@ void main() {
       final client = XboardApiClient(
         domainManager: XboardDomainManager(),
         authDataProvider: () => 'Bearer token123',
-        dio: Dio()..httpClientAdapter = _FakeAdapter((options) {
-          authHeader = options.headers['Authorization'] as String?;
-          return _ok('true');
-        }),
+        dio: Dio()
+          ..httpClientAdapter = _FakeAdapter((options) {
+            authHeader = options.headers['Authorization'] as String?;
+            return _ok('true');
+          }),
       );
       await client.get<void>('/user/checkLogin');
       expect(authHeader, 'Bearer token123');
+    });
+
+    test('允许所有 HTTP 状态时仍正确识别鉴权和服务端错误', () async {
+      for (final status in [302, 401, 403, 500]) {
+        final manager = XboardDomainManager();
+        final dio = Dio(BaseOptions(validateStatus: (_) => true));
+        dio.httpClientAdapter = _FakeAdapter(
+          (_) => ResponseBody.fromString(
+            '{"status":"success","message":"拒绝","data":true}',
+            status,
+            headers: {
+              Headers.contentTypeHeader: [Headers.jsonContentType],
+            },
+          ),
+        );
+        final client = XboardApiClient(domainManager: manager, dio: dio);
+        await expectLater(
+          client.get<bool>('/user/checkLogin'),
+          throwsA(
+            isA<XboardException>()
+                .having((e) => e.statusCode, 'statusCode', status)
+                .having(
+                  (e) => e.type,
+                  'type',
+                  status == 401 || status == 403
+                      ? XboardErrorType.auth
+                      : status >= 500
+                      ? XboardErrorType.server
+                      : XboardErrorType.business,
+                ),
+          ),
+        );
+        expect(manager.activeFailureCount, 0);
+      }
+    });
+
+    test('连接异常不把请求地址或认证信息放入异常消息', () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _FakeAdapter(
+        (options) => throw DioException(
+          requestOptions: options,
+          type: DioExceptionType.connectionError,
+          message: 'https://fixture.invalid/?token=fixture-secret',
+        ),
+      );
+      final client = XboardApiClient(
+        domainManager: XboardDomainManager(),
+        dio: dio,
+      );
+      await expectLater(
+        client.get<void>('/user/info'),
+        throwsA(
+          isA<XboardException>().having(
+            (e) => e.message,
+            'message',
+            'connection failure',
+          ),
+        ),
+      );
     });
   });
 }

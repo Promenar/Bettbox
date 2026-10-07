@@ -31,23 +31,22 @@ if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden)
 endif ()
 
-set(LIB_CLASH_PATH "${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libclash.so")
+set(LIB_CLASH_DIR "${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}")
+set(LIB_CLASH_PATH "${LIB_CLASH_DIR}/libclash.so")
+set(LIB_CLASH_HEADER_PATH "${LIB_CLASH_DIR}/libclash.h")
 
-message("LIB_CLASH_PATH ${LIB_CLASH_PATH}")
-if (EXISTS ${LIB_CLASH_PATH})
-    message("Found libclash.so for ABI ${ANDROID_ABI}")
-    add_compile_definitions(LIBCLASH)
-    include_directories(${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
-    link_directories(${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
-    add_library(${CMAKE_PROJECT_NAME} SHARED
-            jni_helper.cpp
-            core.cpp)
-    target_link_libraries(${CMAKE_PROJECT_NAME}
-            clash)
-else ()
-    message("Not found libclash.so for ABI ${ANDROID_ABI}")
-    add_library(${CMAKE_PROJECT_NAME} SHARED
-            jni_helper.cpp
-            core.cpp)
-    target_link_libraries(${CMAKE_PROJECT_NAME})
-endif ()
+# 每个 ABI 必须同时具备核心与生成头文件，禁止产出缺少核心功能的 JNI 库。
+foreach(REQUIRED_CORE_FILE IN ITEMS "${LIB_CLASH_PATH}" "${LIB_CLASH_HEADER_PATH}")
+    if (NOT EXISTS "${REQUIRED_CORE_FILE}" OR IS_DIRECTORY "${REQUIRED_CORE_FILE}")
+        message(FATAL_ERROR "ABI ${ANDROID_ABI} 缺少必要核心文件：${REQUIRED_CORE_FILE}。请先生成对应 ABI 的核心。")
+    endif ()
+endforeach()
+
+add_compile_definitions(LIBCLASH)
+include_directories("${LIB_CLASH_DIR}")
+add_library(clash SHARED IMPORTED)
+set_target_properties(clash PROPERTIES IMPORTED_LOCATION "${LIB_CLASH_PATH}")
+add_library(${CMAKE_PROJECT_NAME} SHARED
+        jni_helper.cpp
+        core.cpp)
+target_link_libraries(${CMAKE_PROJECT_NAME} clash)

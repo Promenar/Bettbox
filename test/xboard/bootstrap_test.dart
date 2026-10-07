@@ -43,13 +43,20 @@ void main() {
     test('合法文档解析', () {
       final doc = XboardBootstrapDoc.tryParse({
         'version': 1,
-        'api_domains': ['https://a.example.com', 'https://b.example.com', 'https://a.example.com'],
+        'api_domains': [
+          'https://a.example.com',
+          'https://b.example.com',
+          'https://a.example.com',
+        ],
         'bootstrap_sources': ['https://src.example.com/domains.json'],
         'min_app_version': 1000000,
         'announcement_url': 'https://ann.example.com',
       });
       expect(doc, isNotNull);
-      expect(doc!.apiDomains, ['https://a.example.com', 'https://b.example.com'], reason: '去重保序');
+      expect(doc!.apiDomains, [
+        'https://a.example.com',
+        'https://b.example.com',
+      ], reason: '去重保序');
       expect(doc.bootstrapSources, ['https://src.example.com/domains.json']);
       expect(doc.minAppVersion, 1000000);
     });
@@ -57,7 +64,12 @@ void main() {
     test('空/非法 api_domains 判为不可用（返回 null）', () {
       expect(XboardBootstrapDoc.tryParse(null), isNull);
       expect(XboardBootstrapDoc.tryParse({'api_domains': []}), isNull);
-      expect(XboardBootstrapDoc.tryParse({'api_domains': ['ftp://x']}), isNull);
+      expect(
+        XboardBootstrapDoc.tryParse({
+          'api_domains': ['ftp://x'],
+        }),
+        isNull,
+      );
       expect(XboardBootstrapDoc.tryParse({'api_domains': 'https://x'}), isNull);
     });
 
@@ -68,20 +80,45 @@ void main() {
       expect(doc, isNotNull);
       expect(doc!.apiDomains, ['https://ok.example.com']);
     });
+
+    test('远端配置不能降级 TLS 或携带内嵌鉴权', () {
+      final doc = XboardBootstrapDoc.tryParse({
+        'api_domains': [
+          'http://bad.example.com',
+          'https://user:password@bad.example.com',
+          'https://bad.example.com/api',
+          'https://ok.example.com/',
+        ],
+        'bootstrap_sources': [
+          'http://bad.example.com/bootstrap.json',
+          'https://user:password@bad.example.com/bootstrap.json',
+          'https://ok.example.com/bootstrap.json',
+        ],
+      });
+      expect(doc!.apiDomains, ['https://ok.example.com']);
+      expect(doc.bootstrapSources, ['https://ok.example.com/bootstrap.json']);
+    });
   });
 
   group('XboardBootstrapClient.fetch', () {
     test('按序尝试：首个合法文档生效，非法源回退下一源', () async {
-      final dio = Dio(BaseOptions(
-        baseUrl: 'https://fake',
-        validateStatus: (_) => true,
-      ));
+      final dio = Dio(
+        BaseOptions(baseUrl: 'https://fake', validateStatus: (_) => true),
+      );
       dio.httpClientAdapter = _FakeAdapter([
         (200, {'api_domains': []}), // 第一个源 schema 非法
-        (200, {'api_domains': ['https://b.example.com']}), // 第二个源合法
+        (
+          200,
+          {
+            'api_domains': ['https://b.example.com'],
+          },
+        ), // 第二个源合法
       ]);
       final client = XboardBootstrapClient(dio: dio);
-      final doc = await client.fetch(['https://s1/domains.json', 'https://s2/domains.json']);
+      final doc = await client.fetch([
+        'https://s1/domains.json',
+        'https://s2/domains.json',
+      ]);
       expect(doc, isNotNull);
       expect(doc!.apiDomains, ['https://b.example.com']);
     });
@@ -94,16 +131,35 @@ void main() {
       ]);
       final client = XboardBootstrapClient(dio: dio);
       final errors = <String>[];
-      final doc = await client.fetch(['https://s1', 'https://s2'], onError: (s, e) => errors.add(s));
+      final doc = await client.fetch([
+        'https://s1',
+        'https://s2',
+      ], onError: (s, e) => errors.add(s));
       expect(doc, isNull);
       expect(errors.length, 2);
+    });
+
+    test('拒绝不安全源，不向它发送请求，并继续安全源', () async {
+      final dio = Dio(BaseOptions(validateStatus: (_) => true));
+      dio.httpClientAdapter = _FakeAdapter([
+        (
+          200,
+          {
+            'api_domains': ['https://ok.example.com'],
+          },
+        ),
+      ]);
+      final doc = await XboardBootstrapClient(dio: dio).fetch([
+        'http://bad.example.com/bootstrap.json',
+        'https://ok.example.com/bootstrap.json',
+      ]);
+      expect(doc!.apiDomains, ['https://ok.example.com']);
     });
   });
 
   test('builtinBootstrapSources 生成面板同源路径', () {
-    expect(
-      builtinBootstrapSources(['https://a.example.com:8443']),
-      ['https://a.example.com:8443/bootstrap.json'],
-    );
+    expect(builtinBootstrapSources(['https://a.example.com:8443']), [
+      'https://a.example.com:8443/bootstrap.json',
+    ]);
   });
 }

@@ -28,7 +28,7 @@ Future<Profile> syncManagedSubscription({
   required String subscribeUrl,
   required String planName,
 }) async {
-  debugPrint('[XBOARD_BINDING] sync start: $subscribeUrl');
+  debugPrint('[XBOARD_BINDING] sync start');
   final managed = findManagedProfile();
   if (managed == null) {
     final fresh = Profile.normal(

@@ -6,12 +6,18 @@ void main() {
     final manager = XboardDomainManager();
     expect(manager.domains, XboardDomainManager.defaultDomains);
     expect(manager.active, XboardDomainManager.defaultDomains.first);
-    expect(manager.rotateNext(), isFalse, reason: '单域名池不轮换');
+    expect(manager.active, 'https://api.bingcn.site');
+    expect(manager.rotateNext(), isTrue);
+    expect(manager.active, 'https://cloud.microsoftnexushub.top:8443');
   });
 
   test('连续失败达到阈值后轮换到下一候选', () {
     final manager = XboardDomainManager(
-      domains: ['https://a.example.com', 'https://b.example.com', 'https://c.example.com'],
+      domains: [
+        'https://a.example.com',
+        'https://b.example.com',
+        'https://c.example.com',
+      ],
     );
     manager.reportConnectionFailure();
     expect(manager.active, 'https://a.example.com');
@@ -50,13 +56,29 @@ void main() {
     manager.updatePool(['https://b.example.com', 'https://c.example.com']);
     expect(
       manager.domains,
-      containsAll(['https://a.example.com', 'https://b.example.com', 'https://c.example.com']),
+      containsAll([
+        'https://a.example.com',
+        'https://b.example.com',
+        'https://c.example.com',
+      ]),
     );
     expect(manager.domains.first, 'https://b.example.com', reason: '引导源列表排前');
-    expect(manager.active, 'https://b.example.com', reason: 'a 不在引导源列表（退役）→ 切到列表首域名');
+    expect(
+      manager.active,
+      'https://b.example.com',
+      reason: 'a 不在引导源列表（退役）→ 切到列表首域名',
+    );
     manager.updatePool(['https://c.example.com', 'https://d.example.com']);
-    expect(manager.active, 'https://c.example.com', reason: '活跃域名 b 被退役则切到新列表首域名');
-    expect(manager.domains, contains('https://a.example.com'), reason: '旧域名保留为轮换备选');
+    expect(
+      manager.active,
+      'https://c.example.com',
+      reason: '活跃域名 b 被退役则切到新列表首域名',
+    );
+    expect(
+      manager.domains,
+      contains('https://a.example.com'),
+      reason: '旧域名保留为轮换备选',
+    );
   });
 
   test('updatePool 触发持久化钩子', () {
@@ -66,7 +88,10 @@ void main() {
       persisted.addAll(domains);
     };
     manager.updatePool(['https://b.example.com']);
-    expect(persisted, containsAll(['https://a.example.com', 'https://b.example.com']));
+    expect(
+      persisted,
+      containsAll(['https://a.example.com', 'https://b.example.com']),
+    );
   });
 
   test('addDomain 校验并切换（救援手动输入）', () {
@@ -93,5 +118,43 @@ void main() {
     expect(manager.allDomainsFailing, isTrue);
     manager.resetFailures();
     expect(manager.allDomainsFailing, isFalse);
+  });
+
+  test('拒绝会泄露鉴权或改变请求位置的入口', () {
+    for (final value in [
+      'http://example.com',
+      'https://',
+      'https://user:password@example.com',
+      'https://example.com/path',
+      'https://example.com?token=fixture',
+      'https://example.com#fragment',
+      'https://example.com:65536',
+      'https://example.com\\evil',
+    ]) {
+      expect(() => XboardDomainManager(domains: [value]), throwsArgumentError);
+      expect(XboardDomainManager().addDomain(value), isFalse);
+    }
+  });
+
+  test('池重排序仍保持活跃入口，空或恶意更新保留旧池', () {
+    final manager = XboardDomainManager(
+      domains: ['https://a.example.com', 'https://b.example.com'],
+    );
+    manager.rotateNext();
+    manager.updatePool(['https://b.example.com', 'https://a.example.com']);
+    expect(manager.active, 'https://b.example.com');
+    manager.updatePool(['http://bad.example.com']);
+    manager.updatePool([]);
+    expect(manager.active, 'https://b.example.com');
+    expect(manager.domains, ['https://b.example.com', 'https://a.example.com']);
+  });
+
+  test('根路径归一化且手动重试清零既有失败', () {
+    final manager = XboardDomainManager(domains: ['https://a.example.com/']);
+    expect(manager.active, 'https://a.example.com');
+    manager.reportConnectionFailure();
+    expect(manager.addDomain('https://a.example.com/'), isTrue);
+    expect(manager.activeFailureCount, 0);
+    expect(manager.domains.length, 1);
   });
 }

@@ -288,3 +288,34 @@ record-fingerprint: b2e9dc0551b74b82144dc99bc494105fa8be13908ad09689663d89552c43
 
 ### HLG
 按append dry-run/apply新增环境事实与本机分工，不回写暂停记录，平台业务验收不外推。
+
+## 2026-10-07T18:48:52+08:00 · 三端发行目标启动与共享网络安全基础验收
+
+type: development
+scope: ["Bettbox"]
+status: in_progress
+tags: ["release", "android", "ios", "macos", "xboard"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 3d6b632ca91ac2190c24cb20470144de963d0d3093bc27379a4658039121af80
+
+### Summary
+用户明确建立自主三端开发与服务端适配 Goal，交付目标为实际可用发行版；当前 Goal active，未完成发行。共享网络安全基础完成独立审阅与回归。
+
+### Changed
+实施HTTPS地址策略、域名池更新、禁止API/引导自动重定向、非成功HTTP状态优先判定及凭据日志脱敏；Android缺签名和缺内核输入时中止。计划见 .agents/plans/2026-10-07-three-platform-release.md。原生iOS与付呗候选由有界Agent施工，尚未作为发行交付。
+
+### Validation
+Flutter全量106项测试通过、另4项实际IO重定向回归通过；flutter analyze无问题。macOS应用169.3MB编译成功，锁文件无漂移，但构建期间仓库并行变更导致source_unchanged=false，入口非零退出，不作为发行证据。GUI实际启动、未登录首页/账户/登录页和NoSLA套餐读取通过。iOS基础bridge race通过，但独立审阅随后发现Close竞态、modulemap和来源记录不足并要求修复；集成版本仍待重新验收。Android脚本10项和契约扩展3项Python测试通过，预检通过，真实Android构建未开始。
+
+### Next
+稳定源码后更新PDEC证据并重新验证iOS集成、Android门禁和原生构建；接入Runner/PacketTunnel、真实账户订阅邀请、数据库到账返佣幂等与服务端适配；完成签名与设备发行验收。
+
+### Risks
+有效Apple开发签名身份不等于具备NetworkExtension团队权限，真机连接与团队状态待答复。付呗默认禁用，商户门店产品权限及安全秘密引用未确认；回调/精确金额修复待隔离PHP验证，数据库并发幂等未实现。PDEC统一枚举暂不包含Android，项目扩展保留真实Android目标并独立验证。用户.video_agent未纳入任务。
+
+### DIA
+已同步 CHANGELOG 和 ARCHITECTURE 的共享安全变更；原生与服务端文档待对应工作包验收后同步。
+
+### HLG
+结构化追加本记录，Goal保持active，继续自主推进。

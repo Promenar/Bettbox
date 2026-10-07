@@ -5,20 +5,28 @@
 /// 纯 Dart，可单测。
 library;
 
+import 'url_policy.dart';
+
 class XboardDomainManager {
   XboardDomainManager({List<String>? domains})
-    : _domains = List<String>.unmodifiable(
-        domains == null || domains.isEmpty ? defaultDomains : domains,
-      ),
-      assert(domains == null || domains.every(_isHttpUrl), '域名须为 http(s) URL');
+    : _domains = _validatedDomains(domains);
 
-  /// M0 测试面板；正式域名池由引导源下发后替换。
+  /// 当前服务入口；引导源可更新顺序与追加兼容入口。
   static const List<String> defaultDomains = [
+    'https://api.bingcn.site',
     'https://cloud.microsoftnexushub.top:8443',
   ];
 
-  static bool _isHttpUrl(String s) =>
-      s.startsWith('http://') || s.startsWith('https://');
+  static List<String> _validatedDomains(List<String>? values) {
+    if (values == null || values.isEmpty) return defaultDomains;
+    final result = <String>[];
+    for (final value in values) {
+      final origin = normalizePanelOrigin(value);
+      if (origin == null) throw ArgumentError('API 入口须为无认证的 HTTPS 根地址');
+      if (!result.contains(origin)) result.add(origin);
+    }
+    return List.unmodifiable(result);
+  }
 
   List<String> _domains;
   int _activeIndex = 0;
@@ -63,18 +71,26 @@ class XboardDomainManager {
   /// 追加在后（保序）作为轮换备选；当前活跃域名若不在新列表（被引导源
   /// 退役），立即切到新列表首个域名，并将其标记为已失效。
   void updatePool(List<String> newDomains) {
+    final accepted = newDomains
+        .map(normalizePanelOrigin)
+        .whereType<String>()
+        .toSet()
+        .toList();
+    if (accepted.isEmpty) return;
     final activeNow = _domains[_activeIndex];
     final merged = <String>[];
-    for (final domain in newDomains) {
+    for (final domain in accepted) {
       if (!merged.contains(domain)) merged.add(domain);
     }
     for (final domain in _domains) {
       if (!merged.contains(domain)) merged.add(domain);
     }
     _domains = List.unmodifiable(merged);
-    if (!newDomains.contains(activeNow)) {
+    if (!accepted.contains(activeNow)) {
       _activeIndex = 0;
       _failureCounts[activeNow] = failureThreshold;
+    } else {
+      _activeIndex = _domains.indexOf(activeNow);
     }
     onPoolChanged?.call(_domains);
   }
@@ -82,15 +98,17 @@ class XboardDomainManager {
   /// 救援模式手动输入的域名：校验通过后并入池并立即切换（失败计数清零）。
   /// 返回是否采纳；未通过校验返回 false。
   bool addDomain(String url) {
-    if (!_isHttpUrl(url)) return false;
-    final index = _domains.indexOf(url);
+    final origin = normalizePanelOrigin(url);
+    if (origin == null) return false;
+    final index = _domains.indexOf(origin);
     if (index >= 0) {
       _activeIndex = index;
+      _failureCounts[origin] = 0;
       return true;
     }
-    _domains = List.unmodifiable([..._domains, url]);
+    _domains = List.unmodifiable([..._domains, origin]);
     _activeIndex = _domains.length - 1;
-    _failureCounts[url] = 0;
+    _failureCounts[origin] = 0;
     onPoolChanged?.call(_domains);
     return true;
   }

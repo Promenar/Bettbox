@@ -14,7 +14,24 @@ val mStoreFile = file("keystore.jks")
 val mStorePassword: String? = localProperties.getProperty("storePassword")
 val mKeyAlias: String? = localProperties.getProperty("keyAlias")
 val mKeyPassword: String? = localProperties.getProperty("keyPassword")
-val isRelease = mStoreFile.exists() && mStorePassword != null && mKeyAlias != null && mKeyPassword != null
+val hasReleaseSigningConfig = mStoreFile.isFile &&
+    !mStorePassword.isNullOrBlank() &&
+    !mKeyAlias.isNullOrBlank() &&
+    !mKeyPassword.isNullOrBlank()
+
+// 根据实际任务图检查，覆盖 Flutter、Gradle 聚合任务与缩写任务入口。
+// debug 构建不依赖正式签名；release 任务在执行前拒绝缺失的签名配置。
+gradle.taskGraph.whenReady {
+    val hasReleaseTask = allTasks.any {
+        it.project == project && it.name.contains("release", ignoreCase = true)
+    }
+    if (hasReleaseTask && !hasReleaseSigningConfig) {
+        throw GradleException(
+            "正式 release 任务需要有效的 keystore.jks 文件及非空的 " +
+                "storePassword、keyAlias、keyPassword 配置；禁止使用 debug 签名发行。"
+        )
+    }
+}
 
 android {
     namespace = "com.appshub.bettbox"
@@ -39,7 +56,7 @@ android {
     }
 
     signingConfigs {
-        if (isRelease) {
+        if (hasReleaseSigningConfig) {
             create("release") {
                 storeFile = mStoreFile
                 storePassword = mStorePassword
@@ -57,7 +74,7 @@ android {
         release {
             isMinifyEnabled = true
             isDebuggable = false
-            signingConfig = signingConfigs.getByName(if (isRelease) "release" else "debug")
+            signingConfig = if (hasReleaseSigningConfig) signingConfigs.getByName("release") else null
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

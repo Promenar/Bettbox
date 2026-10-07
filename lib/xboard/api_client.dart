@@ -43,20 +43,29 @@ class XboardApiClient {
   Options _options() {
     final auth = _authDataProvider?.call();
     return Options(
-      headers: {
-        if (auth != null && auth.isNotEmpty) 'Authorization': auth,
-      },
+      followRedirects: false,
+      headers: {if (auth != null && auth.isNotEmpty) 'Authorization': auth},
     );
   }
 
   /// GET + 包络解析；[parse] 为空时返回原始 data。
-  Future<T?> get<T>(String path, {Map<String, dynamic>? query, T Function(dynamic data)? parse}) async {
-    final envelope = await _run(() => _dio.getUri<dynamic>(_uri(path, query), options: _options()));
+  Future<T?> get<T>(
+    String path, {
+    Map<String, dynamic>? query,
+    T Function(dynamic data)? parse,
+  }) async {
+    final envelope = await _run(
+      () => _dio.getUri<dynamic>(_uri(path, query), options: _options()),
+    );
     return _unwrap<T>(envelope, parse);
   }
 
   /// POST（JSON body）+ 包络解析。
-  Future<T?> post<T>(String path, {Map<String, dynamic>? body, T Function(dynamic data)? parse}) async {
+  Future<T?> post<T>(
+    String path, {
+    Map<String, dynamic>? body,
+    T Function(dynamic data)? parse,
+  }) async {
     final envelope = await _run(
       () => _dio.postUri<dynamic>(
         _uri(path),
@@ -78,7 +87,7 @@ class XboardApiClient {
           error.type == DioExceptionType.sendTimeout) {
         return XboardException(
           XboardErrorType.connection,
-          error.message ?? 'connection failure',
+          'connection failure',
           statusCode: status,
         );
       }
@@ -93,11 +102,11 @@ class XboardApiClient {
         status != null && status >= 500
             ? XboardErrorType.server
             : XboardErrorType.business,
-        _messageOf(response?.data) ?? error.message ?? 'request failed',
+        _messageOf(response?.data) ?? 'request failed',
         statusCode: status,
       );
     }
-    return XboardException(XboardErrorType.business, error.toString());
+    return XboardException(XboardErrorType.business, 'request failed');
   }
 
   String? _messageOf(dynamic body) {
@@ -111,6 +120,18 @@ class XboardApiClient {
     XboardEnvelope envelope;
     try {
       final response = await send();
+      final status = response.statusCode;
+      if (status == null || status < 200 || status >= 300) {
+        throw XboardException(
+          status == 401 || status == 403
+              ? XboardErrorType.auth
+              : status != null && status >= 500
+              ? XboardErrorType.server
+              : XboardErrorType.business,
+          _messageOf(response.data) ?? 'request failed',
+          statusCode: status,
+        );
+      }
       envelope = XboardEnvelope.parse(response.data);
     } catch (error) {
       final ex = _classify(error);
