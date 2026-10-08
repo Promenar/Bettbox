@@ -119,3 +119,5 @@
 - docs/validation/2026-10-07-three-platform/shutdown-completion-validation.json — Go shutdown失败责任保留、Dart关闭/销毁回执顺序及未确认runtime退出边界
 
 - docs/validation/2026-10-07-three-platform/listener-stop-ffi-validation.json — 后台监听关闭实际action接线、ClashCore红绿及真实Go FFI消费与设备待验边界
+
+- docs/validation/2026-10-07-three-platform/android-2011be5-apk-validation.json — 完整正式签名构建、实际安装回读、首页与冷启动及VPN待验边界

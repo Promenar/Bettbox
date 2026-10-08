@@ -2427,3 +2427,34 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 ### HLG
 标准append先dry-run后apply，保留真实FFI范围和未完成发行条件。
+
+## 2026-10-08T23:46:58+08:00 · Android 2011be5正式候选安装与冷启动证据
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["android", "release", "device"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: ba46a1ca97998dd3155b76f8dcfc8439dac9cb51f774c3f72390f042f91f4dc3
+
+### Summary
+完整Android release构建通过；正式签名候选在现有Pixel_7 ARM64模拟器保留数据安装，回读摘要匹配，首页及冷启动返回首页通过。
+
+### Changed
+保存不可变本机APK build/releases/android/Bettbox-arm64-2011be5.apk及公开脱敏设备回执；同步平台验证、CHANGELOG和registry。无产品源修改。
+
+### Validation
+PDEC退出0 execution_ready=true；release receipt passed，签名锚通过，12项APK库复核；APK SHA256 1ddd8c675a14b75d3d37cfaf7e08f7476646f5a75268479dafe46fa1bb6a4afb。adb install -r成功，回读相同。首页实际UI树、无本应用crash buffer记录；无前台服务且VPN transport均为请求后冷启动成功，首页恢复且无密码表单。
+
+### Next
+定位实际启动未进入运行态原因；完成唯一Native owner/配置/TUN及engine退出合同；macOS完整界面与签名，iOS开发验收及业务全路径。
+
+### Risks
+启动后仍显示服务已就绪，VPN未验证成功；日志握手异常尚未关联本次启动根因。首页恢复不证明账户接口或订阅正确，release_verified=false。Apple正式签名、上游订阅及支付商外部条件未齐。未读或修改.video_agent。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、registry及公开回执。
+
+### HLG
+通过标准append dry-run后apply追加，目标保持active。

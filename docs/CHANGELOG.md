@@ -1,5 +1,9 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — Android正式候选实际安装
+
+- 2011be5完整release构建与正式签名、APK库检查通过，现有ARM64模拟器保留数据安装及设备回读摘要匹配。实际首页与冷启动返回首页通过；点击启动未确认VPN连接，保留候选状态。公开回执登记于平台验收文档。
+
 ## 2026-10-08 — 后台检查式监听关闭接线
 
 - Android后台停止监听使用invokeAction的检查式Go动作，confirmListenerStop只接受同次id、stopListener方法、整数code=0与严格data=true；失败、畸形、缺字段或异次回执均不能确认成功。GlobalState后台与ClashCore公开停止入口对false阻断本地状态清理；ClashCore.withInterface供隔离行为验证，ClashLibHandler.withLibrary初始化测试库但不替换生产单例。生产默认库名libclash.so保持一致。

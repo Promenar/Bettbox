@@ -1,0 +1,60 @@
+{
+  "source_commit": "2011be5a5b9cbf9e21fdaeca6aadc27c95c49aa1",
+  "artifact": "build/releases/android/Bettbox-arm64-2011be5.apk",
+  "sha256": "1ddd8c675a14b75d3d37cfaf7e08f7476646f5a75268479dafe46fa1bb6a4afb",
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "build_passed": true,
+  "signature_verified": true,
+  "apk_library_validation_passed": true,
+  "installed_readback_matches": true,
+  "device": {
+    "avd": "Pixel_7",
+    "abi": "arm64-v8a",
+    "sdk": 36
+  },
+  "ui": {
+    "ui_exit": 0,
+    "xml_present": true,
+    "node_count": 32,
+    "public_markers": [
+      "首页",
+      "订阅",
+      "连接",
+      "启动",
+      "节点",
+      "流量",
+      "套餐"
+    ],
+    "password_field_count": 0,
+    "app_running": true,
+    "app_crash_mentions": 0,
+    "crash_buffer_sha256": "4dcb5d4b64e4292dcd435a3d40de1195c9f44f11cda4be833486c712592990e9"
+  },
+  "start_control_observed": {
+    "public_control_markers": [
+      {
+        "markers": [
+          "启动"
+        ],
+        "bounds": "[42,1928][1038,2148]",
+        "clickable": "true",
+        "package": "com.appshub.bettbox"
+      }
+    ]
+  },
+  "cold_restart_completed": true,
+  "vpn_connected_verified": false,
+  "release_verified": false,
+  "remaining": [
+    "点击启动后未观察到启动时间，原因待定位",
+    "后台Service存在不等于隧道建立",
+    "实际代理流量和完整业务闭环待验"
+  ],
+  "cold_ui": {
+    "home_visible": true,
+    "login_form_visible": false,
+    "service_ready_visible": true,
+    "start_time_visible": false,
+    "ui_node_count": 31
+  }
+}

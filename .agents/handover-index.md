@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T23:11:09+08:00
+> generated_at: 2026-10-08T23:46:58+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-08T23:11:09+08:00 | done | ["Bettbox", "Android", "Go", "Dart"] | 后台检查式监听停止实际接线与Go FFI验收 | `.agents/handover.md` · `2026-10-08T23:11:09+08:00` · `fp:ee0c053aa8` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T22:11:12+08:00 | progress | ["Bettbox", "Android"] | Android实际VPN授权路径与完整Kotlin工程编译 | `.agents/handover.md` · `2026-10-08T22:11:12+08:00` · `fp:a007f83489` |
+| three-platform-release | resume | 2026-10-08T23:46:58+08:00 | partial | ["Bettbox", "Android"] | Android 2011be5正式候选安装与冷启动证据 | `.agents/handover.md` · `2026-10-08T23:46:58+08:00` · `fp:ba46a1ca97` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T23:46:58+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["android", "release", "device"] | Android 2011be5正式候选安装与冷启动证据 | `.agents/handover.md` · `2026-10-08T23:46:58+08:00` · `fp:ba46a1ca97` |
 | 2026-10-08T23:11:09+08:00 | iso | done | resume | ["Bettbox", "Android", "Go", "Dart"] | ["listener", "ffi", "validation"] | 后台检查式监听停止实际接线与Go FFI验收 | `.agents/handover.md` · `2026-10-08T23:11:09+08:00` · `fp:ee0c053aa8` |
 | 2026-10-08T22:53:11+08:00 | iso | done | resume | ["Bettbox", "Android", "Go"] | ["shutdown", "ownership", "validation"] | shutdown监听责任保留与Dart销毁回执等待 | `.agents/handover.md` · `2026-10-08T22:53:11+08:00` · `fp:13a0dccf9f` |
 | 2026-10-08T22:43:20+08:00 | iso | done | resume | ["Bettbox", "Android"] | ["android", "stop", "validation"] | Android普通停止原生确认与Dart失败传播 | `.agents/handover.md` · `2026-10-08T22:43:20+08:00` · `fp:64d27b3084` |
