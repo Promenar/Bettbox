@@ -2520,3 +2520,65 @@ record-fingerprint: 9004e9f69cd198c24e28cb9244fc23f2f27f74c409f055e69a6d4370561d
 
 ### HLG
 标准append dry-run后apply，保留实际已完成与未验证边界。
+
+## 2026-10-09T00:31:17+08:00 · macOS完整开发候选启动与空白探针定位
+
+type: development
+scope: ["Bettbox", "macOS"]
+status: partial
+tags: ["macos", "keychain", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 572967697eff1a00fef732d46ba4e569a182c5c9cdc73e0539d49cfad1dce232
+
+### Summary
+完整开发候选构建与签名封装成功，CUA实际首页可见。全黑窗口确认为空白supervisor探针，正常退出未完成后只终止确认过的PID32063。
+
+### Changed
+开发Keychain显式开关、独立service、严格指定键删除确认；独立开发channel、空权利封装与真实App.framework版本路径校验。源码和文档尚未完成里程碑提交。
+
+### Validation
+PDEC执行前校验有效；构建退出0，封装MACOS_CANDIDATE_SEAL_PASS；Flutter244项、analyze、开发存储7项、builder24项、sealer34项通过。CUA完整首页可见，系统代理/TUN关闭且无配置。初次red曾在stale契约下误执行且未采纳，冻结源和重新校验后red退出1、green通过。
+
+### Next
+完成实际插件登录/会话冷启动验收与DIA同步、独立复核剩余差异，再提交推送候选；代理流量和正式发行条件独立验收。
+
+### Risks
+开发候选非发行版。主页显示不证明账户持久化或VPN流量；秘密不得进入LLM或日志。
+
+### DIA
+已同步开发计划和公开启动回执；实现相关架构、平台说明、CHANGELOG与PDEC README同步待完成。
+
+### HLG
+通过标准append记录该开发阶段与未完成边界。
+
+## 2026-10-09T00:35:28+08:00 · macOS开发存储与封装来源绑定收口
+
+type: development
+scope: ["Bettbox", "macOS"]
+status: partial
+tags: ["macos", "keychain", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 09a07a67bda03d235e8f50b38dbc6f50d7622ec3613444fda69017603c317981
+
+### Summary
+完整本机开发渠道实现、文档和审阅已收口，候选首页实际启动；真实账户会话与代理发行验收未完成。
+
+### Changed
+默认正式DP路径保持，开发后端固定独立service和构建渠道，删除仅对确认不存在的指定键归一化锁定插件错误。构建/封装采用独立目录和空权利；源、复制后、签后的framework入口链精确绑定Versions/A。
+
+### Validation
+独立审阅发现并关闭内部B版本重定向P2：red两个子例失败，green35项通过；独立审阅读取实际修复源码确认关闭。已封装实际候选固定A链接和严格codesign再验通过。复用同Dart源244Flutter、7开发存储、analyze及24builder终端结果。PDEC有效、diff检查通过。
+
+### Next
+登录表单已打开，由用户在本机输入现有测试账户以避免原始秘密进入模型；验证实际插件、冷启动、订阅和代理流量。提交推送该候选实现并核对远端SHA。
+
+### Risks
+已启动bundle构建在最终Python封装入口修复前，Dart源一致；真实bundle按新入口规则另验通过，不声称最终源码完全重构建。未公证，不是发行版；登录持久化和VPN流量未证明。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、PDEC README、registry、实施计划与公开启动回执。
+
+### HLG
+标准append追加当前阶段、复核和未完成边界。

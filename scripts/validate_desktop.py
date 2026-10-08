@@ -360,8 +360,11 @@ def command_plan(
     target: Target,
     core_sha256: str,
     unsigned_macos: bool = False,
+    local_development_keychain: bool = False,
 ) -> list[Command]:
     signing_mode(target, unsigned_macos)
+    if local_development_keychain and (target.needs_helper or not unsigned_macos):
+        raise RuntimeError("本机开发Keychain仅支持显式unsigned macOS构建")
     core_env = {
         "GOOS": target.goos,
         "GOARCH": target.goarch,
@@ -431,8 +434,10 @@ def command_plan(
         "windows" if target.needs_helper else "macos",
         "--release",
         f"--dart-define=CORE_SHA256={core_sha256}",
-        "--dart-define=APP_ENV=pre",
+        "--dart-define=APP_ENV=local-macos-development" if local_development_keychain else "--dart-define=APP_ENV=pre",
     )
+    if local_development_keychain:
+        flutter_args += ("--dart-define=BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true",)
     commands.append(
         Command(
             flutter_args,
@@ -832,7 +837,8 @@ def close_failed_execution(
 
 
 def execute_build(
-    root: Path, target: Target, unsigned_macos: bool = False
+    root: Path, target: Target, unsigned_macos: bool = False,
+    local_development_keychain: bool = False,
 ) -> None:
     started_at = datetime.now(timezone.utc).isoformat()
     requested_signing_mode = signing_mode(target, unsigned_macos)
@@ -840,7 +846,8 @@ def execute_build(
     source_before = git_source_state(root)
     core_path = root / target.core_path
     placeholder = "<core-sha256>"
-    initial_plan = command_plan(root, target, placeholder, unsigned_macos=unsigned_macos)
+    initial_plan = command_plan(root, target, placeholder, unsigned_macos=unsigned_macos,
+                                local_development_keychain=local_development_keychain)
     initial_commands = commands_in_stage(initial_plan, "prepare")
     core_identity = None
     signature_output = ""
@@ -853,7 +860,8 @@ def execute_build(
             core_identity = finalize_core_identity(root, target, initial_plan)
         core_sha256 = core_identity["sha256"] if core_identity is not None else sha256_file(core_path)
         plan = command_plan(
-            root, target, core_sha256, unsigned_macos=unsigned_macos
+            root, target, core_sha256, unsigned_macos=unsigned_macos,
+            local_development_keychain=local_development_keychain
         )
         run_commands(commands_in_stage(plan, "dependencies"))
         if target.needs_helper:
@@ -899,6 +907,8 @@ def execute_build(
             "signature_evidence": signature_evidence,
             "core_identity": core_identity,
             "host_signing_mode": requested_signing_mode,
+            "build_channel": "local-macos-development" if local_development_keychain else "pre",
+            "local_development_keychain": local_development_keychain,
         }
         manifest_path = write_manifest(root, target, manifest)
         print(f"验证清单：{manifest_path.relative_to(root).as_posix()}")
@@ -935,6 +945,8 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="关闭 Xcode signing 编译 macOS 候选；不作为登录、权限或持久化验收",
     )
+    parser.add_argument("--local-development-keychain", action="store_true",
+                        help="独立macOS本机开发Keychain构建；不能用于正式发行")
     return parser.parse_args(argv)
 
 
@@ -962,11 +974,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         target,
         "<core-sha256>",
         unsigned_macos=args.unsigned_macos,
+        local_development_keychain=args.local_development_keychain,
     ):
         print(f"  {display_command(command, root)}")
 
     if args.execute:
-        execute_build(root, target, unsigned_macos=args.unsigned_macos)
+        execute_build(root, target, unsigned_macos=args.unsigned_macos,
+                      local_development_keychain=args.local_development_keychain)
     else:
         print("preflight 完成；未执行编译。传入 --execute 后才会构建。")
     return 0

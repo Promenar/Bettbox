@@ -124,3 +124,5 @@
 
 - .agents/plans/2026-10-09-macos-development-keychain.md — 完整客户端开发Keychain准入、原生合成键边界与回滚
 - docs/validation/2026-10-07-three-platform/macos-development-keychain-validation.json — 本机原生覆盖写/重复删除诊断、六项工具回归及完整App待验边界
+
+- docs/validation/2026-10-07-three-platform/macos-local-development-launch.json — 完整本机开发候选构建、封装和实际首页启动证据；会话与发行另验

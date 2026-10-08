@@ -250,4 +250,4 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 ### macOS本机开发安全存储准入
 
-正式XboardSecureStore使用FlutterSecureStorage默认DP路径。开发文件Keychain方案必须显式开启、独立服务名，不能运行时自动回退或迁移既有凭据；当前未采用。锁定Darwin0.3.2同步查询和删除行为存在重复删除缺少权利的实际诊断证据，完整插件与会话适配须在正式配置之外独立验证。原生诊断脚本只操作新UUID合成键并公开状态码/比对，不读取业务秘密。
+正式 XboardSecureStore 使用 FlutterSecureStorage 默认 DP 路径。显式本机开发构建须同时满足 macOS、APP_ENV=local-macos-development 与 BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true；默认构造使用独立 service com.appshub.bettbox.local-development.xboard 的文件 Keychain。平台或渠道不符时拒绝初始化，不自动回退或迁移既有凭据。开发后端仅对锁定插件特定整数 -34018 删除错误执行同键读取确认，条目确已不存在才成功；其它错误、读取失败或仍存在均失败。调用方显式注入 FlutterSecureStorage 时，其配置属于调用方信任边界。完整开发候选将公开 App 链接与 Versions/Current 精确绑定到已核验的 A 版本，在源准入、复制后和签后检查。候选采用独立空权利文件和目录，正式 Release 权利保持。完整首页已启动；实际插件会话和冷启动持久化尚待验收。原生诊断脚本只操作新 UUID 合成键并公开状态码/比对，不读取业务秘密。

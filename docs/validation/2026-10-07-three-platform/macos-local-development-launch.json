@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-09",
+  "artifact": "build/macos-local-development/Bettbox.app",
+  "build_exit_code": 0,
+  "seal_result": "MACOS_CANDIDATE_SEAL_PASS",
+  "channel": "local-macos-development",
+  "distribution": "non-distribution",
+  "ui_verified": {
+    "full_main_entry": true,
+    "home_visible": true,
+    "network_speed_card": true,
+    "system_proxy_off": true,
+    "tun_off": true,
+    "no_profile_loaded": true
+  },
+  "validation": {
+    "flutter_tests": 244,
+    "flutter_analyze": "passed",
+    "desktop_builder_tests": 24,
+    "sealer_tests": 35,
+    "development_storage_tests": 7
+  },
+  "remaining": [
+    "实际账户登录和插件安全会话冷启动",
+    "真实代理流量",
+    "正式签名与公证"
+  ],
+  "probe_resolution": "已确认空白supervisor探针并终止，随后启动完整开发候选",
+  "framework_entry_fixed_A_verified": true,
+  "codesign_verified": true
+}

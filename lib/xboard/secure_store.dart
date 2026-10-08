@@ -6,10 +6,11 @@ library;
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'storage_backend.dart';
 
 class XboardSecureStore {
   XboardSecureStore({FlutterSecureStorage? storage})
-    : _storage = storage ?? const FlutterSecureStorage();
+    : _storage = xboardStorageForBuild(storage: storage);
 
   static const _keyAuthData = 'xboard_auth_data';
   static const _keyEmail = 'xboard_email';
@@ -18,9 +19,12 @@ class XboardSecureStore {
   static const _keyAnnouncementUrl = 'xboard_announcement_url';
   static const _keyLoadBalance = 'xboard_load_balance';
 
-  final FlutterSecureStorage _storage;
+  final XboardStorageBackend _storage;
 
-  Future<void> saveSession({required String authData, required String email}) async {
+  Future<void> saveSession({
+    required String authData,
+    required String email,
+  }) async {
     await _storage.write(key: _keyAuthData, value: authData);
     await _storage.write(key: _keyEmail, value: email);
   }
@@ -48,7 +52,8 @@ class XboardSecureStore {
     );
   }
 
-  Future<({List<String> domains, List<String> sources})?> readDomainPool() async {
+  Future<({List<String> domains, List<String> sources})?>
+  readDomainPool() async {
     final raw = await _storage.read(key: _keyDomainPool);
     if (raw == null || raw.isEmpty) return null;
     try {

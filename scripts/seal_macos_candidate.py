@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path("build/macos/Build/Products/Release/Bettbox.app")
 DESTINATION = Path("build/macos-local-candidate/Bettbox.app")
 PROBE_DESTINATION = Path("build/macos-flutter-supervisor/Bettbox.app")
+LOCAL_DEVELOPMENT_DESTINATION = Path("build/macos-local-development/Bettbox.app")
+LOCAL_BUILD_MANIFEST = Path("build/desktop-validation/macos-arm64.json")
 ENV = {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}
 MAGIC = {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca", b"\xca\xfe\xba\xbf", b"\xbf\xba\xfe\xca"}
 
@@ -217,7 +219,8 @@ def artifact(app, name, identifier):
 def require_supported_entitlement_profile(root, destination_relative):
     if destination_relative == PROBE_DESTINATION:
         return {}
-    path = root / "macos/Runner/Release.entitlements"
+    local = destination_relative == LOCAL_DEVELOPMENT_DESTINATION
+    path = root / ("macos/Runner/LocalDevelopment.entitlements" if local else "macos/Runner/Release.entitlements")
     if not path.is_file() or path.is_symlink() or path.stat().st_size > 16384:
         raise RuntimeError("候选权利配置无效")
     for parent in path.parents:
@@ -233,9 +236,99 @@ def require_supported_entitlement_profile(root, destination_relative):
         raise RuntimeError("候选权利配置无效")
     # 此封装器没有profile信任与受限权利授权校验，空访问组数组也不能放行。
     if entitlements:
+        if local:
+            raise RuntimeError("本机开发权利必须为空")
         raise RuntimeError("完整候选需要经过provisioning profile准入验证")
     # 没有profile授权校验时仅支持无权利宿主；返回快照用于验签后核对。
     return entitlements
+
+
+def local_build_admission(root, source):
+    try:
+        return _local_build_admission(root, source)
+    except OSError:
+        raise RuntimeError("本机开发构建来源未验证") from None
+
+
+def local_framework_entry(app):
+    # 固定加载入口链路，禁止内部其它版本绕过已核验A版本摘要。
+    framework = app / "Contents/Frameworks/App.framework"
+    for relative, target in (("App", "Versions/Current/App"), ("Versions/Current", "A")):
+        path = framework / relative
+        if not path.is_symlink() or os.readlink(path) != target:
+            raise RuntimeError("本机开发framework加载入口不符")
+    if ((framework / "App").resolve(strict=True) != (framework / "Versions/A/App").resolve(strict=True) or
+            (framework / "Versions/Current").resolve(strict=True) != (framework / "Versions/A").resolve(strict=True)):
+        raise RuntimeError("本机开发framework加载入口不符")
+
+
+def _local_build_admission(root, source):
+    # 完整构建清单只证明本机开发来源，不授予profile或发行资格。
+    failure = "本机开发构建来源未验证"
+    local_framework_entry(source)
+    descriptor, directory, before = identity.open_public_file(root, LOCAL_BUILD_MANIFEST)
+    try:
+        if before.st_size > 16777216:
+            raise RuntimeError(failure)
+        with os.fdopen(os.dup(descriptor), "rb") as stream:
+            raw = stream.read(16777217)
+        identity.check_public_binding(root, LOCAL_BUILD_MANIFEST, descriptor, directory, before)
+    finally:
+        os.close(descriptor); os.close(directory)
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise RuntimeError(failure)
+            result[key] = value
+        return result
+    try:
+        fields = json.loads(raw, object_pairs_hook=pairs)
+    except (ValueError, TypeError, UnicodeError):
+        raise RuntimeError(failure) from None
+    required = {"target": "macos-arm64", "build_channel": "local-macos-development",
+                "local_development_keychain": True, "commands_succeeded": True,
+                "source_unchanged": True, "locks_unchanged": True,
+                "host_signing_mode": "unsigned", "bundle_path": SOURCE.as_posix()}
+    if not isinstance(fields, dict) or any(
+            type(fields.get(key)) is not type(value) or fields.get(key) != value
+            for key, value in required.items()):
+        raise RuntimeError(failure)
+    records = fields.get("bundle_files")
+    if not isinstance(records, list) or not records:
+        raise RuntimeError(failure)
+    evidence = {}
+    for record in records:
+        if (not isinstance(record, dict) or not isinstance(record.get("path"), str) or
+                type(record.get("size")) is not int or record["size"] < 0 or
+                not isinstance(record.get("sha256"), str) or
+                re.fullmatch(r"[0-9a-f]{64}", record["sha256"]) is None):
+            raise RuntimeError(failure)
+        relative = Path(record["path"])
+        if (relative.is_absolute() or ".." in relative.parts or
+                relative.as_posix() != record["path"] or not relative.is_relative_to(SOURCE) or
+                record["path"] in evidence):
+            raise RuntimeError(failure)
+        evidence[record["path"]] = record
+    if any(source.rglob("embedded.provisionprofile")):
+        raise RuntimeError("本机开发候选不允许未验证profile")
+    verified = {}
+    # Flutter框架公开App为内部链接；只读取固定版本目录中的实际普通文件。
+    for suffix in ("Contents/MacOS/Bettbox", "Contents/Frameworks/App.framework/Versions/A/App"):
+        relative = SOURCE / suffix
+        expected = evidence.get(relative.as_posix())
+        if expected is None:
+            raise RuntimeError(failure)
+        descriptor, directory, before = identity.open_public_file(root, relative)
+        try:
+            actual = identity.hash_bound_file(descriptor)
+            after = identity.check_public_binding(root, relative, descriptor, directory, before)
+            if actual != expected["sha256"] or after.st_size != expected["size"]:
+                raise RuntimeError(failure)
+            verified[suffix] = actual
+        finally:
+            os.close(descriptor); os.close(directory)
+    return verified
 
 
 def verified_host_entitlements(app, expected):
@@ -250,14 +343,25 @@ def verified_host_entitlements(app, expected):
         raise RuntimeError("宿主实际权利不符")
 
 
-def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
+def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc", local_development=False):
     if signing_mode not in ("adhoc", "apple-development"):
         raise RuntimeError("候选签名模式不符")
-    if destination_relative not in (DESTINATION, PROBE_DESTINATION):
+    if type(local_development) is not bool:
+        raise RuntimeError("候选开发模式不符")
+    if local_development:
+        if signing_mode != "apple-development" or destination_relative != DESTINATION:
+            raise RuntimeError("本机开发候选目标或签名模式不符")
+        destination_relative = LOCAL_DEVELOPMENT_DESTINATION
+    if destination_relative not in (DESTINATION, PROBE_DESTINATION) and not local_development:
         raise RuntimeError("候选目标目录不符")
+    source = root / SOURCE; destination = root / destination_relative
+    local_evidence = None
+    if local_development:
+        checked_tree(source)
+        local_evidence = local_build_admission(root, source)
+        require_supported_entitlement_profile(root, destination_relative)
     selected = development_identity() if signing_mode == "apple-development" else None
     signing_identity = selected[0] if selected is not None else "-"
-    source = root / SOURCE; destination = root / destination_relative
     checked_tree(source)
     expected_entitlements = require_supported_entitlement_profile(root, destination_relative)
     # build父目录必须是项目内实际目录；不覆盖既有候选。
@@ -275,6 +379,11 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
     source_host = digest(source / "Contents/MacOS/Bettbox")
     shutil.copytree(source, destination, symlinks=True)
     checked_tree(destination)
+    if local_development:
+        local_framework_entry(destination)
+    if local_development and any(digest(destination / suffix) != expected
+                                 for suffix, expected in local_evidence.items()):
+        raise RuntimeError("本机开发候选复制字节不符")
     framework_root = destination / "Contents/Frameworks"
     frameworks = sorted(framework_root.rglob("*.framework"), key=lambda p: len(p.parts), reverse=True)
     # 先签叶级Mach-O，再签其bundle；不使用签名--deep推测层次。
@@ -293,10 +402,13 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
     host_argv = ["/usr/bin/codesign", "--force", "--sign", signing_identity, "--identifier", "com.appshub.bettbox"]
     # 探针不使用账户或钥匙串；ad hoc宿主不能携带受限钥匙串权利。
     if destination_relative != PROBE_DESTINATION:
-        host_argv += ["--entitlements", str(root / "macos/Runner/Release.entitlements")]
+        entitlement = "LocalDevelopment.entitlements" if local_development else "Release.entitlements"
+        host_argv += ["--entitlements", str(root / "macos/Runner" / entitlement)]
     tool(host_argv + [str(destination)])
     tool(["/usr/bin/codesign", "--verify", "--deep", "--strict", str(destination)])
     verified_host_entitlements(destination, expected_entitlements)
+    if local_development:
+        local_framework_entry(destination)
     host_raw = tool(["/usr/bin/codesign", "-d", "--verbose=4", str(destination)]).stderr
     if selected is not None:
         host_identity = development_host(host_raw, selected)
@@ -314,6 +426,9 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
         ("BettboxCoreSupervisor", "com.appshub.bettbox.core.supervisor"))}
     if after != baseline or source_after != baseline or digest(source / "Contents/MacOS/Bettbox") != source_host:
         raise RuntimeError("签名期间固定产物或原宿主漂移")
+    if local_development and (local_build_admission(root, source) != local_evidence or
+                              require_supported_entitlement_profile(root, destination_relative) != expected_entitlements):
+        raise RuntimeError("本机开发构建来源或权利漂移")
     report = {"schema": 1, "passed": True, "signingmode": signing_mode, "notarized": False,
               "launch_validated": False,
               "source": SOURCE.as_posix(), "destination": destination_relative.as_posix(),
@@ -322,18 +437,24 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
               "host_cdhash": host_identity["cdhash"],
               "entitlement_profile": "probe-none" if destination_relative == PROBE_DESTINATION else "release",
               "scope": "完整bundle开发签名；不证明应用会话、系统代理或发行资格"}
+    if local_development:
+        report.update(entitlement_profile="local-development", build_channel="local-macos-development",
+                      distribution="non-distribution", local_development_keychain=True,
+                      source_build_manifest=LOCAL_BUILD_MANIFEST.as_posix())
     publish_report(destination.parent, report)
     return report
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="固定本机macOS候选开发签名")
-    parser.add_argument("--probe", action="store_true")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--probe", action="store_true")
+    modes.add_argument("--local-development", action="store_true")
     parser.add_argument("--signing-mode", choices=("adhoc", "apple-development"), default="adhoc")
     arguments = parser.parse_args()
     try:
         seal(destination_relative=PROBE_DESTINATION if arguments.probe else DESTINATION,
-             signing_mode=arguments.signing_mode)
+             signing_mode=arguments.signing_mode, local_development=arguments.local_development)
         print("MACOS_CANDIDATE_SEAL_PASS")
     except (RuntimeError, OSError, ValueError, subprocess.SubprocessError):
         print("MACOS_CANDIDATE_SEAL_FAIL"); raise SystemExit(1)

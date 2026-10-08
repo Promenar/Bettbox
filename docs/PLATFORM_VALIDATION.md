@@ -305,3 +305,9 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 同步存在查询返回itemNotFound，同步删除却返回-34018；按锁定Darwin0.3.2删除判定，首次本地删除成功掩盖同步错误，重复删除返回-34018。因此三个MacOsOptions参数不足以证明开发会话重复清理可用，开发存储尚未采用，正式DP配置与权利未变。原生夹具不是完整Flutter插件或App验收，不证明冷启动和账户安全存储。六项工具边界测试通过，独立审阅两项P2修正闭合，合成条目已确认清理。
 
 证据：validation/2026-10-07-three-platform/macos-development-keychain-validation.json；计划：../.agents/plans/2026-10-09-macos-development-keychain.md。完整macOS启动、开发存储适配和发行签名仍待验收。
+
+## macOS 完整本机开发候选
+
+2026-10-09，`build/macos-local-development/Bettbox.app` 完成完整 main 入口构建与 Apple Development 封装，CUA 确认实际首页与导航显示，系统代理和 TUN 关闭、无配置。空白 supervisor 探针已结束，不能把探针黑色窗口当作产品界面。公开回执为 `validation/2026-10-07-three-platform/macos-local-development-launch.json`。
+
+构建命令为 `python3 scripts/validate_desktop.py --target macos-arm64 --execute --unsigned-macos --local-development-keychain`；封装命令为 `python3 scripts/seal_macos_candidate.py --signing-mode apple-development --local-development`。执行前须通过 PDEC。开发 Keychain 使用独立 service 与显式构建开关；正式默认 DP 路径保持。封装清单保留 launch_validated=false，实际启动证据由上述独立回执承载。候选未公证、不可作为正式发行；真实插件写读、会话冷启动、系统代理恢复与有效上游流量尚待验收。

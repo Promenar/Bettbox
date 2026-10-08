@@ -20,6 +20,23 @@ SPEC.loader.exec_module(validate_desktop)
 
 
 class ValidateDesktopTest(unittest.TestCase):
+    def test_local_keychain_build_requires_unsigned_macos(self) -> None:
+        target = validate_desktop.TARGETS["macos-arm64"]
+        with self.assertRaises(RuntimeError):
+            validate_desktop.command_plan(Path("repo"), target, "digest", local_development_keychain=True)
+        with self.assertRaises(RuntimeError):
+            validate_desktop.command_plan(Path("repo"), validate_desktop.TARGETS["windows-x64"], "digest",
+                                          local_development_keychain=True)
+        plan = validate_desktop.command_plan(Path("repo"), target, "digest", unsigned_macos=True,
+                                             local_development_keychain=True)
+        flutter = [c for c in plan if c.stage == "flutter"][0]
+        self.assertIn("--dart-define=BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true", flutter.argv)
+        self.assertIn("--dart-define=APP_ENV=local-macos-development", flutter.argv)
+        default = validate_desktop.command_plan(Path("repo"), target, "digest", unsigned_macos=True)
+        default_flutter = [c for c in default if c.stage == "flutter"][0]
+        self.assertIn("--dart-define=APP_ENV=pre", default_flutter.argv)
+        self.assertFalse(any("DEVELOPMENT_KEYCHAIN" in x for x in default_flutter.argv))
+
     def test_windows_reparse_point_rejected_before_file_open(self) -> None:
         info = mock.Mock(st_mode=0o100644, st_file_attributes=0x400)
         with mock.patch.object(validate_desktop.os, "supports_dir_fd", set()), \

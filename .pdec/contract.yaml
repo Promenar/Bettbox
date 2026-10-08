@@ -2718,6 +2718,62 @@
       "timeout_seconds": 120,
       "artifacts": [],
       "verification": "公开替身验证输出边界、未确认清理与超时责任，不调用Keychain或签名。"
+    },
+    "test-macos-development-storage": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "test/xboard/macos_development_storage_test.dart",
+        "--dart-define=BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true",
+        "--dart-define=APP_ENV=local-macos-development"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "公开Flutter存储替身复现重复删除，不读真实Keychain或凭据。"
+    },
+    "build-macos-local-development": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/validate_desktop.py",
+        "--target",
+        "macos-arm64",
+        "--execute",
+        "--unsigned-macos",
+        "--local-development-keychain"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 2700,
+      "artifacts": [
+        "build/macos/Build/Products/Release/Bettbox.app",
+        "build/desktop-validation/macos-arm64.json"
+      ],
+      "verification": "固定源与锁依赖完整本机开发构建，显式独立Keychain，不发布/公证或启用代理；不作为正式发行。"
+    },
+    "seal-macos-local-development": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/seal_macos_candidate.py",
+        "--signing-mode",
+        "apple-development",
+        "--local-development"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": [
+        "build/macos-local-development/Bettbox.app",
+        "build/macos-local-development/seal.json"
+      ],
+      "verification": "核对完整构建来源、实际Dart/宿主摘要与空开发权利后使用唯一现有AppleDevelopment身份，新目录不覆盖，保留固定Core/helper，不读私钥，不发行/公证。"
     }
   },
   "deployment": {
@@ -2729,7 +2785,7 @@
     "rollback": ""
   },
   "evidence": {
-    "scripts/validate_desktop.py": "4ae7982bf886b46406133ecba712f310b0ff7703724dac78d5c3979ca9ce70a6",
+    "scripts/validate_desktop.py": "e02095c72332d0938cedf6d80f24bbf92a432be32f323baf67783ce886bdb28c",
     ".github/workflows/validate-desktop.yaml": "ad83eea5cbb847ccef09045808db62c7cccbcd35de3bbe04aa614855fff7c360",
     "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
     "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
@@ -2761,7 +2817,7 @@
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
     "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
-    "scripts/tests/test_validate_desktop.py": "78394c1c8def4afc9af79df2020a4a2dd7e9dbab37d3467a30cad84672b2e512",
+    "scripts/tests/test_validate_desktop.py": "c88c07510e46ce0e738e64ff84df2ae596308e52b7c65a90ccbc56ee84cfb5d4",
     "scripts/tests/test_android_contract.py": "d1cf88bb38cae2f913a7cc78807063637db2eb4164e7df9dce50adb08e6e0e9e",
     "scripts/check_android_regressions.py": "9192077d0b1dc7abb38cc394e645577266dfe109e87dabecef087633316819ae",
     "plugins/proxy/macos/Package.swift": "e98972e639c1b7b02e8534be5aaa3e455a5c1baf763765935108e909ede83d15",
@@ -2877,9 +2933,9 @@
     "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py": "c93f39325fb30cd4b38bf24b22535a5f694f4a7f7f7525bf6e46e821e3c7f06c",
     "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1",
     "scripts/macos_supervisor_artifact.py": "0b4fdba385f187a36f79ccade6b8031ce070250da2e52308de6641f41e5ee3f4",
-    "scripts/seal_macos_candidate.py": "8537e4fc0a6a4c9d39628994c465b50aa600af3e81207a8b6248b534fed0b50f",
+    "scripts/seal_macos_candidate.py": "31e65a8dace73424061aa3345e9d1306106de4b69cea618bdb103c6eda712610",
     "scripts/tests/test_macos_supervisor_artifact.py": "4f7bdbc758a924008ea9b0ae3771963dbb315bf1cf9e9e078efa70740edc05cc",
-    "scripts/tests/test_seal_macos_candidate.py": "1f0500a9d3f268a3f8b2e8349a5baf68d758a18173f9a9b81296cf4eb011091e",
+    "scripts/tests/test_seal_macos_candidate.py": "b172907e39514554c43272affa7c16e0769f1384249557fcd9b156b723e3571a",
     "scripts/check_macos_flutter_supervisor.py": "2273e582a54a4bab5b4f485628c83f441c05e0590037397debf812de1432bb28",
     "scripts/tests/test_macos_flutter_supervisor.py": "0c716db1caf247daeaff971a4c517ffa87f7026a8e3270a357b10600d1f46062",
     "integration_test/macos_supervisor_probe.dart": "9ec1c50053eeb0fe3ffd9d18f59e372e5dd1a43ad575998bf69061f004102457",
@@ -2999,8 +3055,12 @@
     "core/lib_non_mobile.go": "d2808402d1da2e7725cf1332b38d95ebda30cf378f08c948b2e849b5edd75071",
     "scripts/probe_macos_keychain_options.py": "633cb06719dbe1429b154e217e8475579930c6ccdf7aed75cdbc780e6a223a01",
     "scripts/probe_macos_keychain_options.swift": "d2d2a95adc16e82f84d349ca22893889b9e05215a53df41fe5b215ce5fa4d0f3",
-    ".agents/plans/2026-10-09-macos-development-keychain.md": "338362b7bc0715ecdf27f3b7c83ea60e7d1ab5a44f75218e1476970ac02b0cd1",
-    "scripts/tests/test_macos_keychain_options.py": "47c455d3011dff1ffa2d1c039234e05fa8e9e693ee598d1e7e87e699f9e5dcda"
+    ".agents/plans/2026-10-09-macos-development-keychain.md": "c43a5860c5dcbdf791ddf813d51a58d0cf13d47e744a25ac0d71a5f102299c92",
+    "scripts/tests/test_macos_keychain_options.py": "47c455d3011dff1ffa2d1c039234e05fa8e9e693ee598d1e7e87e699f9e5dcda",
+    "test/xboard/macos_development_storage_test.dart": "68a25c6b8d4bfb40dac25af74db7f5b359715436646353adf18b7c5a8cfd799c",
+    "macos/Runner/LocalDevelopment.entitlements": "97704a8960b4facceef54397a08fb5d0a456247c3627359215aa2a27df22656c",
+    "lib/xboard/storage_backend.dart": "a562821814cd82a72ef33bc3bbc2479924d66fc746df8a19b83f46a14dfe1ce2",
+    "lib/xboard/secure_store.dart": "5167785747cbf8311864caa4843890b23880b93bf6f14b6cafeecca63c05fe30"
   },
   "platform_extensions": {
     "android": {
@@ -3076,6 +3136,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "7b74e3e7a2cea5a754e997a62486d8b4f8d6649a829abc7e8b031b5c958f5bc7"
+    "contract_digest": "d850f8993039d19c45fb8d4b6fb4c428dab8632b55e89747705ea250bea6ee25"
   }
 }

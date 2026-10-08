@@ -159,3 +159,7 @@ Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例�
 
 
 `probe-macos-keychain-options`在本机使用现有唯一Apple Development身份签原生合成键探针，固定独立service与新UUID，两种命名空间不存在才写入；不读业务秘密、不改ACL/搜索列表。实际结果区分写入、覆盖、删除和重复删除，退出0只表示诊断完成且清理确认，不证明插件或App可用。异常保留同次case定位合成条目责任。`test-macos-keychain-options`使用公开替身验证输出边界和失败责任，无实际Keychain调用。
+
+## 完整 macOS 本机开发渠道
+
+`build-macos-local-development` 使用显式 `--unsigned-macos --local-development-keychain` 构建完整 main 入口，固定 APP_ENV=local-macos-development 和开发存储标记。`seal-macos-local-development` 使用现有唯一 Apple Development 身份、独立空权利文件与固定新目录 `build/macos-local-development/Bettbox.app`，拒绝覆盖；按清单校验实际宿主和 App.framework/Versions/A/App、原生 Core/helper 字节。封装成功不声明启动、公证或发行通过。启动记录另存公开回执，正式默认存储与 Release 权利保持。

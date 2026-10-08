@@ -17,6 +17,10 @@
 3. 开发构建独立目录、独立空权利文件、显式开发标记；签后权利精确核对，Core/Supervisor 固定字节不变。没有未验证 embedded profile，不替代正式封装准入。
 4. 在完整客户端验证临时合成值、覆盖更新、冷启动、指定键删除，再验证正常登录页/首页和真实开发账户。错误或系统提示取消不得成为成功。
 
+## 本机完整界面验收
+
+2026-10-09 完整 main 入口的独立开发候选完成构建、Apple Development 封装并通过 CUA 启动验收，首页卡片和导航可见；系统代理与虚拟网卡关闭，没有加载配置。候选路径为 `build/macos-local-development/Bettbox.app`，公开回执为 `docs/validation/2026-10-07-three-platform/macos-local-development-launch.json`。黑色窗口属于空白 supervisor 探针，已结束该确认过的进程。实际账户登录、插件冷启动持久化和代理流量尚待验收；界面启动不等于发行准入。
+
 ## 验收与回滚
 
 PDEC validate 退出0且 execution_ready=true 后执行探针；Swift 编译与唯一现有 Apple Development 身份签名结果本机捕获，仅公开脱敏状态。探针是原生查询诊断，不替代完整插件、会话和代理验收。合成条目仅清理同次 UUID，不能清理旧凭据。关闭开发开关并恢复原候选入口可回滚；正式发行仍需有效签名、授权链、公证与 Gatekeeper 验证。
