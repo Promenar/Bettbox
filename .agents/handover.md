@@ -1218,3 +1218,34 @@ Android/macOS优先交付，iOS保留开发版。修复macOS预检拒绝后无�
 
 ### HLG
 使用结构化append dry-run/apply追加，保留原记录，goal active。
+
+## 2026-10-08T09:14:50+08:00 · macOS SystemConfiguration SDK候选及HTTP-only事务验收
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["proxy", "sdk", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 8cab1f6bde6bc31452d646504ea7b9d42ddd39ada1d6aeef79ae82cd2bec9687
+
+### Summary
+完成HTTP-only代理事务与真实SystemConfiguration后端候选，当前SDK编译及只读验收通过，完整发行目标active。Android/macOS优先，iOS保留开发版。
+
+### Changed
+新增白名单字典codec及SDK后端，当前NetworkSet、非等待配置锁、Commit/Apply分开、解锁丢弃session、动态Proxies双读。只写HTTP/HTTPS、bypass和PAC/WPAD启用位，保留SOCKS/认证/未知键；启用或未知运行SOCKS拒绝。只选择enabled且有运行字典服务。stored.disabled零端口/空bypass允许原样恢复，新intent保持严格。schema3拒绝旧2恢复。未改Runner/Dart/签名/服务端/.video_agent。
+
+### Validation
+34项Swift测试exit0；真实SDK数量验收services9/enabled9/runtimeProxyPresent1/authUnknown9，配置签名unchanged=true。SDK旧解析失败先定位：27个disabled零端口、6个stored空bypass；原样恢复回归通过。HTTP-only旧代码1案例2断言实际失败。红例与源码SHA保留，公开macos-sc-backend-validation.json。独立基础审阅及兼容边界回审无P1/P2；PDEC validate0/execution_ready=true。
+
+### Next
+可信native专用入口授权与schema3保护journal；Flutter原生注册、实际写入/恢复/取消/网络切换验收，正常main/Keychain；Android整包JNI及正式APK、有效订阅流量；iOS发行研究与支付商外部条件。
+
+### Risks
+本组件是SwiftPM library，未注册App，不是发行包。真实服务认证unknown，start被拒绝；未执行真实stage/commit/apply/restore，动态字典存在不证明连通/代理流量。生产journal后端尚未实现，schema3须在后端保持，旧2人工处理。完整App未重建，184项Flutter证据沿用未变Dart版本，不伪称本版App运行。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、registry、事务计划、PDEC说明及公开回执。
+
+### HLG
+结构化append dry-run/apply追加，保留原链；goal active。

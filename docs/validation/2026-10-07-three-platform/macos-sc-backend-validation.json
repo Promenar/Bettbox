@@ -1,0 +1,65 @@
+{
+  "scope": "SystemConfiguration SDK后端候选及HTTP-only事务；没有系统设置写入或完整应用验收",
+  "base_commit": "e49ed372fccaf1eea9dcf26cc771d6f07741c164",
+  "source_hashes": {
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "3edd58edc1a6c93af6afa378ea62b711c08de2bcc0003e09ca6888c6b340aaf1",
+    "plugins/proxy/macos/Classes/Core/Lifecycle.swift": "562050f9876a11363a170cd36c1499fbd42f4d75c6d74edb3ad0bd08bcb6dc07",
+    "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "b05c5863898abf17d5c41ca02122688b04738ca23e948e052d9722f275166a26",
+    "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "465852da13449c51aac224542c60f446eca5ab50ac8ff903aa87d67c3b2a655f",
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "24b2c2661db0569cfd790a6e5f32edff65fd64f510b158d04812a1fd4e4f0a78",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "19d559acecc8a71f84d7f3876d0be28e1a11d700b70840062a3c03bf7894055a",
+    "plugins/proxy/macos/Tests/Core/LifecycleTests.swift": "75c981dbcbe26fd444cffa738616eb0a82f7ec8fcdecc21ae9e9f4a9ffef2149",
+    "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "186bf0ffa1588df1adc2dea044748f7544a9626d2d180050daf9cca875c9832f",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "aea420c0b0a1a6d16d0e87c1a6a831bd98f69fcf2a9d879d36925151aa4871db"
+  },
+  "swift_tests": {
+    "count": 34,
+    "failures": 0,
+    "exit_code": 0,
+    "target": "arm64-apple-macos12"
+  },
+  "read_only_sdk": {
+    "services": 9,
+    "enabled": 9,
+    "runtime_proxy_dictionary_present": 1,
+    "unknown_authentication": 9,
+    "preferences_signature_unchanged": true,
+    "disabled_zero_ports": 27,
+    "enabled_zero_ports": 0,
+    "stored_empty_bypass_strings": 6,
+    "system_stage_commit_apply_called": false
+  },
+  "red": {
+    "http_only": {
+      "exit_code": 1,
+      "case_count": 1,
+      "assertion_failures": 2,
+      "hashes": {
+        "plugins/proxy/macos/Classes/Core/Transaction.swift": "531381c1d9307a933288b0865ac8fd942e0f8cc1e3f2ea204ee31d9eb84342f6",
+        "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "2673b4c48d6eee5a6fc8ea614bd0f5a0874139d8cde0a90741161f6c43f40960"
+      }
+    },
+    "zero_port_sdk": {
+      "exit_code": 1,
+      "hashes": {
+        "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "8651845c59e161e52628068e6b680ff68c1388cfd091d83e26b9c67480352d02",
+        "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "3ff15149f38986e46cab0ae93b7ac09c3a6d92faaec2ff14445d27e104cadf9f"
+      }
+    },
+    "empty_bypass_sdk": {
+      "exit_code": 1,
+      "hashes": {
+        "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "918dfae946c3409bb1f6b591a762adc7e5d41af8392de2926808743428e1144c",
+        "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "5a0ac78491550f33b7988972d4716bb476bce7863efeba9616129fcde40b278a"
+      }
+    }
+  },
+  "independent_review": "基础实现和stored兼容边界串行审阅，无可复现P1/P2",
+  "limitations": [
+    "没有原生SC消费授权、Flutter插件注册或生产journal后端",
+    "真实服务认证为unknown，事务拒绝真实start；没有假定认证absence",
+    "动态Proxies存在不证明连通或流量；实际stage/commit/apply/restore未验证",
+    "旧schema2拒绝自动恢复；生产journal必须支持schema3",
+    "未重建或安装完整App；Android/iOS发行条件另验"
+  ]
+}

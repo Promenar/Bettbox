@@ -2,13 +2,13 @@
 
 ## 目标与边界
 
-系统 HTTP、HTTPS、SOCKS 与 bypass/PAC 状态由串行原生事务管理。只有实际应用、持久所有权记录和当前设置匹配时恢复原值，保留外部修改。Linux、Windows、TUN 与 Network Extension 不属于该工作包。
+系统 HTTP、HTTPS 与 bypass/PAC 状态由串行原生事务管理；SOCKS不属于专用HTTP入口的写入范围。只有实际应用、持久所有权记录和当前设置匹配时恢复原值，保留外部修改。Linux、Windows、TUN 与 Network Extension 不属于该工作包。
 
 ## 核心与施工所有权
 
 - `plugins/proxy/macos/Classes/Core/`：类型化字段组、事务状态机及生命周期代次。主控集成已独立审阅的核心；所有服务认证未知或已配置认证时，必须在写入前拒绝。
 - `plugins/proxy/macos/Tests/Core/` 与 `Package.swift`：实际事务逻辑使用 fake 配置与 journal 验收，测试不访问系统代理或真实用户配置。
-- 实际 SCPreferences、受保护 journal 和 Flutter channel 由后续独立工作包实现；实施前确认接口、原生插件注册、权限以及运行状态核验方式。当前核心未接入 App，不代表现有 networksetup 路径已修复。
+- SCPreferences后端与白名单字典合并已实现并通过当前SDK编译及只读验收；受保护journal、native入口授权与Flutter channel待接线。事务核心未接入App，不代表系统代理可用。
 - Dart 协调器、错误国际化、系统代理实际状态和托盘刷新在原生契约稳定后接入；不得把用户偏好或内核运行等同系统代理已生效。
 
 ## 不变量与故障处理
@@ -21,7 +21,7 @@
 
 ## 验收与发布条件
 
-纯核心入口：`swift test --package-path plugins/proxy/macos --scratch-path .test/three-platform-release/macos-proxy-core-build`。入口已登记 PDEC，当前来源校验通过；真实编译及23项隔离 fixture 通过。结果不包含系统代理或 App 接线。
+纯核心入口：`swift test --package-path plugins/proxy/macos --scratch-path .test/three-platform-release/macos-proxy-core-build`。入口已登记 PDEC，当前来源校验通过；实际编译及34项测试通过，其中真实SDK只读验收返回9个服务、1个运行Proxies字典、9个认证unknown，配置签名未变化。结果不包含系统设置写入或App接线。
 
 核心验收后完成真实 SDK 编译、Dart 协调器与错误状态测试，再在明确受控的测试服务验证权限拒绝、写入/恢复、外部修改、网络切换与进程退出。不能自动对日常网络服务做破坏性试验。
 
@@ -33,7 +33,7 @@
 
 现有事务的absent门禁保持，真实适配实施前先验证独立专用入口的凭据隔离与可信控制能力，再裁定unknown服务接管契约；不伪造absence。当前HTTP即便无认证器仍解析代理认证并生成用户名日志/metadata，SOCKS5密码方法可进入AlwaysValid。专用HTTP/CONNECT入口须绑定127.0.0.1:0、隔离订阅配置，认证解析前删除代理认证字段且不生成inUser。普通HTTP/Upgrade输出请求与输入Trailer必须分离，丢弃输出Trailer，拒绝声明的代理认证Trailer；CONNECT拒绝正文/Trailer。目标站Authorization保留。首包只拥有HTTP/HTTPS，SOCKS须持久/运行未启用，PAC/WPAD只拥有启用位并保全未知URL。
 
-原生UDS处理frame前核验双方UID、peer audit token/PID和预期代码身份，并绑定应用本次实际启动的core；使用私有0700目录、0600socket、拒绝链接和TCP降级。能力绑定可信连接、代次及真实监听，断线退出即失效。当前Dart首连接不具备此证明，单一能力字段不能替代身份核验。真实SDK、签名及进程生命周期策略须在实施前定约并独立审阅。所有权按入口、生命周期、原生传输、SC后端、Dart接线串行交接。验收使用虚构认证标记覆盖普通/CONNECT/Upgrade、Trailer EOF、原认证不变、伪造首连接/错误PID/旧代次/断线及未知配置键保全；不读取真实凭据。专用入口与传输尚未实现，TUN独立推进。
+原生UDS处理frame前核验双方UID、peer audit token/PID和预期代码身份，并绑定应用本次实际启动的core；使用私有0700目录、0600socket、拒绝链接和TCP降级。能力绑定可信连接、代次及真实监听，断线退出即失效。当前Dart首连接不具备此证明，单一能力字段不能替代身份核验。真实SDK、签名及进程生命周期策略须在实施前定约并独立审阅。所有权按入口、生命周期、原生传输、SC后端、Dart接线串行交接。验收使用虚构认证标记覆盖普通/CONNECT/Upgrade、Trailer EOF、原认证不变、伪造首连接/错误PID/旧代次/断线及未知配置键保全；不读取真实凭据。专用HTTP入口与owned匿名管道已实现；nativeSC消费授权尚未接线，TUN独立推进。
 
 ## 专用 HTTP 入口实施与验收（2026-10-08）
 
@@ -50,3 +50,11 @@
 主控所有权：core main/server/action、owned_session/owned_pipe及fixture；Mihomo route restart/owned_pipe_guard。独立审阅两项P2已在候选源码闭合：绝对截止时间必须在ready准入前核对；CGO0普通测试不可标为race。验收先执行离线只读依赖的CGO0普通包测试及route编译；真实产物首帧、满内核管道和exitCode另以captured child验收。宿主身份桥接、Dart代次与SC事务尚未接线，不开放原共享IPC或root/setuid执行。
 
 Go逻辑撤销不等待writer/Close，不代表旧业务合作退出；宿主只有观察真实exitCode后才能宣布停止。真实子进程测试不读用户配置/凭据、不发业务动作、不启用系统代理/TUN，stdout/stderr原文不保留。回滚限定本工作包文件，不覆盖其它平台变更。
+
+## SystemConfiguration 后端与HTTP入口范围
+
+主控串行负责Classes/Core下SDK适配器、字典编解码、事务HTTP范围及隔离测试；其它平台和Runner不改动。真实后端使用当前Network Set、SCPreferences非等待锁、Commit与Apply分离、SCDynamicStore服务Proxies双读；未确认的动态状态不冒充生效。解锁丢弃session；字段白名单合并保留未知键、认证配置与键缺失。原配置不得进入日志、错误或Agent输入。认证只报告unknown，不搜查Keychain；真实写入在native入口授权/安全journal完成前不执行。
+
+专用入口仅HTTP/HTTPS，不写SOCKS；持久及运行SOCKS为启用或未知时启动必须拒绝。PAC/WPAD只写启用位、保全其配置摘要。只接管当前启用且有运行状态的服务。测试先复现SOCKS错误覆盖，再做字段缺失/类型污染/未知值保全和当前SDK编译；真实系统仅执行只读数量验收，禁止提交网络设置。登记PDEC输入、独立串行审阅、同步文档后提交。回滚限定上述文件，不读写.video_agent或凭据。
+
+SDK兼容验收确认27个已禁用零值端口与6个既有空bypass；仅stored字段允许原样恢复，新intent继续拒绝空输入、启用零值端口和类型污染。HTTP-only journal为schema3，旧2拒绝自动恢复，生产journal后端尚未实现。公开回执 `docs/validation/2026-10-07-three-platform/macos-sc-backend-validation.json`。独立串行审阅无P1/P2；系统stage/commit/apply/restore尚未执行。

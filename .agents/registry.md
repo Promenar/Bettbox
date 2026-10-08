@@ -43,3 +43,5 @@
 - docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json — MacService传输接线、应用协调器/RPC实际Flutter与事件追踪负例；正常main/SC另验
 
 - docs/validation/2026-10-07-three-platform/macos-preflight-recovery-validation.json — 未发行reservation的预检撤销证据、实际Session/Application重试及未知owner保留
+
+- docs/validation/2026-10-07-three-platform/macos-sc-backend-validation.json — HTTP-only事务、SystemConfiguration SDK只读验收及stored字典恢复边界

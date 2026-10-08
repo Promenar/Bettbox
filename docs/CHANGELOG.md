@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — macOS SystemConfiguration候选
+
+- 新增真实SDK后端与受限字典合并，HTTP/HTTPS事务保留SOCKS；schema3拒绝旧2自动恢复。
+- 真实只读验收发现并修复stored零值端口、空bypass兼容；新intent保持严格校验。34项Swift测试通过，系统配置未写入；native授权、生产journal及App接线待验收。
+
 ## 2026-10-08 — macOS预检失败恢复
 
 - 修复未发行reservation的预检拒绝导致客户端无法重试：通过原生同代撤销证据恢复，保留迟到worker和所有已发行/未知进程所有权。

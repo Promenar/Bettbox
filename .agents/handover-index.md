@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T09:00:15+08:00
+> generated_at: 2026-10-08T09:14:50+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T09:00:15+08:00 | progress | ["Bettbox", "macOS", "three-platform-release"] | macOS未发行预检恢复及同代原生停止证据 | `.agents/handover.md` · `2026-10-08T09:00:15+08:00` · `fp:0278d31720` |
+| three-platform-release | resume | 2026-10-08T09:14:50+08:00 | progress | ["Bettbox", "macOS", "three-platform-release"] | macOS SystemConfiguration SDK候选及HTTP-only事务验收 | `.agents/handover.md` · `2026-10-08T09:14:50+08:00` · `fp:8cab1f6bde` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T09:14:50+08:00 | iso | progress | resume | ["Bettbox", "macOS", "three-platform-release"] | ["proxy", "sdk", "release"] | macOS SystemConfiguration SDK候选及HTTP-only事务验收 | `.agents/handover.md` · `2026-10-08T09:14:50+08:00` · `fp:8cab1f6bde` |
 | 2026-10-08T09:00:15+08:00 | iso | progress | resume | ["Bettbox", "macOS", "three-platform-release"] | ["supervisor", "preflight", "release"] | macOS未发行预检恢复及同代原生停止证据 | `.agents/handover.md` · `2026-10-08T09:00:15+08:00` · `fp:0278d31720` |
 | 2026-10-08T08:51:32+08:00 | iso | progress | resume | ["Bettbox", "macOS", "three-platform-release"] | ["release", "supervisor", "rpc", "events"] | macOS应用协调器及有界RPC真实Flutter接线验收 | `.agents/handover.md` · `2026-10-08T08:51:32+08:00` · `fp:5791bfda0b` |
 | 2026-10-08T07:15:22+08:00 | iso | progress | resume | ["Bettbox", "macOS", "three-platform-release"] | ["release", "supervisor", "flutter", "signing"] | macOS真实Flutter两代生产会话及并发child退出验收 | `.agents/handover.md` · `2026-10-08T07:15:22+08:00` · `fp:83248e8a9a` |

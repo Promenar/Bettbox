@@ -102,3 +102,5 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 `test-supervisor-rpc` 覆盖生产RPC、就绪判断、Application协调策略与真实ClashMessage派发；Session证据在协调器测试中明确为fake。实际负例复现早回包后sender失败/挂起、旧initial错误/新tail漏等和多listener中途throw，保留回归。`probe-macos-flutter-supervisor` 的独立入口使用同一生产Application/RPC两代真实Go getIsInit与退出；不加载账户或启用SC。正常main、正式Keychain签名和专用HTTP/SC路由独立验收，不能用该探针宣称可用发行。
 
 预检恢复保持现有host/Session/full-test/analyze执行位置，新增同代原生停止确认不改变构建/部署权限。输入摘要已更新；184项Flutter测试与host fixture不替代完整应用发行验收。
+
+`test-macos-proxy-core`覆盖SystemConfiguration候选SDK编译、HTTP-only事务及只读数量验收。测试不调用真实stage/commit/apply，不读取Keychain或输出原始配置。schema3与新SDK源码已绑定输入摘要；不能视作完整App或代理写入验收。

@@ -36,12 +36,13 @@ final class ProxyTransaction {
                 let recovery = try self.recoverLocked(generation)
                 guard recovery.status == .restored || recovery.status == .idle else { return recovery }
             }
-            let services = try self.configuration.persistentServices().filter { $0.enabled }
+            let services = try self.configuration.persistentServices().filter { $0.enabled && $0.active }
             guard !services.isEmpty else { throw FixedFailure(status: .noServices) }
             guard services.count <= 256 else { throw FixedFailure(status: .recoveryRequired) }
             guard Set(services.map { $0.id }).count == services.count else {
                 throw FixedFailure(status: .recoveryRequired)
             }
+            let running = try self.configuration.activeGroups(serviceIDs: services.map { $0.id })
             var entries: [JournalEntry] = []
             // 全部服务预检完成后才能写 journal 或系统配置。
             for service in services {
@@ -51,13 +52,21 @@ final class ProxyTransaction {
                 guard !service.id.isEmpty && service.hasProxyProtocol && self.validGroups(service.groups) else {
                     throw FixedFailure(status: .recoveryRequired)
                 }
+                // 专用入口不提供SOCKS；必须由持久与运行双读证明其未启用。
+                guard case .manual(let storedSOCKS)? = service.groups[.socks],
+                      case .manual(let activeSOCKS)? = running[service.id]?[.socks] else {
+                    throw FixedFailure(status: .recoveryRequired)
+                }
+                guard storedSOCKS.enabled != true, activeSOCKS.enabled != true else {
+                    throw FixedFailure(status: .unsupportedSOCKSProxy)
+                }
                 let written = self.desiredGroups(intent, before: service.groups)
                 let owned = Set(ProxyGroup.allCases.filter { service.groups[$0] != written[$0] })
                 entries.append(JournalEntry(serviceID: service.id, before: service.groups,
                                             written: written, ownedGroups: owned))
             }
             guard isCurrent() else { return SafeResult(status: .cancelled, generation: generation) }
-            var record = OwnershipJournal(schemaVersion: 2,
+            var record = OwnershipJournal(schemaVersion: 3,
                 installOwnerID: self.journal.installOwnerID, generation: generation, transactionID: UUID(),
                 intent: intent, phase: .prepared, entries: entries)
             try self.journal.persist(record)
@@ -244,14 +253,14 @@ final class ProxyTransaction {
         for key in ProxyGroup.allCases {
             switch (key, groups[key]) {
             case (.http, .manual(let fields)?), (.https, .manual(let fields)?), (.socks, .manual(let fields)?):
-                if let port = fields.port, !(1...65535).contains(port) { return false }
+                if let port = fields.port, !(1...65535).contains(port) && !(port == 0 && fields.enabled != true) { return false }
                 if let host = fields.host, !host.isEmpty {
                     guard host.utf8.count <= 255, host.unicodeScalars.allSatisfy({
                         CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-:[]").contains($0)
                     }) else { return false }
                 }
             case (.bypass, .bypass(let domains)?):
-                if let domains = domains, !ProxyIntent(port: 1, bypass: domains).validate() { return false }
+                if let domains = domains, !ProxyIntent(port: 1, bypass: domains).validate(allowEmptyStoredBypass: true) { return false }
             case (.pac, .automatic(let fields)?), (.wpad, .automatic(let fields)?):
                 guard fields.unchangedConfigurationDigest.count == 64,
                       fields.unchangedConfigurationDigest.allSatisfy({ "0123456789abcdef".contains($0) }) else { return false }
@@ -263,7 +272,7 @@ final class ProxyTransaction {
 
     private func desiredGroups(_ intent: ProxyIntent, before: [ProxyGroup: GroupValue]) -> [ProxyGroup: GroupValue] {
         var result = before
-        for group in [ProxyGroup.http, .https, .socks] {
+        for group in [ProxyGroup.http, .https] {
             result[group] = .manual(ManualProxy(enabled: true, host: "127.0.0.1", port: intent.port))
         }
         result[.bypass] = .bypass(intent.bypass)
@@ -277,7 +286,7 @@ final class ProxyTransaction {
     }
 
     private func validateJournal(_ record: OwnershipJournal) throws {
-        guard record.schemaVersion == 2, record.installOwnerID == journal.installOwnerID,
+        guard record.schemaVersion == 3, record.installOwnerID == journal.installOwnerID,
               record.intent.validate(), !record.entries.isEmpty,
               record.entries.count <= 256,
               Set(record.entries.map { $0.serviceID }).count == record.entries.count else { throw JournalFailure.invalid }

@@ -24,21 +24,22 @@ struct ServiceSnapshot {
     var hasProxyProtocol: Bool
     var authentication: AuthenticationState
     var groups: [ProxyGroup: GroupValue]
+    var active: Bool = true
 }
 struct ProxyIntent: Equatable {
     let port: Int
     let bypass: [String]
-    func validate() -> Bool {
+    func validate(allowEmptyStoredBypass: Bool = false) -> Bool {
         (1...65535).contains(port) && bypass.count <= 256 &&
         bypass.reduce(0) { $0 + $1.utf8.count } <= 4096 &&
-        bypass.allSatisfy { !$0.isEmpty && $0.utf8.count <= 255 &&
+        bypass.allSatisfy { (allowEmptyStoredBypass || !$0.isEmpty) && $0.utf8.count <= 255 &&
             !$0.contains("@") && !$0.contains("://") && !$0.contains("?") && !$0.contains("#") &&
             !$0.unicodeScalars.contains { CharacterSet.controlCharacters.contains($0) } }
     }
 }
 enum SafeStatus: String {
     case idle, applied, restored, cancelled, conflict, permissionDenied, busy
-    case invalidInput, noServices, unsupportedAuthenticatedProxy
+    case invalidInput, noServices, unsupportedAuthenticatedProxy, unsupportedSOCKSProxy
     case failedRolledBack, recoveryRequired
 }
 // 安全结果仅有固定枚举和数字，不容纳原配置或任意诊断字符串。

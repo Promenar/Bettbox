@@ -19,6 +19,49 @@ final class TransactionTests: XCTestCase {
         XCTAssertFalse(backend.locked)
     }
 
+    func testEnabledOrUnknownActiveSOCKSRefusesAllWrites() {
+        for activeOnly in [false, true] {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            if activeOnly { backend.active["public-service"]?[.socks] = .manual(ManualProxy(enabled: true, host: "external.example", port: 1080)) }
+            else { backend.services[0].groups[.socks] = .manual(ManualProxy(enabled: true, host: "external.example", port: 1080)) }
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .unsupportedSOCKSProxy)
+            XCTAssertEqual(backend.stages, 0); XCTAssertNil(store.record)
+        }
+        let backend = FakeConfiguration(), store = FakeJournal()
+        backend.active = [:]
+        XCTAssertEqual(ProxyTransaction(configuration: backend, journal: store).start(intent, generation: 1, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertEqual(backend.stages, 0)
+    }
+    func testPriorSOCKSJournalSchemaRefusesAutomaticRecovery() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        let original = store.record!
+        store.record = OwnershipJournal(schemaVersion: 2, installOwnerID: original.installOwnerID,
+            generation: original.generation, transactionID: original.transactionID,
+            intent: original.intent, phase: original.phase, entries: original.entries)
+        let before = backend.stages
+        XCTAssertEqual(transaction.stop(generation: 2).status, .recoveryRequired)
+        XCTAssertEqual(backend.stages, before)
+    }
+    func testInactiveServicesAreNotClaimed() {
+        var inactive = publicService("inactive-service"); inactive.active = false
+        let backend = FakeConfiguration([publicService(), inactive]), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(store.record?.entries.map { $0.serviceID }, ["public-service"])
+        XCTAssertEqual(backend.services[1].groups, inactive.groups)
+    }
+    func testHTTPOnlyStartDoesNotOwnOrChangeSOCKS() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let original = backend.services[0].groups[.socks]
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(backend.services[0].groups[.socks], original)
+        XCTAssertFalse(store.record!.entries[0].ownedGroups.contains(.socks))
+    }
+
     func testInitialStopDoesNotTouchAnyConfiguration() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
@@ -119,7 +162,7 @@ final class TransactionTests: XCTestCase {
         XCTAssertEqual(backend.active["public-service"]?[.pac], pac)
         XCTAssertEqual(backend.services[0].groups[.socks], publicService().groups[.socks])
         XCTAssertEqual(store.record?.phase, .uncertain)
-        let restored = Set([ProxyGroup.https, .socks, .bypass, .wpad].map {
+        let restored = Set([ProxyGroup.https, .bypass, .wpad].map {
             OwnedGroupID(serviceID: "public-service", group: $0)
         })
         let conflicts = Set([ProxyGroup.http, .pac].map {
