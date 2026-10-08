@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "date": "2026-10-09",
+  "scope": "本机原生合成键诊断，不代表完整Flutter插件、完整App或正式发行",
+  "actual_signature_verified": true,
+  "development_signed": true,
+  "actual_entitlement_keys": [],
+  "native_sha256": "d1690c67fbb3f31449a060e532e0e5ce9de37850a4e9e835409f681f57356e76",
+  "source_sha256": {
+    "scripts/probe_macos_keychain_options.swift": "d2d2a95adc16e82f84d349ca22893889b9e05215a53df41fe5b215ce5fa4d0f3",
+    "scripts/probe_macos_keychain_options.py": "633cb06719dbe1429b154e217e8475579930c6ccdf7aed75cdbc780e6a223a01"
+  },
+  "native_result": {
+    "absent_after_delete": true,
+    "first_read_matches": true,
+    "first_write_status": 0,
+    "local_delete_status": 0,
+    "new_key_absent": true,
+    "overwrite_read_matches": true,
+    "overwrite_status": 0,
+    "plugin_delete_status": 0,
+    "plugin_repeat_delete_status": -34018,
+    "real_credentials_accessed": false,
+    "repeat_delete_status": -25300,
+    "scope": "独立合成键的原生查询行为；不代表完整Flutter插件或App验收",
+    "sync_delete_status": -34018,
+    "sync_query_status": -25300
+  },
+  "boundary_tests": {
+    "passed": 6,
+    "real_keychain_called": false
+  },
+  "independent_review": "两项P2经修正复核闭合，当前探针未发现新P1/P2",
+  "cleanup_confirmed": true,
+  "development_storage_adopted": false,
+  "full_client_launch_validated": false,
+  "release_verified": false
+}

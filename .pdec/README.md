@@ -156,3 +156,6 @@ Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例�
 
 
 本机监听关闭FFI验证构建darwin-arm64 c-shared库至`.test/listener-stop-ffi/libclash.dylib`，通过`BETTBOX_TEST_CORE_LIBRARY`注入Flutter测试。测试校验真实路径并调用生产后台handler；默认无该变量时仅跳过这项跨语言测试。此操作不安装动态库、不创建系统TUN或代理，不代替Android JNI和设备验收。
+
+
+`probe-macos-keychain-options`在本机使用现有唯一Apple Development身份签原生合成键探针，固定独立service与新UUID，两种命名空间不存在才写入；不读业务秘密、不改ACL/搜索列表。实际结果区分写入、覆盖、删除和重复删除，退出0只表示诊断完成且清理确认，不证明插件或App可用。异常保留同次case定位合成条目责任。`test-macos-keychain-options`使用公开替身验证输出边界和失败责任，无实际Keychain调用。

@@ -2489,3 +2489,34 @@ record-fingerprint: 144518436f2ebe9c386972a29244082ea383ae7fa288f607021056febb4c
 
 ### HLG
 标准append dry-run再apply，完整目标保持active。
+
+## 2026-10-09T00:09:23+08:00 · macOS开发Keychain实际原生准入与重复删除缺陷
+
+type: development
+scope: ["Bettbox", "macOS"]
+status: partial
+tags: ["macos", "keychain", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 9004e9f69cd198c24e28cb9244fc23f2f27f74c409f055e69a6d4370561d3f1c
+
+### Summary
+实际独立原生合成键首次写读与覆盖通过，锁定插件重复删除判定返回-34018，不能直接采用三个MacOsOptions参数；完整App启动仍待验。
+
+### Changed
+新增受限原生探针、工具包装器与六项边界测试，登记PDEC及计划。正式DP配置、Release权利、旧凭据和旧候选未变。
+
+### Validation
+实际唯一AppleDevelopment身份签名、无权利、严格验签通过；源码摘要及状态保存在公开回执。双命名空间不存在准入，WhenUnlocked普通查询，指定键清理确认；同步删除-34018，插件规则重复删除-34018。六项mock边界回归通过，PDEC execution_ready=true；独立只读审阅两项P2修正复核闭合。
+
+### Next
+在独立开发构建边界收敛Keychain适配的错误、覆盖、重复清理语义；完整Flutter插件合成值及冷启动验证后再启动真实客户端登录/首页；Android规则转发、统一Native owner和三端业务发行继续。
+
+### Risks
+原生查询夹具不代表完整插件与App，不宣称Keychain开发方案已采用。系统默认文件Keychain通常login，不能保证固定搜索列表。正式Apple发行、有效代理节点和支付商外部条件未齐，Goal active。
+
+### DIA
+已同步架构、平台验证、CHANGELOG、PDEC说明、registry、计划及公开回执。
+
+### HLG
+标准append dry-run后apply，保留实际已完成与未验证边界。

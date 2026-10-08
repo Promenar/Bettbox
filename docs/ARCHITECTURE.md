@@ -246,3 +246,8 @@ Android后台停止监听使用invokeAction的检查式Go动作，confirmListene
 FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binder、真实TUN、关闭失败跨FFI或全部runtime退出。关闭失败由Go公开登记监听回归与Dart协议回归分别验证。GlobalState后台副作用仅静态审阅；invokeAction缺失回执仍可能无限等待。统一Native owner、配置/TUN接线、epoch、engine session/ACK与EXITING准入尚未完成。
 
 证据：`docs/validation/2026-10-07-three-platform/listener-stop-ffi-validation.json`。
+
+
+### macOS本机开发安全存储准入
+
+正式XboardSecureStore使用FlutterSecureStorage默认DP路径。开发文件Keychain方案必须显式开启、独立服务名，不能运行时自动回退或迁移既有凭据；当前未采用。锁定Darwin0.3.2同步查询和删除行为存在重复删除缺少权利的实际诊断证据，完整插件与会话适配须在正式配置之外独立验证。原生诊断脚本只操作新UUID合成键并公开状态码/比对，不读取业务秘密。
