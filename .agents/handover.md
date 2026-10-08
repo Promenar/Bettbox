@@ -2024,3 +2024,34 @@ core race因离线certstore CGO依赖缺失未启动。没有新APK或实际JVM/
 
 ### HLG
 通过标准append dry-run/apply记录，不直接编辑事实链。
+
+## 2026-10-08T17:58:35+08:00 · Android配置预留回执跨层兼容
+
+type: development
+scope: ["Bettbox", "Android"]
+status: in_progress
+tags: ["android", "configuration", "jni", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 60e82946d2737e28b34432d0a1cfed873848a810139a7cbddc3ea350b68e5faf
+
+### Summary
+修复Kotlin生产解析器拒绝Go配置预留错误码的跨层不兼容。
+
+### Changed
+支持tunConfigurationReserved与tunCleanupUnknown，并限定真实Go可发行的outcome/phase/configured/blocked及revision组合。invalidTunReservation保持内部错误，不纳入配置回执。
+
+### Validation
+新增公开JSON在旧生产parser执行fixture RED exit1，修复后Kotlin/Gson编译及fixture GREEN exit0；独立只读审阅无确认P1/P2，主控核对真实源码和回执。
+
+### Next
+接入真实TUN/JNI版本预留、FD/global-ref检查式拒绝清理、旧配置旁路收敛及唯一Native owner。
+
+### Risks
+未运行Android JVM/CheckJNI、未生成新APK。macOS签名profile及上游/支付权限外部条件待确认。
+
+### DIA
+已同步CHANGELOG、平台验收、联合计划、registry与PDEC说明。
+
+### HLG
+标准append dry-run后apply记录。

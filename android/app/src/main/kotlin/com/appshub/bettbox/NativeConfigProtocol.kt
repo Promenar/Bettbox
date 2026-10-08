@@ -35,7 +35,7 @@ object NativeConfigProtocol {
         "coreNotInitialized", "initialStateMissing", "initialCompositeAfterConfig", "invalidKind",
         "invalidPayload", "legacyConfigPresent", "optionsSnapshotFailed", "payloadTooLarge",
         "receiptEncodingFailed", "revisionOverflow", "staleEpoch", "staleRevision", "stateApplyFailed",
-        "updateApplyFailed", "updateBeforeConfig", "unconfigured")
+        "updateApplyFailed", "updateBeforeConfig", "unconfigured", "tunConfigurationReserved", "tunCleanupUnknown")
     private val integer = Regex("(?:0|[1-9][0-9]*)")
     private val number = Regex("-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")
     private val gson = GsonBuilder().disableHtmlEscaping().create()
@@ -102,6 +102,10 @@ object NativeConfigProtocol {
                 NativeConfigOutcome.REJECTED -> if (phase != NativeConfigPhase.NOT_ENTERED ||
                     options !== Value.NullValue || error !in errors) fail()
             }
+            if (error == "tunConfigurationReserved" && (outcome != NativeConfigOutcome.REJECTED || blocked ||
+                    !configured || revision == 0L || attempted != revision)) fail()
+            if (error == "tunCleanupUnknown" && (outcome != NativeConfigOutcome.UNKNOWN ||
+                    !configured || revision == 0L || attempted != revision)) fail()
             val optionsJson = if (options is Value.ObjectValue) compact(options) else null
             if (optionsJson != null && optionsJson.toByteArray(Charsets.UTF_8).size > MAX_INPUT_BYTES) fail()
             return NativeConfigReceipt(outcome, phase, epoch, revision, attempted, generation, configured,

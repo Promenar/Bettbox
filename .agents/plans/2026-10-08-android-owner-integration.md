@@ -97,3 +97,5 @@ Checked JNI释放桥已闭合：release_object_func为int，非空对象0表示�
 ## 配置预留模块实施状态
 
 协调器已实现锁内 reserve/finishStart/finishStop：epoch/revision/pointer 身份匹配，同次 options 复制，预留期间 commit 在 ENTERED 前拒绝；正常启动必须同时证明 resource、lease 与 running，清理未知永久保留责任，干净失败和确认停止解除。旧回执不得释放新预留。六项回归、全 core CGO0 和 Android ARM64 核心编译通过；独立审阅发现的缺 lease 条件已用单独红绿关闭。core race 因离线 CGO 依赖缺失未启动。lib_android/JNI、配置旁路、Native codec 错误码和 owner 接线仍为下一关键路径；模块没有对设备发布运行状态。
+
+NativeConfigProtocol 已支持配置预留和 TUN 清理未知的固定错误码，并保持严格 phase/blocked/configured/version 组合。真实生产 parser 公开 JSON 红绿通过。TUN入口、旧配置接口收敛和唯一 owner 接线仍需完成。

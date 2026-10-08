@@ -243,3 +243,5 @@ Android 生命周期候选接入完整工作门禁、独立绑定/启动意图�
 
 - 增加配置版本预留、同次 options 复制、启动/停止报告核验与未知责任保留。
 - 六项模块回归、完整 core CGO0 测试和 Android ARM64 核心编译通过；core race 因离线 CGO 依赖缺失未启动。真实 TUN/JNI 接线和新 APK 尚未验收。
+
+Android 原生配置回执解析器支持 `tunConfigurationReserved` 与 `tunCleanupUnknown`，并验证相应拒绝/未知状态和版本组合。旧解析器红回归失败、修复后夹具通过；实际设备与 owner 接线另验。

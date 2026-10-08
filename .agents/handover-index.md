@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T17:55:11+08:00
+> generated_at: 2026-10-08T17:58:35+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-08T13:32:53+08:00 | in_progress | ["Bettbox", "Android", "macOS"] | Android f881880正式构建安装与跨层owner接线边界 | `.agents/handover.md` · `2026-10-08T13:32:53+08:00` · `fp:3cb6c5e3ad` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T17:55:11+08:00 | in_progress | ["Bettbox", "Android"] | Android配置预留模块与TUN接线边界 | `.agents/handover.md` · `2026-10-08T17:55:11+08:00` · `fp:87e5e66bde` |
+| three-platform-release | resume | 2026-10-08T17:58:35+08:00 | in_progress | ["Bettbox", "Android"] | Android配置预留回执跨层兼容 | `.agents/handover.md` · `2026-10-08T17:58:35+08:00` · `fp:60e82946d2` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T17:58:35+08:00 | iso | in_progress | resume | ["Bettbox", "Android"] | ["android", "configuration", "jni", "validation"] | Android配置预留回执跨层兼容 | `.agents/handover.md` · `2026-10-08T17:58:35+08:00` · `fp:60e82946d2` |
 | 2026-10-08T17:55:11+08:00 | iso | in_progress | resume | ["Bettbox", "Android"] | ["android", "tun", "configuration", "validation"] | Android配置预留模块与TUN接线边界 | `.agents/handover.md` · `2026-10-08T17:55:11+08:00` · `fp:87e5e66bde` |
 | 2026-10-08T17:48:26+08:00 | iso | done | resume | ["Bettbox", "Android"] | ["android", "jni", "release", "handover"] | Android注册JNI释放确认与线程收尾 | `.agents/handover.md` · `2026-10-08T17:48:26+08:00` · `fp:87ea148cce` |
 | 2026-10-08T17:16:26+08:00 | iso | done | resume | ["Bettbox", "Android", "macOS"] | ["android", "macos", "release", "handover"] | Android生产启动报告与macOS候选profile准入 | `.agents/handover.md` · `2026-10-08T17:16:26+08:00` · `fp:5c140a954c` |

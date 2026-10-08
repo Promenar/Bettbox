@@ -13,6 +13,7 @@ object NativeConfigProtocolFixture {
         strictSchemaAndNumbers()
         outcomesAndCombinations()
         stringsOptionsAndBudgets()
+        tunReservationReceipts()
         println("cases=$cases, failed=$failed")
         check(failed == 0) { "配置回执fixture失败" }
     }
@@ -133,6 +134,29 @@ object NativeConfigProtocolFixture {
         reject(receipt(options = "{\"value\":\"" + "x".repeat(NativeConfigProtocol.MAX_INPUT_BYTES) + "\"}"))
         // UTF-8字节预算不能由UTF-16字符数代替。
         reject(receipt(options = "{\"value\":\"" + "公".repeat(NativeConfigProtocol.MAX_INPUT_BYTES / 3 + 1) + "\"}"))
+    }
+
+    private fun tunReservationReceipts() {
+        case {
+            val value = NativeConfigProtocol.parse(receipt("rejected", "notEntered", options = "null", error = "tunConfigurationReserved"))
+            check(value.outcome == NativeConfigOutcome.REJECTED && !value.blocked && value.configRevision == 2L)
+            check(value.optionsCanonicalJson == null)
+        }
+        case {
+            val value = NativeConfigProtocol.parse(receipt("unknown", "entered", blocked = "true", options = "null", error = "tunCleanupUnknown"))
+            check(value.outcome == NativeConfigOutcome.UNKNOWN && value.blocked && value.configRevision == 2L)
+            check(value.attemptedRevision == 2L && value.optionsCanonicalJson == null)
+        }
+        reject(receipt("unknown", "entered", blocked = "false", options = "null", error = "tunCleanupUnknown"))
+        reject(receipt("unknown", "notEntered", blocked = "true", options = "null", error = "tunCleanupUnknown"))
+        reject(receipt("rejected", "notEntered", options = "{}", error = "tunConfigurationReserved"))
+        reject(receipt("rejected", "notEntered", options = "null", error = "invalidTunReservation"))
+        reject(receipt("unknown", "entered", blocked = "true", options = "null", error = "tunConfigurationReserved"))
+        reject(receipt("rejected", "notEntered", blocked = "true", options = "null", error = "tunConfigurationReserved"))
+        reject(receipt("rejected", "notEntered", attempted = "3", options = "null", error = "tunConfigurationReserved"))
+        reject(receipt("rejected", "notEntered", options = "null", error = "tunCleanupUnknown"))
+        reject(receipt("unknown", "entered", configured = "false", blocked = "true", options = "null", error = "tunCleanupUnknown"))
+        reject(receipt("unknown", "entered", attempted = "3", blocked = "true", options = "null", error = "tunCleanupUnknown"))
     }
 
     private fun appliedReceiptUsesImmutableOptions() {

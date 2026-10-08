@@ -2006,6 +2006,36 @@
       ],
       "verification": "本机NDK28/API26 Android ARM64实际生产core c-shared离线编译；独立输出保留已有ABI产物，不安装/启用VPN，不证明JVM或设备行为",
       "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "test-android-config-reservation-red": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-config-reservation-red"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "test-android-config-reservation-green": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-config-reservation-green"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
     }
   },
   "deployment": {
@@ -2238,8 +2268,8 @@
     "core/android_config_test.go": "ef16be14f655b7c3fcd28c72dd1590356a42bcb45613bd329124801f3e10b31a",
     "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
     "scripts/check_android_config_protocol.py": "4afd0904c291eb16cfbd5a1be79e3be58373ab085a92d282997cedd5da4a87dc",
-    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "370d8765dafcae16feaf1b73f9684375fec0877032984c5783d35454400b95cb",
-    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "fa9c82d5556e04ddfdebcf37752fc2153efe1c440852d643d5625551cc4aa727",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "51b38eeba4eaa7a3d443bbf9ac92bdb2d284ce7f927d46500bd181b657489f76",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "0ab75827b93b7e2f0372bdbc576ffc3a0a18e3176df277932bc6fa74113653a4",
     "android/core/src/main/cpp/config_jni.cpp": "ad00a3b446c7c4782c8c95823734b97b79614da67aba13f43f06ace29dafaa22",
     "android/core/src/test/cpp/config_jni_fixture.cpp": "84ff2b8d7eab7f1a49be81f23e69ec57b2b459d860aa4ac70513d923c48bb1c8",
     "core/androidstartup/start_report_test.go": "230ecf1116c11fddc8087458f0731c53a1cb1b2c885406cea5a8be53c9713c69",
@@ -2324,6 +2354,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "c92e84d949a03b9d1f0d5372609061dac8b1d83b0605bd9aa4347260cdbea6c1"
+    "contract_digest": "231220bf52aa126c16216bb7091954f8ef24dec1d9f448c50a9b7d26686aeb2f"
   }
 }

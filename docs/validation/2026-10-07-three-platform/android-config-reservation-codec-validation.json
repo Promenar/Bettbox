@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "baseline": "e99515ac7cf79810e51f6a931f9304f31a4041ce",
+  "source_sha256": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "51b38eeba4eaa7a3d443bbf9ac92bdb2d284ce7f927d46500bd181b657489f76",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "0ab75827b93b7e2f0372bdbc576ffc3a0a18e3176df277932bc6fa74113653a4"
+  },
+  "red": {
+    "stage": "fixture",
+    "exit_code": 1
+  },
+  "green": {
+    "exit_code": 0,
+    "receipt": ".test/android-config-reservation-green/receipt.json"
+  },
+  "boundary": "使用缓存Kotlin编译器/Gson在本机JVM执行生产parser和公开JSON，不是Android JVM/CheckJNI、新APK或完整owner接线。"
+}

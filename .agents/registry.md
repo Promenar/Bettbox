@@ -93,3 +93,5 @@
 - docs/validation/2026-10-07-three-platform/android-jni-checked-release-validation.json — 注册JNI释放完成状态、线程收尾红绿及实际ABI边界
 
 - docs/validation/2026-10-07-three-platform/android-tun-reservation-validation.json — 配置预留六项回归、核心编译与尚未接线边界
+
+- docs/validation/2026-10-07-three-platform/android-config-reservation-codec-validation.json — 配置预留错误码跨层兼容红绿与JVM边界
