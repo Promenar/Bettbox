@@ -1435,3 +1435,34 @@ record-fingerprint: e16dc5dbfbc6149337c9ad42fb74a0a99a1a895094041b567ab157342e45
 
 ### HLG
 通过append dry-run后apply追加，保留真实账户副作用、接口证据及秘密读取边界。
+
+## 2026-10-08T10:59:05+08:00 · Android账户输入法边界修复与完整Flutter回归
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "input", "credentials", "flutter"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 406841ad0ea887a2d79126f7e48c759d3c1c41e411a7af2b1ac1631b72dc4f89
+
+### Summary
+正式APK设备登录未通过：邮箱注入后完整比对失败，逐字输入亦发生改写。三页账户输入候选修复与实际回归完成，需正式APK重建后确认设备行为。Goal活跃。
+
+### Changed
+登录、注册、找回密码的邮箱/密码及注册邀请码关闭autocorrect、enableSuggestions、smartDashesType和smartQuotesType；密码显示保持相同配置。新增8项真实TextInput.setClient通道回归与PDEC test-account-input。仅改本任务三页及测试，不改IME全局设置、服务端注册配置或资金记录。
+
+### Validation
+EditorInfo固定解析0x8021；当前android-36 SDK javap确认AUTO_CORRECT=32768、NO_SUGGESTIONS=524288、EMAIL_ADDRESS=32。8测试旧代码实际失败；修复后8通过，完整flutter test 192通过；四个相关Dart文件静态分析无问题。智能字符enum在当前SDK线上编码为字符串，测试断言已按真实格式修正。原生独立审阅无P1/P2。无截图、原始UI树或日志回显，无凭据进入报告。公开回执android-account-input-validation.json记录候选及实际未通过边界。
+
+### Next
+提交推送此候选，然后冻结源码/PDEC/文档并使用现有正式签名脚本重建APK；真实构建driver终止前禁止写入或重启同任务。安装候选后重新核验原生inputType与完整输入，再提交登录、订阅同步/冷启动/VPN。测试凭据只由本机工具从受保护private目录注入，禁止模型读取内容。
+
+### Risks
+当前已安装APK仍是ebc7d3c旧输入配置；尚未证明新APK设备输入、真实登录、冷启动及VPN流量。UI改写和自动纠错标志是已验证观察，不能声称排除所有输入法因素。macOS原生系统代理/Keychain、Apple正式签名和支付外部条件保持待验收。
+
+### DIA
+已同步架构、平台验证、CHANGELOG、账户验收计划、PDEC和公开回执。
+
+### HLG
+使用append dry-run后apply追加实际设备观察、修复及后续冻结边界。

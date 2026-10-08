@@ -51,11 +51,9 @@ class _ForgetPageState extends ConsumerState<ForgetPage> {
     }
     setState(() => _loading = true);
     try {
-      await ref.read(xboardAuthRepositoryProvider).forget(
-            email: email,
-            emailCode: code,
-            password: password,
-          );
+      await ref
+          .read(xboardAuthRepositoryProvider)
+          .forget(email: email, emailCode: code, password: password);
       if (mounted) {
         context.showSnackBar(appLocalizations.success);
         Navigator.of(context).pop();
@@ -81,6 +79,10 @@ class _ForgetPageState extends ConsumerState<ForgetPage> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               decoration: InputDecoration(
                 labelText: appLocalizations.xbEmail,
                 prefixIcon: const Icon(Icons.mail_outline_rounded),
@@ -113,6 +115,10 @@ class _ForgetPageState extends ConsumerState<ForgetPage> {
             TextField(
               controller: _passwordController,
               obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               decoration: InputDecoration(
                 labelText: appLocalizations.xbNewPassword,
                 prefixIcon: const Icon(Icons.lock_outline_rounded),

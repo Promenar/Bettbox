@@ -75,7 +75,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
     setState(() => _loading = true);
     try {
-      await ref.read(xboardSessionProvider.notifier).register(
+      await ref
+          .read(xboardSessionProvider.notifier)
+          .register(
             email: email,
             password: password,
             emailCode: code,
@@ -103,6 +105,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
                 labelText: appLocalizations.xbEmail,
@@ -140,6 +146,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             TextField(
               controller: _passwordController,
               obscureText: _obscure,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               decoration: InputDecoration(
                 labelText: appLocalizations.xbPassword,
                 prefixIcon: const Icon(Icons.lock_outline_rounded),
@@ -157,6 +167,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _inviteController,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               decoration: InputDecoration(
                 labelText: appLocalizations.xbInviteCodeOptional,
                 prefixIcon: const Icon(Icons.card_giftcard_rounded),

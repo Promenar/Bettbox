@@ -28,3 +28,11 @@
 - 真实 HTTPS 登录、账户、订阅和节点接口均 HTTP 200，订阅未过期，返回 23 个节点。
 - 0600 文件继承额外 ACL 的问题由公开 fixture 实际复现，文件及目录 FD 清理通过；两项 P2 独立复审闭合。
 - 验证脚本的时钟调用错误实际复现并修正。公开回执为 `docs/validation/2026-10-07-three-platform/android-live-account-validation.json`；界面登录、冷启动和 VPN 尚未由这些接口结果证明。
+
+## 输入法边界与候选验证
+
+正式 APK 实测邮箱输入发生改写，完整比对失败；只读 Android EditorInfo 为 `0x8021`，本机 SDK 验证其包含自动纠错标志 `32768`。快速及逐字输入均未保持完整地址，不将这种观察直接认定为服务端登录失败。
+
+主控独占登录、注册、找回密码三页及 `test/xboard/account_input_test.dart`：邮箱、密码、邀请码禁止纠错、候选建议、智能横线及引号替换，密码显示状态保持相同限制。通过真实 `TextInput.setClient` 配置回归验证边界，公开字符串不提交登录或邮件。8 项测试在修复前失败、修复后通过；完整 Flutter 192 项通过，相关文件静态分析无问题，独立审阅无 P1/P2。智能字符枚举线上格式按当前 Flutter SDK 的字符串表示断言。
+
+重建正式 APK 并安装后复核原生 EditorInfo 与完整输入，再提交登录；设备修复尚未验证。公开证据为 `docs/validation/2026-10-07-three-platform/android-account-input-validation.json`。不修改输入法全局设置，也不声称已排除所有输入法因素。

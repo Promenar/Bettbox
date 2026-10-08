@@ -1,0 +1,49 @@
+{
+  "status": "candidate_validated",
+  "device_observation": {
+    "installed_apk_source_commit": "ebc7d3cdd635f7c5b68f60e395d5a25307bb6db9",
+    "login_verified": false,
+    "email_full_match": false,
+    "email_changed_after_fast_and_slow_input": true,
+    "editor_input_type": "0x8021",
+    "auto_correct_flag_value": 32768,
+    "sdk_constants_verified": true,
+    "credentials_reported": false,
+    "raw_ui_or_logs_reported": false
+  },
+  "fix": {
+    "scope": "三页邮箱、密码及注册邀请码输入；关闭纠错、建议、智能横线及引号",
+    "device_verified": false,
+    "new_apk_required": true
+  },
+  "tests": {
+    "before_fix_failed": 8,
+    "after_fix_passed": 8,
+    "complete_flutter_passed": 192,
+    "scoped_analysis_issues": 0,
+    "channel": "TextInput.setClient真实配置",
+    "enum_string_wire_format_verified_from_current_sdk": true
+  },
+  "independent_review": {
+    "executor": "native supervisor_native_review",
+    "p1_p2_findings": 0,
+    "scope": "三页实现及通道回归；不代替设备验证"
+  },
+  "source_sha256": {
+    "lib/views/account/login_page.dart": "a7bc34b75b3800817eaf97c15e8276760563533181caf160710b91cc080c2424",
+    "lib/views/account/register_page.dart": "6562ab291e5bea2d890ee09ec771c7382c08fb95e9d33bb05eb82072329f1fcd",
+    "lib/views/account/forget_page.dart": "b0551a36eeaa66205953c506208ea888bcadbaf56f9c4bc2b9660a87e72a084a",
+    "test/xboard/account_input_test.dart": "93effa65074685c105b8ec01178490ad3c06bb08ce206aa7b26203edad2f8fe5"
+  },
+  "public_test_log_sha256": {
+    "input-red.log": "e476103de676a39f8978f86c43bc9e7c306ba87c53627e520c3ecde50b1d88c2",
+    "input-green.log": "4305c7b5f7e07ae05b96e0ae9c4d54cbc87db9c6961b4d4068452f158b25f983",
+    "input-full-regression.log": "19f554d5207908ac4091f0fd28c9c3a3302867525cc1de6356e25c63171e2e76",
+    "input-analyze.log": "f1d44d03d6aaf4a73ddddedce76b0ace0d6f46d5cba8f72dc580ba250215d41a"
+  },
+  "limits": [
+    "正式候选重建/安装后才可确认设备输入修复",
+    "实际登录、冷启动和VPN流量待验收",
+    "输入改写与自动纠错标志均已观察，不声称排除所有输入法因素"
+  ]
+}

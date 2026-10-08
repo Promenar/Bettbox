@@ -36,10 +36,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
     setState(() => _loading = true);
     try {
-      await ref.read(xboardSessionProvider.notifier).login(
-            email: email,
-            password: password,
-          );
+      await ref
+          .read(xboardSessionProvider.notifier)
+          .login(email: email, password: password);
       if (mounted) Navigator.of(context).pop();
     } on XboardException catch (error) {
       if (mounted) context.showSnackBar(error.message);
@@ -67,6 +66,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               autofillHints: const [AutofillHints.email],
               decoration: InputDecoration(
                 labelText: appLocalizations.xbEmail,
@@ -78,6 +81,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             TextField(
               controller: _passwordController,
               obscureText: _obscure,
+              autocorrect: false,
+              enableSuggestions: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
               onSubmitted: (_) => _submit(),
               decoration: InputDecoration(
                 labelText: appLocalizations.xbPassword,
@@ -115,7 +122,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: () => BaseNavigator.push(context, const RegisterPage()),
+              onPressed: () =>
+                  BaseNavigator.push(context, const RegisterPage()),
               child: Text(appLocalizations.xbNoAccount),
             ),
           ],
