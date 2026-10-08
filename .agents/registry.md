@@ -97,3 +97,5 @@
 - docs/validation/2026-10-07-three-platform/android-config-reservation-codec-validation.json — 配置预留错误码跨层兼容红绿与JVM边界
 
 - docs/validation/2026-10-07-three-platform/android-rejected-input-validation.json — 拒绝新输入保留旧连接、粘滞责任及状态模块race证据
+
+- docs/validation/2026-10-07-three-platform/android-tun-mode-validation.json — 实际State非VPN fd0报告、固定模式与双向拒绝回归

@@ -2086,3 +2086,34 @@ record-fingerprint: 1abee142d85cdfb8e9fbb8ff173be6b89c748916d184b3e263d61ef479a9
 
 ### HLG
 标准append dry-run后apply追加。
+
+## 2026-10-08T18:07:51+08:00 · Android预留模式核验与真实owner接线合同
+
+type: development
+scope: ["Bettbox", "Android"]
+status: in_progress
+tags: ["android", "tun", "configuration", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: bd9d14b0ba928e77c76e17a0b69221714fc57443b167041ff395bcdf38f1a867
+
+### Summary
+修复合法非VPN fd0报告误拒，并核对实际生产owner接线缺口。
+
+### Changed
+预留固定VPN模式；双向模式不匹配unknown。当前Android主源码未含候选owner，真实VpnPlugin仍用bool，联合计划已澄清实际调用与FD/ref回执合同。
+
+### Validation
+两新增测试旧模块RED exit1；最终八项GREEN exit0、全core CGO0 exit0、Android ARM64核心编译exit0；独立只读复核无确认P1/P2。
+
+### Next
+落实带完整请求与资源身份的Go/JNI start/stop和Native最终桥回执，实际采用唯一owner，收敛配置旁路与Dart状态。
+
+### Risks
+未接入真实JNI/设备，未生成新APK。配置锁不可跨回调/构造/drain。macOS profile及上游/支付条件待确认。
+
+### DIA
+已同步架构、CHANGELOG、平台验收、联合计划及registry。
+
+### HLG
+标准append dry-run后apply记录。

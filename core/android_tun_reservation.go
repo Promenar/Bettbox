@@ -12,11 +12,12 @@ const androidConfigErrorTunReservation = "invalidTunReservation"
 // 配置锁只保护预留发行与完成核验；调用方必须在锁外构造TUN和等待回调收尾。
 // token不跨JNI传指针；原生owner接线时另行提供固定wire身份。
 type androidTunReservation struct {
-	epoch    int64
-	revision int64
-	options  *state.AndroidVpnOptions
-	settled  bool
-	running  bool
+	epoch       int64
+	revision    int64
+	vpnRequired bool
+	options     *state.AndroidVpnOptions
+	settled     bool
+	running     bool
 }
 
 func (c *androidConfigCoordinator) reserveTunLocked(epoch, revision int64) (*androidTunReservation, string) {
@@ -38,7 +39,7 @@ func (c *androidConfigCoordinator) reserveTunLocked(epoch, revision int64) (*and
 	if c.tunReservation != nil {
 		return nil, androidConfigErrorTunReserved
 	}
-	r := &androidTunReservation{epoch: c.epoch, revision: c.lastApplied, options: cloneAndroidVpnOptions(c.options)}
+	r := &androidTunReservation{epoch: c.epoch, revision: c.lastApplied, vpnRequired: c.options.Enable, options: cloneAndroidVpnOptions(c.options)}
 	c.tunReservation = r
 	return r, ""
 }
@@ -67,7 +68,10 @@ func (c *androidConfigCoordinator) finishTunStartLocked(r *androidTunReservation
 	if report.CleanupUnconfirmed {
 		return c.blockTunLocked()
 	}
-	if report.Started && report.Entered && report.Running && report.RetainsResource && report.RetainsLease && report.Code == "" {
+	// 模式来自预留时的配置值，不能从调用方可读options重新推导。
+	validMode := r.vpnRequired && report.Entered && report.RetainsResource && report.RetainsLease ||
+		!r.vpnRequired && !report.Entered && !report.RetainsResource && !report.RetainsLease
+	if report.Started && report.Running && report.Code == "" && validMode {
 		r.running = true
 		return ""
 	}

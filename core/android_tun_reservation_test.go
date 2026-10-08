@@ -9,7 +9,7 @@ func configuredReservationFixture(t *testing.T) (*androidConfigCoordinator, *fix
 	t.Helper()
 	d := &fixtureAndroidConfigDriver{initialized: true}
 	c := newAndroidConfigCoordinatorForTest(d)
-	c.commitLocked(c.epoch, 0, fixtureMutation(t, androidConfigKindState, `{"bypass-domain":["public.invalid"]}`))
+	c.commitLocked(c.epoch, 0, fixtureMutation(t, androidConfigKindState, `{"bypass-domain":["public.invalid"],"vpn-props":{"enable":true}}`))
 	if result := c.commitLocked(c.epoch, 0, fixtureMutation(t, androidConfigKindSetup, fixtureSetupJSON(t))); result.Outcome != androidConfigOutcomeApplied {
 		t.Fatal("公开配置未完成")
 	}
@@ -32,6 +32,7 @@ func TestAndroidConfigTunReservationRunningRetainsUntilCheckedStop(t *testing.T)
 	c, _ := configuredReservationFixture(t)
 	r, _ := c.reserveTunLocked(c.epoch, c.lastApplied)
 	r.options.BypassDomain[0] = "changed.invalid"
+	r.options.Enable = false // 消费者修改options不能改变已预留的模式。
 	if c.options.BypassDomain[0] != "public.invalid" {
 		t.Fatal("预留泄露配置别名")
 	}
@@ -117,5 +118,46 @@ func TestAndroidConfigTunReservationRejectsWrongStampAndUnconfigured(t *testing.
 	c.lastApplied++ // 模拟尚未收敛的旧旁路，完成核验不能伪造成功。
 	if code := c.finishTunStartLocked(r, androidstartup.StartReport{Started: true, Entered: true, Running: true, RetainsResource: true, RetainsLease: true}); code != androidConfigErrorTunUnknown || !c.blocked {
 		t.Fatal("版本漂移未阻断")
+	}
+}
+
+func TestAndroidConfigTunReservationNonVpnModeAcceptsRealStateReport(t *testing.T) {
+	c, _ := configuredReservationFixture(t)
+	if result := c.commitLocked(c.epoch, 1, fixtureMutation(t, androidConfigKindState, `{"vpn-props":{"enable":false}}`)); result.Outcome != androidConfigOutcomeApplied {
+		t.Fatal("公开非VPN模式配置失败")
+	}
+	r, code := c.reserveTunLocked(c.epoch, 2)
+	if r == nil || code != "" {
+		t.Fatal("非VPN模式预留失败")
+	}
+	var s androidstartup.State
+	report := s.StartWithInputCleanupReport(0, true, nil, nil, nil)
+	if !report.Started || !report.Running || report.Entered || report.RetainsResource || report.RetainsLease {
+		t.Fatal("实际fd0报告与合同不符")
+	}
+	if code := c.finishTunStartLocked(r, report); code != "" || c.blocked || !r.running {
+		t.Fatalf("实际非VPN报告被误拒: %s", code)
+	}
+	if code := c.finishTunStopLocked(r, s.Stop()); code != "" || c.tunReservation != nil {
+		t.Fatal("非VPN模式不能确认停止")
+	}
+}
+
+func TestAndroidConfigTunReservationRejectsModeMismatch(t *testing.T) {
+	for _, enabled := range []bool{true, false} {
+		c, _ := configuredReservationFixture(t)
+		if !enabled {
+			c.commitLocked(c.epoch, 1, fixtureMutation(t, androidConfigKindState, `{"vpn-props":{"enable":false}}`))
+		}
+		r, _ := c.reserveTunLocked(c.epoch, c.lastApplied)
+		report := androidstartup.StartReport{Started: true, Running: true}
+		if !enabled {
+			report.Entered = true
+			report.RetainsResource = true
+			report.RetainsLease = true
+		}
+		if code := c.finishTunStartLocked(r, report); code != androidConfigErrorTunUnknown || !c.blocked || c.tunReservation != r {
+			t.Fatal("模式不匹配报告伪造成功")
+		}
 	}
 }

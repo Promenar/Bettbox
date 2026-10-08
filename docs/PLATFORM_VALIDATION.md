@@ -244,3 +244,5 @@ TUN 配置预留模块的红绿、独立审阅及核心编译证据见 `validati
 配置预留错误码的 Kotlin 生产解析器兼容证据见 `validation/2026-10-07-three-platform/android-config-reservation-codec-validation.json`。验证只覆盖本机 JVM 公开 JSON，不代表 Android JNI 或完整应用。
 
 拒绝输入清理的公开资源计数和完整状态模块 race 证据见 `validation/2026-10-07-three-platform/android-rejected-input-validation.json`；未执行真实 FD/JNI/VPN，不表示发行候选通过。
+
+模式核验证据见 `validation/2026-10-07-three-platform/android-tun-mode-validation.json`，只证明模块和核心编译，未证明设备或发行包。

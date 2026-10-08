@@ -12,7 +12,7 @@
 
 ## 实施与所有权
 
-先采用并扩展既有 owner，增加不可变 typed completion；在 owner 内分类、提交、捕获 snapshot 后才释放执行锁。Boolean 兼容接口从同一次 completion 派生，不能 await bool 后重读后来状态。权限、绑定及建立等待可撤销；已进入同步提交或 JNI 的工作不能因调用者取消丢失归属。输入 FD 仅由当前领取合同关闭一次。
+在现有 VpnPlugin/nativeGate 入口接入唯一配置与生命周期 owner，增加不可变 typed completion；在 owner 内分类、提交、捕获 snapshot 后才释放执行锁。Boolean 兼容接口从同一次 completion 派生，不能 await bool 后重读后来状态。权限、绑定及建立等待可撤销；已进入同步提交或 JNI 的工作不能因调用者取消丢失归属。输入 FD 仅由当前领取合同关闭一次。
 
 Go 提交器分配配置 revision；同步 JNI backend 在首个副作用前登记 ENTERED，并在实际完成后从同次提交派生复制 options。TUN 启动核验该版本对应快照。增加 setState 的类型化 mutation，关闭直接配置写旁路，保留实际热更新与 HTTP 功能。尚未 ENTERED、仍为当前意图的排队配置遇到版本推进时，只能由同 owner 重新准备；不修改旧 payload 的 baseRevision 冒充新准备，不让后台再次 beginStart 覆盖用户 STOP。
 
@@ -103,3 +103,9 @@ NativeConfigProtocol 已支持配置预留和 TUN 清理未知的固定错误码
 ## 未入构造输入的拒绝收尾
 
 State 提供独立 RejectInputWithCleanup：拒绝新输入不调用 stop/open，不改变既有resource/lease/runtime。先收尾未采纳FD，再执行本次OnceLease释放；错误与panic固定首因，释放失败pendingLease可达并阻断新启动。报告区分本次InputCleanupConfirmed和既有Blocked；后续输入成功不清洗旧责任。真实启动在配置预留拒绝后应锁外调用该入口，然后锁内核对并报告；禁止用ready=false的StartReport处理拒绝，以免误停旧连接。公开资源红绿、并发输入及全状态模块race通过，JNI前置领取与Native最终回执仍须接线。
+
+## 生产入口核对与模式合同
+
+当前 Android 主源码没有 AndroidNativeOperations/NativePreparedConfig；历史公开候选不等于生产接线。实际 VpnPlugin 调用 Core.startTun/stopTun 的 bool 并自行发布START。统一owner尚须接入这些真实调用点，不以候选夹具替代。配置预留按同次options.Enable固定vpnRequired；VPN完成须Entered/resource/lease齐备，非VPN fd0完成须三者皆无，二者共同要求Started/Running且无清理未知。消费者修改options不得改变固定模式。真实State fd0红绿、双向模式拒绝、全core与Android核心编译通过。
+
+带版本start/stop需携带epoch/configRevision/唯一owner generation，禁止Core或ledger发行第二代次。回执分别表达请求身份、本次started/entered、输入处置、FD和reference收尾确认、当前残留资源身份/runtime及全局blocked；成功持有输入不得声称已关闭。JNI保持peek/global-ref/claim合同，claim前Kotlin收尾未领FD，claim后Go负责FD/ref包括版本拒绝；finally closeUnclaimed=true不证明Go已关闭。null/编码失败为unknown。晚到stop须核对资源完整身份，不能停止新代。配置锁仅发行reservation和完成核验，构造、Java回调、drain与State收尾在锁外；所谓同一边界是reservation覆盖责任期间，不是持续持runLock。原生最终桥回执须在finally后不可变捕获。

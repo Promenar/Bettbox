@@ -250,3 +250,7 @@ Android 原生配置回执解析器支持 `tunConfigurationReserved` 与 `tunCle
 
 - 新增独立拒绝输入收尾入口，保留旧连接，避免复用启动流程时误停旧资源。
 - 四项测试（含四种失败子场景）、并发拒绝输入及完整 androidstartup race 通过；真实入口接线与 APK 另验。
+
+### Android VPN/非VPN模式核验（2026-10-08）
+
+修复配置预留误拒合法fd0非VPN启动，并按预留快照拒绝双向模式不匹配。八项定向、全core CGO0与Android ARM64核心编译通过；实际JNI接线和APK另验。

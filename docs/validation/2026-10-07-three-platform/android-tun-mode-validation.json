@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "baseline": "851ce2da94c919861818dc3088602c311d7b8222",
+  "source_sha256": {
+    "core/android_tun_reservation.go": "254a9a80b44c02a9126d61108f4dd6ad30c233f73efddd94dc1523c02ac7dd61",
+    "core/android_tun_reservation_test.go": "5244fbd21b1ca4738017775f4b0fccc994af00d208b00a68070c52f4c87bcfd7"
+  },
+  "validation": {
+    "red_exit": 1,
+    "red_failed_new_tests": 2,
+    "targeted_green_exit": 0,
+    "targeted_tests": 8,
+    "full_core_cgo0_exit": 0,
+    "android_arm64_core_build_exit": 0
+  },
+  "review": "独立只读复核无确认P1/P2",
+  "boundary": [
+    "实际State fd0公开报告，不是Android设备模式验收",
+    "TUN reservation尚未接入JNI与唯一Native owner",
+    "未生成新APK；owner不存在于当前生产源码，现有VpnPlugin仍发布Boolean启停状态"
+  ]
+}
