@@ -1047,6 +1047,73 @@
       "cwd": "core",
       "timeout_seconds": 180,
       "artifacts": []
+    },
+    "test-android-fd-lease": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_tun_lease.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 150,
+      "artifacts": [
+        ".test/android-tun-lease/receipt.json"
+      ]
+    },
+    "compile-android-tun-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-tun-abi/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-tun-abi/libclash.so",
+        ".test/android-tun-abi/libclash.h"
+      ],
+      "verification": "本机 Android ARM64 NDK 28 编译实际生产核心与生成 C ABI；离线依赖，不安装设备，不包含秘密或真实业务流量",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "compile-android-tun-jni": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "cross_compile": "Android ARM64 NDK 28 JNI shared",
+      "argv": [
+        "clang++",
+        "-std=c++17",
+        "-O3",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-DLIBCLASH",
+        "-I.test/android-tun-abi",
+        "-shared",
+        "android/core/src/main/cpp/core.cpp",
+        "android/core/src/main/cpp/jni_helper.cpp",
+        "-L.test/android-tun-abi",
+        "-lclash",
+        "-Wl,-z,max-page-size=16384",
+        "-o",
+        ".test/android-tun-abi/libcore.so"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/android-tun-abi/libcore.so"
+      ],
+      "verification": "实际生产 JNI 源与本工作树新生成 Go C ABI 链接；不替代 Android 装机及 JNI 行为验证"
     }
   },
   "deployment": {
@@ -1136,14 +1203,14 @@
     "core/state/snapshot_test.go": "0eef91b22dacc03cfeb2a4d0fa15f54f22d4778aef6d1eefb83517be3c02318c",
     "core/hub.go": "109a06c96a424caac84c574087374b2eaa6a9675e06727598a388d3961f0511c",
     "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
-    "core/lib_android.go": "e581e6443009ee6b7f59aa2c7b74a2000570798efffd58efdc414c6b2e446a62",
+    "core/lib_android.go": "ca6cbe6e2120beb6650eabfdfa069d7d20875086ae9ec8b1e50251ed61a3b10b",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
     "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
     "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e",
     "core/androidstartup/callback_gate_test.go": "5303bbfaad866ba291d83d892ae6786fac6847cc011515323470a73aaf0912b5",
-    "core/androidstartup/state_test.go": "be31fd19f2c3e7789cfacffdb5a2594f261e1130adf6552c2a4bfb1e917e0103",
+    "core/androidstartup/state_test.go": "22032245acb9753a573995233e56561cbdb7882c5d08dfe1722bda7e556e1a13",
     "core/androidstartup/callback_gate.go": "633c2445a022cc58d8c68029d512fd1830f01e001eca5761954f482c1eff6c9c",
-    "core/androidstartup/state.go": "d8602cdf10b0465a8742e407921399da9090e34bc60a26db64a452f2693969b5",
+    "core/androidstartup/state.go": "42d836f8c9fe58fc5a61e5cee84a850cb974db5413ca0ca40d7cc3f38fc25e14",
     "scripts/macos_core_identity.py": "34e6f9b38b657005906eb4c96f219c0c94fba00f948a4bfc551f4d6384ca0118",
     "scripts/tests/test_macos_core_identity.py": "8a6569d5b7da4afd6e11841326e88dc6f5d7d5d21de1401ddd2bc578f50c7303",
     "setup.dart": "05ef5c07540f1d1c7545d30caf3b8cdb8e7d7642026a0d6b91672df1da2f89a4",
@@ -1241,7 +1308,18 @@
     "scripts/probe_node_subscription.py": "5b65f1415d762e3c5de66b8594275d8cdbce7c404d72eb3960cc7f133a562576",
     "scripts/tests/test_probe_node_subscription.py": "46ea2c29f2270d399ea4bbb9b31fc0a9dbef5b55a68260216e7c5f46d217c28f",
     "core/Clash.Meta/listener/sing_tun/server.go": "45ab9154f8cbe68a88dd8d9ef8f3f415cb64ef5a701952693f737a17b6d073d8",
-    "core/Clash.Meta/listener/sing_tun/native_fd_ownership_test.go": "b6eb26423dcb67e788b9be9f71668702584b4dddf4ba534156c42fea99b390ea"
+    "core/Clash.Meta/listener/sing_tun/native_fd_ownership_test.go": "b6eb26423dcb67e788b9be9f71668702584b4dddf4ba534156c42fea99b390ea",
+    "core/androidstartup/input_cleanup_test.go": "5f23523ceab88088e9af606b38f4cbdf9880eb094ca4f0d5d046c14a92a3bbf2",
+    "core/android_bride.go": "74a7023de5dec456f61404ee4f9fe523664ea7bb8c2debb3fcd3b625dd6e2aa5",
+    "core/tun/tun.go": "f10d11aa419543c7d6cb7d57c6036cbad4e2a739523a07889091dfd16404590c",
+    "core/androidstartup/socket_protect_test.go": "290e41d493c0e21ab97356b902d7564fe46e5fd4bd30fbacdc33460e30f89f98",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "76d8e8aaf1358459e45c35b9a857a55768a82fd5453e71a1d3092f486b2434dc",
+    "android/core/src/main/java/com/appshub/bettbox/core/TunInterface.kt": "c0a1e9c1cc1c4e255d030f2843405a79fabdaf45cdb0d7eae2a7a9ed6781a3d3",
+    "android/core/src/main/java/com/appshub/bettbox/core/TunFDLease.kt": "f6b4d292f4bccf90f2d6847b922c4fd7e8158db798a1191ebe731beb8a25de40",
+    "android/core/src/test/kotlin/com/appshub/bettbox/core/TunFDLeaseFixture.kt": "d8e57f3a5336ad295728ecc1c703af9bcfc1517e22537c88426d563742ee2304",
+    "android/core/src/main/cpp/core.cpp": "4bb60215e20ead965766b45e4fd5ae0ad480f26797398b98586cd30df3f74006",
+    "android/core/src/main/cpp/jni_helper.cpp": "ab982e5deaf0c917d55d0a2da638a7bf9f4ec23eb53fc8ee788b61c627a6ab19",
+    "scripts/check_android_tun_lease.py": "af34e306b45260817a1a480fd93b94f509dc7647ac3dd91ec2ad2d74a116b088"
   },
   "platform_extensions": {
     "android": {
@@ -1317,6 +1395,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "4ec894c49eeb49d13afacfdf98ef1bfb0bc29a9f463d24f5987bc34271e2f745"
+    "contract_digest": "aca0ab72bedc0159e2af8c37486d12e0159f91c4b7f7a284409af760f14d87b3"
   }
 }

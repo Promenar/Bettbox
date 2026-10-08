@@ -1590,3 +1590,34 @@ sing_tun server.go新增NewWithNativeFDOwnership，保留Stack、同步采纳与
 
 ### HLG
 标准append dry-run后apply，保留事实链和生产/替身边界。
+
+## 2026-10-08T12:39:08+08:00 · Android FD领取与Go JNI真实ABI接线验收
+
+type: implementation
+scope: ["android", "core", "release"]
+status: in_progress
+tags: ["android", "vpn", "jni", "fd", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 02ae0ff7739950ebbb0c25ae8081a5123a13b1a6d4926f72861530078929ae29
+
+### Summary
+按用户选择优先交付Android/macOS，iOS保留开发版及发行研究。Android Go/JNI/Core所有权接线与实际ABI编译已完成，完整Service代际保护由有界原生Agent施工。Goal保持active，不将编译候选标为可用发行。
+
+### Changed
+Go adapter采用State/CallbackGate/Shutdown/FDLease；配置快照释放runLock后再取得启停锁；输入FD关闭首错永久阻断，protect false传回socket。Kotlin TunFDLease显式claim分界，JNI领取前Kotlin关闭，领取后Go负责，包括构造失败；启停和protect返回Boolean。PDEC新增本机Android核心/JNI交叉编译与公开JVM租约测试入口。
+
+### Validation
+实际输入清理3条红回归失败后修复，androidstartup race退出0；生产Kotlin FD租约6例JVM通过，仅Kotlin2.0.21。Android arm64 API26 NDK28.2实际Go c-shared编译退出0，生产CPP JNI链接新生成头文件退出0；start/stop GoUint8及protect int、JNI导出和无本机绝对DT_NEEDED核验。独立冻结源码审阅无新增P1/P2。回执docs/validation/2026-10-07-three-platform/android-tun-abi-validation.json；生成二进制位于ignored .test/android-tun-abi。
+
+### Next
+完成固定Service/generation、native Mutex串行及通知发布末端门禁；GlobalState runLock不跨native或suspend，5sec timer不清洗未知状态。冻结后独立审阅、更新PDEC证据、完整Android工程构建和设备启停验证；有效NativeTun constructor故障路径另验。macOS SC/main联合与有效上游业务继续。
+
+### Risks
+纯Go/JVM及编译链接不证明真实Android FD、JNI global ref/线程attach或通知行为。Listener构造有效输入与stack路径缺设备覆盖。上游同步UA与客户端UA均HTTP500/500/403，cached snapshots expired，未收到用户更新答复，不续费/写上游。macOS发行签名、iOSTeam/NE、支付商授权条件未闭合。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、registry及Android实施计划和公开ABI回执。
+
+### HLG
+标准append dry-run后apply；当前施工文件未提交，保留精确源摘要与执行边界。

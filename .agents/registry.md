@@ -60,3 +60,4 @@
 - docs/validation/2026-10-07-three-platform/android-tun-control-flow-red.json — 生产启动控制流实际失败回归及替身边界
 
 - docs/validation/2026-10-07-three-platform/native-fd-ownership-contract.json — 原生FD构造合同红绿回归、独立复审及未接线边界
+- docs/validation/2026-10-07-three-platform/android-tun-abi-validation.json — 实际 Android ARM64 Go/JNI 编译链接、FD 输入清理回归及未覆盖设备边界

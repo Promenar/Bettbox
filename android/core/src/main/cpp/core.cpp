@@ -1,20 +1,48 @@
 #ifdef LIBCLASH
 #include <jni.h>
 #include <cstring>
+
+static jmethodID m_fd_lease_peek;
+static jmethodID m_fd_lease_claim;
+
+// 回调异常只转换成固定失败，禁止描述包含私有参数的Java异常。
+static bool clear_callback_exception(JNIEnv *env) {
+    if (!env->ExceptionCheck()) return false;
+    env->ExceptionClear();
+    return true;
+}
 #include "jni_helper.h"
 #include "libclash.h"
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_com_appshub_bettbox_core_Core_startTun(JNIEnv *env, jobject, const jint fd, jobject cb) {
-    const auto interface = new_global(cb);
-    startTUN(fd, interface);
+JNIEXPORT jboolean JNICALL
+Java_com_appshub_bettbox_core_Core_startNativeTun(JNIEnv *env, jobject, jobject lease, jobject cb) {
+    if (!lease) return JNI_FALSE;
+    const jint pending_fd = env->CallIntMethod(lease, m_fd_lease_peek);
+    if (clear_callback_exception(env) || pending_fd < 0) return JNI_FALSE;
+
+    jobject interface = nullptr;
+    if (pending_fd > 0) {
+        if (!cb) return JNI_FALSE;
+        interface = new_global(cb);
+        if (clear_callback_exception(env) || !interface) {
+            if (interface) del_global(interface);
+            return JNI_FALSE;
+        }
+    }
+    const jint fd = env->CallIntMethod(lease, m_fd_lease_claim);
+    if (clear_callback_exception(env) || fd < 0) {
+        if (interface) del_global(interface);
+        return JNI_FALSE;
+    }
+    // 从领取开始，FD与global ref均由Go接管，包括失败返回路径。
+    return startTUN(fd, interface) ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_com_appshub_bettbox_core_Core_stopTun(JNIEnv *) {
-    stopTun();
+JNIEXPORT jboolean JNICALL
+Java_com_appshub_bettbox_core_Core_stopNativeTun(JNIEnv *) {
+    return stopTun() ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C"
@@ -33,11 +61,13 @@ static void release_jni_object_impl(void *obj) {
     del_global(static_cast<jobject>(obj));
 }
 
-static void call_tun_interface_protect_impl(void *tun_interface, const int fd) {
+static int call_tun_interface_protect_impl(void *tun_interface, const int fd) {
     ATTACH_JNI();
-    env->CallVoidMethod(static_cast<jobject>(tun_interface),
-                        m_tun_interface_protect,
-                        fd);
+    if (!tun_interface) return 0;
+    const jboolean protected_socket = env->CallBooleanMethod(static_cast<jobject>(tun_interface),
+                        m_tun_interface_protect, fd);
+    if (clear_callback_exception(env)) return 0;
+    return protected_socket == JNI_TRUE ? 1 : 0;
 }
 
 static const char *
@@ -47,6 +77,7 @@ call_tun_interface_resolve_process_impl(void *tun_interface, int protocol,
                                         const int uid) {
     ATTACH_JNI();
     if (env->PushLocalFrame(8) < 0) {
+        clear_callback_exception(env);
         return strdup("");
     }
     const auto packageName = reinterpret_cast<jstring>(env->CallObjectMethod(static_cast<jobject>(tun_interface),
@@ -55,7 +86,16 @@ call_tun_interface_resolve_process_impl(void *tun_interface, int protocol,
                                                                        new_string(source),
                                                                        new_string(target),
                                                                        uid));
+    if (clear_callback_exception(env) || !packageName) {
+        env->PopLocalFrame(nullptr);
+        return strdup("");
+    }
     const auto result = get_string(packageName);
+    if (clear_callback_exception(env)) {
+        free(const_cast<char *>(result));
+        env->PopLocalFrame(nullptr);
+        return strdup("");
+    }
     env->PopLocalFrame(nullptr);
     return result;
 }
@@ -71,10 +111,19 @@ JNI_OnLoad(JavaVM *vm, void *) {
     initialize_jni(vm, env);
 
     const auto c_tun_interface = find_class("com/appshub/bettbox/core/TunInterface");
+    if (clear_callback_exception(env) || !c_tun_interface) return JNI_ERR;
 
-    m_tun_interface_protect = find_method(c_tun_interface, "protect", "(I)V");
+    m_tun_interface_protect = find_method(c_tun_interface, "protect", "(I)Z");
     m_tun_interface_resolve_process = find_method(c_tun_interface, "resolverProcess",
                                                   "(ILjava/lang/String;Ljava/lang/String;I)Ljava/lang/String;");
+
+    if (clear_callback_exception(env) || !m_tun_interface_protect || !m_tun_interface_resolve_process) return JNI_ERR;
+    const auto c_fd_lease = find_class("com/appshub/bettbox/core/TunFDLease");
+    if (clear_callback_exception(env) || !c_tun_interface || !c_fd_lease) return JNI_ERR;
+    m_fd_lease_peek = find_method(c_fd_lease, "peek", "()I");
+    m_fd_lease_claim = find_method(c_fd_lease, "claim", "()I");
+    if (clear_callback_exception(env) || !m_fd_lease_peek || !m_fd_lease_claim ||
+        !m_tun_interface_protect || !m_tun_interface_resolve_process) return JNI_ERR;
 
     registerCallbacks(&call_tun_interface_protect_impl,
                       &call_tun_interface_resolve_process_impl,

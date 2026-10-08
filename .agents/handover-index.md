@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T12:19:43+08:00
+> generated_at: 2026-10-08T12:39:08+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T12:19:43+08:00 | in_progress | ["android", "core", "nosla"] | 上游订阅只读失效证据与原生FD构造合同 | `.agents/handover.md` · `2026-10-08T12:19:43+08:00` · `fp:404d55d961` |
+| three-platform-release | resume | 2026-10-08T12:39:08+08:00 | in_progress | ["android", "core", "release"] | Android FD领取与Go JNI真实ABI接线验收 | `.agents/handover.md` · `2026-10-08T12:39:08+08:00` · `fp:02ae0ff773` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T12:39:08+08:00 | iso | in_progress | resume | ["android", "core", "release"] | ["android", "vpn", "jni", "fd", "release"] | Android FD领取与Go JNI真实ABI接线验收 | `.agents/handover.md` · `2026-10-08T12:39:08+08:00` · `fp:02ae0ff773` |
 | 2026-10-08T12:19:43+08:00 | iso | in_progress | resume | ["android", "core", "nosla"] | ["vpn", "ownership", "upstream", "validation"] | 上游订阅只读失效证据与原生FD构造合同 | `.agents/handover.md` · `2026-10-08T12:19:43+08:00` · `fp:404d55d961` |
 | 2026-10-08T12:00:34+08:00 | iso | in_progress | resume | ["android", "core", "pdec"] | ["vpn", "protocol", "validation"] | 同源受限协议探测及真实节点失败边界 | `.agents/handover.md` · `2026-10-08T12:00:34+08:00` · `fp:8a18467eda` |
 | 2026-10-08T11:43:53+08:00 | iso | done | resume | ["Bettbox", "Android", "NoSLA"] | ["vpn", "upstream", "runtime-validation"] | Android VPN节点路径复现与协议层诊断边界 | `.agents/handover.md` · `2026-10-08T11:43:53+08:00` · `fp:f36c81c87d` |

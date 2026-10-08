@@ -1,0 +1,25 @@
+{
+  "source_base_sha": "82727c049a3953ecbb81056c7f93cdfdc5d24555",
+  "source_has_uncommitted_changes": true,
+  "source_manifest_sha256": "838746c8c6d919f93d28ad9347e79a723ac943c63c670e91dd3bac88357c8347",
+  "target": "Android ARM64 API26 NDK28.2.13676358",
+  "go_core_compile_exit": 0,
+  "production_jni_link_exit": 0,
+  "generated_start_stop_return": "GoUint8",
+  "protect_callback_return": "int",
+  "JNI_exports_verified": [
+    "Core_startNativeTun",
+    "Core_stopNativeTun",
+    "JNI_OnLoad"
+  ],
+  "DT_NEEDED_local_absolute_path": false,
+  "artifacts_sha256": {
+    "libclash.so": "d0b9a169f5dfc25f7419cd80c0bc196c89e92990d8c2c919f01f0a78e6a06c3d",
+    "libclash.h": "a454fc2930e788d343586c12c5da3c7264ee80f7298d98615641f7ed75f37d43",
+    "libcore.so": "496ee5955a6fbf2ac144892ddeac128d0720a91ba1d11a074b1367d018dd166d"
+  },
+  "boundary": "实际生产 Go 与 JNI 编译链接；未装入 JVM 或 Android，未覆盖 JNI 异常、真实FD及服务启停。",
+  "independent_review": "冻结 Go/JNI/Core 源码未发现新增 P1/P2；Plugin/GlobalState 不在该轮审阅范围。",
+  "pure_go_tests": "androidstartup -race -count=1 -timeout=120s 退出0；输入关闭3条实际红回归修复后通过。",
+  "kotlin_lease_tests": "生产 TunFDLease JVM 6例通过，Gradle8.14 Kotlin2.0.21；不替代 Android 工程 Kotlin2.1.0。"
+}

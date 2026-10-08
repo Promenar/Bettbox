@@ -23,10 +23,25 @@ JavaVM *global_java_vm() {
 }
 
 char *jni_get_string(JNIEnv *env, jstring str) {
+    if (!str || !m_get_bytes) return strdup("");
     const auto array = reinterpret_cast<jbyteArray>(env->CallObjectMethod(str, m_get_bytes));
+    if (env->ExceptionCheck() || !array) {
+        env->ExceptionClear();
+        return strdup("");
+    }
     const int length = env->GetArrayLength(array);
-    const auto content = static_cast<char *>(malloc(length + 1));
+    if (env->ExceptionCheck() || length < 0) {
+        env->ExceptionClear();
+        return strdup("");
+    }
+    const auto content = static_cast<char *>(malloc(static_cast<size_t>(length) + 1));
+    if (!content) return nullptr;
     env->GetByteArrayRegion(array, 0, length, reinterpret_cast<jbyte *>(content));
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        free(content);
+        return strdup("");
+    }
     content[length] = 0;
     return content;
 }

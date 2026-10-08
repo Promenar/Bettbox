@@ -182,32 +182,29 @@ func TestSnapshotReleasesConfigLockAndCopiesMutableInput(t *testing.T) {
 func TestFDAdoptionBeforeAndAfterListenerFailure(t *testing.T) {
 	for _, adopted := range []bool{false, true} {
 		t.Run(map[bool]string{false: "tunNew前失败", true: "采纳后失败"}[adopted], func(t *testing.T) {
-			originalClosed, duplicateClosed, nativeClosed := 0, 0, 0
+			detachedClosed, nativeClosed := 0, 0
 			lease, err := NewFDLease(9, func(fd int) error {
 				if fd != 9 {
-					originalClosed++
+					t.Errorf("关闭了未移交的 FD：%d", fd)
 				}
-				duplicateClosed++
+				detachedClosed++
 				return nil
 			})
 			if err != nil {
 				t.Fatal(err)
 			}
-			// witness 必须在 NativeTun 进入 listener 的关闭列表之后发生。
+			// 采纳通知必须在 NativeTun 进入 listener 的关闭列表之后发生。
 			if adopted {
 				lease.Adopt()
 				nativeClosed++
 			}
 			lease.ReleaseUnadopted()
 			lease.ReleaseUnadopted()
-			if originalClosed != 0 {
-				t.Fatal("关闭了 Service 原 FD")
-			}
-			if adopted && (duplicateClosed != 0 || nativeClosed != 1) {
+			if adopted && (detachedClosed != 0 || nativeClosed != 1) {
 				t.Fatal("采纳后双重关闭")
 			}
-			if !adopted && duplicateClosed != 1 {
-				t.Fatal("采纳前失败泄漏副本")
+			if !adopted && detachedClosed != 1 {
+				t.Fatal("采纳前失败泄漏移交的 FD")
 			}
 		})
 	}

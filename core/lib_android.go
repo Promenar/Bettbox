@@ -4,7 +4,6 @@ package main
 
 import "C"
 import (
-	"context"
 	"core/androidstartup"
 	bridge "core/dart-bridge"
 	"core/platform"
@@ -12,21 +11,17 @@ import (
 	t "core/tun"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/metacubex/mihomo/component/dialer"
 	"github.com/metacubex/mihomo/component/process"
 	"github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/dns"
 	"github.com/metacubex/mihomo/listener/sing_tun"
 	"github.com/metacubex/mihomo/log"
-	"golang.org/x/sync/semaphore"
 	"net"
 	"strconv"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"syscall"
-	"time"
 	"unsafe"
 )
 
@@ -34,43 +29,39 @@ type TunHandler struct {
 	listener *sing_tun.Listener
 	callback unsafe.Pointer
 
-	limit *semaphore.Weighted
+	gate     *androidstartup.CallbackGate
+	lease    *androidstartup.OnceLease
+	shutdown androidstartup.Shutdown
 }
 
-func (t *TunHandler) close() {
-	_ = t.limit.Acquire(context.TODO(), 4)
-	defer t.limit.Release(4)
-	removeTunHook()
-	if t.listener != nil {
-		_ = t.listener.Close()
+func (t *TunHandler) Close() error {
+	err := t.shutdown.Close(t.gate, t.lease, func() error {
+		if t.listener != nil {
+			return t.listener.Close()
+		}
+		return nil
+	})
+	if err == nil {
+		tunHandler.CompareAndSwap(t, nil)
 	}
-
-	if t.callback != nil {
-		releaseObject(t.callback)
-	}
-	t.callback = nil
-	t.listener = nil
+	return err
 }
 
-func (t *TunHandler) handleProtect(fd int) {
-	_ = t.limit.Acquire(context.Background(), 1)
-	defer t.limit.Release(1)
-
-	cb := t.callback
-	if cb == nil {
-		return
+func (t *TunHandler) handleProtect(fd int) bool {
+	pin, ok := t.gate.Enter()
+	if !ok {
+		return false
 	}
-
-	Protect(cb, fd)
+	defer pin.Done()
+	return Protect(t.callback, fd)
 }
 
 func (t *TunHandler) handleResolveProcess(source, target net.Addr) string {
-	_ = t.limit.Acquire(context.Background(), 1)
-	defer t.limit.Release(1)
-
-	if t.listener == nil {
+	pin, ok := t.gate.Enter()
+	if !ok {
 		return ""
 	}
+	defer pin.Done()
 	var protocol int
 	uid := -1
 	switch source.Network() {
@@ -86,94 +77,116 @@ func (t *TunHandler) handleResolveProcess(source, target net.Addr) string {
 }
 
 var (
-	tunLock    sync.Mutex
-	runTime    *time.Time
+	tunState   androidstartup.State
 	errBlocked = errors.New("blocked")
 	tunHandler atomic.Pointer[TunHandler]
 )
 
 func init() {
+	initTunHook()
 	dialer.DefaultSocketHook = func(network, address string, conn syscall.RawConn) error {
 		if platform.ShouldBlockConnection() {
 			return errBlocked
 		}
 		handler := tunHandler.Load()
 		if handler != nil {
-			return conn.Control(func(fd uintptr) {
-				handler.handleProtect(int(fd))
-			})
+			return androidstartup.ProtectSocket(conn, handler.handleProtect)
 		}
 		return nil
 	}
 }
 
-func handleStopTun() {
-	tunLock.Lock()
-	defer tunLock.Unlock()
-	runTime = nil
-	handler := tunHandler.Swap(nil)
-	if handler != nil {
-		handler.close()
-	}
+func handleStopTun() bool {
+	return tunState.Stop()
 }
 
-func handleStartTun(fd int, callback unsafe.Pointer) {
-	handleStopTun()
-	tunLock.Lock()
-	defer tunLock.Unlock()
-	now := time.Now()
-	runTime = &now
-	if fd != 0 {
-		if currentConfig == nil {
-			log.Warnln("[APP] handleStartTun called before setupConfig")
-			handleStopTun()
-			return
-		}
-		handler := &TunHandler{
-			callback: callback,
-			limit:    semaphore.NewWeighted(4),
-		}
-		tunHandler.Store(handler)
-		initTunHook()
-		tunListener, _ := t.Start(fd, currentConfig.General.Tun.Device, currentConfig.General.Tun.Stack, currentConfig.General.Tun.DisableICMPForwarding, uint32(currentConfig.General.Tun.MTU), currentConfig.General.IPv6)
-		if tunListener != nil {
-			log.Infoln("TUN address: %v", tunListener.Address())
-			handler.listener = tunListener
-		} else {
-			removeTunHook()
-			tunHandler.Store(nil)
+type androidTunConfig struct {
+	ready                 bool
+	device                string
+	stack                 constant.TUNStack
+	disableICMPForwarding bool
+	mtu                   uint32
+	ipv6                  bool
+}
+
+func handleStartTun(fd int, callback unsafe.Pointer) bool {
+	release := func() {
+		if callback != nil {
+			releaseObject(callback)
 		}
 	}
+	var fdLease *androidstartup.FDLease
+	if fd > 0 {
+		var err error
+		fdLease, err = androidstartup.NewFDLease(fd, syscall.Close)
+		if err != nil {
+			return tunState.StartWithInputCleanup(fd, false, release, nil, func() error { return syscall.Close(fd) })
+		}
+	}
+	// 快照只含值类型，不保留配置对象或可变别名；配置锁先于生命周期锁释放。
+	config := androidstartup.Snapshot(&runLock, func() androidTunConfig {
+		if currentConfig == nil {
+			return androidTunConfig{}
+		}
+		return androidTunConfig{
+			ready:                 true,
+			device:                currentConfig.General.Tun.Device,
+			stack:                 currentConfig.General.Tun.Stack,
+			disableICMPForwarding: currentConfig.General.Tun.DisableICMPForwarding,
+			mtu:                   uint32(currentConfig.General.Tun.MTU),
+			ipv6:                  currentConfig.General.IPv6,
+		}
+	})
+	return tunState.StartWithInputCleanup(fd, config.ready && (fd <= 0 || callback != nil), release, func(lease *androidstartup.OnceLease) (androidstartup.Resource, error) {
+		handler := &TunHandler{callback: callback, gate: androidstartup.NewCallbackGate(4), lease: lease}
+		// 构造栈期间也需要保护 socket；解析回调不读取尚未提交的 listener。
+		tunHandler.Store(handler)
+		listener, err, cleanupErr := t.StartOwned(fd, config.device, config.stack, config.disableICMPForwarding, config.mtu, config.ipv6, fdLease.Adopt)
+		handler.listener = listener
+		if err == nil && listener == nil {
+			err = errors.New("TUN 构造未返回资源")
+		}
+		if cleanupErr != nil {
+			handler.shutdown.SeedCleanupFailure(cleanupErr)
+		}
+		return handler, err
+	}, func() error {
+		err := fdLease.ReleaseUnadopted()
+		if err != nil {
+			// 未采纳的输入关闭失败时留下拒绝回调的哨兵，禁止放行新 socket。
+			gate := androidstartup.NewCallbackGate(4)
+			gate.CloseAdmission()
+			tunHandler.CompareAndSwap(nil, &TunHandler{gate: gate})
+		}
+		return err
+	})
 }
 
 func handleGetRunTime() string {
-	if runTime == nil {
+	runtime := tunState.Runtime()
+	if runtime.IsZero() {
 		return ""
 	}
-	return strconv.FormatInt(runTime.UnixMilli(), 10)
+	return strconv.FormatInt(runtime.UnixMilli(), 10)
 }
 
 func initTunHook() {
 	process.DefaultPackageNameResolver = func(metadata *constant.Metadata) (string, error) {
+		handler := tunHandler.Load()
+		if handler == nil {
+			return "", process.ErrPlatformNotSupport
+		}
 		src, dst := metadata.RawSrcAddr, metadata.RawDstAddr
 		if src == nil || dst == nil {
 			return "", process.ErrInvalidNetwork
-		}
-		handler := tunHandler.Load()
-		if handler == nil {
-			return "", errors.New("tun is closed")
 		}
 		return handler.handleResolveProcess(src, dst), nil
 	}
 }
 
-func removeTunHook() {
-	process.DefaultPackageNameResolver = nil
-}
-
 func handleGetAndroidVpnOptions() string {
-	tunLock.Lock()
-	defer tunLock.Unlock()
+	runLock.Lock()
+	defer runLock.Unlock()
 	if currentConfig == nil {
 		log.Warnln("[APP] handleGetAndroidVpnOptions called before setupConfig")
 		return ""
@@ -201,7 +214,6 @@ func handleGetAndroidVpnOptions() string {
 	}
 	data, err := json.Marshal(options)
 	if err != nil {
-		fmt.Println("Error:", err)
 		return ""
 	}
 	return string(data)
@@ -209,7 +221,6 @@ func handleGetAndroidVpnOptions() string {
 
 func handleUpdateDns(value string) {
 	go func() {
-		log.Infoln("[DNS] updateDns %s", value)
 		dns.UpdateSystemDNS(strings.Split(value, ","))
 		dns.FlushCacheWithDefaultResolver()
 	}()
@@ -257,8 +268,7 @@ func quickStart(initParamsChar *C.char, paramsChar *C.char, stateParamsChar *C.c
 
 //export startTUN
 func startTUN(fd C.int, callback unsafe.Pointer) bool {
-	handleStartTun(int(fd), callback)
-	return true
+	return handleStartTun(int(fd), callback)
 }
 
 //export getRunTime
@@ -267,8 +277,8 @@ func getRunTime() *C.char {
 }
 
 //export stopTun
-func stopTun() {
-	handleStopTun()
+func stopTun() bool {
+	return handleStopTun()
 }
 
 //export getCurrentProfileName

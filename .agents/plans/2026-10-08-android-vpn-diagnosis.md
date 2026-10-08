@@ -42,3 +42,12 @@ sing_tun新增受限入口NewWithNativeFDOwnership(options,tunnel,adopted,additi
 
 
 监听器所有权入口已完成8项回归与独立复审，未接Android ABI。Kotlin租约还需在native调用异常时确知JNI是否领取FD；优先评估JNI通过本代局部FDLease.claim领取并记录标记，Kotlin finally仅关闭未领取FD，杜绝异常后double-close。所有权合同测试不能替代实际构造采纳路径；接线验收须覆盖采纳前失败、采纳后失败及system/gvisor/mixed选择。
+
+
+## 生产接线执行包
+
+Go施工独占core/lib_android.go、core/android_bride.go、core/tun/tun.go、core/androidstartup/state.go及关联新增测试；主控独占Core.kt、TunInterface.kt、JNI core.cpp及Kotlin FD租约。接口保持startTUN(fd,callback)布尔结果，stopTun新增布尔结果，protect C回调返回int（JNI(I)Z）。Core对应用层startTun(fd,protect,resolver)返回Boolean；JNI私有入口通过Kotlin本代FDLease领取描述符，finally只关闭未领取FD。生成libclash头与ABI由冻结后正式驱动生成，不手工改生成头。
+
+Go配置只在runLock下复制必要primitive字段，释放后才进入State生命周期锁。原生FD租约在进入State前创建并在所有提前拒绝路径收回；未采纳关闭失败保留首错并阻止新代启动。CallbackGate先关准入后等pin，再释放一次JNI引用；闭门handler作为拒绝socket保护哨兵，成功关闭后才清空，未知关闭保留。监听器初始化期间必须可保护socket，resolver不读取未同步listener指针。
+
+验收：现有State/CallbackGate回归、新增输入关闭失败及RawConn.Control保护false/异常逻辑回归；JNI生成头和Kotlin真实编译后做候选APK构建、安装回读、失败启动/停止/重新启动设备验证。有效上游恢复后才验证代理出口；三栈有效constructor采纳路径仍需有界失败夹具与设备证据。

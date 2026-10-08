@@ -1,13 +1,23 @@
 package com.appshub.bettbox.core
 
 import android.util.Log
+import android.os.ParcelFileDescriptor
+import java.util.concurrent.atomic.AtomicBoolean
 import java.net.InetSocketAddress
 
 object Core {
 
-    private external fun startTun(fd: Int, cb: TunInterface)
+    private external fun startNativeTun(lease: TunFDLease, cb: TunInterface?): Boolean
     private external fun suspend(suspended: Int)
-    external fun stopTun()
+    private external fun stopNativeTun(): Boolean
+    private val inputCleanupFailed = AtomicBoolean(false)
+
+    fun stopTun(): Boolean = runCatching {
+        stopNativeTun() && !inputCleanupFailed.get()
+    }.getOrElse {
+        Log.e("Core", "TUN 停止未确认")
+        false
+    }
 
     init {
         System.loadLibrary("core")
@@ -29,29 +39,44 @@ object Core {
         fd: Int,
         protect: (Int) -> Boolean,
         resolverProcess: (protocol: Int, source: InetSocketAddress, target: InetSocketAddress, uid: Int) -> String
-    ) {
-        startTun(fd, object : TunInterface {
-            override fun protect(fd: Int) {
-                runCatching { protect(fd) }
-                    .onFailure { Log.e("Core", "protect JNI callback error: ${it.message}") }
-            }
+    ): Boolean {
+        if (fd < 0) return false
+        val lease = TunFDLease(fd) { owned -> ParcelFileDescriptor.adoptFd(owned).close() }
+        var started = false
+        try {
+            if (!inputCleanupFailed.get()) {
+                val callback = if (fd == 0) null else object : TunInterface {
+                    override fun protect(fd: Int): Boolean = runCatching { protect(fd) }
+                        .getOrElse {
+                            Log.e("Core", "socket 保护回调失败")
+                            false
+                        }
 
-            override fun resolverProcess(
-                protocol: Int,
-                source: String,
-                target: String,
-                uid: Int
-            ): String = runCatching {
-                resolverProcess(
-                    protocol,
-                    parseInetSocketAddress(source),
-                    parseInetSocketAddress(target),
-                    uid
-                )
-            }.onFailure {
-                Log.e("Core", "resolverProcess JNI callback error: ${it.message}")
-            }.getOrDefault("")
-        })
+                    override fun resolverProcess(
+                        protocol: Int,
+                        source: String,
+                        target: String,
+                        uid: Int
+                    ): String = runCatching {
+                        resolverProcess(
+                            protocol,
+                            parseInetSocketAddress(source),
+                            parseInetSocketAddress(target),
+                            uid
+                        )
+                    }.getOrElse {
+                        Log.e("Core", "进程解析回调失败")
+                        ""
+                    }
+                }
+                started = startNativeTun(lease, callback)
+            }
+        } catch (_: Throwable) {
+            Log.e("Core", "TUN 启动调用失败")
+        } finally {
+            if (!lease.closeUnclaimed()) inputCleanupFailed.set(true)
+        }
+        return started && !inputCleanupFailed.get()
     }
 
     fun suspended(value: Boolean) {
@@ -60,7 +85,7 @@ object Core {
             suspend(if (value) 1 else 0)
             Log.d("Core", "suspend JNI call completed")
         }.onFailure {
-            Log.e("Core", "Error calling suspend: ${it.message}", it)
+            Log.e("Core", "TUN 挂起调用失败")
         }
     }
 }

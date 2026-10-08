@@ -205,3 +205,5 @@ Android正式arm64 APK实际构建尝试：官方Java TLS、Gradle help、Go核�
 
 
 `sing_tun.NewWithNativeFDOwnership` 新入口保留原配置与Stack，在NativeTun采纳且登记后同步通知；必须提供采纳回调。构造失败关闭成功则清空，关闭失败则保留部分Listener及首次错误；旧入口的清理行为保持兼容。8项Go测试通过，首次关闭错误丢失与nil回调预检均有实际红/绿回归，并完成未施工者独立复审。测试使用真实Listener.Close和替身Stack；有效NativeTun构造、采纳后的失败、三种栈运行及Android JNI尚未验收，不能称Android修复已完成。回执 `validation/2026-10-07-three-platform/native-fd-ownership-contract.json`。
+
+Android 原生启停接线：Go State/CallbackGate/FDLease、Kotlin 显式领取租约及 JNI Boolean 已接入；输入关闭失败阻断新启动，protect 失败传回 socket 创建方。实际 ARM64 Go 核心及生产 JNI 编译链接通过，纯 Go race 与 Kotlin 租约6例通过，独立静态审阅未发现新增 P1/P2。完整 Service 代际保护、有效 NativeTun 构造和设备启动/停止行为尚待验收，不能将该编译产物作为可用发行版。回执为 `docs/validation/2026-10-07-three-platform/android-tun-abi-validation.json`。
