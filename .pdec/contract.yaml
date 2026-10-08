@@ -3063,8 +3063,10 @@
     "lib/xboard/secure_store.dart": "5167785747cbf8311864caa4843890b23880b93bf6f14b6cafeecca63c05fe30",
     "lib/plugins/smart_stop_completion.dart": "8ae046e82ee7f7623c18a91640af3ad6df398ab21e07cd32299ed1eaf76fa66b",
     "test/plugins/smart_stop_completion_test.dart": "06c60b886df21b2e3c6e0d0a6ae424854e4e596fe8cf854084f020346bd92a23",
-    "lib/manager/smart_auto_stop_manager.dart": "0796fde8a119a4b6633d36acf488a8dbb6c2f37164609029b75f27225ba07235",
-    "lib/main.dart": "12c5f4ea0b923d9db3dd6271df579333dc8f4f9a0ff4e5cc1d1530973f35d6c8"
+    "lib/manager/smart_auto_stop_manager.dart": "8a0898e5e225af69b713f2d013bf599281f26ce6aef6c610436918e72fb63bda",
+    "lib/main.dart": "12c5f4ea0b923d9db3dd6271df579333dc8f4f9a0ff4e5cc1d1530973f35d6c8",
+    "lib/manager/smart_auto_stop_policy.dart": "536a50f70573dfb78450d171911617ea78bf86f808ff5a2d258231494981c6f1",
+    "test/manager/smart_auto_stop_policy_test.dart": "f3dba8591c76b514b558b3c84beb08abda3c263e5fc1ca273305235e064c5c62"
   },
   "platform_extensions": {
     "android": {
@@ -3140,6 +3142,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "e712ada9c1655a250bde80e25bcdef3c37ce4b4a7eb769ae9411315fe55a3a4d"
+    "contract_digest": "2ba08a124867d545fbc07990b8125f0fd787757a9079a4539b8c43c444b8652e"
   }
 }

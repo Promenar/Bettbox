@@ -2675,3 +2675,34 @@ PDEC valid/execution_ready。原智能启停关闭且规则为空；匹配当前
 
 ### HLG
 按标准append追加设备事实和待修缺陷，整体Goal保持active。
+
+## 2026-10-09T01:33:16+08:00 · 智能启停空规则恢复决策红绿与源码候选
+
+type: development
+scope: ["Bettbox", "Android", "macOS"]
+status: partial
+tags: ["smart-stop", "policy", "regression", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 30b824f9a7f4f59f4765dffbe1b27a43a919406682691e70957009069b322a3b
+
+### Summary
+空/空白规则与关闭功能共用串行恢复决策，普通停止保护和无地址保持状态已回归。
+
+### Changed
+新增生产实际使用的策略模块与11项测试；设置变化串行进入检查，查询结束拒绝设置换代及已销毁组件。更新PDEC源码摘要及验收文档。
+
+### Validation
+保持行为提取后真实red3项恢复断言失败，修复后green11项通过。267项完整Flutter测试（同源真实Go FFI）及flutter analyze退出0、No issues。smart_empty_rules_review原生只读静态审阅无确认P1/P2，主控复核源码接线、diff与实际测试输出。
+
+### Next
+提交推送源码候选；修复smartResume无条件成功及预清状态，建立完成回执回归，再构建新APK验证空规则恢复与实际流量。
+
+### Risks
+旧35b6443设备证据只证明缺陷复现，不能宣称修复后设备通过；当前恢复service通道无条件true、管理器预清状态和native owner/engine ACK缺口已识别。管理器换代/销毁未有集成回归。整体Goal未完成。
+
+### DIA
+已同步CHANGELOG、PLATFORM_VALIDATION、registry、计划与源码验收回执。
+
+### HLG
+标准append记录红绿、独立审阅、候选边界与后续。

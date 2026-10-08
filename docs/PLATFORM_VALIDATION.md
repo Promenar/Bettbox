@@ -329,3 +329,9 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 35b6443 已安装候选在匹配当前模拟器地址后，日志确认规则匹配与智能停止，运行计时消失而前台服务保留。清空规则未触发恢复，与 `SmartAutoStopManager._checkCurrentNetwork` 的空规则直接返回一致；这是待修复缺陷。关闭功能后计时和前台服务恢复，但未观察到活动 VPN transport，不能宣称 TUN 或有效代理流量通过。
 
 测试结束已恢复原配置（关闭、空规则）并普通停止，计时和前台服务均撤销。当前 NetworkAgent 的 transport 为 CELLULAR/WIFI 且具有 NOT_VPN；不要把历史事件、NetworkRequest 或 NOT_VPN 字样当作活动 VPN。公开回执为 `validation/2026-10-07-three-platform/android-smart-stop-device-2026-10-09.json`；快速交错、唯一 owner、engine ACK 与发行验收仍待完成。
+
+## 智能启停空规则源码候选
+
+`SmartAutoStopManager` 的设置与网络变化进入同一串行检查；空/空白规则或关闭功能会恢复已智能停止会话，不启动普通停止会话。非空规则缺少地址则保留状态；地址查询期间设置换代或组件销毁时拒绝旧决策。策略 red 有 3 项预期失败，green 11 项通过，完整 Flutter 267 项（真实 Go FFI）及 analyze 通过；独立审阅覆盖决策与生产接线。
+
+公开回执为 `validation/2026-10-07-three-platform/smart-auto-stop-empty-rules-validation.json`，绑定源码摘要。设备复现证据来自旧 APK 35b6443，不能用于宣称修复后设备恢复通过。`smartResume` 的 service 通道仍无条件返回 true，管理器仍预先清除停止标记；这些恢复完成确认缺口、唯一 owner/engine ACK、新 APK 及有效代理流量须独立完成。

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
-import 'package:bett_box/common/network_matcher.dart';
+import 'package:bett_box/manager/smart_auto_stop_policy.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/plugins/smart_stop_completion.dart';
@@ -30,6 +30,7 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   final _checkLock = Lock();
 
   int _checkSequence = 0;
+  int _settingsRevision = 0;
 
   late final NativeEventCallback _nativeEventCallback;
 
@@ -86,17 +87,8 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   }
 
   void _onSettingsChanged() {
-    final vpnProps = ref.read(vpnSettingProvider);
-    if (!vpnProps.smartAutoStop) {
-      // Feature disabled, if we were smart-stopped, resume.
-      final isSmartStopped = ref.read(isSmartStoppedProvider);
-      if (isSmartStopped) {
-        ref.read(isSmartStoppedProvider.notifier).set(false);
-        _restartVpn();
-      }
-      return;
-    }
-    // Re-check current network
+    _settingsRevision++;
+    // 设置变化与网络变化共用串行入口，关闭或清空规则也能恢复。
     _checkCurrentNetwork();
   }
 
@@ -121,51 +113,38 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
 
   Future<void> _checkCurrentNetwork() async {
     await _checkLock.synchronized(() async {
+      if (!mounted) return;
+      final revision = _settingsRevision;
       final vpnProps = ref.read(vpnSettingProvider);
-      if (!vpnProps.smartAutoStop) return;
-
       final networks = vpnProps.smartAutoStopNetworks;
-      if (networks.isEmpty) return;
-
-      final isSmartStopped = ref.read(isSmartStoppedProvider);
-
-      // Get current IP(s) — always from native on Android for consistency
-      List<String> candidateIps;
-      if (system.isAndroid) {
-        candidateIps = await _getNativeLocalIpAddresses();
-      } else {
-        final ip = await _getLocalIpAddress();
-        candidateIps = ip != null ? [ip] : [];
-      }
-
-      if (candidateIps.isEmpty) {
-        commonPrint.log('Smart Auto Stop: No IP found. Skipping.');
-        return;
-      }
-
-      // Match: any IP matches any rule = should stop
-      final shouldStop = candidateIps.any(
-        (ip) => NetworkMatcher.matchAny(ip, networks),
-      );
-
-      commonPrint.log(
-        'SmartAutoStop: IPs=${candidateIps.join(",")}, RuleMatch=$shouldStop, SmartStopped=$isSmartStopped',
-      );
-
-      // Dedup: only act on state transitions
-      if (shouldStop && !isSmartStopped) {
-        // Need to stop, but only if VPN is actually running
-        final isRunning =
-            ref.read(runTimeProvider) != null || globalState.isStart;
-        if (isRunning) {
-          commonPrint.log('Smart Auto Stop: Stopping ...');
-          await _stopVpn();
+      List<String> candidateIps = [];
+      // 关闭或空规则已确定不匹配，无需等待地址查询。
+      if (vpnProps.smartAutoStop && networks.trim().isNotEmpty) {
+        if (system.isAndroid) {
+          candidateIps = await _getNativeLocalIpAddresses();
+        } else {
+          final ip = await _getLocalIpAddress();
+          candidateIps = ip != null ? [ip] : [];
         }
-      } else if (!shouldStop && isSmartStopped) {
-        // Need to resume
-        ref.read(isSmartStoppedProvider.notifier).set(false);
-        commonPrint.log('Smart Auto Stop: Restarting ...');
-        await _restartVpn();
+      }
+      // 地址查询期间设置变化时，由排队的新检查处理，拒绝旧决策。
+      if (!mounted || revision != _settingsRevision) return;
+      final isSmartStopped = ref.read(isSmartStoppedProvider);
+      final decision = decideSmartAutoStop(
+        enabled: vpnProps.smartAutoStop,
+        networks: networks,
+        addresses: candidateIps,
+        suspended: isSmartStopped,
+        running: ref.read(runTimeProvider) != null || globalState.isStart,
+      );
+      switch (decision) {
+        case SmartAutoStopDecision.stop:
+          await _stopVpn();
+        case SmartAutoStopDecision.resume:
+          ref.read(isSmartStoppedProvider.notifier).set(false);
+          await _restartVpn();
+        case SmartAutoStopDecision.none:
+          break;
       }
     });
   }

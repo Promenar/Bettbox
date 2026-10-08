@@ -1,0 +1,43 @@
+{
+  "stage": "源码候选；新APK设备验收待完成",
+  "source_base_commit": "8e205eb8a1295037ce38876e1b91e288fbae04ac",
+  "source_sha256": {
+    "lib/manager/smart_auto_stop_manager.dart": "8a0898e5e225af69b713f2d013bf599281f26ce6aef6c610436918e72fb63bda",
+    "lib/manager/smart_auto_stop_policy.dart": "536a50f70573dfb78450d171911617ea78bf86f808ff5a2d258231494981c6f1",
+    "test/manager/smart_auto_stop_policy_test.dart": "f3dba8591c76b514b558b3c84beb08abda3c263e5fc1ca273305235e064c5c62"
+  },
+  "red": {
+    "expected_recovery_failures": 3
+  },
+  "green": {
+    "policy_tests": 11,
+    "full_flutter_tests": 267,
+    "real_go_ffi_enabled": true,
+    "flutter_analyze_no_issues": true,
+    "flutter_analyze_seconds": 62.8
+  },
+  "independent_review": {
+    "agent": "smart_empty_rules_review",
+    "read_only": true,
+    "confirmed_p1_p2": 0,
+    "scope": "纯决策与生产管理器接线，未独立执行测试"
+  },
+  "device_before_fix": {
+    "receipt": "android-smart-stop-device-2026-10-09.json",
+    "empty_rule_recovery_observed": false
+  },
+  "fixed_behavior": [
+    "空/仅空白规则恢复已智能停止会话，无需地址",
+    "关闭功能使用同一串行决策",
+    "普通停止会话不自动启动",
+    "非空规则但无地址保持状态",
+    "地址查询期间设置版本变化或组件销毁放弃旧决策"
+  ],
+  "release_verified": false,
+  "remaining": [
+    "smartResume 通道及显示状态的完成确认",
+    "唯一native owner/engine ACK",
+    "管理器换代与销毁集成回归",
+    "新APK设备恢复及真实代理流量"
+  ]
+}
