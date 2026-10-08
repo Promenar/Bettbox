@@ -52,3 +52,5 @@ Android 使用持续沿用的发行 keystore，区别于 Windows 的 SignPath �
 ## macOS 发行身份与验收
 
 本机只读核验确认 Apple Development 身份可用，未找到 Developer ID Application 身份。已有 ad hoc 应用的嵌套签名核验失败，不能作为正式分发制品。Developer ID 签名、Hardened Runtime、公证、staple与下载后的Gatekeeper验收独立于本地编译；不得通过自动关闭系统安全设置满足发行门禁。Android、macOS优先交付，iOS保留开发版研究。
+
+2026-10-08 正式Android arm64 APK构建、单一证书验签及Pixel_7安装/首页登录页验收通过，证书沿用既有身份。此候选不等于完整业务发行，VPN有效流量、账户/邀请/支付和真实16KiB设备尚未由本次安装证明；公开回执见 `docs/validation/2026-10-07-three-platform/android-formal-apk-validation.json`。

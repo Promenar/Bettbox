@@ -1373,3 +1373,34 @@ session69912实际exit1，APK阶段拒绝maven-google1，其他越界类别0；�
 
 ### HLG
 标准append dry-run/apply追加，索引工具重建。
+
+## 2026-10-08T10:25:13+08:00 · Android正式签名APK及模拟器安装启动验收
+
+type: validation
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "release", "emulator"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 6af4ec326e66853b862f1204378f31d4e9c08f101545df8f9f1469b2f69362a2
+
+### Summary
+正式arm64 APK构建通过并保存可安装候选；完整三端/服务端发行Goal保持active，不把候选当完整业务发行。
+
+### Changed
+新增公开回执、模拟器启动/正式APK安装/启动PDEC登记与文档。候选build/releases/android/Bettbox-arm64-ebc7d3c.apk，源码ebc7d3c、APK77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105。
+
+### Validation
+session75243终态exit0，单一正式证书6a121d74匹配锚，包内核心一致，全部native ELF与zipalign16KiB通过。源码/锁稳定、构建进程和网络清理确认。Pixel_7 emulator-5554 install Success，回读APK全摘要一致，首页/登录页真实显示，应用pid存活，日志FATAL EXCEPTION/UnsatisfiedLinkError/Fatal signal均0。API36页大小4096；未测试真实16KiB页设备。
+
+### Next
+沿用已运行Pixel_7完成受控账户/有效订阅、邀请、收银及VPN全路径；Android真实启停/配置所有权仍需接线。Mac native可信端点授权、正常main与签名/Keychain继续；iOS开发版研究范围有效。
+
+### Risks
+正式包仅安装启动候选，未登录、无有效订阅流量及实际返佣/付款，release_verified=false。NoSLA容器只读均Up17h、公开配置确认email_verify1/app_url正确，不等价业务可用。真实资金、商户权限与Apple组织/NE/DeveloperID条件尚未闭合。
+
+### DIA
+已同步PlatformValidation、CHANGELOG、SIGNING-POLICY、PDEC说明、registry和公开回执。
+
+### HLG
+标准append dry-run/apply追加，索引工具重建。模拟器session46654作为开发环境保留，未新建AVD/清除debug数据。

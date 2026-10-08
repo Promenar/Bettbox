@@ -940,6 +940,24 @@
       "cwd": ".",
       "timeout_seconds": 180,
       "artifacts": []
+    },
+    "boot-android-release-emulator": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "emulator",
+        "-avd",
+        "Pixel_7",
+        "-port",
+        "5554",
+        "-no-snapshot-save",
+        "-no-audio"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "本机完整Android开发调试授权；只启动既有Pixel_7，不新建/清除AVD，不覆盖debug包。长期模拟器进程与构建任务分离。"
     }
   },
   "deployment": {
@@ -1157,10 +1175,49 @@
       "artifacts": [
         "build/app/outputs/flutter-apk/app-release.apk"
       ]
+    },
+    "android_release_install": {
+      "executor": "local-mac",
+      "target_os": "android",
+      "target_arch": "arm64",
+      "argv": [
+        "adb",
+        "-s",
+        "emulator-5554",
+        "install",
+        "-r",
+        "build/app/outputs/flutter-apk/app-release.apk"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "apk_sha256": "77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105",
+      "package": "com.appshub.bettbox",
+      "verification": "本机三端完整调试及正式Android身份授权；不卸载或清除旧debug包，先核验正式APK来源/签名及Pixel_7归属。"
+    },
+    "android_release_launch": {
+      "executor": "local-mac",
+      "target_os": "android",
+      "target_arch": "arm64",
+      "argv": [
+        "adb",
+        "-s",
+        "emulator-5554",
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-n",
+        "com.appshub.bettbox/.MainActivity"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [],
+      "verification": "已安装正式同源APK，固定Pixel_7与正式包名，只验证界面及进程，不自动注册或付款。"
     }
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "978e348f9a1f74c67123639266407758e13fe6aaac913bc9b6d4fcd3f23dc65e"
+    "contract_digest": "6e79943f4682f99c018d38b23c54c182392217dc561e2ac6d422cf48e5cd29ca"
   }
 }

@@ -49,3 +49,5 @@
 - docs/validation/2026-10-07-three-platform/macos-protected-journal-validation.json — 受保护journal源摘要、实际红绿回归及验收边界
 
 - docs/validation/2026-10-07-three-platform/android-release-build-attempt.json — Android正式APK实际构建失败阶段、网络固定事件及退出证明
+
+- docs/validation/2026-10-07-three-platform/android-formal-apk-validation.json — 正式Android候选证书、产物/安装摘要、真实界面及未验收业务边界

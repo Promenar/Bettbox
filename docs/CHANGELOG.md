@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — Android正式签名候选
+
+- Android arm64正式签名APK构建、单一发行证书、核心一致性与16KiB对齐检查通过，保存固定源码候选。
+- Pixel_7安装及回读摘要一致，首页/登录页显示正常，观察范围内无Java/JNI/native崩溃；完整账户、订阅、VPN与支付发行验收另验。
+
 ## 2026-10-08 — Android Google Maven别名
 
 - 根据真实正式构建拒绝事件与Google官方仓库文档，将maven.google.com精确HTTPS主机纳入项目专用依赖通道。明文、其他端口、子域及未知主机继续拒绝。

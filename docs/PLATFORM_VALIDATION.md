@@ -180,3 +180,5 @@ macOS受保护journal候选：native固定路径、0700目录/0600单链接文�
 Android正式arm64 APK实际构建尝试：官方Java TLS、Gradle help、Go核心与锁定pub依赖通过，APK构建阶段因任务代理拒绝越出批准范围的请求失败；1次outside-other事件尚不能区分未知目标和非CONNECT请求。任务进程退出、网络租约停止、源码和锁无漂移已确认。没有正式APK验签结果，禁止视为发行通过。回执 `validation/2026-10-07-three-platform/android-release-build-attempt.json`。
 
 正式APK拒绝定位已由固定类别证实：maven.google.com为唯一越界目标类别，非CONNECT及未知域名类别为0。Google官方确认其为Maven仓库HTTPS别名，项目任务代理接入后94项回归通过；真实正式APK未由这些测试证明。回执 `validation/2026-10-07-three-platform/android-google-maven-rejection.json`。
+
+正式Android arm64候选：源码ebc7d3c，APK SHA77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105，单一正式证书与本机身份锚一致。Go核心/头、包内核心、全native ELF及16KiB zipalign通过；源码与依赖锁无漂移，任务代理及构建进程清理确认。候选保存在 `build/releases/android/Bettbox-arm64-ebc7d3c.apk`。Pixel_7 API36安装成功，回读APK摘要一致，首页/登录页真实显示，观察日志致命/JNI/native崩溃标记0；实际页大小4096，未做真实16KiB设备测试。未登录、未验证有效订阅/VPN/邀请注册/支付，release_verified保持false。回执 `validation/2026-10-07-three-platform/android-formal-apk-validation.json`。

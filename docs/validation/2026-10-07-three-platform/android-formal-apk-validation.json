@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "target": "android-arm64-release",
+  "signature_verified": true,
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "apk": {
+    "path": "build/app/outputs/flutter-apk/app-release.apk",
+    "sha256": "77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105"
+  },
+  "artifacts": {
+    "libclash/android/arm64-v8a/libclash.so": "e0849fed8430da33fd0fe0efff6c1789faba92e88d76c546e446e2225c73458b",
+    "libclash/android/arm64-v8a/libclash.h": "886e019d5ed682941ffa93ac8f00ff8550087d3a6dffa2d892aba2c370e67d35"
+  },
+  "approved_contract_digest": "978e348f9a1f74c67123639266407758e13fe6aaac913bc9b6d4fcd3f23dc65e",
+  "source_commit": "ebc7d3cdd635f7c5b68f60e395d5a25307bb6db9",
+  "release_verified": false,
+  "device_verified": true,
+  "cleanup_verified": true,
+  "remaining_owned_count": 0,
+  "network_stopped": true,
+  "receipt_sha256": "d624fa5a57f5e9d51b2e8edec3e09ea91a74e6a26e4e69b8e52f008b364ad889",
+  "candidate_copy": {
+    "path": "build/releases/android/Bettbox-arm64-ebc7d3c.apk",
+    "sha256": "77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105",
+    "bytes": 55804443
+  },
+  "device": {
+    "avd": "Pixel_7",
+    "serial": "emulator-5554",
+    "installation": "Success",
+    "resolved_activity": "com.appshub.bettbox/.MainActivity",
+    "cold_launch_status": "ok",
+    "home_rendered": true,
+    "login_rendered": true,
+    "logged_in": false,
+    "notification_permission_granted": true,
+    "effective_subscription_traffic_verified": false,
+    "observed_app_crash_markers": {
+      "FATAL EXCEPTION": 0,
+      "UnsatisfiedLinkError": 0,
+      "Fatal signal": 0
+    },
+    "versionName": "1.19.0",
+    "versionCode": "2026081601",
+    "api_level": 36,
+    "page_size": 4096,
+    "installed_apk_sha256": "77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105"
+  },
+  "screenshots": {
+    "android-formal-ready.png": "3200d7bf2b0942b6c95946aa0ba032858f83acebdc48b8c079b4bf6bbb20da60",
+    "android-formal-login.png": "2f26ef0542883f0cf3a189b165b7f66d8639455cafdcd303a4507af57657416a"
+  },
+  "apk_libraries": {
+    "lib/arm64-v8a/libapp.so": "481bba76ca836b3e238e34d60d2d3e8f4c6efd5b321a9f22482ba7f4d0bd4ca7",
+    "lib/arm64-v8a/libbarhopper_v3.so": "ec09597e9eb3aee0eb55ae3366da0d4ba416f5aa35a1af0b3811f50ff46743a1",
+    "lib/arm64-v8a/libclash.so": "e0849fed8430da33fd0fe0efff6c1789faba92e88d76c546e446e2225c73458b",
+    "lib/arm64-v8a/libcode_forge.so": "ca2cb4e860bf68eb3d202f13383fd6d3d04e102f6003110f6116d28aeedde4d5",
+    "lib/arm64-v8a/libcore.so": "97b6dd81d8de1f68e448e685c719fb27ee99de8497246e88cefff772b021501e",
+    "lib/arm64-v8a/libdartjni.so": "5fbc116569c4721d05e32fb572e6d4ef52a54902a2acff34eebcf1869687a79d",
+    "lib/arm64-v8a/libdatastore_shared_counter.so": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+    "lib/arm64-v8a/libflutter.so": "151099d0b73b3025d7545c8431af4d7f23bf3e7fe5767d9fec6323fa372ef743",
+    "lib/arm64-v8a/libimage_processing_util_jni.so": "0292b063fafccf734472cbb59588e756c2dbca907c72021ba6fbf126385508a2",
+    "lib/arm64-v8a/libqjs.so": "d1b50013b8ff69afc6452b8780023401e854f8999255b0187a13ef9d04e1fd95",
+    "lib/arm64-v8a/libsqlite3.so": "081df67ee9ab852daea6a0679427e90fc89a0245d06f93dafe2309875c609c5c",
+    "lib/arm64-v8a/libsurface_util_jni.so": "a5c9d1928ea92ec7a94dff8cf666e7739cd734198b9f0ae1d4e28ea3c86516ba"
+  },
+  "artifact_checks": {
+    "single_release_signer": true,
+    "elf_16k_alignment": true,
+    "zipalign_16k": true,
+    "packaged_core_matches_build": true
+  }
+}
