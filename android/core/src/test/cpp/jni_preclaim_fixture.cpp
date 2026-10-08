@@ -79,3 +79,7 @@ int main(int argc, char **argv) {
     std::printf("{\"case\":%d,\"failed\":%d,\"actual_JVM\":false}\n", mode, failed);
     return failed ? 1 : 0;
 }
+
+// 旧入口夹具仅满足新增ABI链接，不调用带身份启动。
+extern "C" char *startTUNOwned(long long, long long, long long, int, void *) { return nullptr; }
+extern "C" char *stopTUNOwned(long long, long long, long long) { return nullptr; }

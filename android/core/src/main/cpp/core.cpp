@@ -1,6 +1,7 @@
 #ifdef LIBCLASH
 #include <jni.h>
 #include <cstring>
+#include <cstdlib>
 
 static jmethodID m_fd_lease_peek;
 static jmethodID m_fd_lease_claim;
@@ -55,6 +56,49 @@ Java_com_appshub_bettbox_core_Core_stopNativeTun(JNIEnv *) {
     // 未知JNI责任不阻止Go收回已知资源，但不能报告整体清理成功。
     const bool stopped = stopTun();
     return stopped && !jni_cleanup_unknown() ? JNI_TRUE : JNI_FALSE;
+}
+
+// Go回执为C堆字符串；转换失败也必须释放，调用方将null视为结果未知。
+static jstring consume_owned_tun_reply(JNIEnv *env, char *reply) {
+    if (!reply) return nullptr;
+    jstring result = nullptr;
+    if (!jni_cleanup_unknown()) result = jni_new_string(env, reply);
+    std::free(reply);
+    return clear_callback_exception(env) ? nullptr : result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_appshub_bettbox_core_Core_startOwnedTunNative(JNIEnv *env, jobject,
+    jlong epoch, jlong revision, jlong generation, jobject lease, jobject cb) {
+    if (!lease || jni_cleanup_unknown()) return nullptr;
+    const jint pending_fd = env->CallIntMethod(lease, m_fd_lease_peek);
+    if (clear_callback_exception(env) || pending_fd < 0) return nullptr;
+    jobject interface = nullptr;
+    if (pending_fd > 0) {
+        if (!cb) return nullptr;
+        interface = new_global(cb);
+        if (clear_callback_exception(env) || !interface) {
+            release_preclaim_callback(env, interface);
+            return nullptr;
+        }
+    }
+    const jint fd = env->CallIntMethod(lease, m_fd_lease_claim);
+    const bool claim_failed = clear_callback_exception(env);
+    if (claim_failed) jni_mark_cleanup_unknown();
+    if (claim_failed || fd < 0) {
+        release_preclaim_callback(env, interface);
+        if (claim_failed || jni_cleanup_unknown()) return nullptr;
+        // 未领取FD由Kotlin finally关闭；Go仅收尾空输入并报告现有资源。
+        return consume_owned_tun_reply(env, startTUNOwned(epoch, revision, generation, -1, nullptr));
+    }
+    return consume_owned_tun_reply(env, startTUNOwned(epoch, revision, generation, fd, interface));
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_appshub_bettbox_core_Core_stopOwnedTunNative(JNIEnv *env, jobject,
+    jlong epoch, jlong revision, jlong generation) {
+    // 已知Go资源仍尝试按身份收口；已有JNI未知不允许结果被转换为成功。
+    return consume_owned_tun_reply(env, stopTUNOwned(epoch, revision, generation));
 }
 
 extern "C"

@@ -295,3 +295,7 @@ int main(int argc, char **argv) {
                 protect_jni_calls, resolve_jni_calls, passed ? 0 : 1);
     return passed ? 0 : 1;
 }
+
+// 旧入口夹具仅满足新增ABI链接，不调用带身份启动。
+extern "C" char *startTUNOwned(long long, long long, long long, int, void *) { return nullptr; }
+extern "C" char *stopTUNOwned(long long, long long, long long) { return nullptr; }

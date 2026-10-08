@@ -271,3 +271,7 @@ JNI实际启动入口对领取前global ref删除检查并清除异常，失败�
 ## [Unreleased] - Android Go带身份启停入口 (2026-10-08)
 
 Android Go新增带epoch/configRevision/generation的startTUNOwned/stopTUNOwned C导出。生产桥在配置锁内预留并复制构造值，锁外调用State和实际NativeTun，最后锁内核验；拒绝输入从同次State报告捕获旧资源身份，stop须同时匹配reservation与State。准备异常、输入/关闭未知保留阻断，fd0仅在非VPN模式采用。九项桥接测试含两项单侧身份漂移、全core CGO0、startup race、NDK28/API26 ARM64 c-shared及同次JNI链接通过，ELF包含两个导出符号。JNI/Kotlin调用方、旧FFI/HTTP/quickStart配置和启停旁路尚未采用/收敛，不能将该ABI候选称为完整客户端或设备验收。
+
+## [Unreleased] - 带身份TUN的JNI与Core回执通路 (2026-10-08)
+
+Android新增startOwnedTunNative/stopOwnedTunNative JNI入口，传递epoch/configRevision/generation至Go；领取前失败收尾检查引用删除，普通负claim调用空负输入取得Go报告，Java领取异常或JNI清理未知不进入新启动。Go C堆回执始终在Java字符串转换后释放，stop先尝试Go按身份收尾，JNI未知时返回null。Core新增Raw调用，OwnedTunInvocation在finally关闭未领FD之后捕获不可变输入快照，异常/null/关闭失败粘滞阻断。九项生产JNI函数表ASAN、六项Invocation JVM行为、完整Core/TunInterface对公开Android SDK jar编译、旧17+6+9项JNI回归和NDK同次头链接通过。该验证未执行Core/ParcelFileDescriptor的实际运行；严格owner解析、VpnPlugin采用、并发事务及旧旁路收敛仍未完成，不能声明新入口已启用或发行包可用。

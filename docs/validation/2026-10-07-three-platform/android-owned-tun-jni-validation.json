@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-10-08T21:36:24.161739+08:00",
+  "base_commit": "91a2c19c840470e76832b55df6c2b958fd1c5388",
+  "source_sha256": {
+    "android/core/src/main/cpp/core.cpp": "e3d495db84c7fc417515c2ec55de4ea1f249c6645660a5c62192f76b83f59947",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "ee83781b608da1a0f8acfa4cd8814db955c8194f38e25a9b3dbe251e86b5c6ba",
+    "android/core/src/main/java/com/appshub/bettbox/core/OwnedTunInvocation.kt": "3b5fa8bbbd1721e7cfc9d4c07564b6e4edeaebdaf7b7d26cdf1c8781ab67d2c5",
+    "android/core/src/test/cpp/jni_owned_tun_fixture.cpp": "a2a9c445258e388eb0188a387e1bde524b6ad530ebca9c9296baeaed43c22671",
+    "android/core/src/test/kotlin/com/appshub/bettbox/core/OwnedTunInvocationFixture.kt": "b362317a0c631e55e5fbfafda0d127b4dc432fa8909b982e6f34333c25496a86",
+    "scripts/check_android_owned_tun_invocation.py": "7bd5e1317aeb1ea22ae11bbe5c658483027ff093c4eacbc0fa2614576e326fe9"
+  },
+  "validation": {
+    "owned_jni_public_cases": 9,
+    "ASAN_compile": true,
+    "invocation_JVM_cases": 6,
+    "Core_TunInterface_SDK_compile_exit": 0,
+    "legacy_release_cases": 17,
+    "legacy_preclaim_cases": 6,
+    "legacy_failure_cases": 9,
+    "android_JNI_same_Go_header_link_exit": 0
+  },
+  "independent_review": "限定生产文件未发现确定P1/P2，主控已复核实际测试与链接结果",
+  "artifact_sha256": "cc6851ffc52d96a3e8f2b90451f2a8d3733e108c653f1cc42ca2c3ef68fdc59c",
+  "limits": [
+    "JNI仅公共函数表，没有真实JVM/CheckJNI",
+    "JVM行为夹具不初始化Core、不执行ParcelFileDescriptor或真实FD",
+    "未覆盖共享blocked check/invoke并发事务",
+    "严格回执owner解析及VpnPlugin采用、旧旁路收敛尚未完成",
+    "没有新APK或设备业务验证"
+  ]
+}

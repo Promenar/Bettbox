@@ -125,3 +125,7 @@ Go OnceLease增加并发安全的held/released/unknown值状态；释放panic粘
 ## 生产Go带身份启停入口
 
 主控独占android_tun_owned.go、lib_android.go、reservation generation字段与State拒绝报告快照。新增C导出携带epoch/configRevision/generation，生产桥串行锁只治理TUN操作；runLock内预留及复制构造参数，锁外调用State/Java及drain，完成后锁内核验。拒绝输入使用RejectInputWithCleanup并由同次报告捕获旧资源身份；停止必须匹配预留及State完整身份。普通旧接口不得停受管State；JNI/Kotlin owner采用及配置HTTP/FFI旁路收敛另包实施，不将新增ABI称为整包已接通。测试使用真实协调器与State、公开Resource，覆盖版本拒绝、旧stop、配置构造期间拒绝、清理未知及fd0模式；先编译RED，随后GREEN、startup race、core回归、Android ARM64 c-shared、独立审阅及DIA/HLG。
+
+## JNI与Core原始回执通路实施状态
+
+Android新增startOwnedTunNative/stopOwnedTunNative JNI入口，传递epoch/configRevision/generation至Go；领取前失败收尾检查引用删除，普通负claim调用空负输入取得Go报告，Java领取异常或JNI清理未知不进入新启动。Go C堆回执始终在Java字符串转换后释放，stop先尝试Go按身份收尾，JNI未知时返回null。Core新增Raw调用，OwnedTunInvocation在finally关闭未领FD之后捕获不可变输入快照，异常/null/关闭失败粘滞阻断。九项生产JNI函数表ASAN、六项Invocation JVM行为、完整Core/TunInterface对公开Android SDK jar编译、旧17+6+9项JNI回归和NDK同次头链接通过。该验证未执行Core/ParcelFileDescriptor的实际运行；严格owner解析、VpnPlugin采用、并发事务及旧旁路收敛仍未完成，不能声明新入口已启用或发行包可用。

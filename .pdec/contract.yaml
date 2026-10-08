@@ -1719,7 +1719,7 @@
         "-DLIBCLASH",
         "-I.test/android-jni-failure/include",
         "-Iandroid/core/src/main/cpp",
-        "-I.test/android-checked-release-abi",
+        "-I.test/android-tun-reservation-abi",
         "android/core/src/test/cpp/jni_release_fixture.cpp",
         "android/core/src/main/cpp/jni_helper.cpp",
         "android/core/src/main/cpp/core.cpp",
@@ -2111,7 +2111,7 @@
         "-DLIBCLASH",
         "-I.test/android-jni-failure/include",
         "-Iandroid/core/src/main/cpp",
-        "-I.test/android-checked-release-abi",
+        "-I.test/android-tun-reservation-abi",
         "android/core/src/test/cpp/jni_preclaim_fixture.cpp",
         "android/core/src/main/cpp/jni_helper.cpp",
         "android/core/src/main/cpp/core.cpp",
@@ -2247,6 +2247,153 @@
       "timeout_seconds": 300,
       "artifacts": [],
       "verification": "CGO0 Darwin真实生产适配器与内存/os.Pipe fixture编译测试，GOPROXY/GOSUMDBoff，只读mod；不代表race或宿主身份/系统代理验收"
+    },
+    "compile-jni-owned-tun": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "clang++",
+        "-std=c++17",
+        "-fsanitize=address",
+        "-DLIBCLASH",
+        "-I.test/android-jni-failure/include",
+        "-Iandroid/core/src/main/cpp",
+        "-I.test/android-tun-reservation-abi",
+        "android/core/src/test/cpp/jni_owned_tun_fixture.cpp",
+        "android/core/src/main/cpp/jni_helper.cpp",
+        "android/core/src/main/cpp/core.cpp",
+        "-o",
+        ".test/android-checked-release-jni/owned-tun-fixture"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/android-checked-release-jni/owned-tun-fixture"
+      ],
+      "verification": "生产JNI真实registerCallbacks函数表，公开fixture/ASAN，不启动JVM或业务网络"
+    },
+    "test-jni-owned-tun-1": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "1"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-2": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "2"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-3": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "3"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-4": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "4"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-5": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "5"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-6": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "6"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-7": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "7"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-8": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "8"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-jni-owned-tun-9": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-checked-release-jni/owned-tun-fixture",
+        "9"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": []
+    },
+    "test-owned-tun-invocation": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_owned_tun_invocation.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 150,
+      "artifacts": [
+        ".test/android-owned-tun-invocation/receipt.json"
+      ]
     }
   },
   "deployment": {
@@ -2446,14 +2593,14 @@
     "core/android_bride.go": "270b71d0f23b86c0858a056f748f6453f0bc7b73310abfdbaf44899588e4220f",
     "core/tun/tun.go": "f10d11aa419543c7d6cb7d57c6036cbad4e2a739523a07889091dfd16404590c",
     "core/androidstartup/socket_protect_test.go": "290e41d493c0e21ab97356b902d7564fe46e5fd4bd30fbacdc33460e30f89f98",
-    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "88168afb0d1c0546d5a9e80de05e8ed3fd676e3e6beb9142ed6b39252d548a58",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "ee83781b608da1a0f8acfa4cd8814db955c8194f38e25a9b3dbe251e86b5c6ba",
     "android/core/src/main/java/com/appshub/bettbox/core/TunInterface.kt": "c0a1e9c1cc1c4e255d030f2843405a79fabdaf45cdb0d7eae2a7a9ed6781a3d3",
     "android/core/src/main/java/com/appshub/bettbox/core/TunFDLease.kt": "35601d506ad20be9bee7f7303f6b773da04312d0a098a0e21bc23983dae68f51",
     "android/core/src/test/kotlin/com/appshub/bettbox/core/TunFDLeaseFixture.kt": "37e8e5260309c37dea1ac9be9528753a1f6734d2d93f4dcabb7c005447096cce",
-    "android/core/src/main/cpp/core.cpp": "53b065ae4f93f0b27770e9d8dca1e6724230f1615d9cb54165fad66f839f72a4",
+    "android/core/src/main/cpp/core.cpp": "e3d495db84c7fc417515c2ec55de4ea1f249c6645660a5c62192f76b83f59947",
     "android/core/src/main/cpp/jni_helper.cpp": "1286d8f1c57d2ad1c14bfaf4c93f5a7ab378a2ef27584baf3da7e57b2ef36dbb",
     "scripts/check_android_tun_lease.py": "af34e306b45260817a1a480fd93b94f509dc7647ac3dd91ec2ad2d74a116b088",
-    "android/core/src/test/cpp/jni_failure_fixture.cpp": "6915139c400dca2876bb82434900595b87c49bda7b193de88c8f30452cb78586",
+    "android/core/src/test/cpp/jni_failure_fixture.cpp": "1548b452ae5b4540251ceccfb871405ce234379f2490b1a3721543a53dcd36a0",
     "android/core/src/main/cpp/jni_helper.h": "94c8ea35845d2e0b57bdca798bb85dc4fa926e3748403f4d56a179d92816b747",
     "scripts/check_android_vpn_work_gate.py": "b260fd129bd1ca419f50606e23c5efda4b9293fcb83d510fb5fd8cb6433a2057",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "2778ce3b7501b569310477f70fb0befdcd8cd9ac6824718b441a39cff71733d8",
@@ -2487,7 +2634,7 @@
     "core/androidstartup/release_confirmation.go": "8bcc318336ebc6fbbd6e43b0ba011f4ca5e4eb4f026147b1bb371feee4bbf7b2",
     "core/androidstartup/release_confirmation_test.go": "d95b53ec1f45626a5179f9acca89978e78bf1eb157eb1daeccdddbef0cab93b0",
     "scripts/check_android_jni_release.py": "417346c52b9a2588ae5624a933641b65ac5163e3f6c4e0f6dd8675ca0409978d",
-    "android/core/src/test/cpp/jni_release_fixture.cpp": "d7cfe7feea2039254b00b5dbbca98d6e4f20b600aa458d9383fd608a434edd9c",
+    "android/core/src/test/cpp/jni_release_fixture.cpp": "4dc71737b8aaeb7e260a78069b8dd9c6fd378fd2371d60dd3e77c5f8700de7c8",
     "core/android_tun_reservation.go": "cb32c9c56cf6e90fff2982025057e142eb905a57ea717971c6dd9932f66d44fd",
     "core/android_tun_reservation_test.go": "5244fbd21b1ca4738017775f4b0fccc994af00d208b00a68070c52f4c87bcfd7",
     "core/androidstartup/rejected_input.go": "9f732f682594d1d2a69905155d4fab62b60c2fed210a84379bae43c83459bb15",
@@ -2496,9 +2643,13 @@
     "core/androidstartup/owned_state_test.go": "093ec8e6dc2612aaa5b9fb4309b3a420cf40959749fd0f44518abce97e9a807f",
     "core/androidstartup/lease_disposition.go": "fb825166f088f2b61fdb1aafecdadc1e21501adbdd5cee13e17afc50a44b1852",
     "core/androidstartup/lease_disposition_test.go": "02448aca5caa2b17bd3476bfb594cc1379bf7680d8e632dc8d71dd8815fbba8d",
-    "android/core/src/test/cpp/jni_preclaim_fixture.cpp": "88bada3618e51d0367a57e66abef7e31bc11162cb86bac8ee38e4ce762660045",
+    "android/core/src/test/cpp/jni_preclaim_fixture.cpp": "781ae95863ebe1056e5f640e94e81449fee2a5f205791e9515ab576e4848f71d",
     "core/android_tun_owned.go": "66c433923f2140ed64eb22b1b6b016a8589ae379c4fa5ab4d7778242f6e79bf4",
-    "core/android_tun_owned_test.go": "83346dac106438e1ab39bd6fdce454841c98ac90b59a1314e59f47bd9a101484"
+    "core/android_tun_owned_test.go": "83346dac106438e1ab39bd6fdce454841c98ac90b59a1314e59f47bd9a101484",
+    "android/core/src/main/java/com/appshub/bettbox/core/OwnedTunInvocation.kt": "3b5fa8bbbd1721e7cfc9d4c07564b6e4edeaebdaf7b7d26cdf1c8781ab67d2c5",
+    "android/core/src/test/kotlin/com/appshub/bettbox/core/OwnedTunInvocationFixture.kt": "b362317a0c631e55e5fbfafda0d127b4dc432fa8909b982e6f34333c25496a86",
+    "android/core/src/test/cpp/jni_owned_tun_fixture.cpp": "a2a9c445258e388eb0188a387e1bde524b6ad530ebca9c9296baeaed43c22671",
+    "scripts/check_android_owned_tun_invocation.py": "7bd5e1317aeb1ea22ae11bbe5c658483027ff093c4eacbc0fa2614576e326fe9"
   },
   "platform_extensions": {
     "android": {
@@ -2574,6 +2725,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "e25abb25ff11fd4f6f611cabba757b2568adb4096c9b8f4c56e8878123ea5b05"
+    "contract_digest": "7f76e3f3f202d3fef0f782dfd2c68aef7ee1a7ee5d9b8da8c9e995ac57438652"
   }
 }

@@ -23,7 +23,23 @@ object Core {
     private external fun startNativeTun(lease: TunFDLease, cb: TunInterface?): Boolean
     private external fun suspend(suspended: Int)
     private external fun stopNativeTun(): Boolean
+    private external fun startOwnedTunNative(epoch: Long, revision: Long, generation: Long, lease: TunFDLease, cb: TunInterface?): String?
+    private external fun stopOwnedTunNative(epoch: Long, revision: Long, generation: Long): String?
     private val inputCleanupFailed = AtomicBoolean(false)
+
+    // 仅向唯一owner交付finally之后的不可变输入状态，不自行发布START/STOP。
+    fun startTunOwnedRaw(epoch: Long, revision: Long, generation: Long, fd: Int, callback: TunInterface?): OwnedTunCall {
+        val lease = TunFDLease(fd) { owned -> ParcelFileDescriptor.adoptFd(owned).close() }
+        return OwnedTunInvocation.start(lease, inputCleanupFailed) {
+            startOwnedTunNative(epoch, revision, generation, lease, callback)
+        }
+    }
+
+    fun stopTunOwnedRaw(epoch: Long, revision: Long, generation: Long): Pair<String?, Boolean> {
+        val receipt = runCatching { stopOwnedTunNative(epoch, revision, generation) }.getOrNull()
+        if (receipt == null) inputCleanupFailed.set(true)
+        return Pair(receipt, inputCleanupFailed.get())
+    }
 
     fun stopTun(): Boolean = runCatching {
         stopNativeTun() && !inputCleanupFailed.get()

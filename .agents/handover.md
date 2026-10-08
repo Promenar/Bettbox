@@ -2241,3 +2241,34 @@ JNI类型化启停桥及严格Kotlin消费/最终finally快照；实际VpnPlugin
 
 ### HLG
 通过append dry-run和apply追加交接。
+
+## 2026-10-08T21:36:24+08:00 · Android带身份TUN的JNI与Core原始回执通路
+
+type: maintenance
+scope: ["android-native"]
+status: done
+tags: ["android", "jni", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 69d7cecb9f710dca5904f5db70a80427742aa554cc1b5a1810d393ac4199a267
+
+### Summary
+Go带身份入口已通过JNI接至Core Raw调用，Kotlin在finally后返回输入处置和阻断。
+
+### Changed
+core.cpp新增owned start/stop及C回执转换释放；Core新增Raw方法；OwnedTunInvocation捕获最终输入状态和共享sticky阻断。旧公共fixture补新ABI链接stub，新增JNI与Invocation夹具及PDEC操作。
+
+### Validation
+九场景生产JNI函数表ASAN与六项Invocation JVM通过；完整Core/TunInterface对公开Android SDK jar编译通过，旧JNI17+6+9回归及NDK28同次Go头实际链接exit0；独立审阅未发现P1/P2。公开回执 docs/validation/2026-10-07-three-platform/android-owned-tun-jni-validation.json。
+
+### Next
+实现严格Kotlin TUN回执parser/final completion，接实际VpnPlugin唯一owner及配置旁路收敛，再正式APK设备与有效节点验收。macOS匹配profile后完整App/iOS开发和服务端业务闭环继续。
+
+### Risks
+当前Raw接口尚未被产品VpnPlugin采用。非真实JVM/CheckJNI、ParcelFileDescriptor或FD证据。并发check/invoke需由未来owner串行；真实邀请返佣及支付与签名外部条件尚未闭环。
+
+### DIA
+已同步架构、CHANGELOG、平台验证、registry、实施计划及公开回执。
+
+### HLG
+通过append dry-run/apply追加交接。
