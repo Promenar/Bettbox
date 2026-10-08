@@ -2049,7 +2049,28 @@
         "-count=1",
         "-timeout=120s",
         "-run",
-        "^TestRejectedInput",
+        "^TestOwnedState",
+        "-v",
+        "./androidstartup"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实生产报告接口red/green，公开内存Resource，不调用系统FD、VPN或网络"
+    },
+    "test-android-owned-state": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=120s",
+        "-run",
+        "^TestOwnedState",
         "-v",
         "./androidstartup"
       ],
@@ -2153,7 +2174,7 @@
     "core/androidstartup/callback_gate_test.go": "0b2f0578c79f57fd7b8341078d5dd69fa4b588a6c79277bb94a07092d19bed49",
     "core/androidstartup/state_test.go": "22032245acb9753a573995233e56561cbdb7882c5d08dfe1722bda7e556e1a13",
     "core/androidstartup/callback_gate.go": "1b3157a0f5b5c9a1c61a7a22ee7388d3e0accaab3f5f130592fa01acfd77e8aa",
-    "core/androidstartup/state.go": "b31e3c57aa86d76d6693cc5327af32637a230b35e6339df24e456414e2be5de0",
+    "core/androidstartup/state.go": "f6ab26780a7629d6bb4ae60b6ccecd2ab66337e46f3e6f66b061775cb489fb39",
     "scripts/macos_core_identity.py": "34e6f9b38b657005906eb4c96f219c0c94fba00f948a4bfc551f4d6384ca0118",
     "scripts/tests/test_macos_core_identity.py": "8a6569d5b7da4afd6e11841326e88dc6f5d7d5d21de1401ddd2bc578f50c7303",
     "setup.dart": "05ef5c07540f1d1c7545d30caf3b8cdb8e7d7642026a0d6b91672df1da2f89a4",
@@ -2301,7 +2322,9 @@
     "core/android_tun_reservation.go": "254a9a80b44c02a9126d61108f4dd6ad30c233f73efddd94dc1523c02ac7dd61",
     "core/android_tun_reservation_test.go": "5244fbd21b1ca4738017775f4b0fccc994af00d208b00a68070c52f4c87bcfd7",
     "core/androidstartup/rejected_input.go": "9b0ddc91719323ff4a728febc91f2dfc37789fcc6b38c69bcbba0c5f59ce2911",
-    "core/androidstartup/rejected_input_test.go": "25a8688125f49bf9b66722485e9f4a35cc9bf504340c1e267762f6b48a933cd6"
+    "core/androidstartup/rejected_input_test.go": "25a8688125f49bf9b66722485e9f4a35cc9bf504340c1e267762f6b48a933cd6",
+    "core/androidstartup/owned_state.go": "7da0ec4bb322620b7022b7e6aad0c215987f9ff3e7b120293d3ed04e30df771b",
+    "core/androidstartup/owned_state_test.go": "093ec8e6dc2612aaa5b9fb4309b3a420cf40959749fd0f44518abce97e9a807f"
   },
   "platform_extensions": {
     "android": {
@@ -2377,6 +2400,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "ffa885beb585e98d38fe7775fb328c7b5fcae968e00610cf5974d4f87697b986"
+    "contract_digest": "604b5186fc286b7eb1e69ffcb78e4d94913448324fdd5a6cbd3b63068f7055b8"
   }
 }

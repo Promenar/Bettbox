@@ -205,3 +205,5 @@ Android 配置协调器提供同一配置锁内的 TUN 预留：绑定 epoch/con
 Android State 的 `RejectInputWithCleanup` 独立清理未进入构造的新输入，不停止旧资源或修改旧 runtime。关闭错误或 panic、回调释放 panic 转换为固定首因并粘滞阻断；释放失败保留 pending lease。输入完成与 State 已有 blocked 责任分别报告。回调不得重入 State；真实启动接线和设备验收独立完成。
 
 Android TUN预留固定同次VPN模式：VPN成功须进入构造并保留resource/lease；非VPN fd0成功仅有running且无三项责任。两者不可互相冒充，options消费者修改不能改变已固定模式。实际唯一owner尚未接入生产VpnPlugin。
+
+Android State提供值身份TunOwnership（epoch/configRevision/generation）。受管start只接纳已收口状态，无身份start/stop不能替换或停止受管资源；受管stop要求完整身份相符。身份在进入构造前绑定，构造或回调收尾未知时保留，确认收尾后清空，非VPNfd0同样绑定。StartReport和OwnedStopReport在同一状态锁内复制完成事实及残余身份；OwnedIdentity只表示当前态，不能用来拼接完成回执。State不发行代次、不校验外层请求授权，实际JNI/owner接线另验。

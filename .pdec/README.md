@@ -141,3 +141,5 @@ TUN 配置预留验证入口：`test-android-tun-reservation`、`test-android-co
 `test-android-config-reservation-red/green` 使用缓存 Kotlin/Gson 验证预留错误码的原生 parser 合同，输出为独立 `.test/android-config-reservation-*`。
 
 `test-android-rejected-input` 验证独立拒绝输入清理；完整状态模块 race 使用 `test-android-startup-full`。公开替身不操作真实 FD/VPN。
+
+`test-android-owned-state`验证受管State完整身份；全模块race使用`test-android-startup-full`，Android核心编译使用`compile-android-tun-reservation-core`。

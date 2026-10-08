@@ -246,3 +246,5 @@ TUN 配置预留模块的红绿、独立审阅及核心编译证据见 `validati
 拒绝输入清理的公开资源计数和完整状态模块 race 证据见 `validation/2026-10-07-three-platform/android-rejected-input-validation.json`；未执行真实 FD/JNI/VPN，不表示发行候选通过。
 
 模式核验证据见 `validation/2026-10-07-three-platform/android-tun-mode-validation.json`，只证明模块和核心编译，未证明设备或发行包。
+
+资源身份回归与同次完成快照证据见 `validation/2026-10-07-three-platform/android-owned-state-validation.json`；公开Resource不代表真实FD/JVM/设备。

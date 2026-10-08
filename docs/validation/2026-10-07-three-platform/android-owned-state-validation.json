@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "baseline": "67d138dbe47ae2b52ce0c6e336f115caa1321c0a",
+  "source_sha256": {
+    "core/androidstartup/state.go": "f6ab26780a7629d6bb4ae60b6ccecd2ab66337e46f3e6f66b061775cb489fb39",
+    "core/androidstartup/owned_state.go": "7da0ec4bb322620b7022b7e6aad0c215987f9ff3e7b120293d3ed04e30df771b",
+    "core/androidstartup/owned_state_test.go": "093ec8e6dc2612aaa5b9fb4309b3a420cf40959749fd0f44518abce97e9a807f"
+  },
+  "validation": {
+    "initial_red_exit": 1,
+    "initial_red_failed_tests": 3,
+    "fd0_release_red_exit": 1,
+    "final_green_exit": 0,
+    "final_tests": 10,
+    "full_startup_race_exit": 0,
+    "android_arm64_build_exit": 0
+  },
+  "review": "独立复审确认fd0引用未知身份丢失P2关闭，无新确认P1/P2",
+  "boundary": [
+    "State接受调用方已核验的身份，不自行分配代次或证明外层配置授权",
+    "真实lib_android/JNI/Native owner尚未调用受管入口",
+    "公开Resource与计数替身，不是实际FD/JVM/设备",
+    "未生成或安装新APK"
+  ]
+}

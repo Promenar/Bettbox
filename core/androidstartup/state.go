@@ -36,6 +36,7 @@ func (l *OnceLease) Release() {
 
 type State struct {
 	mu              sync.Mutex
+	owner           *TunOwnership
 	resource        Resource
 	lease           *OnceLease
 	pendingLeases   []*OnceLease
@@ -60,6 +61,8 @@ const (
 // StartReport 描述一次启动尝试结束后由 State 能直接证明的资源状态。
 // RetainsLease 仅表示 State 仍持有 lease 指针，不证明外部 JNI 引用已释放。
 type StartReport struct {
+	Ownership          TunOwnership
+	HasOwnership       bool
 	Started            bool
 	Entered            bool
 	CleanupUnconfirmed bool
@@ -78,6 +81,10 @@ func (s *State) StartWithInputCleanupReport(
 	open func(*OnceLease) (Resource, error),
 	inputCleanup func() error,
 ) (report StartReport) {
+	return s.startWithOwnershipReport(nil, fd, ready, release, open, inputCleanup)
+}
+
+func (s *State) startWithOwnershipReport(owner *TunOwnership, fd int, ready bool, release func(), open func(*OnceLease) (Resource, error), inputCleanup func() error) (report StartReport) {
 	s.mu.Lock()
 	started := false
 	entered := false
@@ -122,10 +129,23 @@ func (s *State) StartWithInputCleanupReport(
 			Running:            !s.runtime.IsZero(),
 			Code:               code,
 		}
+		if s.owner != nil {
+			report.Ownership = *s.owner
+			report.HasOwnership = true
+		}
 		s.mu.Unlock()
 	}()
 
 	activeLease = NewOnceLease(release)
+	if s.owner != nil || owner != nil && (!owner.valid() || s.resource != nil || s.lease != nil || !s.runtime.IsZero()) {
+		attemptCode = "ownershipRejected"
+		if releaseLease(activeLease) {
+			s.retainPendingLeaseLocked(activeLease)
+			s.markBlockedLocked(startCodeReleasePanic)
+		}
+		activeLease = nil
+		return
+	}
 	if !s.stopLocked() {
 		if releaseLease(activeLease) {
 			s.retainPendingLeaseLocked(activeLease)
@@ -135,6 +155,9 @@ func (s *State) StartWithInputCleanupReport(
 		return
 	}
 	if fd <= 0 {
+		if fd == 0 && ready {
+			s.setOwnerLocked(owner)
+		}
 		if releaseLease(activeLease) {
 			s.retainPendingLeaseLocked(activeLease)
 			s.markBlockedLocked(startCodeReleasePanic)
@@ -150,6 +173,7 @@ func (s *State) StartWithInputCleanupReport(
 			attemptCode = startCodeNotReady
 			return
 		}
+		s.setOwnerLocked(owner)
 		s.runtime = time.Now()
 		started = true
 		return
@@ -165,6 +189,7 @@ func (s *State) StartWithInputCleanupReport(
 	}
 
 	entered = true
+	s.setOwnerLocked(owner)
 	s.retainPendingLeaseLocked(activeLease)
 	resource, err, panicked := callOpen(open, activeLease)
 	if panicked {
@@ -186,6 +211,9 @@ func (s *State) StartWithInputCleanupReport(
 			s.markBlockedLocked(startCodeReleasePanic)
 		}
 		activeLease = nil
+		if s.blockedCode == "" {
+			s.owner = nil
+		}
 		return
 	}
 	s.resource, s.lease, s.runtime = resource, activeLease, time.Now()
@@ -298,6 +326,7 @@ func (s *State) closeCurrentLocked() bool {
 		return false
 	}
 	s.lease = nil
+	s.owner = nil
 	return true
 }
 
@@ -314,7 +343,14 @@ func (s *State) StartWithInputCleanup(fd int, ready bool, release func(), open f
 	return s.StartWithInputCleanupReport(fd, ready, release, open, inputCleanup).Started
 }
 
-func (s *State) Stop() bool         { s.mu.Lock(); defer s.mu.Unlock(); return s.stopLocked() }
+func (s *State) Stop() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.owner != nil {
+		return false
+	}
+	return s.stopLocked()
+}
 func (s *State) Runtime() time.Time { s.mu.Lock(); defer s.mu.Unlock(); return s.runtime }
 
 // FDLease 接管 Kotlin 脱离的 FD，仅关闭尚未被 NativeTun 采纳的输入。

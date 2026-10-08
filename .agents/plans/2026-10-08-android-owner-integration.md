@@ -109,3 +109,7 @@ State 提供独立 RejectInputWithCleanup：拒绝新输入不调用 stop/open�
 当前 Android 主源码没有 AndroidNativeOperations/NativePreparedConfig；历史公开候选不等于生产接线。实际 VpnPlugin 调用 Core.startTun/stopTun 的 bool 并自行发布START。统一owner尚须接入这些真实调用点，不以候选夹具替代。配置预留按同次options.Enable固定vpnRequired；VPN完成须Entered/resource/lease齐备，非VPN fd0完成须三者皆无，二者共同要求Started/Running且无清理未知。消费者修改options不得改变固定模式。真实State fd0红绿、双向模式拒绝、全core与Android核心编译通过。
 
 带版本start/stop需携带epoch/configRevision/唯一owner generation，禁止Core或ledger发行第二代次。回执分别表达请求身份、本次started/entered、输入处置、FD和reference收尾确认、当前残留资源身份/runtime及全局blocked；成功持有输入不得声称已关闭。JNI保持peek/global-ref/claim合同，claim前Kotlin收尾未领FD，claim后Go负责FD/ref包括版本拒绝；finally closeUnclaimed=true不证明Go已关闭。null/编码失败为unknown。晚到stop须核对资源完整身份，不能停止新代。配置锁仅发行reservation和完成核验，构造、Java回调、drain与State收尾在锁外；所谓同一边界是reservation覆盖责任期间，不是持续持runLock。原生最终桥回执须在finally后不可变捕获。
+
+## State资源身份实施包
+
+State增加epoch/configRevision/generation值身份，不自行发行代次。带身份start不得替换未收口资源；拒绝只释放本次输入，保留旧runtime。带身份stop只接受完整匹配的当前责任；无身份旧stop不得停止受管资源。身份在进入构造前绑定，构造/输入/引用收尾未知时保留，确认所有收尾后清空；非VPNfd0同样绑定。旧legacy模式自身行为保留，向受管模式切换须先收口。主控独占state.go/owned_state.go及测试/PDEC，独立审阅后执行定向和完整startup race；实际JNI/Native owner暂不激活此入口。

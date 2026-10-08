@@ -254,3 +254,7 @@ Android 原生配置回执解析器支持 `tunConfigurationReserved` 与 `tunCle
 ### Android VPN/非VPN模式核验（2026-10-08）
 
 修复配置预留误拒合法fd0非VPN启动，并按预留快照拒绝双向模式不匹配。八项定向、全core CGO0与Android ARM64核心编译通过；实际JNI接线和APK另验。
+
+### Android资源身份（2026-10-08）
+
+增加State资源完整身份与匹配停止，阻止迟到旧代stop及无身份旁路停止新受管资源。十项回归、完整startup race和Android ARM64核心编译通过；真实JNI/owner及APK尚未接线验收。

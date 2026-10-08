@@ -99,3 +99,5 @@
 - docs/validation/2026-10-07-three-platform/android-rejected-input-validation.json — 拒绝新输入保留旧连接、粘滞责任及状态模块race证据
 
 - docs/validation/2026-10-07-three-platform/android-tun-mode-validation.json — 实际State非VPN fd0报告、固定模式与双向拒绝回归
+
+- docs/validation/2026-10-07-three-platform/android-owned-state-validation.json — 资源完整身份、错代停止、未知保留与同次快照验收

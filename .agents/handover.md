@@ -2117,3 +2117,34 @@ record-fingerprint: bd9d14b0ba928e77c76e17a0b69221714fc57443b167041ff395bcdf38f1
 
 ### HLG
 标准append dry-run后apply记录。
+
+## 2026-10-08T18:16:04+08:00 · AndroidState资源身份及同次完成回执
+
+type: development
+scope: ["Bettbox", "Android"]
+status: in_progress
+tags: ["android", "tun", "ownership", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: c5a59ee06f7f5ea50cb96a6c3a884dbd362954c5e0866153bc90ce34ea867122
+
+### Summary
+State增加完整资源身份与匹配停止，拒绝旧请求误停/替换受管资源。
+
+### Changed
+受管与legacy隔离；未收口replacement只清新输入；StartReport/OwnedStopReport同锁捕获残余身份，未知构造/引用收尾保留身份，fd0同样绑定。
+
+### Validation
+初始三项RED exit1；独立P2的fd0引用未知RED exit1，修复后十项GREEN exit0、完整startup race exit0及Android ARM64核心编译exit0。独立复审P2关闭无新确认P1/P2。
+
+### Next
+接入真实Go/JNI带身份启动/停止，形成finally后的Native桥回执，采用唯一owner并收敛旧配置和Dart状态入口。
+
+### Risks
+State不发行generation、不校验外层配置授权。未接入真实JNI/设备或生成新APK；macOS profile与上游/支付外部条件待确认。
+
+### DIA
+已同步架构、CHANGELOG、平台验收、联合计划、registry与PDEC说明。
+
+### HLG
+标准append dry-run后apply记录。
