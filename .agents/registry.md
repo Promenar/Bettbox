@@ -129,3 +129,5 @@
 
 - docs/validation/2026-10-07-three-platform/android-smart-stop-validation.json — 智能停止回执、会话显示提交及 Kotlin 编译候选证据；设备另验
 - docs/validation/2026-10-07-three-platform/node-protocol-observation-2026-10-09.json — 同源独立协议探测的公开分类结果；上游根因未定
+
+- docs/validation/2026-10-07-three-platform/android-35b6443-apk-validation.json — 正式签名候选、设备回读、普通停止及冷启动；智能停止与发行另验

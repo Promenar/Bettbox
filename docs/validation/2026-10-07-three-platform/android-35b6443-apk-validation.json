@@ -1,0 +1,62 @@
+{
+  "source_commit": "35b6443593d4fe6a9b0b79504c45357f3631e12a",
+  "target": "android-arm64-release",
+  "artifact": "build/releases/android/Bettbox-arm64-35b6443.apk",
+  "apk_sha256": "f2c949be35c69857e1b3437950dfa0fc5c59a326922846e5187a3cfcc66b44ea",
+  "apk_bytes": 55862759,
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "signature_verified": true,
+  "native_libraries_checked": 12,
+  "native_elf_16k_alignment_verified": true,
+  "gradle_cleanup_verified": true,
+  "build_started_at": "2026-10-08T16:51:55.357253+00:00",
+  "build_finished_at": "2026-10-08T17:06:03.864060+00:00",
+  "device": {
+    "avd": "Pixel_7",
+    "serial": "emulator-5554",
+    "installed_apk_hash_matches": true,
+    "data_preserved_install": true,
+    "initial_launch": "WARM",
+    "initial_runtime_nonzero": true,
+    "initial_foreground_service_present": true,
+    "ordinary_stop": {
+      "home_present": true,
+      "runtime_clock_present": false,
+      "foreground_service_present": false,
+      "vpn_network_samples": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "vpn_transport_text_present": true,
+      "active_vpn_network_present": false,
+      "remaining_vpn_lines_are_network_requests": true,
+      "measurement_note": "宽泛VPN文本检查包含NetworkRequest；停止后的所有VPN transport行均为请求记录。"
+    },
+    "cold_launch": "COLD",
+    "cold_state": {
+      "cold_home_present": true,
+      "runtime_clock_present": false,
+      "foreground_service_present": false,
+      "active_vpn_transport_line_present": false,
+      "app_nodes_present": true
+    }
+  },
+  "release_verified": false,
+  "remaining": [
+    "智能停止/恢复真实设备交错",
+    "唯一native owner及带身份engine ACK",
+    "有效代理节点HTTPS流量",
+    "真机和16KiB系统设备",
+    "正式发行准入"
+  ]
+}

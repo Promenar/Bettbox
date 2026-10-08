@@ -2613,3 +2613,34 @@ VpnPlugin/ServicePlugin完成回执，Core.suspended返回JNI调用是否抛异�
 
 ### HLG
 标准append记录该开发候选、实测、独立复核与剩余边界。
+
+## 2026-10-09T01:13:44+08:00 · Android35b6443正式签名候选安装与冷启动
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["android", "apk", "device", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: cf2b1ba6d0218f378a83f11f4bd0a93f37a555e0bf90f2c8d4600a135a4f9fd8
+
+### Summary
+完整正式签名候选构建成功并保留数据安装，设备回读同源，首页、普通停止和冷启动保持停止验证通过。
+
+### Changed
+固定保存35b6443 APK与构建回执，PDEC安装摘要绑定实际产物；同步公开设备验收回执和平台文档。
+
+### Validation
+实际构建driver退出0，source/locks unchanged、signature verified、12原生库16KiB ELF检查及Gradle任务清理通过。Pixel_7安装Success，回读SHA匹配。初次WARM首页非零runtime/前台服务，普通停止后无runtime/foreground；VPN宽泛文本持续存在但全部为NetworkRequest，收窄活动网络判据后确认无活动VPN。强制停止准确包名后COLD返回首页保持停止。
+
+### Next
+提交推送验收记录；验证智能停止/恢复真实设备路径与唯一owner/engine ACK，定位有效上游流量失败。macOS本机登录输入仍待用户完成。
+
+### Risks
+初次运行状态恢复原因未定；无智能停止/设备交错、真机或16KiB系统证明。APK source35b6443，文档和安装摘要变更不代表新APK源码。尚无可用代理流量/正式发行证明，整体Goal未完成。
+
+### DIA
+已同步CHANGELOG、PLATFORM_VALIDATION、registry与公开回执；无架构或业务代码变更。
+
+### HLG
+标准append记录终态构建、安装、测量纠偏和剩余边界。

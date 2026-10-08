@@ -317,3 +317,9 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 实际 Dart 包装器 red 两项失败，修复后 12 项 channel 回归与生产 Kotlin gate/lifecycle 的协程屏障夹具通过；release Kotlin 工程编译退出0。公开证据为 `validation/2026-10-07-three-platform/android-smart-stop-validation.json`。失败、空回执、旧代投递和会话换代禁止成功清理。完整 Flutter 与静态分析结果由回执承载。未安装新 APK，实际 Handler/JNI/设备交错与智能恢复未验；不能升级为 VPN 或发行通过。
 
 当前同源独立协议探测见 `validation/2026-10-07-three-platform/node-protocol-observation-2026-10-09.json`。抽样两条 AnyTLS 传输失败及两条 Hysteria2 认证失败只证明相同协议在独立核心也失败，不能确定密码、额度或上游配置根因。
+
+## Android 35b6443 已安装候选
+
+产物 `build/releases/android/Bettbox-arm64-35b6443.apk`，SHA256 为 `f2c949be35c69857e1b3437950dfa0fc5c59a326922846e5187a3cfcc66b44ea`。完整构建、正式签名、源码和锁文件不漂移、12 个原生库 ELF 16KiB 对齐检查通过。Pixel_7 保留数据安装及设备回读同源摘要通过；实际首页、普通停止后前台服务撤销、冷启动返回首页保持停止通过。初次 WARM 启动存在运行计时与前台服务，尚未确定恢复原因。
+
+公开回执为 `validation/2026-10-07-three-platform/android-35b6443-apk-validation.json`。VPN transport 文本须区分活动网络与 NetworkRequest，不能用宽泛文本匹配证明残留连接。本阶段不证明智能停止交错、代理节点 HTTPS、真机或16KiB系统设备；候选不可升级为发行验收通过。
