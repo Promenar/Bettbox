@@ -3295,3 +3295,34 @@ record-fingerprint: 604061865ad11bc1db28fe53faeb2f1ef22aa95341c0d41161ce7171ea31
 
 ### HLG
 使用标准append dry-run后apply追加并生成索引。
+
+## 2026-10-09T06:06:29+08:00 · 真实优惠券和管理员付款业务验收
+
+type: maintenance
+scope: ["Bettbox", "server/billing"]
+status: partial
+tags: ["billing", "coupon", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: e6a0cc8eb143ebfc4386062e4d48f8c1d2e9a9b3fb429114940f2f02e332c4e1
+
+### Summary
+真实固定金额券全局一次使用、创建后故障事务回滚和管理员paid控制器双进程开通通过；生产业务未修改，发行目标未完成。
+
+### Changed
+新增 laravel_coupon_admin_check.php、两个精确公开源码输入CouponService/Coupon及既有Admin候选映射和隔离路由。实际业务分别核对折扣/余额/订单/券剩余次数、故障撤销与重试，以及manual付款单次套餐/流量和重复不延期。runner强制61输入与关键完成标签，PDEC加入公开缓存源摘要。
+
+### Validation
+真实green937b0349224b46b58d53475917757aa7通过289 checks/61冻结输入；source_unchanged/cleanup_verified true。主控核对26候选源摘要及NoSLA只读获取、非LLM凭据字面量扫描通过的CouponService70356228079f62042333eb2196b47c171dc6017cc4761b6b0988d4ae9fdf3291/Coupon eea8958073ee738a581393bddbf8a5602f4f871017a2c2508ab0cd5e5d1c9c81。13项执行器回归通过；独立只读审阅无确认P1/P2，PDEC ready=true。
+
+### Next
+生产管理员/用户认证、真实插件生命周期、未知下单恢复；生产命令注册、停写/备份与候选部署门禁。Android整体owner接线及有效节点流量；macOS解锁后的黑屏/系统代理验收。
+
+### Risks
+券仅固定金额全局一次、服务入口；未验真实下单请求验证、百分比/个人/套餐/周期/过期/取消政策，数据库回滚不证明外部钩子副作用撤销。Admin身份和路由是夹具，未证明生产权限中间件。真实商户及三端有效VPN/发行签名边界保持；生产数据未修改。
+
+### DIA
+已同步README、PLAN、CHANGELOG、PLATFORM_VALIDATION、PDEC、registry和当前公开回执；架构与生产接口无变化。
+
+### HLG
+标准append dry-run后apply追加，生成索引保留历史。

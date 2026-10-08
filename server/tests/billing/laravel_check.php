@@ -96,11 +96,11 @@ try {
         'App\\Models\\User','App\\Models\\Plan','App\\Models\\Order','App\\Models\\Payment','App\\Models\\Setting','App\\Models\\CommissionLog','App\\Models\\TrafficResetLog',
         'App\\Services\\UserService','App\\Services\\PlanService','App\\Services\\TrafficResetService','App\\Services\\PaymentService',
         'App\\Services\\Plugin\\PluginManager','App\\Services\\Plugin\\AbstractPlugin','App\\Services\\Plugin\\HookManager','App\\Services\\Plugin\\InterceptResponseException',
-        'App\\Support\\Setting','App\\Utils\\Helper',
+        'App\\Support\\Setting','App\\Utils\\Helper','App\\Services\\CouponService','App\\Models\\Coupon',
     ];
     $appMap=[];
     foreach ($applicationClasses as $class) $appMap[$class]=fixtureFile($public,'app/'.str_replace('\\','/',substr($class,4)).'.php');
-    foreach (['Services/Billing/Atomic','Services/Billing/Outbox','Services/Billing/AtomicMigration','Services/OrderService','Jobs/OrderHandleJob','Console/Commands/CheckCommission','Console/Commands/CheckOrder','Console/Commands/BillingMigrate','Http/Controllers/V1/User/OrderController','Http/Controllers/V1/Guest/PaymentController'] as $class) {
+    foreach (['Services/Billing/Atomic','Services/Billing/Outbox','Services/Billing/AtomicMigration','Services/OrderService','Jobs/OrderHandleJob','Console/Commands/CheckCommission','Console/Commands/CheckOrder','Console/Commands/BillingMigrate','Http/Controllers/V1/User/OrderController','Http/Controllers/V1/Guest/PaymentController','Http/Controllers/V2/Admin/OrderController'] as $class) {
         $appMap['App\\'.str_replace('/','\\',$class)]=fixtureFile($candidate,'server/patches/billing/overlay/app/'.$class.'.php');
     }
     $appMap['Plugin\\Fubei\\Plugin']=fixtureFile($candidate,'server/plugins/Fubei/Plugin.php');
@@ -182,6 +182,8 @@ SQL);
     $positive=App\Models\Payment::create(['uuid'=>'PUBLIC_POSITIVE','payment'=>'FixtureLegacy','name'=>'公开网关','enable'=>true,'config'=>[],'handling_fee_fixed'=>100]);
     $fubeiPayment=App\Models\Payment::create(['uuid'=>'PUBLIC_FUBEI','payment'=>'Fubei','name'=>'公开付呗','enable'=>true,'config'=>['enabled'=>true,'identity_mode'=>'merchant','app_id'=>'PUBLIC_APP','merchant_id'=>123,'store_id'=>456,'secret_ref'=>'public_fixture','gateway'=>'https://gateway.example.test','gateway_hosts'=>'gateway.example.test','notify_hosts'=>'fixture.example.test','payment_hosts'=>'pay.example.test']]);
     $kernel=$app->make(Illuminate\Contracts\Http\Kernel::class);
+    // 管理员身份注入是夹具，不宣称生产管理员权限链路已验收。
+    $app['router']->middleware('api')->post('/fixture/admin-paid',fn(Illuminate\Http\Request $req)=>$app->make(App\Http\Controllers\V2\Admin\OrderController::class)->paid($req));
     $app['router']->middleware('api')->post('/fixture/cancel',fn(Illuminate\Http\Request $req)=>$app->make(App\Http\Controllers\V1\User\OrderController::class)->cancel($req));
     $app['router']->middleware('api')->post('/fixture/checkout',fn(Illuminate\Http\Request $req)=>$app->make(App\Http\Controllers\V1\User\OrderController::class)->checkout($req));
     $app['router']->middleware('api')->post('/api/v1/guest/payment/notify/{method}/{uuid}',[App\Http\Controllers\V1\Guest\PaymentController::class,'notify']);
@@ -249,6 +251,8 @@ SQL);
     // fork 前释放旧 PDO 引用，各子进程重新建立连接。
     $pdo=null;
     fixtureLaravelConcurrency($db,$temporary,$makeUser,$plan,$positive,$request);
+    require fixtureFile($candidate,'server/tests/billing/laravel_coupon_admin_check.php');
+    fixtureLaravelCouponAdmin($db,$temporary,$makeUser,$plan,$request);
     require fixtureFile($candidate,'server/tests/billing/laravel_queue_check.php');
     fixtureLaravelDatabaseQueue($db,$temporary,$makeUser,$plan);
     $pdo=$db->getPdo();

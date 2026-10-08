@@ -401,7 +401,7 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 
 ## 服务端支付候选当前来源核验
 
-2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 24 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
+2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 26 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
 
 ## SQLite 账务真实迁移与故障原子性
 
@@ -414,7 +414,7 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 
 真实 Laravel 两进程、共同起跑、独立重连和操作区间重叠已验证同用户只创建一单、重复取消退款一次、重复通知开通/流量/消费一次、取消与到账合法赢家状态和返佣余额/日志一次。197 项检查、56 个冻结输入在 NoSLA 禁网只读 128 MiB 临时容器通过；实际进程收尾 deadline 责任缺陷已通过红绿回归修复。仅单轮两进程、旧网关夹具和同步队列，不代表同时等待同一 mutex 的测量、压力测试或真实付呗并发。
 
-公开证据见 `validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。10 项执行器回归包含缺失并发/重叠标签时必须拒绝通过回执。优惠券、管理员付款、生产 Redis/常驻队列、生产插件发现/认证及商户支付另验。生产业务源码未因测试扩大范围而改写。
+公开证据见 `validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。10 项执行器回归包含缺失并发/重叠标签时必须拒绝通过回执。其它优惠券限制、生产管理员权限、生产 Redis/常驻队列、生产插件发现/认证及商户支付另验。生产业务源码未因测试扩大范围而改写。
 
 
 ## Laravel 三层邀请及零金额付款
@@ -429,3 +429,10 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 真实 Laravel DatabaseQueue/Worker 已在专用 SQLite 队列表验证：CheckOrder 将任务序列化入队且不立即开通；首次开通异常释放任务重试、attempts 增长且业务事务无半次开通；真实 JobProcessed 事件核对两个独立 PID 各消费一个目标任务后队列清空，开通、流量重置和幂等消费者各一次。258 项真实隔离检查、57 个冻结输入与12项执行器回归通过，临时配置恢复。只覆盖有界数据库队列消费，不证明生产 Redis、daemon 信号/超时、failed_jobs终态、强杀或长期压力。
 
 证据见 `validation/2026-10-07-three-platform/laravel-database-queue-validation.json`。认证/插件发现/支付网关夹具边界保持，不等于生产真实商户或三端完整业务验收。
+
+
+## Laravel 优惠券与管理员付款控制器
+
+真实 CouponService/Coupon 公开源码已验证两用户竞争全局限用一次的固定金额券：仅一张订单，券次数零，折扣与余额精确，输家无订单且余额不变。创建后的公开故障完整撤销券次数、余额及订单，重试成功。真实管理员 paid 控制器双进程确认只开通/重置一次，无网关调用且重复不延期；身份注入为夹具，不证明生产管理员权限链路。当前 289 项隔离检查、61 个冻结输入与13项执行器回归通过。
+
+证据见 `validation/2026-10-07-three-platform/laravel-coupon-admin-validation.json`。两个新增公开源只读取自 NoSLA，经本地非 LLM 凭据字面量扫描再登记摘要并精确上传；不加载真实源站配置、账号或数据库。生产管理员鉴权、其它券限制和真实商户链路另验。

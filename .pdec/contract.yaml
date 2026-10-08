@@ -366,7 +366,7 @@
       "timeout_seconds": 300,
       "artifacts": [],
       "cross_compile": "SSH传输精确公开白名单，NoSLA既有镜像内Laravel框架，非交叉编译",
-      "verification": "57个公开冻结输入，禁网只读128MiB空SQLite；实际DatabaseQueue/Worker序列化补偿任务、异常释放重试及双进程重复任务；保留账务与迁移回归；认证/发现/网关stub，不挂生产数据配置，不启动daemon"
+      "verification": "61个公开冻结输入，禁网只读128MiB空SQLite；真实Coupon单次使用与创建失败回滚/Admin付款控制器双进程开通；保留DatabaseQueue/Worker及原业务迁移回归；认证/发现/网关stub，管理员权限为夹具，不挂生产数据配置"
     },
     "test-android-release-signing": {
       "executor": "local-mac",
@@ -3080,9 +3080,9 @@
     "scripts/android_dependency_network.py": "025b56819537f984011196aa9e6dfa8fc3400369267dc131406800b9b8e4ad14",
     "scripts/tests/test_build_android.py": "20b1e4f6106097be2c4b538605187724d05b36cb42688a03c7731321b1e8cf28",
     "scripts/tests/test_android_dependency_network.py": "b25af8eeb09dad2cd2e3724bb110ccc7ddcee9d3cb0e6dcab979710bebbaeca0",
-    "server/tests/billing/run_laravel_isolated.py": "76b8dc83c89b696bce6c29caf5d29e4b42ba49e4dfe33270cbbf98c65e80919a",
-    "server/tests/billing/test_laravel_isolated.py": "46db02c60855a8a149ea41adfe42bba0db46f45ac6a58bf56944c627fbf0477e",
-    "server/tests/billing/laravel_check.php": "1ef8b1e2ccfdc686f56f08d2e104c0d2e6ff3005f77c434eb72d40716e2f6d55",
+    "server/tests/billing/run_laravel_isolated.py": "aef4f83d4226a12786a955f618b3fcb5b59d0cc323a18917b6843a77e942fc72",
+    "server/tests/billing/test_laravel_isolated.py": "c592b9921444ae1af7c6cd4eef598175b69acd0ff5ed26cd6b8313dd7e963386",
+    "server/tests/billing/laravel_check.php": "d084370e185ce9698ddc3ef061fa02bb051be0c572cbca7938399b14d877d7f6",
     "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
@@ -3378,7 +3378,11 @@
     "server/patches/billing/overlay/app/Services/Billing/AtomicMigration.php": "a3e636b14eed17a8294db6b076550997e92217a65b5d05aa583bb597ce935a42",
     "server/patches/billing/overlay/app/Console/Commands/BillingMigrate.php": "706ff6fc43f9bfcf77ff822973e5790221d19f866ec39c8a54a0553255c0d1ee",
     "server/tests/billing/laravel_concurrency_check.php": "3b47abc3a207c7815bc44215f2975a08db97d3d3f2f0925bec90be4c62006edb",
-    "server/tests/billing/laravel_queue_check.php": "d4c858e24030c243fd2f38ac9b5f2d64d05f22bf816b4bfc4f14680713175570"
+    "server/tests/billing/laravel_queue_check.php": "d4c858e24030c243fd2f38ac9b5f2d64d05f22bf816b4bfc4f14680713175570",
+    "server/tests/billing/laravel_coupon_admin_check.php": "5cae1a7f2cd5a6aa4a90a3d517ee39c29f71ab732441b7974cfd7f051839c812",
+    ".test/billing-laravel-public-source/app/Services/CouponService.php": "70356228079f62042333eb2196b47c171dc6017cc4761b6b0988d4ae9fdf3291",
+    ".test/billing-laravel-public-source/app/Models/Coupon.php": "eea8958073ee738a581393bddbf8a5602f4f871017a2c2508ab0cd5e5d1c9c81",
+    "server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php": "cffedc4cdfa51d8103542db3eb286e29ab2bec607466a5d2e1feeeaf2ec02041"
   },
   "platform_extensions": {
     "android": {
@@ -3454,6 +3458,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "6090afaa3d295b97f528ed15cc9ab75f19bb78495ec99f7efbb91c6956065a4b"
+    "contract_digest": "ba2ba55793c577af820f9234c42ae8867d3818a836d533bc474f5afd55b664ac"
   }
 }

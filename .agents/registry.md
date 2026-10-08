@@ -184,3 +184,6 @@
 
 - .agents/plans/2026-10-09-laravel-database-queue.md — 真实数据库异步队列/Worker补偿、异常重试与执行边界
 - docs/validation/2026-10-07-three-platform/laravel-database-queue-validation.json — 持久任务、实际Worker双进程和重复开通不变量证据
+
+- .agents/plans/2026-10-09-laravel-coupon-admin.md — 优惠券和管理员付款业务验收范围、源码及权限边界
+- docs/validation/2026-10-07-three-platform/laravel-coupon-admin-validation.json — 券全局一次/创建回滚和管理员控制器开通证据

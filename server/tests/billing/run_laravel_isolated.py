@@ -28,6 +28,7 @@ PUBLIC_INPUTS = (
     'app/Services/TrafficResetService.php', 'app/Services/PaymentService.php',
     'app/Services/Plugin/PluginManager.php', 'app/Services/Plugin/AbstractPlugin.php',
     'app/Services/Plugin/HookManager.php', 'app/Services/Plugin/InterceptResponseException.php',
+    'app/Services/CouponService.php','app/Models/Coupon.php',
     'app/Support/Setting.php', 'app/Utils/Helper.php', 'app/Helpers/Functions.php',
 )
 CANDIDATE_INPUTS = (
@@ -41,6 +42,7 @@ CANDIDATE_INPUTS = (
     'server/patches/billing/overlay/app/Console/Commands/BillingMigrate.php',
     'server/patches/billing/overlay/app/Http/Controllers/V1/User/OrderController.php',
     'server/patches/billing/overlay/app/Http/Controllers/V1/Guest/PaymentController.php',
+    'server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php',
     'server/patches/billing/overlay/database/migrations/billing_atomic_schema.sql',
     'server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php',
     'server/plugins/Fubei/Plugin.php', 'server/plugins/Fubei/Amount.php',
@@ -51,6 +53,7 @@ CANDIDATE_INPUTS = (
     'server/tests/billing/laravel_migration_check.php',
     'server/tests/billing/laravel_concurrency_check.php',
     'server/tests/billing/laravel_queue_check.php',
+    'server/tests/billing/laravel_coupon_admin_check.php',
 )
 IMAGE_SOURCE_CONTAINER = 'xboard-test-xboard-1'
 DIGEST = re.compile(r'sha256:[a-f0-9]{64}\Z')
@@ -150,6 +153,7 @@ def result_summary(raw, hashes):
     required.update(name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission','parallel_free','parallel_tiers','parallel_cycle'])
     required.update({'queue_dedicated_database', 'queue_serialized_job_not_sync', 'parallel_queue_overlap', 'queue_paid_without_inline_open', 'queue_failure_business_transaction_rolled_back', 'queue_duplicate_retry_open_reset_event_once', 'queue_configuration_restored', 'queue_failed_job_released_for_retry', 'queue_empty_owned_table', 'queue_real_compensation_command', 'queue_workers_consumed_persistent_jobs', 'queue_duplicate_serialized_jobs', 'queue_processing_not_opened'})
     required.add('queue_two_pids_processed_target_once')
+    required.update({'coupon_global_one_use_one_order', 'admin_paid_repeat_rejected', 'admin_paid_open_reset_once_no_gateway', 'coupon_empty_owned_table', 'coupon_user_1_consistent', 'coupon_retry_consumes_once', 'admin_paid_repeat_no_extension', 'parallel_coupon_overlap', 'coupon_winner_discount_balance_exact', 'parallel_admin_paid_overlap', 'coupon_dedicated_database', 'coupon_create_failure_restores_use_balance_order', 'coupon_user_0_consistent'})
     required.update('migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'])
     if not required.issubset(checks) or value.get('environment_loaded') is not False or value.get('production_database_loaded') is not False:
         raise RunnerFailure('fixture_contract_incomplete')

@@ -44,6 +44,8 @@ CHECKS += ['queue_dedicated_database', 'queue_empty_owned_table', 'queue_paid_wi
 
 CHECKS += ['queue_two_pids_processed_target_once']
 
+CHECKS += ['coupon_dedicated_database', 'coupon_empty_owned_table', 'coupon_global_one_use_one_order', 'coupon_winner_discount_balance_exact', 'coupon_user_0_consistent', 'coupon_user_1_consistent', 'coupon_create_failure_restores_use_balance_order', 'coupon_retry_consumes_once', 'admin_paid_open_reset_once_no_gateway', 'admin_paid_repeat_rejected', 'admin_paid_repeat_no_extension', 'parallel_coupon_overlap', 'parallel_admin_paid_overlap']
+
 
 class LaravelIsolatedTest(unittest.TestCase):
     def test_real_migration_input_and_completion_are_required(self):
@@ -78,6 +80,19 @@ class LaravelIsolatedTest(unittest.TestCase):
         hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
         for label in ['queue_serialized_job_not_sync', 'queue_failed_job_released_for_retry',
                       'queue_duplicate_retry_open_reset_event_once', 'parallel_queue_overlap', 'queue_two_pids_processed_target_once']:
+            with self.subTest(label=label):
+                payload = {'ok': True, 'checks': [x for x in CHECKS if x != label], 'source_hashes': {},
+                           'environment_loaded': False, 'production_database_loaded': False}
+                with self.assertRaises(runner.RunnerFailure):
+                    runner.result_summary(json.dumps(payload).encode(), hashes)
+
+    def test_coupon_and_admin_results_are_required(self):
+        self.assertIn('app/Services/CouponService.php', runner.PUBLIC_INPUTS)
+        self.assertIn('app/Models/Coupon.php', runner.PUBLIC_INPUTS)
+        self.assertIn('server/tests/billing/laravel_coupon_admin_check.php', runner.CANDIDATE_INPUTS)
+        hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
+        for label in ['coupon_global_one_use_one_order', 'coupon_create_failure_restores_use_balance_order',
+                      'admin_paid_open_reset_once_no_gateway', 'parallel_admin_paid_overlap']:
             with self.subTest(label=label):
                 payload = {'ok': True, 'checks': [x for x in CHECKS if x != label], 'source_hashes': {},
                            'environment_loaded': False, 'production_database_loaded': False}
@@ -172,7 +187,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 57)
+        self.assertEqual(len(receipt['source_hashes']), 61)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)
