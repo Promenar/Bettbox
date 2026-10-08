@@ -15,3 +15,16 @@ Future<void> completeSmartStop({
   }
   commit();
 }
+
+/// 恢复完成回执属于同一会话时才提交显示；拒绝失败或旧回执。
+Future<void> completeSmartResume({
+  required Future<bool?> Function() resume,
+  required Object? Function() currentSession,
+  required void Function() commit,
+}) async {
+  final session = currentSession();
+  if (await resume() != true || !identical(currentSession(), session)) {
+    throw StateError(appLocalizations.connectionStateUnconfirmed);
+  }
+  commit();
+}

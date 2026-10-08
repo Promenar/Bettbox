@@ -141,7 +141,6 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
         case SmartAutoStopDecision.stop:
           await _stopVpn();
         case SmartAutoStopDecision.resume:
-          ref.read(isSmartStoppedProvider.notifier).set(false);
           await _restartVpn();
         case SmartAutoStopDecision.none:
           break;
@@ -193,16 +192,20 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
 
   Future<void> _restartVpn() async {
     if (system.isAndroid) {
-      // Android: Resume from smart-stop mode
-      await service?.setSmartStopped(false);
-      await service?.smartResume();
-
-      globalState.startTime = DateTime.now();
-      ref.read(runTimeProvider.notifier).value = 0;
-      globalState.appController.addCheckIpNumDebounce();
+      await completeSmartResume(
+        resume: () async => service?.smartResume(),
+        currentSession: () => mounted ? globalState.startTime : Object(),
+        commit: () {
+          ref.read(isSmartStoppedProvider.notifier).set(false);
+          globalState.startTime = DateTime.now();
+          ref.read(runTimeProvider.notifier).value = 0;
+          globalState.appController.addCheckIpNumDebounce();
+        },
+      );
     } else {
       // Desktop: Full start
       await globalState.appController.updateStatus(true);
+      ref.read(isSmartStoppedProvider.notifier).set(false);
     }
   }
 

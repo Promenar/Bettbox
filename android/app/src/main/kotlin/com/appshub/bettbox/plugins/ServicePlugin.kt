@@ -70,8 +70,9 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             "smartResume" -> {
                 val data = call.argument<String>("data")
                 val options = gson.fromJson(data, VpnOptions::class.java)
-                VpnPlugin.handleSmartResume(options)
-                result.success(true)
+                VpnPlugin.handleSmartResume(options) { receipt ->
+                    VpnPlugin.completeSmartResumeResult(result, receipt)
+                }
             }
             "setSmartStopped" -> {
                 GlobalState.isSmartStopped = call.argument<Boolean>("value") ?: false

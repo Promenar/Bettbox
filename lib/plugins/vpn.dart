@@ -96,9 +96,13 @@ class Vpn {
   }
 
   Future<bool?> smartResume(AndroidVpnOptions options) async {
-    return await methodChannel.invokeMethod<bool>('smartResume', {
+    final completed = await methodChannel.invokeMethod<bool>('smartResume', {
       'data': jsonEncode(options),
     });
+    if (completed != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    return completed;
   }
 
   Future<bool> getStatus() async {

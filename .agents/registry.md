@@ -136,3 +136,6 @@
 
 - .agents/plans/2026-10-09-smart-auto-stop-empty-rules.md — 空规则恢复决策、串行检查、过期判断拒绝及回归计划
 - docs/validation/2026-10-07-three-platform/smart-auto-stop-empty-rules-validation.json — 空规则恢复源码红绿、267项完整回归及独立审阅；设备与恢复完成回执另验
+
+- .agents/plans/2026-10-09-smart-resume-completion.md — Android智能恢复同意图完成回执、失败来源及Dart提交计划
+- docs/validation/2026-10-07-three-platform/android-smart-resume-validation.json — 恢复完成源码红绿、完整Kotlin/Flutter及独立复审；设备和typed ACK另验

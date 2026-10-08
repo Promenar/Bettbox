@@ -45,6 +45,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetSocketAddress
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ConcurrentHashMap
@@ -198,7 +199,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
             "smartResume" -> {
                 val data = call.argument<String>("data")
-                result.success(handleSmartResume(Gson().fromJson(data, VpnOptions::class.java)))
+                handleSmartResume(Gson().fromJson(data, VpnOptions::class.java)) { receipt ->
+                    completeSmartResumeResult(result, receipt)
+                }
             }
             
             "setQuickResponse" -> {
@@ -242,10 +245,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         emptyList()
     }
 
-    fun handleStart(options: VpnOptions): Boolean {
+    fun handleStart(options: VpnOptions): Boolean = requestStart(options) != null
+
+    private fun requestStart(options: VpnOptions): SmartResumeOrigin? {
         onUpdateNetwork()
         var request: VpnIntentController.Intent? = null
         var recover = false
+        var wasSmartStopped = false
         val accepted = GlobalState.runLock.withLock {
             recover = !coldRecoveryChecked && !GlobalState.isStopping && GlobalState.isCurrentlyStopping()
             if (startRequested || (GlobalState.isCurrentlyStopping() && !recover) || localCleanupFailed ||
@@ -257,14 +263,14 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
             if (options.enable != this.options?.enable) this.bettBoxService = null
             this.options = options
-            request = intents.request()
+            wasSmartStopped = GlobalState.isSmartStopped
+            request = intents.request(wasSmartStopped)
             startRequested = true
-            GlobalState.isSmartStopped = false
             GlobalState.updateRunState(RunState.PENDING)
             true
         }
-        if (!accepted) return false
-        val intent = request ?: return false
+        if (!accepted) return null
+        val intent = request ?: return null
         if (recover) {
             lifecycleScope.launch {
                 nativeGate.recover(current = {
@@ -295,7 +301,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             GlobalState.runLock.withLock { coldRecoveryChecked = true }
             dispatchStart(intent, options)
         }
-        return true
+        return SmartResumeOrigin(intent, wasSmartStopped)
     }
 
     private fun isMainProcess(): Boolean {
@@ -615,7 +621,10 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }, consume = {
                 if (!isCurrent(ticket) || detachedFd < 0) return@start
                 val nativeFd = detachedFd
-                Core.suspended(false)
+                if (!Core.suspended(false)) {
+                    failStart(ticket, Core.stopTun(), notifyOnFailure)
+                    return@start
+                }
                 if (!isCurrent(ticket)) return@start
                 // Core 从此负责未领取输入的关闭；Go 领取后负责其所有权。
                 detachedFd = -1
@@ -631,7 +640,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
                 val committed = GlobalState.runLock.withLock {
                     if (!lifecycle.started(ticket)) return@withLock false
-                    GlobalState.updateRunState(RunState.START)
+                    GlobalState.isSmartStopped = false
                     true
                 }
                 if (committed && isCurrent(ticket)) {
@@ -641,6 +650,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                         suspendModule?.install()
                     }
                     ticket.service.startForeground(ticket.generation)
+                    GlobalState.runLock.withLock {
+                        if (lifecycle.current(ticket) && lifecycle.phase == VpnLifecycle.Phase.RUNNING) {
+                            GlobalState.updateRunState(RunState.START)
+                        }
+                    }
                 }
             }, finish = {
                 if (detachedFd > 0 && !closeDetachedFd(detachedFd)) markBlocked()
@@ -682,7 +696,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             GlobalState.updateIsStopping(!cleanupSucceeded || localCleanupFailed)
             GlobalState.updateRunState(if (cleanupSucceeded && !localCleanupFailed) RunState.STOP else RunState.PENDING)
             if (notify) ServicePlugin.notifyVpnStartFailed()
-            if (cleanupSucceeded && !localCleanupFailed) handleStop(force = true)
+            if (cleanupSucceeded && !localCleanupFailed) handleStop(force = true, preserveSmartStopped = intents.keepSmartStoppedAfterFailure(GlobalState.isSmartStopped))
         }
     }
 
@@ -709,7 +723,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         ""
     }
 
-    fun handleStop(force: Boolean = false, completion: ((Boolean) -> Unit)? = null) {
+    fun handleStop(force: Boolean = false, preserveSmartStopped: Boolean = false, completion: ((Boolean) -> Unit)? = null) {
         val serviceRef: BaseServiceInterface?
         val connectionRef: ServiceConnection?
         val shouldForceStop: Boolean
@@ -721,6 +735,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 return
             }
             startRequested = false
+            // 恢复超时即使与 RUNNING 提交交错，也保留该请求的重试语义。
+            if (preserveSmartStopped) GlobalState.isSmartStopped = true
             intents.cancel()
             connectionRef = serviceConnection
             serviceConnection = null
@@ -757,15 +773,16 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                                 if (!closeStopPlatform { context.stopService(Intent(context, BettboxVpnService::class.java)) }) platformClosed = false
                                 if (!closeStopPlatform { context.stopService(Intent(context, BettboxService::class.java)) }) platformClosed = false
                             }
+                            if (preserveSmartStopped && !Core.suspended(true)) platformClosed = false
                             platformClosed
                         }
                     }, commit = { stopped ->
                         GlobalState.runLock.withLock {
-                            if (lifecycle.stopped(stopGeneration, stopped, false)) {
+                            if (lifecycle.stopped(stopGeneration, stopped, preserveSmartStopped)) {
                                 isBind = false
                                 isBinding.set(false)
                                 bettBoxService = null
-                                GlobalState.isSmartStopped = false
+                                GlobalState.isSmartStopped = preserveSmartStopped
                                 GlobalState.updateIsStopping(false)
                                 GlobalState.updateRunState(RunState.STOP)
                                 ServicePlugin.notifyRunStateChanged(RunState.STOP)
@@ -786,7 +803,12 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
             } catch (_: Throwable) {
                 completed = false
-                GlobalState.runLock.withLock { localCleanupFailed = true; markBlocked() }
+                GlobalState.runLock.withLock {
+                    if (lifecycle.generation == stopGeneration && !startRequested) {
+                        localCleanupFailed = true
+                        markBlocked()
+                    }
+                }
                 android.util.Log.e("VpnPlugin", "停止完成未确认，保持资源责任")
             } finally {
                 completion?.invoke(completed)
@@ -866,13 +888,68 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
              lifecycle.phase == VpnLifecycle.Phase.SUSPENDED && GlobalState.isSmartStopped)
     }
 
-    fun handleSmartResume(options: VpnOptions): Boolean {
-        return handleStart(options)
+    internal data class SmartResumeReceipt(val intent: VpnIntentController.Intent, val generation: Long)
+
+    internal fun completeSmartResumeResult(result: MethodChannel.Result, receipt: SmartResumeReceipt?) {
+        stopResultHandler.post {
+            val completed = receipt != null && GlobalState.runLock.withLock {
+                intents.current(receipt.intent) && lifecycle.generation == receipt.generation &&
+                    lifecycle.phase == VpnLifecycle.Phase.RUNNING &&
+                    GlobalState.currentRunState == RunState.START && !GlobalState.isSmartStopped &&
+                    intents.acknowledgeStart(receipt.intent)
+            }
+            runCatching { result.success(completed) }
+                .onFailure { android.util.Log.e("VpnPlugin", "恢复完成响应投递失败") }
+        }
     }
 
-    private fun stopIntent(intent: VpnIntentController.Intent) {
+    internal fun handleSmartResume(options: VpnOptions, completed: (SmartResumeReceipt?) -> Unit) {
+        val origin = requestStart(options)
+        if (origin == null) {
+            completed(null)
+            return
+        }
+        val intent = origin.intent
+        lifecycleScope.launch {
+            var receipt: SmartResumeReceipt? = null
+            try {
+                receipt = withTimeoutOrNull(30_000L) {
+                    awaitSmartResumeReceipt(
+                    attempts = 601,
+                    snapshot = {
+                        GlobalState.runLock.withLock {
+                            smartResumeSnapshot(
+                                currentIntent = intents.current(intent),
+                                phase = lifecycle.phase,
+                                runningPublished = GlobalState.currentRunState == RunState.START,
+                                pendingPublished = GlobalState.currentRunState == RunState.PENDING,
+                                startRequested = startRequested,
+                                suspended = GlobalState.isSmartStopped,
+                                receipt = { SmartResumeReceipt(intent, lifecycle.generation) },
+                            )
+                        }
+                    },
+                        pause = { delay(50L) },
+                    )
+                }
+            } catch (_: Throwable) {
+                android.util.Log.e("VpnPlugin", "恢复等待失败")
+            } finally {
+                // 等待失败或到期时仅取消准确请求，不能停止后来启动的会话。
+                try {
+                    if (receipt == null) stopIntent(intent, origin)
+                } finally {
+                    completed(receipt)
+                }
+            }
+        }
+    }
+
+    private fun stopIntent(intent: VpnIntentController.Intent, origin: SmartResumeOrigin? = null) {
         GlobalState.runLock.withLock {
-            if (intents.current(intent)) handleStop(force = true)
+            if (intents.current(intent)) handleStop(force = true, preserveSmartStopped =
+                origin?.preserveOnCleanup(GlobalState.isSmartStopped) ?:
+                    intents.keepSmartStoppedAfterFailure(GlobalState.isSmartStopped))
         }
     }
 
@@ -912,7 +989,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             override fun onServiceDisconnected(name: ComponentName) {
                 GlobalState.runLock.withLock {
                     if (!intents.current(ticket) || serviceConnection !== this) return
-                    handleStop(force = true)
+                    handleStop(force = true, preserveSmartStopped = intents.keepSmartStoppedAfterFailure(GlobalState.isSmartStopped))
                     ServicePlugin.notifyVpnStartFailed()
                 }
             }

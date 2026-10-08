@@ -73,9 +73,13 @@ class Service {
 
   Future<bool?> smartResume() async {
     final options = await clashLib?.getAndroidVpnOptions();
-    return await methodChannel.invokeMethod<bool>('smartResume', {
+    final completed = await methodChannel.invokeMethod<bool>('smartResume', {
       'data': json.encode(options),
     });
+    if (completed != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    return completed;
   }
 
   Future<void> setSmartStopped(bool value) async {

@@ -2706,3 +2706,34 @@ record-fingerprint: 30b824f9a7f4f59f4765dffbe1b27a43a919406682691e70957009069b32
 
 ### HLG
 标准append记录红绿、独立审阅、候选边界与后续。
+
+## 2026-10-09T01:54:51+08:00 · Android智能恢复同意图完成回执与失败来源候选
+
+type: development
+scope: ["Bettbox", "Android", "Dart"]
+status: partial
+tags: ["smart-resume", "lifecycle", "regression", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 6addac526f9a097240102c17a0e1e6a6ec3fd8217ed97b414b086119b63041e6
+
+### Summary
+两恢复通道等待同意图原生运行提交；Dart收到确认前保留停止状态。超时、前台收尾和失败来源缺陷完成红绿及独立复审。
+
+### Changed
+原生增加有界等待/生产快照决策、主线程intent/generation核验、控制器来源保留与同代失败清理；Dart包装拒绝false/null，管理器同会话后提交，后台移除预清。更新PDEC、计划和验收文档。
+
+### Validation
+客户端red2项失败回执断言。独立复审定位超时RUNNING交错、前台/Binder失败来源及RUNNING/PENDING提前失败；分别提取生产协程/来源控制器/快照并JVM red定位3类用例，最终green2个入口且源码摘要一致。最终release Kotlin完整工程编译0/BUILD SUCCESSFUL。278完整Flutter（真实Go FFI）及analyze通过；最终原生独立只读复审无确认P1/P2。后续只改Kotlin，Flutter证据覆盖同一Dart摘要，未重复无关测试。
+
+### Next
+提交推送源码候选，开始完整正式签名APK构建；新设备验证空规则恢复、匹配启停和交错，再推进有效代理流量与三端业务闭环。
+
+### Risks
+当前只证明源码候选，不证明新APK/设备、前台异常/Binder/主线程延迟或发行。Dart startTime空值ABA、唯一native owner/typed Go ACK及有效代理流量仍未闭合；macOS登录输入待用户完成，iOS团队和发行条件待就绪。
+
+### DIA
+已同步CHANGELOG、PLATFORM_VALIDATION当前候选、registry、计划和绑定源码回执。
+
+### HLG
+标准append记录独立审阅纠偏、真实红绿、候选边界及后续；整体Goal保持active。

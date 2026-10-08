@@ -10,8 +10,18 @@ internal class VpnIntentController {
     private var intent: Intent? = null
     private var binding: Binding? = null
     private var registered = false
+    private var smartStoppedOrigin = false
 
-    fun request(): Intent = Intent(++sequence).also { intent = it }
+    fun request(wasSmartStopped: Boolean = false): Intent = Intent(++sequence).also {
+        intent = it
+        smartStoppedOrigin = wasSmartStopped
+    }
+    fun keepSmartStoppedAfterFailure(currentFlag: Boolean): Boolean = smartStoppedOrigin || currentFlag
+    fun acknowledgeStart(value: Intent): Boolean {
+        if (!current(value)) return false
+        smartStoppedOrigin = false
+        return true
+    }
     fun current(value: Intent): Boolean = intent == value
     fun recovered(value: Intent, success: Boolean): Recovery =
         if (!current(value)) Recovery.CANCELLED else if (success) Recovery.READY else Recovery.FAILED
@@ -29,9 +39,10 @@ internal class VpnIntentController {
         return true
     }
     fun isRegistered(value: Binding): Boolean = binding == value && registered
-    fun cancelIntent() { intent = null; ++sequence }
+    fun cancelIntent() { intent = null; smartStoppedOrigin = false; ++sequence }
     fun cancel() {
         intent = null
+        smartStoppedOrigin = false
         binding = null
         registered = false
         ++sequence

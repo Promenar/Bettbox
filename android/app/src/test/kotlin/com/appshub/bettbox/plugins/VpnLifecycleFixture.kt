@@ -8,6 +8,11 @@ object VpnLifecycleFixture {
         failedStopAndInputCleanupBlockStart()
         bindingEpochRejectsOldCallbacks()
         recoveryPreservesOnlyCurrentIntent()
+        smartResumeWaitsAndRejectsTerminalState()
+        failedResumeCleanupRetainsSuspendedRetry()
+        timeoutAfterRunningRetainsOrigin()
+        failedBeforeReceiptRetainsRequestOrigin()
+        resumeForegroundPendingSnapshot()
         println("VPN lifecycle fixture passed")
     }
 
@@ -75,4 +80,107 @@ object VpnLifecycleFixture {
         check(intents.recovered(a, false) == VpnIntentController.Recovery.CANCELLED)
         check(intents.recovered(b, true) == VpnIntentController.Recovery.READY)
     }
+    private fun smartResumeWaitsAndRejectsTerminalState() = kotlinx.coroutines.runBlocking {
+        var polls = 0
+        var pauses = 0
+        val receipt = awaitSmartResumeReceipt(4, snapshot = {
+            polls++
+            if (polls == 3) SmartResumeObservation(false, "same-intent-generation")
+            else SmartResumeObservation(true)
+        }, pause = { pauses++ })
+        check(receipt == "same-intent-generation" && polls == 3 && pauses == 2)
+        polls = 0
+        check(awaitSmartResumeReceipt<String>(4, snapshot = {
+            polls++
+            SmartResumeObservation(false)
+        }, pause = { error("终态不能等待") }) == null && polls == 1)
+        pauses = 0
+        check(awaitSmartResumeReceipt<String>(3, snapshot = {
+            SmartResumeObservation(true)
+        }, pause = { pauses++ }) == null && pauses == 2)
+        val intents = VpnIntentController()
+        val stale = intents.request()
+        intents.cancel()
+        intents.request()
+        check(awaitSmartResumeReceipt<String>(3, snapshot = {
+            if (intents.current(stale)) SmartResumeObservation(false, "stale")
+            else SmartResumeObservation(false)
+        }, pause = { error("过期不能等待") }) == null)
+    }
+
+    private fun failedResumeCleanupRetainsSuspendedRetry() {
+        val state = VpnLifecycle<Any>()
+        val initial = checkNotNull(state.begin(Any()))
+        check(state.started(initial))
+        check(state.stopped(state.invalidate(), true, true))
+        val failedResume = checkNotNull(state.begin(Any()))
+        check(state.failed(failedResume, true))
+        val cleanup = state.invalidate()
+        check(state.stopped(cleanup, true, true))
+        check(state.phase == VpnLifecycle.Phase.SUSPENDED)
+        val retry = checkNotNull(state.begin(Any()))
+        check(retry.generation > failedResume.generation)
+        check(state.started(retry))
+        check(!state.stopped(cleanup, true, true))
+        check(state.phase == VpnLifecycle.Phase.RUNNING)
+        check(state.stopped(state.invalidate(), true, false))
+        check(state.phase == VpnLifecycle.Phase.IDLE)
+    }
+
+    private fun timeoutAfterRunningRetainsOrigin() = kotlinx.coroutines.runBlocking {
+        val intents = VpnIntentController()
+        val state = VpnLifecycle<Any>()
+        val ticket = checkNotNull(state.begin(Any()))
+        val origin = SmartResumeOrigin(intents.request(), true)
+        var smartStopped = true
+        val receipt = kotlinx.coroutines.withTimeoutOrNull(100L) {
+            awaitSmartResumeReceipt<String>(2, snapshot = {
+                SmartResumeObservation(true)
+            }, pause = {
+                check(state.started(ticket))
+                smartStopped = false
+                kotlinx.coroutines.delay(Long.MAX_VALUE)
+            })
+        }
+        check(receipt == null && state.phase == VpnLifecycle.Phase.RUNNING)
+        check(intents.current(origin.intent))
+        val cleanup = state.invalidate()
+        check(state.stopped(cleanup, true, origin.preserveOnCleanup(smartStopped)))
+        check(state.phase == VpnLifecycle.Phase.SUSPENDED)
+    }
+
+    private fun failedBeforeReceiptRetainsRequestOrigin() {
+        val intents = VpnIntentController()
+        val resumed = intents.request(wasSmartStopped = true)
+        check(intents.keepSmartStoppedAfterFailure(currentFlag = false))
+        check(intents.acknowledgeStart(resumed))
+        check(!intents.keepSmartStoppedAfterFailure(currentFlag = false))
+        intents.cancel()
+        val later = intents.request()
+        check(!intents.acknowledgeStart(resumed))
+        check(!intents.keepSmartStoppedAfterFailure(currentFlag = false))
+        check(intents.current(later))
+        check(intents.keepSmartStoppedAfterFailure(currentFlag = true))
+    }
+
+    private fun resumeForegroundPendingSnapshot() {
+        fun snapshot(phase: VpnLifecycle.Phase, ready: Boolean, pending: Boolean,
+                     current: Boolean = true, requested: Boolean = false) = smartResumeSnapshot(
+            currentIntent = current, phase = phase, runningPublished = ready,
+            pendingPublished = pending, startRequested = requested, suspended = false,
+            receipt = { "same-intent-generation" },
+        )
+        check(snapshot(VpnLifecycle.Phase.STARTING, false, true).pending)
+        val foreground = snapshot(VpnLifecycle.Phase.RUNNING, false, true)
+        check(foreground.pending && foreground.receipt == null)
+        val ready = snapshot(VpnLifecycle.Phase.RUNNING, true, false)
+        check(!ready.pending && ready.receipt == "same-intent-generation")
+        check(!snapshot(VpnLifecycle.Phase.RUNNING, true, false, current = false).pending)
+        check(snapshot(VpnLifecycle.Phase.RUNNING, true, false, current = false).receipt == null)
+        for (phase in listOf(VpnLifecycle.Phase.IDLE, VpnLifecycle.Phase.STOPPING, VpnLifecycle.Phase.BLOCKED)) {
+            val terminal = snapshot(phase, false, true)
+            check(!terminal.pending && terminal.receipt == null)
+        }
+    }
+
 }

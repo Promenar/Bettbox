@@ -1,0 +1,60 @@
+{
+  "source_base_commit": "224bad631de46fc31f16648c984722f3c755b963",
+  "stage": "恢复完成确认源码候选",
+  "source_sha256": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "b26dd67cf1c0817006685175d754824e9b1bff7be6620261b05588f610b884bd",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "b93ee10b31fc27cafd7fafc62543ce4de1744a4df27c987454c41a9d165f4c07",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "dfebdc74a3a70eb30c980619a91883341763e7529c77a36690483a8579c74069",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/SmartResumeAwaiter.kt": "333878cdb01d921c6b512a90efd578f900239dcca10020377ec76cbf96ffd084",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt": "e4cfee46c14401790587b05edd81bd57ece5cadab456956292389241927693df",
+    "scripts/check_android_vpn_work_gate.py": "bca5cf8fa6d2a343bfb0ca369630b15b94ae0b9e2f1261ae6ad6607b8c180038",
+    "lib/plugins/service.dart": "c6a1b6f1a3c69cce7cf4bb53597220485ff9bf2ed89a60de7a7bb1ce2bb5fed6",
+    "lib/plugins/vpn.dart": "b7d064be9c20879bc43f566dfcb3ba2a08736abcc481d0b8ac5e523e8f2649a8",
+    "lib/plugins/smart_stop_completion.dart": "c6b5ae168471e9e9aed8cb1d42ab13b7497d249db7dde24f240783d450c6466a",
+    "lib/manager/smart_auto_stop_manager.dart": "02450fb7f9a9e4f257f78fb4fe7cd15f49edb24233bff0cbae24743365af4c67",
+    "lib/main.dart": "5a1fcf8f263ea5bfd1a118128f2acf643c1c6ad27e279ff5b85c0703e7c05a73",
+    "test/plugins/android_smart_resume_test.dart": "900bfe852d29d1d934b8736eb7de8bb50f0e2e2572eefc2b71fa39a9a609f02c",
+    "test/plugins/smart_resume_completion_test.dart": "0a602d72a5ab979ef038b4faa96cb6a37541dbd5fa56424c0331c7d06365505c"
+  },
+  "red": {
+    "dart_unconfirmed_receipts_failures": 2,
+    "jvm_timeout_origin_failure": true,
+    "jvm_pre_receipt_failure_origin_failure": true,
+    "jvm_foreground_pending_failure": true
+  },
+  "green": {
+    "full_flutter_tests": 278,
+    "real_go_ffi_enabled": true,
+    "flutter_analyze_no_issues": true,
+    "jvm_entrypoints": 2,
+    "jvm_source_hashes_match": true,
+    "android_release_kotlin": {
+      "kotlin_exit_code": 0,
+      "build_successful": true,
+      "compiler_error_count": 0
+    }
+  },
+  "independent_review": {
+    "agent": "smart_resume_completion_review",
+    "final_confirmed_p1_p2": 0,
+    "read_only": true
+  },
+  "behavior": [
+    "两通道等待同一启动意图完成，主线程核验intent和generation后响应",
+    "RUNNING/PENDING前台收尾属于等待，RUNNING/START才可成功",
+    "恢复来源在请求接受时捕获，未确认的失败/超时/Binder清理保留重试语义",
+    "原生失败清理同代提交SUSPENDED，普通停止仍清语义",
+    "Dart拒绝false/null，完成回执及同会话后才清停止标记并设置运行计时",
+    "30秒有界等待到期取消准确请求；旧停止异常不得阻断新请求"
+  ],
+  "device_verified": false,
+  "typed_engine_ack_verified": false,
+  "effective_proxy_flow_verified": false,
+  "release_verified": false,
+  "remaining": [
+    "新APK设备恢复与快速交错",
+    "实际Android前台异常、Binder断开及主线程投递延迟",
+    "startTime为空时的ABA边界及唯一native owner/Go engine ACK",
+    "有效代理流量、三端业务闭环与发行准入"
+  ]
+}

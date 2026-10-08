@@ -334,4 +334,10 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 `SmartAutoStopManager` 的设置与网络变化进入同一串行检查；空/空白规则或关闭功能会恢复已智能停止会话，不启动普通停止会话。非空规则缺少地址则保留状态；地址查询期间设置换代或组件销毁时拒绝旧决策。策略 red 有 3 项预期失败，green 11 项通过，完整 Flutter 267 项（真实 Go FFI）及 analyze 通过；独立审阅覆盖决策与生产接线。
 
-公开回执为 `validation/2026-10-07-three-platform/smart-auto-stop-empty-rules-validation.json`，绑定源码摘要。设备复现证据来自旧 APK 35b6443，不能用于宣称修复后设备恢复通过。`smartResume` 的 service 通道仍无条件返回 true，管理器仍预先清除停止标记；这些恢复完成确认缺口、唯一 owner/engine ACK、新 APK 及有效代理流量须独立完成。
+公开回执为 `validation/2026-10-07-three-platform/smart-auto-stop-empty-rules-validation.json`，绑定源码摘要。设备复现证据来自旧 APK 35b6443，不能用于宣称修复后设备恢复通过。恢复完成确认的源码候选见下节；唯一 owner/engine ACK、新 APK 及有效代理流量须独立完成。
+
+## Android 智能恢复完成确认源码候选
+
+两通道响应绑定同一启动意图与 generation，等待前台收尾和 RUNNING/START，主线程投递时再次核验。RUNNING/PENDING 保持等待；请求来源在接受时捕获，未确认的超时、启动失败与 Binder 断开按原始智能停止语义清理，同代提交 SUSPENDED 并保留重试资格；普通停止仍清除来源。Dart 拒绝 false/null，只在同一会话确认后提交计时和停止标记。
+
+公开回执为 `validation/2026-10-07-three-platform/android-smart-resume-validation.json`，绑定最终源码摘要。客户端 red2 项、生产协程/控制器 red3 类缺陷修复后通过；最终 JVM、完整 release Kotlin 编译、278项 Flutter 回归（真实Go FFI）、analyze 与独立复审通过。原生快照确认仍不等于带身份的 Go engine ACK；前台异常、Binder、主线程延迟、新 APK 设备恢复、startTime为空的ABA及有效代理流量均不能用源码测试替代。
