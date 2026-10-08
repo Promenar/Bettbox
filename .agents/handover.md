@@ -1311,3 +1311,34 @@ PDEC release approved；首次入口缺Flutter PATH预检退出，显式任务PA
 
 ### HLG
 通过标准append dry-run/apply记录执行失败、终态和下一步。
+
+## 2026-10-08T09:49:50+08:00 · Android固定拒绝诊断及正式构建候选
+
+type: implementation
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "network", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: b120eb4fe79ab37a52c7f485bf1522536184a02771717120682fb243ebc9ede5
+
+### Summary
+完成固定拒绝分类候选，为正式APK失败定位提供无任意请求数据的诊断；完整Goal保持active。
+
+### Changed
+区分非CONNECT、非法authority、未批准CONNECT域名及固定公开候选；HOSTS、TLS、DNS、并发和预算未改变。
+
+### Validation
+新增回归旧实现实际失败，当前构建工具/network共93 tests exit0；独立只读复核无P1/P2。原始host/header/URL不进入事件，所有新类别保持拒绝。
+
+### Next
+提交推送该候选后冻结源码，以正式release入口实际重跑；保留具体运行handle，先观察终态再修改。定位实际拒绝后处理，正式APK安装与业务流量继续。
+
+### Risks
+固定公开候选仅拒绝投影，不授予联网权限；尚未验证真实拒绝类别或正式APK。Mac系统代理消费授权与正常App、iOS开发版及支付外部条件另需完成。
+
+### DIA
+已同步CHANGELOG、PDEC说明、计划与脱敏验收回执。
+
+### HLG
+标准append dry-run/apply记录，索引由工具重建。

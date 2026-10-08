@@ -1,0 +1,20 @@
+{
+  "scope": "Android任务代理固定拒绝诊断，不扩展域名/HTTPS授权",
+  "sources": {
+    "scripts/android_dependency_network.py": "9af4cee7146e382adc1f38348ecef9e91eac558ba1ccf9beb867c110fae9e413",
+    "scripts/tests/test_android_dependency_network.py": "b74ace3df24cc617c6de9defd1f8300d914945f4649d67719601f6bc723b5cfe",
+    "scripts/build_android.py": "683b024325178562b63046e8f43903bfbcb192f245bbf398adfa6a9964b1eec0"
+  },
+  "tests": 93,
+  "exit_code": 0,
+  "red": {
+    "sources": {
+      "scripts/android_dependency_network.py": "8704c43fde3d51034f96172e2b638725c76edd1a0d0f46716231ec9bd9c545d5",
+      "scripts/tests/test_android_dependency_network.py": "4d8699d22f2e19c9b4eccc23e7aaa8004a788a6dddb49d6247f98d295ef06bed"
+    },
+    "log_sha256": "54cdb886e4c079237a71bdc4b5a8f3a1d8288fd21755c95e4d03f649c57eff4a"
+  },
+  "green_log_sha256": "3e1a6b72b0f71778cabe82c21aaa5a4546877e089fc423adb026af4f725c9df0",
+  "independent_review": "只读复核无P1/P2；测试由主控执行",
+  "release_apk_verified": false
+}

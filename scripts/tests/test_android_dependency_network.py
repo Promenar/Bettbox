@@ -64,6 +64,24 @@ class HungProcess:
 
 
 class DependencyNetworkTest(unittest.TestCase):
+    def test_rejected_request_diagnostics_do_not_disclose_authority(self):
+        cases = [
+            (b'GET http://fictional-private.example/ HTTP/1.1\r\n\r\n', 'non-connect-request'),
+            (b'CONNECT fictional-private.example:443 HTTP/1.1\r\n\r\n', 'unapproved-connect-host'),
+            (b'CONNECT plugins.gradle.org:80 HTTP/1.1\r\n\r\n', 'unsupported-connect-authority'),
+            (b'CONNECT maven.google.com:443 HTTP/1.1\r\n\r\n', 'rejected-public-maven-google'),
+        ]
+        for request, source in cases:
+            with self.subTest(source=source), self.assertRaises(network.HeaderError) as caught:
+                network.connect_host(request)
+            self.assertEqual(caught.exception.source, source)
+            self.assertNotIn('fictional-private', str(caught.exception))
+            with tempfile.TemporaryDirectory() as temp:
+                lease = network.NetworkLease(Path(temp), time.monotonic() + 10)
+                lease._event(caught.exception.source)
+                self.assertNotIn('fictional-private', json.dumps(lease.history))
+                self.assertTrue(lease.close())
+
     def test_plan_has_no_network_or_filesystem_side_effects(self):
         with mock.patch.object(network, "query") as query, mock.patch.object(Path, "write_text") as write:
             plan = network.plan()
@@ -410,7 +428,7 @@ class DependencyNetworkTest(unittest.TestCase):
 
     def test_rejected_repository_diagnostics_never_retain_raw_target(self):
         for host, label in [('jcenter.bintray.com', 'nonofficial-jcenter'),
-                            ('jitpack.io', 'nonofficial-jitpack'), ('private-token.invalid', 'outside-other')]:
+                            ('jitpack.io', 'nonofficial-jitpack'), ('private-token.invalid', 'unapproved-connect-host')]:
             with self.assertRaises(network.HeaderError) as caught:
                 network.connect_host(f'CONNECT {host}:443 HTTP/1.1\r\n\r\n'.encode())
             error = caught.exception

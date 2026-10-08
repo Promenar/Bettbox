@@ -98,3 +98,7 @@ Go专用入口与Checked关闭API已集成并通过当前工作树回归：Mac m
 固定SDK身份链、单一owner、回归fixture和真实公开child测试已纳入macos/CoreSupervisor；当前实际源码编译验证通过。后续关键路径为真实签名host/helper/Core链验收、固定身份发行器与opaque handle表、非阻塞relay及Dart/SC联合接线。Android同步JNI/配置资源owner未完成；不触发发行可用声明。
 
 真实签名host/helper/Core双角色SDK矩阵已通过，身份源SHA与actual一致。后续实施先完成固定身份发行器、worker排队与非阻塞relay，再接Dart opaque handle和SC事务；公开等EOF Core不得替代真实Mihomo业务验收。
+
+## Android正式构建网络拒绝定位
+
+主控独占任务代理及相关测试；仅新增固定拒绝类别，区分非CONNECT、非法authority、未批准CONNECT域名及固定公开候选，不记录任意主机、头、URL或凭据。所有拒绝继续阻断任务，不改HOSTS、TLS、DNS、并发或预算。先运行失败回归，再执行登记test-android-network；独立只读复核后冻结源码执行正式release构建。依据真实事件决定后续方案，未知请求不得凭猜测扩权。验证源码/锁未漂移与归属退出，再同步DIA/HLG、一次提交推送。

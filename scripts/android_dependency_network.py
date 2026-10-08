@@ -40,6 +40,19 @@ SOURCES = {
     "release-assets.githubusercontent.com": "Gradle 官方 GitHub 分发资产重定向",
 }
 DOMAIN = re.compile(r"(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}")
+# 仅投影固定公开名称供排错；这些目标依然拒绝，不能作为联网授权。
+REJECTED_PUBLIC_TARGETS = {
+    "maven.google.com": "rejected-public-maven-google",
+    "downloads.gradle.org": "rejected-public-gradle-downloads",
+    "redirector.gvt1.com": "rejected-public-gvt-redirector",
+    "dl-ssl.google.com": "rejected-public-google-dl-ssl",
+    "download.jetbrains.com": "rejected-public-jetbrains-download",
+    "api.adoptium.net": "rejected-public-adoptium-api",
+    "download.java.net": "rejected-public-java-download",
+}
+REJECTION_SOURCES = ("nonofficial-jcenter", "nonofficial-jitpack", "outside-other",
+                     "non-connect-request", "unsupported-connect-authority", "unapproved-connect-host",
+                     *REJECTED_PUBLIC_TARGETS.values())
 
 
 class NetworkError(RuntimeError):
@@ -50,7 +63,7 @@ class HeaderError(NetworkError):
     """固定请求头原因不携带目标值、请求头或传输正文。"""
 
     def __init__(self, category: str, source: str | None = None):
-        if source not in (None, "nonofficial-jcenter", "nonofficial-jitpack", "outside-other"):
+        if source is not None and source not in REJECTION_SOURCES:
             raise NetworkError("代理目标来源标签越出固定范围")
         self.source = source
         messages = {'header-timeout': 'CONNECT 请求头时间预算耗尽',
@@ -260,7 +273,10 @@ def connect_host(header: bytes) -> tuple[str, bytes]:
         match = re.fullmatch(r'CONNECT ([A-Za-z0-9.-]+):443 HTTP/1\.[01]', lines[0])
         if match is None or match[1].lower() not in HOSTS:
             sources = {"jcenter.bintray.com": "nonofficial-jcenter", "jitpack.io": "nonofficial-jitpack"}
-            label = sources.get(match[1].lower(), "outside-other") if match else "outside-other"
+            if match:
+                label = sources.get(match[1].lower(), REJECTED_PUBLIC_TARGETS.get(match[1].lower(), "unapproved-connect-host"))
+            else:
+                label = "unsupported-connect-authority" if lines[0].startswith("CONNECT ") else "non-connect-request"
             raise HeaderError("target-outside-allowlist", label)
         for line in lines[1:]:
             if not re.fullmatch(r'[A-Za-z0-9-]+: [\x20-\x7e]*', line):
@@ -404,7 +420,7 @@ class NetworkLease:
         self.history: list[dict[str, object]] = []
         self._event_counts = {name: 0 for name in ('overload', 'queue-expired', 'upstream-unavailable',
                                                   'header-timeout', 'header-too-large', 'header-malformed', 'target-outside-allowlist',
-                                                  'relay-failed', 'resolution-slot-expired', 'nonofficial-jcenter', 'nonofficial-jitpack', 'outside-other')}
+                                                  'relay-failed', 'resolution-slot-expired', *REJECTION_SOURCES)}
         self._event_summary: dict[str, object] | None = None
 
     def _publish_events(self) -> None:

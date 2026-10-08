@@ -106,3 +106,5 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 `test-macos-proxy-core`覆盖SystemConfiguration候选SDK编译、HTTP-only事务及只读数量验收。测试不调用真实stage/commit/apply，不读取Keychain或输出原始配置。schema3与新SDK源码已绑定输入摘要；不能视作完整App或代理写入验收。
 
 `test-macos-proxy-core`同时覆盖受保护journal真实私有文件与跨进程flock；46项测试仅在任务私有fixture目录发布记录，真实SystemConfiguration仍只读，不代表正常App系统代理写入验收。
+
+Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法authority、未批准CONNECT域名及固定公开候选；候选标签不赋予联网权限。九域名HOSTS与HTTPS/TLS门禁保持，任意目标、请求头和URL不进入回执。诊断回归及构建工具93项测试通过；真实正式APK重跑与验签结果单独记录。
