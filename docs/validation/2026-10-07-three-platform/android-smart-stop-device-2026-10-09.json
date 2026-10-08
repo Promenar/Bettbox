@@ -1,0 +1,89 @@
+{
+  "source_commit": "35b6443593d4fe6a9b0b79504c45357f3631e12a",
+  "apk_sha256": "f2c949be35c69857e1b3437950dfa0fc5c59a326922846e5187a3cfcc66b44ea",
+  "device": "Pixel_7 / emulator-5554 / ARM64 SDK36",
+  "observed_at": "2026-10-09T01:27:06.903064+08:00",
+  "original_setting": {
+    "enabled": false,
+    "network_rule_empty": true
+  },
+  "matching_rule_test": {
+    "rule_from_current_device_interface": true,
+    "samples": [
+      {
+        "sample": 0,
+        "runtime_clock": true,
+        "smart_suspended_label": false,
+        "foreground_service": true,
+        "active_vpn_line_present": false
+      },
+      {
+        "sample": 1,
+        "runtime_clock": false,
+        "smart_suspended_label": false,
+        "foreground_service": true,
+        "active_vpn_line_present": false
+      },
+      {
+        "sample": 2,
+        "runtime_clock": false,
+        "smart_suspended_label": false,
+        "foreground_service": true,
+        "active_vpn_line_present": false
+      },
+      {
+        "sample": 3,
+        "runtime_clock": false,
+        "smart_suspended_label": false,
+        "foreground_service": true,
+        "active_vpn_line_present": false
+      },
+      {
+        "sample": 4,
+        "runtime_clock": false,
+        "smart_suspended_label": false,
+        "foreground_service": true,
+        "active_vpn_line_present": false
+      }
+    ],
+    "log_rule_match_true": true,
+    "log_smart_stopped_true": true,
+    "log_stopping_message": true
+  },
+  "empty_rule_recovery": {
+    "rule_empty_restored": true,
+    "observation": {
+      "runtime_clock_present": false,
+      "foreground_service_present": true,
+      "active_vpn_line_present": false,
+      "restart_message_seen": false,
+      "rule_no_match_seen": false
+    },
+    "recovery_observed": false,
+    "source_cause": "_checkCurrentNetwork 在 networks.isEmpty 时直接返回，未处理已智能停止的恢复。"
+  },
+  "disabled_feature_recovery": {
+    "runtime_clock_present": true,
+    "foreground_service_present": true,
+    "active_vpn_line_present": false
+  },
+  "final_state": {
+    "runtime_clock_present": false,
+    "foreground_service_present": false,
+    "active_vpn_line_present": false,
+    "current_network_transport_types": [
+      "CELLULAR",
+      "WIFI"
+    ],
+    "current_networks_not_vpn_capability": true
+  },
+  "settings_restored": true,
+  "native_engine_ack_verified": false,
+  "effective_proxy_flow_verified": false,
+  "release_verified": false,
+  "limitations": [
+    "关闭功能后观察到运行计时和前台服务恢复，未观察到活动 VPN transport，不能据此确认 TUN 或代理流量。",
+    "日志与界面证明普通匹配路径，未覆盖快速交错、过期 native owner 或 engine ACK。",
+    "空规则恢复缺陷已复现，待回归测试和修复。"
+  ]
+}

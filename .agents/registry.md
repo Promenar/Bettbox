@@ -131,3 +131,5 @@
 - docs/validation/2026-10-07-three-platform/node-protocol-observation-2026-10-09.json — 同源独立协议探测的公开分类结果；上游根因未定
 
 - docs/validation/2026-10-07-three-platform/android-35b6443-apk-validation.json — 正式签名候选、设备回读、普通停止及冷启动；智能停止与发行另验
+
+- docs/validation/2026-10-07-three-platform/android-smart-stop-device-2026-10-09.json — 实际匹配停止、关闭功能恢复及空规则恢复缺陷；配置已还原，流量与发行未通过

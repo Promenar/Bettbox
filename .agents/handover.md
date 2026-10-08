@@ -2644,3 +2644,34 @@ record-fingerprint: cf2b1ba6d0218f378a83f11f4bd0a93f37a555e0bf90f2c8d4600a135a4f
 
 ### HLG
 标准append记录终态构建、安装、测量纠偏和剩余边界。
+
+## 2026-10-09T01:27:13+08:00 · Android智能启停设备路径与空规则恢复复现
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["android", "smart-stop", "device", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: eb3479910e6418dadc48319e1bd59ac33a3e470cd11d5637cff935540bdce0c5
+
+### Summary
+已安装35b6443候选完成可恢复智能启停设备观察，定位空规则恢复缺陷。
+
+### Changed
+增加公开设备观察回执并同步验收文档；无业务代码变更。
+
+### Validation
+PDEC valid/execution_ready。原智能启停关闭且规则为空；匹配当前模拟器地址后日志确认RuleMatch=true和SmartStopped=true，运行计时消失且前台服务保留。清空规则不恢复，与源码直接返回一致。关闭功能后计时与前台服务恢复，未见活动VPN transport。已恢复原关闭/空规则并普通停止，计时和前台服务撤销；当前CELLULAR/WIFI均NOT_VPN。
+
+### Next
+建立空规则恢复失败回归并修复，继续智能恢复原生完成确认、owner/engine ACK及有效代理流量验收；macOS用户登录输入待完成。
+
+### Risks
+仅有限设备路径，未证明快速交错、engine ACK、真实代理流量或正式发行。模拟器输入法改写斜杠的未提交输入已清除，采用设备实际IPv4规则且提交前逐字核验。
+
+### DIA
+已同步CHANGELOG、PLATFORM_VALIDATION、registry及公开设备回执。
+
+### HLG
+按标准append追加设备事实和待修缺陷，整体Goal保持active。

@@ -323,3 +323,9 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 产物 `build/releases/android/Bettbox-arm64-35b6443.apk`，SHA256 为 `f2c949be35c69857e1b3437950dfa0fc5c59a326922846e5187a3cfcc66b44ea`。完整构建、正式签名、源码和锁文件不漂移、12 个原生库 ELF 16KiB 对齐检查通过。Pixel_7 保留数据安装及设备回读同源摘要通过；实际首页、普通停止后前台服务撤销、冷启动返回首页保持停止通过。初次 WARM 启动存在运行计时与前台服务，尚未确定恢复原因。
 
 公开回执为 `validation/2026-10-07-three-platform/android-35b6443-apk-validation.json`。VPN transport 文本须区分活动网络与 NetworkRequest，不能用宽泛文本匹配证明残留连接。本阶段不证明智能停止交错、代理节点 HTTPS、真机或16KiB系统设备；候选不可升级为发行验收通过。
+
+## Android 智能启停实际设备路径
+
+35b6443 已安装候选在匹配当前模拟器地址后，日志确认规则匹配与智能停止，运行计时消失而前台服务保留。清空规则未触发恢复，与 `SmartAutoStopManager._checkCurrentNetwork` 的空规则直接返回一致；这是待修复缺陷。关闭功能后计时和前台服务恢复，但未观察到活动 VPN transport，不能宣称 TUN 或有效代理流量通过。
+
+测试结束已恢复原配置（关闭、空规则）并普通停止，计时和前台服务均撤销。当前 NetworkAgent 的 transport 为 CELLULAR/WIFI 且具有 NOT_VPN；不要把历史事件、NetworkRequest 或 NOT_VPN 字样当作活动 VPN。公开回执为 `validation/2026-10-07-three-platform/android-smart-stop-device-2026-10-09.json`；快速交错、唯一 owner、engine ACK 与发行验收仍待完成。
