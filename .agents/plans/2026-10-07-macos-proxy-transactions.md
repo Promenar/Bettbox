@@ -58,3 +58,11 @@ Go逻辑撤销不等待writer/Close，不代表旧业务合作退出；宿主只
 专用入口仅HTTP/HTTPS，不写SOCKS；持久及运行SOCKS为启用或未知时启动必须拒绝。PAC/WPAD只写启用位、保全其配置摘要。只接管当前启用且有运行状态的服务。测试先复现SOCKS错误覆盖，再做字段缺失/类型污染/未知值保全和当前SDK编译；真实系统仅执行只读数量验收，禁止提交网络设置。登记PDEC输入、独立串行审阅、同步文档后提交。回滚限定上述文件，不读写.video_agent或凭据。
 
 SDK兼容验收确认27个已禁用零值端口与6个既有空bypass；仅stored字段允许原样恢复，新intent继续拒绝空输入、启用零值端口和类型污染。HTTP-only journal为schema3，旧2拒绝自动恢复，生产journal后端尚未实现。公开回执 `docs/validation/2026-10-07-three-platform/macos-sc-backend-validation.json`。独立串行审阅无P1/P2；系统stage/commit/apply/restore尚未执行。
+
+## 持久所有权journal
+
+目标：schema3保护文件保存原始字段组、阶段与恢复进度，App生命周期持有独占flock。主控独占JournalCoding.swift、ProtectedJournalBackend.swift及Tests/Core/ProtectedJournalTests.swift；不注册App、不调用真实SC写入、不读取真实凭据。固定用户ApplicationSupport/Bettbox/proxy-ownership目录由native选择，测试仅使用仓库.test下私有fixture。
+
+以逐级openat/O_NOFOLLOW固定目录FD，验证owner/权限及危险ACL，私有目录700和文件600且无扩展ACL；拒绝链接、硬链接、不安全已有权限和目录替换。固定owner ID持久化；owner缺失但journal存在时拒绝重建。lock文件不删除。canonical Codable schema3拒绝未知/重复字段、非canonical内容、错误owner与旧2，事务再次校验业务不变量。文件4MiB限制，原子同目录发布、文件fsync/F_FULLFSYNC和目录fsync；失败不宣称持久完成。不存在有效所有权时禁止load/persist/clear。
+
+验收：登记test-macos-proxy-core、真实文件权限/锁与跨实例竞争、事务关闭重开恢复、部分恢复证据、链接/篡改/超限拒绝；固定故障注入验证发布后sync失败保留未知。独立串行审阅后DIA/HLG与一次提交推送。回滚限定上述文件，保留任何未知journal，不自动删除用户记录。

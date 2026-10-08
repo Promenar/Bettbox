@@ -1,18 +1,18 @@
 import Foundation
 
 // 这些值只在后端与事务内部使用，不允许放入 channel、日志或错误正文。
-enum ProxyGroup: String, CaseIterable, Hashable { case http, https, socks, bypass, pac, wpad }
-struct ManualProxy: Equatable {
+enum ProxyGroup: String, CaseIterable, Hashable, Codable { case http, https, socks, bypass, pac, wpad }
+struct ManualProxy: Equatable, Codable {
     var enabled: Bool?
     var host: String?
     var port: Int?
 }
-struct AutomaticProxy: Equatable {
+struct AutomaticProxy: Equatable, Codable {
     var enabled: Bool?
-    // 不保存 PAC URL；摘要必须由未来原生适配器内部生成。
+    // 不保存 PAC URL；摘要由原生字典适配器内部生成。
     var unchangedConfigurationDigest: String
 }
-enum GroupValue: Equatable {
+enum GroupValue: Equatable, Codable {
     case manual(ManualProxy)
     case bypass([String]?)
     case automatic(AutomaticProxy)
@@ -26,7 +26,7 @@ struct ServiceSnapshot {
     var groups: [ProxyGroup: GroupValue]
     var active: Bool = true
 }
-struct ProxyIntent: Equatable {
+struct ProxyIntent: Equatable, Codable {
     let port: Int
     let bypass: [String]
     func validate(allowEmptyStoredBypass: Bool = false) -> Bool {
@@ -55,8 +55,8 @@ enum BackendFailure: Error, Equatable {
     case commitRejected, commitUncertain, applyFailed, verificationFailed
 }
 enum JournalFailure: Error { case unavailable, invalid, busy }
-enum JournalPhase: Equatable { case prepared, committed, verifiedApplied, uncertain }
-struct OwnedGroupID: Hashable {
+enum JournalPhase: String, Equatable, Codable { case prepared, committed, verifiedApplied, uncertain }
+struct OwnedGroupID: Hashable, Codable {
     let serviceID: String
     let group: ProxyGroup
 }
@@ -70,7 +70,7 @@ struct JournalEntry: Equatable {
     let written: [ProxyGroup: GroupValue]
     let ownedGroups: Set<ProxyGroup>
 }
-struct OwnershipJournal {
+struct OwnershipJournal: Codable {
     let schemaVersion: Int
     let installOwnerID: UUID
     let generation: UInt64
@@ -95,7 +95,7 @@ protocol ConfigurationBackend: AnyObject {
 }
 protocol JournalBackend: AnyObject {
     var installOwnerID: UUID { get }
-    // 应用生命周期锁，不能仅按一次读写加锁；真实路径/权限实现不在草稿内。
+    // 应用生命周期锁，不能仅按一次读写加锁；受保护后端持有目录FD与内核文件锁。
     func acquireOwnership() throws
     func releaseOwnership()
     func load() throws -> OwnershipJournal?

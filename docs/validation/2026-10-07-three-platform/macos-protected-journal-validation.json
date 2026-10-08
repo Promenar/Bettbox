@@ -1,0 +1,67 @@
+{
+  "scope": "受保护schema3 journal候选；真实私有fixture文件与跨进程flock，配置恢复使用fake backend；未接入App或写真实系统配置",
+  "base_commit": "e2febbb7c579dca3a9afc3edd258545d5040fba8",
+  "source_hashes": {
+    "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "465852da13449c51aac224542c60f446eca5ab50ac8ff903aa87d67c3b2a655f",
+    "plugins/proxy/macos/Classes/Core/ProtectedJournalBackend.swift": "dcc7e1f848aa58335825442b52717df5b2bd042dfece37cbbb523b04babd2077",
+    "plugins/proxy/macos/Classes/Core/Lifecycle.swift": "562050f9876a11363a170cd36c1499fbd42f4d75c6d74edb3ad0bd08bcb6dc07",
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "1e6997a0fea988ef80c2fffcb38726a6fb823de8cfed12f8828b48d0785eea3f",
+    "plugins/proxy/macos/Classes/Core/JournalCoding.swift": "75009173158794ff7181ad0e94f81e415b91724f910c76dfa71a02dd26a4b092",
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "24b2c2661db0569cfd790a6e5f32edff65fd64f510b158d04812a1fd4e4f0a78",
+    "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "b05c5863898abf17d5c41ca02122688b04738ca23e948e052d9722f275166a26",
+    "plugins/proxy/macos/Tests/Core/ProtectedJournalTests.swift": "48326dc5c387661567c66c7eb281e36a65a9d3eb73e6f29f58a28dd6457b7064",
+    "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "186bf0ffa1588df1adc2dea044748f7544a9626d2d180050daf9cca875c9832f",
+    "plugins/proxy/macos/Tests/Core/LifecycleTests.swift": "75c981dbcbe26fd444cffa738616eb0a82f7ec8fcdecc21ae9e9f4a9ffef2149",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "19d559acecc8a71f84d7f3876d0be28e1a11d700b70840062a3c03bf7894055a",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "aea420c0b0a1a6d16d0e87c1a6a831bd98f69fcf2a9d879d36925151aa4871db"
+  },
+  "swift_tests": {
+    "count": 46,
+    "failures": 0,
+    "exit_code": 0
+  },
+  "red": {
+    "first_create": {
+      "phase": "parent-directory-sync-red",
+      "sources": {
+        "plugins/proxy/macos/Classes/Core/ProtectedJournalBackend.swift": "752319784562b2060a812dd487f004a8c98db4d3899002a28007a98a7dcd8d1a",
+        "plugins/proxy/macos/Tests/Core/ProtectedJournalTests.swift": "87dac606bed5f77ad13fef90c067a896904a7257dc928a94a0748866ad867c75"
+      },
+      "log_sha256": "73c0942283bafbda3ebb0533d2839dfa2dfd7505e0f660eaab38367858434dae",
+      "tests": 45,
+      "assertion_failures": 4,
+      "failed_cases": 2
+    },
+    "cross_instance": {
+      "sources": {
+        "plugins/proxy/macos/Classes/Core/ProtectedJournalBackend.swift": "390347966dc13b7bcd252b4ed43109ee78923b69d183319e2f29eea938209c2b",
+        "plugins/proxy/macos/Tests/Core/ProtectedJournalTests.swift": "68291f58ffabb35209a97e11c5b8a8e09c34e415e859ec8028649a7531d252fc"
+      },
+      "log_sha256": "6b0c7b31a78157f2b56cdaaa4b95fa0e288b6f01e389e2494ccc115fd1dbf7a0",
+      "tests": 46,
+      "failed_cases": 1,
+      "assertion_failures": 2,
+      "exit_code": 1
+    }
+  },
+  "green_log_sha256": "f54f8950c69fa7924cf50222f2130b8fbc10083487e952f426cf142332d527fa",
+  "read_only_sdk": {
+    "services": 9,
+    "enabled": 9,
+    "runtime_proxy_dictionary_present": 1,
+    "unknown_authentication": 9,
+    "preferences_signature_unchanged": true,
+    "stage_commit_apply_called": false
+  },
+  "boundaries": [
+    "不是同UID或root攻击防护",
+    "没有正常App接线",
+    "没有真实系统代理写入或有效订阅流量",
+    "没有发行签名或公证验收"
+  ],
+  "independent_review": {
+    "reviewer": "supervisor_native_review",
+    "result": "首次创建和跨实例父目录同步P2静态闭合，无新增阻断发现",
+    "executed_tests_by_reviewer": false
+  }
+}

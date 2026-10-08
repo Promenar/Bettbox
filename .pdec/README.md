@@ -104,3 +104,5 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 预检恢复保持现有host/Session/full-test/analyze执行位置，新增同代原生停止确认不改变构建/部署权限。输入摘要已更新；184项Flutter测试与host fixture不替代完整应用发行验收。
 
 `test-macos-proxy-core`覆盖SystemConfiguration候选SDK编译、HTTP-only事务及只读数量验收。测试不调用真实stage/commit/apply，不读取Keychain或输出原始配置。schema3与新SDK源码已绑定输入摘要；不能视作完整App或代理写入验收。
+
+`test-macos-proxy-core`同时覆盖受保护journal真实私有文件与跨进程flock；46项测试仅在任务私有fixture目录发布记录，真实SystemConfiguration仍只读，不代表正常App系统代理写入验收。

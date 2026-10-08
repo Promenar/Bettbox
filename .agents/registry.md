@@ -45,3 +45,5 @@
 - docs/validation/2026-10-07-three-platform/macos-preflight-recovery-validation.json — 未发行reservation的预检撤销证据、实际Session/Application重试及未知owner保留
 
 - docs/validation/2026-10-07-three-platform/macos-sc-backend-validation.json — HTTP-only事务、SystemConfiguration SDK只读验收及stored字典恢复边界
+
+- docs/validation/2026-10-07-three-platform/macos-protected-journal-validation.json — 受保护journal源摘要、实际红绿回归及验收边界

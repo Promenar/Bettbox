@@ -1249,3 +1249,34 @@ record-fingerprint: 8cab1f6bde6bc31452d646504ea7b9d42ddd39ada1d6aeef79ae82cd2bec
 
 ### HLG
 结构化append dry-run/apply追加，保留原链；goal active。
+
+## 2026-10-08T09:32:49+08:00 · macOS受保护journal及跨实例目录同步验收
+
+type: implementation
+scope: ["Bettbox", "macOS"]
+status: done
+tags: ["journal", "proxy", "three-platform-release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: a936cfd7eef5ee710aa30b3cda9e71f2d8ca0f9db29abb960cb1206b96f4cfe9
+
+### Summary
+完成native受保护schema3 journal候选；Android/macOS发行优先，iOS开发版研究范围有效，完整发行Goal保持active。
+
+### Changed
+新增canonical编码、0700/0600与ACL/inode检查、固定native路径、稳定owner ID及生命周期flock。文件同步后原子发布，完整目录链同步后允许owner发布；失败保留未知状态。
+
+### Validation
+当前46项Swift测试exit0，真实私有文件和跨进程锁；真实SC只读9服务、9认证unknown、配置签名unchanged。首次创建45测试4断言失败与跨实例46测试2断言失败均已保存源摘要，修复后通过。独立native reviewer静态闭合P2。Dart未改，既有Flutter证据不作为本轮新运行。
+
+### Next
+建立native可信HTTP端点授权与系统代理Flutter接线，完成正常App账户、安全存储与有效订阅流量；Android正式发行及实际服务所有权接线继续。
+
+### Risks
+journal未接入正常App/default路径与真实SC写入恢复；不抵抗同UID/root。无DeveloperID公证、Apple Team/NE及有效订阅/商户外部条件，不能称可用发行完成。.video_agent属于用户未触碰。
+
+### DIA
+已同步Architecture、PlatformValidation、CHANGELOG、PDEC说明、registry、计划及公开脱敏回执。
+
+### HLG
+本记录通过标准append dry-run及apply追加，索引由脚本重建。

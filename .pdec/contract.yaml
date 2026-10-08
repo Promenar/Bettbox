@@ -991,7 +991,7 @@
     "plugins/proxy/macos/Tests/Core/Fakes.swift": "19d559acecc8a71f84d7f3876d0be28e1a11d700b70840062a3c03bf7894055a",
     "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "aea420c0b0a1a6d16d0e87c1a6a831bd98f69fcf2a9d879d36925151aa4871db",
     "plugins/proxy/macos/Classes/Core/Lifecycle.swift": "562050f9876a11363a170cd36c1499fbd42f4d75c6d74edb3ad0bd08bcb6dc07",
-    "plugins/proxy/macos/Classes/Core/Contract.swift": "3edd58edc1a6c93af6afa378ea62b711c08de2bcc0003e09ca6888c6b340aaf1",
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "1e6997a0fea988ef80c2fffcb38726a6fb823de8cfed12f8828b48d0785eea3f",
     "plugins/proxy/macos/Classes/Core/Transaction.swift": "24b2c2661db0569cfd790a6e5f32edff65fd64f510b158d04812a1fd4e4f0a78",
     "scripts/verify_android_java_identity.py": "27d8c4fb134674091e1049ef15802993dbeb40562c77e3ec9c48189bfb26ea5a",
     "plugins/flutter_qjs/android/build.gradle": "c3787a343227aaa3ba86959b3f519a9e1ed64fd79a9575ae6febe3811ec5a440",
@@ -1121,7 +1121,10 @@
     "lib/clash/supervisor/supervisor_events.dart": "a0b1a4d8dcead830f1120cfbccc4027a01addb3abcde213c0435c41f19dae8c6",
     "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "465852da13449c51aac224542c60f446eca5ab50ac8ff903aa87d67c3b2a655f",
     "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "b05c5863898abf17d5c41ca02122688b04738ca23e948e052d9722f275166a26",
-    "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "186bf0ffa1588df1adc2dea044748f7544a9626d2d180050daf9cca875c9832f"
+    "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "186bf0ffa1588df1adc2dea044748f7544a9626d2d180050daf9cca875c9832f",
+    "plugins/proxy/macos/Classes/Core/JournalCoding.swift": "75009173158794ff7181ad0e94f81e415b91724f910c76dfa71a02dd26a4b092",
+    "plugins/proxy/macos/Classes/Core/ProtectedJournalBackend.swift": "dcc7e1f848aa58335825442b52717df5b2bd042dfece37cbbb523b04babd2077",
+    "plugins/proxy/macos/Tests/Core/ProtectedJournalTests.swift": "48326dc5c387661567c66c7eb281e36a65a9d3eb73e6f29f58a28dd6457b7064"
   },
   "platform_extensions": {
     "android": {
@@ -1158,6 +1161,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "0cf05df62c87a54b505acd2977837b9d380d224b1947979f703fb156cca43c05"
+    "contract_digest": "a42411dcf92524fd469e07383f198472e4cf76691f00bbdbd1c5fd4cee586168"
   }
 }

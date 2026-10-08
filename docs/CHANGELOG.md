@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — macOS受保护所有权记录
+
+- 新增schema3 canonical编码、固定native路径、权限/ACL/inode检查及跨进程flock；原子发布与目录同步失败保留恢复边界。
+- 首次创建及跨实例重开的父目录同步缺口通过实际失败回归复现并修复；46项Swift测试通过。真实系统代理配置未写入，App接线与流量待验收。
+
 ## 2026-10-08 — macOS SystemConfiguration候选
 
 - 新增真实SDK后端与受限字典合并，HTTP/HTTPS事务保留SOCKS；schema3拒绝旧2自动恢复。
