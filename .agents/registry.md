@@ -166,3 +166,5 @@
 - docs/validation/2026-10-07-three-platform/android-suspend-admission-validation.json — 挂起准入真实核心红绿、JNI/模块夹具和 ARM64/Kotlin 编译边界
 
 - docs/validation/2026-10-07-three-platform/android-initial-transaction-validation.json — 首次原子初始化配置的真实失败、driver 回归、监听 race 及实际编译范围
+
+- docs/validation/2026-10-07-three-platform/listener-factory-preflight-validation.json — 真实工厂配置失败、端口释放与 TLS 握手回归及未覆盖资源边界

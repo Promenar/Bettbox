@@ -1,0 +1,67 @@
+{
+  "recorded_at": "2026-10-08T21:10:45.045340+00:00",
+  "source_base": "abb588909d8875eac1ea9db0927f33626d7d6c7b",
+  "sources_sha256": {
+    "core/Clash.Meta/listener/http/server.go": "be1fede8dcc9cd5357eb6f427963f42d1a1d2b9cf9e8fc9a1917028b85f074ee",
+    "core/Clash.Meta/listener/socks/tcp.go": "8e41983c91463919f6737ef934bfcf1d6378a720237e39cec07f7a4bbb5f5643",
+    "core/Clash.Meta/listener/mixed/mixed.go": "8e24af972fb36f93398bed1f27c843502f8900eaeeb9c00e9272309b43a2e85e",
+    "core/Clash.Meta/listener/factory_preflight_test.go": "3fe89c29097f3835feb84aeb515e2f1f3651f3341281c16c18f597446d20f269"
+  },
+  "production_red": {
+    "exit_code": 1,
+    "session_id": 22351,
+    "failed_cases": 3,
+    "failure": "证书失败前创建了实际监听，错误返回丢失资源",
+    "boundary": "修复前真实 HTTP、SOCKS、Mixed 工厂；原六场景测试版本"
+  },
+  "factory_green": {
+    "exit_code": 0,
+    "session_id": 15619,
+    "cases": 9,
+    "command": "CGO_ENABLED=1 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local /opt/homebrew/bin/go test -p=2 -mod=readonly -race -count=1 -timeout=90s -run ^TestFactoryTLSPreflightBeforeRealBind$ github.com/metacubex/mihomo/listener",
+    "cwd": "core",
+    "scope": [
+      "无效证书不绑定",
+      "正常构造、关闭与实际端口重绑",
+      "合成内存身份及启用证书校验的 TLS 握手"
+    ]
+  },
+  "core_green": {
+    "exit_code": 0,
+    "session_id": 90862,
+    "cwd": "core",
+    "command": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local /opt/homebrew/bin/go test -mod=readonly -count=1 -timeout=120s -tags with_gvisor ."
+  },
+  "actual_android_arm64": {
+    "exit_code": 0,
+    "actual_android_arm64": true,
+    "ndk": "28.2.13676358",
+    "source_sha256": {
+      "core/Clash.Meta/listener/http/server.go": "be1fede8dcc9cd5357eb6f427963f42d1a1d2b9cf9e8fc9a1917028b85f074ee",
+      "core/Clash.Meta/listener/socks/tcp.go": "8e41983c91463919f6737ef934bfcf1d6378a720237e39cec07f7a4bbb5f5643",
+      "core/Clash.Meta/listener/mixed/mixed.go": "8e24af972fb36f93398bed1f27c843502f8900eaeeb9c00e9272309b43a2e85e"
+    },
+    "source_unchanged": true,
+    "artifacts": {
+      "libclash.so": "27d4f8aea079668d63d72f5c9df21f15c31ba3b90a4e832792459a3e87796a93",
+      "libclash.h": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5"
+    }
+  },
+  "independent_review": {
+    "reviewer": "android_owned_backend_contract",
+    "read_only": true,
+    "confirmed_defects": 0,
+    "scope": "三处生产工厂校验与绑定顺序；新增 TLS 测试由主控运行"
+  },
+  "not_verified": [
+    "有效文件证书 loader watcher 的明确关闭责任",
+    "Reality/ECH/客户端认证全部失败组合",
+    "accept 与已接收连接和 UDP 任务 drain",
+    "其他协议工厂失败回滚",
+    "Android 完整 owner 与 completion/ACK 采用",
+    "新 APK 和设备行为",
+    "macOS 黑屏根因及实际画面",
+    "有效代理节点 HTTPS"
+  ],
+  "release_verified": false
+}

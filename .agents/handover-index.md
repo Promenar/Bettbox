@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T04:54:24+08:00
+> generated_at: 2026-10-09T05:10:53+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -9,7 +9,7 @@
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
-| bettbox-three-platform-release | resume | 2026-10-09T04:54:24+08:00 | partial | ["Bettbox"] | Android 首次初始化配置原子入口及验收边界 | `.agents/handover.md` · `2026-10-09T04:54:24+08:00` · `fp:f2e8ec565b` |
+| bettbox-three-platform-release | resume | 2026-10-09T05:10:53+08:00 | partial | ["Bettbox", "Android", "Mihomo"] | 真实 TCP 工厂配置失败资源泄漏修复 | `.agents/handover.md` · `2026-10-09T05:10:53+08:00` · `fp:1c2b71b85e` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
 | three-platform-release | resume | 2026-10-09T03:19:06+08:00 | partial | ["Bettbox", "Android"] | Android a35d73f签名候选更新基础设备验收与完整owner采用计划 | `.agents/handover.md` · `2026-10-09T03:19:06+08:00` · `fp:6056af5196` |
 
@@ -17,6 +17,7 @@
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T05:10:53+08:00 | iso | partial | resume | ["Bettbox", "Android", "Mihomo"] | ["android", "listener", "validation", "release"] | 真实 TCP 工厂配置失败资源泄漏修复 | `.agents/handover.md` · `2026-10-09T05:10:53+08:00` · `fp:1c2b71b85e` |
 | 2026-10-09T04:54:24+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "owner", "three-platform"] | Android 首次初始化配置原子入口及验收边界 | `.agents/handover.md` · `2026-10-09T04:54:24+08:00` · `fp:f2e8ec565b` |
 | 2026-10-09T04:42:48+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "suspend", "three-platform"] | Android 挂起准入、拒绝传播与恢复责任回归 | `.agents/handover.md` · `2026-10-09T04:42:48+08:00` · `fp:75252d0839` |
 | 2026-10-09T04:22:23+08:00 | iso | partial | resume | ["Bettbox", "macOS"] | ["macos", "startup", "release"] | macOS同源开发候选构建与真实首帧阶段验收 | `.agents/handover.md` · `2026-10-09T04:22:23+08:00` · `fp:8604d35014` |

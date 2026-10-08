@@ -392,3 +392,9 @@ Go 运行时配置 epoch 已使用库载入期公开随机身份；完整主包�
 kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initial-transaction-validation.json`。真实生产入口从未初始化状态执行实际 init 后，在无效节点准备阶段失败；旧版本没有初始化，修复后保留阻断责任并拒绝旧 init。成功提交、并发首次、重放、参数冲突和初始化故障的证据为 driver 夹具，不能升级为生产成功配置证明。监听登记查询/检查式关闭 race 与严格 Kotlin 错误码解析通过，实际 Android ARM64 核心编译通过。
 
 逐组监听责任查询不是全局原子快照，不能证明 controller 或 listener 包内绕过 core 锁的写入已收敛。Kotlin/Dart 的首次真实 owner 调用、listener/suspend/停止、不可变完成回执与 engine ACK 仍待联合采用；无新 APK 或发行可用声明。
+
+### 三类 TCP 工厂绑定失败回归
+
+公开证据见 `validation/2026-10-07-three-platform/listener-factory-preflight-validation.json`。HTTP、SOCKS、Mixed 使用真实工厂与 loopback 绑定；旧版 3 个无效证书场景均在返回错误前创建实际监听，测试负责收回捕获资源。修复后 9 个场景的 race 验证通过，分别检查错误证书不调用 Listen、正常关闭后端口重绑、合成证书的真实 TLS 握手。TLS 客户端使用合成信任根并保留证书校验，不输出或持久化合成私钥。核心主包回归通过。
+
+该证据不覆盖 Reality/ECH/客户端证书全部失败组合、有效文件证书 watcher、accept/handler/活动 UDP drain、TProxy、SS/TUIC 部分构造或完整 owner 采用。没有新 APK、三端发行或 macOS 黑屏修复声明。

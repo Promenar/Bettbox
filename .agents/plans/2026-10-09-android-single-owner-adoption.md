@@ -47,3 +47,11 @@ commitOwnedConfig 的 kind5 输入为 {init,setup,state}；init 沿用 home-dir 
 主控独占 core/android_config.go、hub.go、Clash.Meta listener 责任查询、原生错误码解析器及关联测试。lastAttempted 在初始化前进入 ENTERED；初始化、准备、提交和快照的异常均保持 blocked。setup 使用初始化后的目录。成功仅发行配置 revision 与不可变 options，不表示 listener 或 VPN START。后续 Kotlin/Dart 首次 owner 必须调用该入口，不能在它前面单独 legacy init。并发首次请求只能一个进入，回执丢失后读取状态，不重发副作用。
 
 验收使用实际核心入口的初始化后准备失败与旧资源拒绝、driver 的成功/并发/重放/身份冲突/初始化故障/溢出，以及严格 Kotlin 错误码解析。主包回归与实际平台编译分别执行；真实设备 listener、完整 completion/ACK 和有效流量仍按总体计划验收。
+
+## 监听资源与真实工厂合同
+
+真实 HTTP、SOCKS、Mixed 工厂的 TLS/Reality 校验必须在绑定前完成，失败不得返回空对象并遗失监听。测试以公开错误证书和实际 loopback 绑定证明该路径，再保留正常构造和关闭后端口重绑对照。主控独占三个工厂与共享协议回归，独立审阅者不施工。三类工厂的合成 TLS 握手已验证并保留证书校验；该修复不证明业务连接、accept 或活动 UDP drain，也不证明有效文件证书 watcher 的显式收尾。
+
+完整服务采用 listener 包内受管资源组，直接使用真实协议工厂并保持已有协议、认证、端口及命名 inbound 能力。绑定、service 和任务在创建时登记；admission 关闭后不再接受连接或排队 UDP，关闭实际资源并等待相关任务。service START/STOP/STATUS 与 TUN 分清 request/resource 身份，不把 listener 混入旧 TUN FD0 字段；只有部分构造、关闭与任务责任都确认后才释放 reservation。
+
+executor 的 updateTunnels、controller PATCH 和包内 ReCreate/Patch 写入必须纳入 owner 准入；config apply 与服务构造分离。UDP 身份通过实际队列、NAT、dial、sender 与工作退出传递，不能仅覆写 Tunnel.NatTable。需要按锁定源码枚举命名协议及 sing/QUIC/KCP Close 语义，并以真实未完成握手、活动 TCP/UDP、QUIC、排队包及失败关闭证明 STOP；未知责任保持 blocked。

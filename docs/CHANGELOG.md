@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 — 真实 TCP 工厂配置失败泄漏修复
+
+- HTTP、SOCKS、Mixed 的 TLS/Reality 配置通过后才绑定；无效证书不再遗失已经创建的 TCP 监听。认证、协议与监听包装保持既有行为。
+- 三个真实工厂失败路径完成 red，修复后 9 个 loopback/TLS 场景的 race 验证及核心主包回归通过。有效文件证书 loader 的 watcher、accept/handler drain、TProxy 和复合协议资源仍需受管合同；不声明所有失败无资源或完整 STOP。
+
 ## 2026-10-09 — Android 首次初始化配置事务
 
 - 配置提交 kind5 在同一核心锁内执行 init/setup/state/options；已有目录和版本必须一致，旧运行标记或登记监听责任存在时拒绝接管。副作用前校验身份、状态和计数，初始化及后续失败保留 ENTERED 尝试和阻断责任。

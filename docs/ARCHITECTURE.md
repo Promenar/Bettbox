@@ -294,3 +294,7 @@ Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2
 ### Android 首次初始化配置事务
 
 原生配置提交 kind5 接收 init、setup、state，在一个 runLock 事务内执行初始化及首次配置；kind1—4 保持既有已初始化合同。已有初始化的目录/版本一致时无操作复用，否则拒绝。旧 isRunning 标记或登记监听槽位存在时拒绝，查询不执行未知资源清理。副作用前核验身份、状态和计数；lastAttempted 在初始化前进入 ENTERED，任何初始化、准备、提交或快照失败均保持 blocked。APPLIED 只表示配置和 options，不表示 listener/VPN 运行完成。逐组登记查询依赖既有 core 锁串行入口，不能封闭绕开该锁的 controller/listener 包内写入；全部真实调用须在唯一 owner 联合采用时处理。
+
+### 协议工厂配置失败边界
+
+HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避免配置失败返回空资源时遗失端口。有效文件证书 loader 可能建立 watcher，需显式生命周期治理；配置预检不是全资源纯操作。传统 Close 仅返回监听关闭结果，完整服务 owner 必须另外登记并收尾握手、accepted 连接、协议 service、异步 UDP 和任务，不以端口释放推断 drain。

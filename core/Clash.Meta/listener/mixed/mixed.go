@@ -59,13 +59,9 @@ func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunn
 		}
 	}
 
-	l, err := lc.Listen(context.Background(), "tcp", config.Listen)
-	if err != nil {
-		return nil, err
-	}
-
 	tlsConfig := &tls.Config{Time: ntp.Now}
 	var realityBuilder *reality.Builder
+	var err error
 
 	if config.Certificate != "" && config.PrivateKey != "" {
 		certLoader, err := ca.NewTLSKeyPairLoader(config.Certificate, config.PrivateKey)
@@ -107,6 +103,12 @@ func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunn
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	// TLS 与 Reality 配置通过后才绑定，避免错误返回遗失已创建的监听。
+	l, err := lc.Listen(context.Background(), "tcp", config.Listen)
+	if err != nil {
+		return nil, err
 	}
 
 	if realityBuilder != nil {

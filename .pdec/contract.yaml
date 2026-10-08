@@ -2999,6 +2999,51 @@
       ],
       "verification": "首次初始化配置事务实际 Android ARM64 c-shared 编译，离线只读依赖，不安装或运行",
       "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "test-listener-factory-preflight": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-run",
+        "^TestFactoryTLSPreflightBeforeRealBind$",
+        "github.com/metacubex/mihomo/listener"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "HTTP/SOCKS/Mixed 真实工厂预检和loopback绑定/关闭；不访问公网，不证明accept drain"
+    },
+    "compile-android-factory-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-factory-core/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-factory-core/libclash.so",
+        ".test/android-factory-core/libclash.h"
+      ],
+      "verification": "真实监听工厂顺序修复后的 Android ARM64 核心编译，离线，不安装或运行",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
     }
   },
   "deployment": {
@@ -3323,7 +3368,11 @@
     "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/VpnPluginStub.kt": "b4c08c72f121a60bb14a5d215bb3e81e30f7065513f0d8b7ff0a4d202ec1f217",
     "core/android_initial_transaction_test.go": "993149fdd80119e2423334fa6c177023d2163dafe423a9fb9e503840bcf93596",
     "core/Clash.Meta/listener/responsibility.go": "4df5ab20995c3b0b27260b1d9a5d6fed6633ac73c0ea225f5b67ba6809996c9d",
-    "core/Clash.Meta/listener/responsibility_test.go": "efa9a9ccd71b5143e3b6629c5a7f71f6e6965da5af5acfd7b9f24d94fb75820e"
+    "core/Clash.Meta/listener/responsibility_test.go": "efa9a9ccd71b5143e3b6629c5a7f71f6e6965da5af5acfd7b9f24d94fb75820e",
+    "core/Clash.Meta/listener/factory_preflight_test.go": "3fe89c29097f3835feb84aeb515e2f1f3651f3341281c16c18f597446d20f269",
+    "core/Clash.Meta/listener/http/server.go": "be1fede8dcc9cd5357eb6f427963f42d1a1d2b9cf9e8fc9a1917028b85f074ee",
+    "core/Clash.Meta/listener/socks/tcp.go": "8e41983c91463919f6737ef934bfcf1d6378a720237e39cec07f7a4bbb5f5643",
+    "core/Clash.Meta/listener/mixed/mixed.go": "8e24af972fb36f93398bed1f27c843502f8900eaeeb9c00e9272309b43a2e85e"
   },
   "platform_extensions": {
     "android": {
@@ -3399,6 +3448,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "bcb8675e0a1ec8273cff7556d3fc4c95b203be8a344e88c0dea559806e2773d5"
+    "contract_digest": "91ba3bffa833095719344eaa627849537b11048d20b9ad72f655784e01f48e6b"
   }
 }

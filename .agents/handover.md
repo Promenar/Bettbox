@@ -3078,3 +3078,34 @@ Kotlin/Dart 唯一 owner 采用 kind5；明确可确认 listener/suspend/stop �
 
 ### HLG
 标准 append dry-run 后 apply，记录完整目标和剩余边界。
+
+## 2026-10-09T05:10:53+08:00 · 真实 TCP 工厂配置失败资源泄漏修复
+
+type: maintenance
+scope: ["Bettbox", "Android", "Mihomo"]
+status: partial
+tags: ["android", "listener", "validation", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 1c2b71b85e02aa90966539a2cda823d1f796ec45f916985ffda8acdceede3441
+
+### Summary
+HTTP、SOCKS、Mixed 工厂将 TLS/Reality 配置校验移至 TCP 绑定之前，修复配置失败后返回空对象并遗失监听的问题。总体发行 Goal 未完成。
+
+### Changed
+三个真实协议工厂、新增真实工厂九场景回归、对应 PDEC 操作及公开验证记录。完整 listener/service/任务 owner 尚未采用。
+
+### Validation
+修复前实际三场景失败；最终九场景 race 通过、核心主包通过、实际 Android ARM64 c-shared 编译通过。公开记录含源及产物 SHA256；主控重新核验当前字节与构建回执一致。独立只读审阅确认三处生产变更无确定缺陷。
+
+### Next
+实现完整服务资源组及唯一 owner 的 Kotlin/Dart 配置、START/STOP/STATUS、completion/ACK 联合采用；解锁后验证 macOS 黑屏；补齐有效上游和业务端到端。
+
+### Risks
+有效文件证书可能产生 watcher，显式关闭未证明；握手之外连接与 UDP drain、其他协议回滚、设备和发行均未通过。当前界面工具仍报告 Mac 锁屏，应用三进程存在不能证明画面正常。
+
+### DIA
+已同步架构、变更日志、平台验收、实施计划、PDEC README 和 registry。
+
+### HLG
+标准 append dry-run 后 apply，保留未完成目标与下步边界。
