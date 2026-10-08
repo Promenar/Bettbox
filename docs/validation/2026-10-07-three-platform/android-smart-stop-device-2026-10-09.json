@@ -85,5 +85,17 @@
     "关闭功能后观察到运行计时和前台服务恢复，未观察到活动 VPN transport，不能据此确认 TUN 或代理流量。",
     "日志与界面证明普通匹配路径，未覆盖快速交错、过期 native owner 或 engine ACK。",
     "空规则恢复缺陷已复现，待回归测试和修复。"
-  ]
+  ],
+  "vpn_transport_erratum": {
+    "recorded_active_vpn_line_present_values_are_valid_connection_evidence": false,
+    "reason": "旧采集器未识别 WIFI|VPN 组合传输类型；原字段保留为历史采集结果，不能解释为确定没有活动 VPN。",
+    "historical_nonfinal_snapshots_available": false,
+    "historical_final_stopped_snapshot_valid": true,
+    "new_ordinary_start_source": "35b6443593d4fe6a9b0b79504c45357f3631e12a",
+    "new_ordinary_start_active_transport_types": [
+      "WIFI",
+      "VPN"
+    ],
+    "current_candidate_device_evidence": "android-a21276f-smart-resume-device-validation.json"
+  }
 }

@@ -139,3 +139,6 @@
 
 - .agents/plans/2026-10-09-smart-resume-completion.md — Android智能恢复同意图完成回执、失败来源及Dart提交计划
 - docs/validation/2026-10-07-three-platform/android-smart-resume-validation.json — 恢复完成源码红绿、完整Kotlin/Flutter及独立复审；设备和typed ACK另验
+
+- docs/validation/2026-10-07-three-platform/android-a21276f-apk-validation.json — 同源正式签名构建、安装回读、普通停止/冷启动与覆盖安装启动边界
+- docs/validation/2026-10-07-three-platform/android-a21276f-smart-resume-device-validation.json — 匹配暂停、空规则/关闭恢复、组合 VPN transport 修正及设置还原

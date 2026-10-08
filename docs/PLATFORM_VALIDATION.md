@@ -326,7 +326,7 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 ## Android 智能启停实际设备路径
 
-35b6443 已安装候选在匹配当前模拟器地址后，日志确认规则匹配与智能停止，运行计时消失而前台服务保留。清空规则未触发恢复，与 `SmartAutoStopManager._checkCurrentNetwork` 的空规则直接返回一致；这是待修复缺陷。关闭功能后计时和前台服务恢复，但未观察到活动 VPN transport，不能宣称 TUN 或有效代理流量通过。
+35b6443 已安装候选在匹配当前模拟器地址后，日志确认规则匹配与智能停止，运行计时消失而前台服务保留。清空规则未触发恢复，与 `SmartAutoStopManager._checkCurrentNetwork` 的空规则直接返回一致；这是 35b6443 的已复现缺陷。关闭功能后计时和前台服务恢复。该记录的 VPN 采集器漏识别 WIFI|VPN 组合传输类型，原始 false 字段不能作为确定没有活动 VPN 的证据；仅留有最终停止态网络快照，历史运行阶段的活动网络结论撤回。空规则设备缺陷的修复验收见 a21276f 设备章节。
 
 测试结束已恢复原配置（关闭、空规则）并普通停止，计时和前台服务均撤销。当前 NetworkAgent 的 transport 为 CELLULAR/WIFI 且具有 NOT_VPN；不要把历史事件、NetworkRequest 或 NOT_VPN 字样当作活动 VPN。公开回执为 `validation/2026-10-07-three-platform/android-smart-stop-device-2026-10-09.json`；快速交错、唯一 owner、engine ACK 与发行验收仍待完成。
 
@@ -334,10 +334,20 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 `SmartAutoStopManager` 的设置与网络变化进入同一串行检查；空/空白规则或关闭功能会恢复已智能停止会话，不启动普通停止会话。非空规则缺少地址则保留状态；地址查询期间设置换代或组件销毁时拒绝旧决策。策略 red 有 3 项预期失败，green 11 项通过，完整 Flutter 267 项（真实 Go FFI）及 analyze 通过；独立审阅覆盖决策与生产接线。
 
-公开回执为 `validation/2026-10-07-three-platform/smart-auto-stop-empty-rules-validation.json`，绑定源码摘要。设备复现证据来自旧 APK 35b6443，不能用于宣称修复后设备恢复通过。恢复完成确认的源码候选见下节；唯一 owner/engine ACK、新 APK 及有效代理流量须独立完成。
+公开回执为 `validation/2026-10-07-three-platform/smart-auto-stop-empty-rules-validation.json`，绑定源码摘要。设备复现证据来自旧 APK 35b6443，不能用于宣称修复后设备恢复通过。恢复完成确认的源码候选见下节；a21276f 的普通设备恢复见设备章节，唯一 owner/engine ACK 和有效代理流量须独立完成。
 
 ## Android 智能恢复完成确认源码候选
 
 两通道响应绑定同一启动意图与 generation，等待前台收尾和 RUNNING/START，主线程投递时再次核验。RUNNING/PENDING 保持等待；请求来源在接受时捕获，未确认的超时、启动失败与 Binder 断开按原始智能停止语义清理，同代提交 SUSPENDED 并保留重试资格；普通停止仍清除来源。Dart 拒绝 false/null，只在同一会话确认后提交计时和停止标记。
 
-公开回执为 `validation/2026-10-07-three-platform/android-smart-resume-validation.json`，绑定最终源码摘要。客户端 red2 项、生产协程/控制器 red3 类缺陷修复后通过；最终 JVM、完整 release Kotlin 编译、278项 Flutter 回归（真实Go FFI）、analyze 与独立复审通过。原生快照确认仍不等于带身份的 Go engine ACK；前台异常、Binder、主线程延迟、新 APK 设备恢复、startTime为空的ABA及有效代理流量均不能用源码测试替代。
+公开回执为 `validation/2026-10-07-three-platform/android-smart-resume-validation.json`，绑定最终源码摘要。客户端 red2 项、生产协程/控制器 red3 类缺陷修复后通过；最终 JVM、完整 release Kotlin 编译、278项 Flutter 回归（真实Go FFI）、analyze 与独立复审通过。原生快照确认仍不等于带身份的 Go engine ACK；前台异常、Binder、主线程延迟、startTime为空的ABA及有效代理流量均不能用源码测试替代；a21276f 的普通设备恢复证据见设备章节。
+
+## Android a21276f 已安装候选与智能恢复设备验收
+
+正式签名产物 `build/releases/android/Bettbox-arm64-a21276f.apk` 的 SHA256 为 `64f077977ea99edc7610a475d132fce4e996c5f81307f18d4d654481ab4a4ef0`，签名证书与既有发行身份一致。完整构建、源码和锁文件不漂移、任务专属 Gradle 清理通过；Pixel_7 保留数据安装，设备回读 APK 摘要一致。普通停止及停止后的冷启动均没有运行计时、前台服务或活动 VPN。
+
+活动网络判定只读取 `Current Networks` 的 `NetworkAgentInfo`，按独立传输标记识别组合类型 WIFI|VPN。35b6443 智能启停记录的旧采集器漏识别该组合，原始 false 字段作为历史采集结果保留并附勘误，不能证明没有活动 VPN；新采集在同一旧 APK 普通启动时实际确认 WIFI|VPN，普通停止后确认仅 CELLULAR/WIFI。
+
+源码测试与设备验收各自绑定版本：`android-a21276f-apk-validation.json` 记录构建/安装/停止态；`android-a21276f-smart-resume-device-validation.json` 记录匹配规则、清空规则及关闭功能的计时、前台服务和系统 VPN 网络。前台异常、Binder 断开、主线程延迟、快速交错、唯一 owner/engine ACK、有效代理 HTTPS 和真机不能由普通恢复路径替代。
+
+SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageReplacedReceiver` 在 SDK36 直接请求启动；安装前的普通停止意图没有保留。这项行为需独立修复和回归，不计作正常冷启动通过。macOS 黑色窗口的原因未确认，界面检查等待解锁；进程存活不能替代渲染验收。候选没有达到完整发行验收。

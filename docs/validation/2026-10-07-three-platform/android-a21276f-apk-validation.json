@@ -1,0 +1,36 @@
+{
+  "source_commit": "a21276fc769404f3282613d1d60f1a717227a77a",
+  "source_snapshot_sha256": "7b94b3b1a53e2fe0c7d05efe6dff5a0ed038076ec089c9b890b015dc4c7d15f0",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "build_status": "passed",
+  "finished_at": "2026-10-08T18:09:12.981674+00:00",
+  "apk_path": "build/releases/android/Bettbox-arm64-a21276f.apk",
+  "apk_sha256": "64f077977ea99edc7610a475d132fce4e996c5f81307f18d4d654481ab4a4ef0",
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "signature_verified": true,
+  "gradle_cleanup_verified": true,
+  "native_library_count": 12,
+  "device": "Pixel_7 / emulator-5554 / ARM64 SDK36",
+  "installed_apk_readback_sha256": "64f077977ea99edc7610a475d132fce4e996c5f81307f18d4d654481ab4a4ef0",
+  "ordinary_stop": {
+    "runtime_visible": false,
+    "foreground_service": false,
+    "active_vpn": false
+  },
+  "cold_start_after_ordinary_stop": {
+    "runtime_visible": false,
+    "foreground_service": false,
+    "active_vpn": false
+  },
+  "package_replacement_observation": {
+    "runtime_visible": true,
+    "active_vpn": true,
+    "source_receiver_sdk36_requests_start": true,
+    "stopped_user_intent_preservation_verified": false
+  },
+  "real_proxy_https_verified": false,
+  "native_engine_ack_verified": false,
+  "physical_device_verified": false,
+  "release_verified": false
+}

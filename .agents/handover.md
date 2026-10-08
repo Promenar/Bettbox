@@ -2737,3 +2737,34 @@ record-fingerprint: 6addac526f9a097240102c17a0e1e6a6ec3fd8217ed97b414b086119b630
 
 ### HLG
 标准append记录独立审阅纠偏、真实红绿、候选边界及后续；整体Goal保持active。
+
+## 2026-10-09T02:17:13+08:00 · Android a21276f正式候选设备恢复与VPN组合判定勘误
+
+type: development
+scope: ["Bettbox", "Android", "validation"]
+status: partial
+tags: ["smart-resume", "device", "apk", "erratum"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 5dd0eccb4dece5e3334a77d25a66de2f5e9f7c0ab6b764ae36ef23b9be925746
+
+### Summary
+a21276f正式签名候选构建/安装回读及普通智能恢复路径完成设备验收；完整三端发行Goal保持active。
+
+### Changed
+更新PDEC安装摘要、公开构建与设备回执、PLATFORM_VALIDATION/CHANGELOG/registry。旧VPN采集器漏识别WIFI|VPN，原记录保留并附勘误，撤回历史运行阶段无活动VPN判断。
+
+### Validation
+原构建会话8783/PID45321终态0，新APK64f07797...a4ef0与设备回读一致，证书沿用6a121d74...a044a82，源码/锁文件/Gradle清理通过。原开关false、规则空；匹配暂停计时false/前台true/VPNfalse；空规则恢复及关闭恢复计时/前台/VPNtrue；最终设置还原并停止至三者false。PDEC校验0/execution_ready=true。
+
+### Next
+修复并验证SDK36覆盖安装对停止意图的保留；推进唯一owner/typed engine ACK、真实有效代理HTTPS、macOS登录/渲染与业务闭环。macOS界面检查等待用户解锁，不重复索取。
+
+### Risks
+SDK36覆盖安装实际自动运行，接收器直接请求start；未作为正常冷启动通过。历史智能启停运行快照缺失，不能追认VPN；macOS进程存活不证明界面正常。快速交错/失败注入、真机、支付商及Apple发行条件仍未完成。
+
+### DIA
+已同步平台验收、CHANGELOG、registry、公开回执和PDEC安装摘要。
+
+### HLG
+通过标准append记录同源构建、设备设置还原、组合传输判定勘误及未闭合边界。

@@ -1,0 +1,165 @@
+{
+  "source_commit": "a21276fc769404f3282613d1d60f1a717227a77a",
+  "apk_sha256": "64f077977ea99edc7610a475d132fce4e996c5f81307f18d4d654481ab4a4ef0",
+  "device": "Pixel_7 / emulator-5554 / ARM64 SDK36",
+  "original_setting": {
+    "enabled": false,
+    "network_rule_empty": true
+  },
+  "matching_rule_from_current_device_wifi": true,
+  "matching_start_samples": [
+    {
+      "observed_at": "2026-10-08T18:12:29.103019+00:00",
+      "runtime_visible": true,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    },
+    {
+      "observed_at": "2026-10-08T18:12:31.085906+00:00",
+      "runtime_visible": false,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    },
+    {
+      "observed_at": "2026-10-08T18:12:33.064130+00:00",
+      "runtime_visible": false,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    }
+  ],
+  "empty_rule_recovery_samples": [
+    {
+      "observed_at": "2026-10-08T18:13:43.477217+00:00",
+      "runtime_visible": true,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ],
+        [
+          "WIFI",
+          "VPN"
+        ]
+      ],
+      "active_vpn": true
+    },
+    {
+      "observed_at": "2026-10-08T18:13:46.650249+00:00",
+      "runtime_visible": true,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ],
+        [
+          "WIFI",
+          "VPN"
+        ]
+      ],
+      "active_vpn": true
+    }
+  ],
+  "rematch_suspended": {
+    "observed_at": "2026-10-08T18:14:47.246908+00:00",
+    "runtime_visible": false,
+    "foreground_service": true,
+    "current_network_transports": [
+      [
+        "CELLULAR"
+      ],
+      [
+        "WIFI"
+      ]
+    ],
+    "active_vpn": false
+  },
+  "disabled_feature_recovery": {
+    "observed_at": "2026-10-08T18:15:19.264548+00:00",
+    "runtime_visible": true,
+    "foreground_service": true,
+    "current_network_transports": [
+      [
+        "CELLULAR"
+      ],
+      [
+        "WIFI"
+      ],
+      [
+        "WIFI",
+        "VPN"
+      ]
+    ],
+    "active_vpn": true
+  },
+  "final_stopped": {
+    "observed_at": "2026-10-08T18:16:30.460929+00:00",
+    "runtime_visible": false,
+    "foreground_service": false,
+    "current_network_transports": [
+      [
+        "CELLULAR"
+      ],
+      [
+        "WIFI"
+      ]
+    ],
+    "active_vpn": false
+  },
+  "settings_restored": true,
+  "transport_detection": {
+    "scope": "Current Networks / NetworkAgentInfo",
+    "recognizes_composite_wifi_vpn": true,
+    "ignores_network_requests_and_history": true
+  },
+  "ordinary_start_old_apk_parser_correction": {
+    "observed_at": "2026-10-08T18:09:22.995545+00:00",
+    "installed_source": "35b6443593d4fe6a9b0b79504c45357f3631e12a",
+    "ordinary_start_vpn_transports": [
+      "WIFI",
+      "VPN"
+    ],
+    "ordinary_stop_runtime": false,
+    "ordinary_stop_active_vpn": false,
+    "setting_changes": false,
+    "real_proxy_https_proven": false
+  },
+  "native_engine_ack_verified": false,
+  "quick_interleaving_verified": false,
+  "effective_proxy_https_verified": false,
+  "physical_device_verified": false,
+  "release_verified": false,
+  "limitations": [
+    "设备证明普通匹配暂停与设置驱动恢复，不覆盖失败注入、Handler延迟、Binder断开或快速交错。",
+    "活动VPN网络不能替代有效代理节点HTTPS、服务端业务闭环或发行验收。"
+  ]
+}
