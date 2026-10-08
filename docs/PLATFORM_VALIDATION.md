@@ -484,3 +484,9 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 认证红回归证明HTTP/Mixed在成功请求之后错误用户仍得到200；逐请求核验后返回403，合法用户切换保持两条身份正确的路由。拒绝接口回归要求pipe关闭错误，超时不能过关；执行信号对fallback做50ms有界观测。完整公共net/HTTP/listener race、既有20项握手回归、核心完整CGO0和最终Android ARM64编译通过，四个加载段均16KiB。SOCKS/Mixed本包没有独立测试，实际工厂行为由listener包回归覆盖。独立终审无新增P1/P2，回执见 `validation/2026-10-07-three-platform/tcp-protocol-lifecycle-validation.json`。
 
 未验证Transport私有任务或证书watcher完全退出；全部协议、UDP和Android唯一owner/ACK及设备有效VPN仍待完成。APK、运行中的macOS包和生产支付未替换，黑屏与三端发行未验收。
+
+## macOS真实窗口与重新启动验证
+
+2026-10-09，CUA已能选择确切 `build/macos-local-development/Bettbox.app` 并观察窗口。首页、账户未登录提示和商店公开套餐均实际绘制；页面切换成功。通过正常退出确认宿主及两个内核进程消失，再启动同一候选后首页可访问。宿主摘要与框架诊断候选封装一致，相关Dart源码摘要一致。公开回执见 `validation/2026-10-07-three-platform/macos-window-runtime-validation.json`。
+
+当前观察未复现黑屏，但没有确认先前黑屏根因或证明间歇问题已修复。仅验证未登录页面、公开套餐和一次重新启动；没有账户、邀请、支付及有效VPN验收。候选源码为56b68b2，未集成f91428d的内核改动；签名仍是本机开发，未公证或公开发行。

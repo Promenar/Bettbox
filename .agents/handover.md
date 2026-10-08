@@ -3512,3 +3512,34 @@ HTTP、SOCKS和Mixed实际TCP工厂采用公共资源责任机制；修复复用
 
 ### HLG
 通过结构化append追加事实链并重建索引，保留后续发行工作。
+
+## 2026-10-09T07:32:45+08:00 · macOS真实窗口与正常退出重新启动验收
+
+type: maintenance
+scope: ["Bettbox", "macOS"]
+status: partial
+tags: ["macos", "window", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 3eff8fe9d6212771d66eda967e595fc8c7f0dd144caef1d185956935e2bff04f
+
+### Summary
+CUA锁屏限制已解除；确切本机开发候选首页、账户未登录页面、商店公开套餐及页面切换正常。当前没有复现全黑。
+
+### Changed
+没有代码或候选变更；补充真实窗口验证回执及PLATFORM_VALIDATION、registry。
+
+### Validation
+真实截图显示首页导航与卡片、账户登录/注册提示及公开套餐。CUA super+q正常退出后6081/6087/6089不在进程表；同一路径重新启动后AX显示完整首页，新宿主12971、supervisor12973、core12978。host sha256与框架候选封装相同，相关Dart源码摘要无漂移。
+
+### Next
+继续完整macOS账户/订阅/邀请/VPN路径、Android唯一owner/ACK及其余协议和UDP生命周期、服务端支付适配与iOS开发验证。若黑屏复现，记录触发步骤和同包运行证据。
+
+### Risks
+一次窗口检查及重新启动不能排除间歇黑屏；根因未确认，没有修复声明。未输入凭据、创建邀请码、下单或付款。当前无配置、代理/TUN关闭；候选为56b68b2，尚未集成最新TCP内核f91428d，开发签名不是发行版本。
+
+### DIA
+已同步真实窗口回执、PLATFORM_VALIDATION及registry。
+
+### HLG
+通过append追加当前事实，保留先前锁屏与未验收记录，重建索引。

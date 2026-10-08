@@ -1,0 +1,44 @@
+{
+  "observed_at": "2026-10-09T07:32:38+08:00",
+  "scope": "macOS本机开发候选真实窗口、页面切换与正常退出重新启动",
+  "candidate": "build/macos-local-development/Bettbox.app",
+  "candidate_source_commit": "56b68b2408ca503461ffb0572a4c0e3cde4d858c",
+  "repository_commit": "f91428de6e219b4587159c1ea57e537422cfe727",
+  "host_sha256": "407d0e5e3b4e82311bb013a520f15a93d054d5bb552793d596c5fc54711d1252",
+  "host_matches_prior_seal": true,
+  "framework_source_matches_prior_receipt": true,
+  "observations": {
+    "cua_unlocked": true,
+    "actual_home_screenshot_rendered": true,
+    "account_navigation_rendered": true,
+    "account_state": "未登录，显示登录/注册与同步订阅提示",
+    "store_navigation_rendered": true,
+    "public_plan_fetch_rendered": true,
+    "purchase_submitted": false,
+    "quit_method": "CUA super+q正常退出",
+    "old_processes_absent_after_quit": [
+      6081,
+      6087,
+      6089
+    ],
+    "relaunch_method": "CUA选择确切开发候选路径",
+    "relaunch_home_accessibility_rendered": true,
+    "new_processes": {
+      "host": 12971,
+      "supervisor": 12973,
+      "core": 12978
+    }
+  },
+  "black_screen": {
+    "reproduced_in_this_observation": false,
+    "root_cause_confirmed": false,
+    "fix_claimed": false
+  },
+  "boundaries": [
+    "仅当前窗口和一次正常退出重新启动，不证明不存在间歇性黑屏",
+    "账户仅未登录状态，未进行凭据输入、邀请创建、下单或真实付款",
+    "无配置，系统代理与TUN关闭，未验证有效VPN",
+    "Apple Development本机签名，未Developer ID公证或公开发行",
+    "运行候选早于f91428d的TCP改动，不能代表最新内核已集成到macOS产物"
+  ]
+}
