@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-10-08T21:16:56.615889+08:00",
+  "scope": "生产JNI领取前异常收尾",
+  "source_sha256": {
+    "android/core/src/main/cpp/core.cpp": "53b065ae4f93f0b27770e9d8dca1e6724230f1615d9cb54165fad66f839f72a4",
+    "android/core/src/main/cpp/jni_helper.cpp": "1286d8f1c57d2ad1c14bfaf4c93f5a7ab378a2ef27584baf3da7e57b2ef36dbb",
+    "android/core/src/main/cpp/jni_helper.h": "94c8ea35845d2e0b57bdca798bb85dc4fa926e3748403f4d56a179d92816b747",
+    "android/core/src/test/cpp/jni_preclaim_fixture.cpp": "88bada3618e51d0367a57e66abef7e31bc11162cb86bac8ee38e4ce762660045"
+  },
+  "red": {
+    "failed_cases": [
+      1,
+      2,
+      3
+    ],
+    "passed_cases": [
+      4,
+      5,
+      6
+    ]
+  },
+  "green": {
+    "preclaim_cases": 6,
+    "release_cases": 17,
+    "failure_cases": 9,
+    "failed": 0,
+    "address_sanitizer": true
+  },
+  "ndk_link": {
+    "exit_code": 0,
+    "target": "Android ARM64 API26",
+    "artifact_sha256": "8ece9ad69a56fd8f2f2b88023ce9dee6aabc034ad6f63c30527c1ec3cac4a0f8"
+  },
+  "independent_review": "未发现确定P1/P2，主控已复核四文件及实际命令",
+  "limits": [
+    "公开JNI函数表，未启动真实JVM",
+    "未验证并发start与unknown标记时序",
+    "typed owner接线及新APK/业务验证未完成"
+  ]
+}

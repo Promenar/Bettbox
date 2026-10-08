@@ -250,3 +250,5 @@ TUN 配置预留模块的红绿、独立审阅及核心编译证据见 `validati
 资源身份回归与同次完成快照证据见 `validation/2026-10-07-three-platform/android-owned-state-validation.json`；公开Resource不代表真实FD/JVM/设备。
 
 输入处置与重入红绿证据见 `validation/2026-10-07-three-platform/android-lease-disposition-validation.json`；没有实际Android FD/Android JVM/CheckJNI或新APK验收。
+
+JNI实际启动入口对领取前global ref删除检查并清除异常，失败保存库生命周期cleanup unknown；Java claim异常同样保存移交未知。未知责任阻断后续启动，stop仍尝试Go资源回收但不得报告整体成功。六项公开函数表ASAN场景修复前有三项失败，修复后全部通过；既有17项释放、9项故障回归及NDK28/API26 ARM64生产JNI链接通过。该证据不覆盖真实JVM/CheckJNI、并发准入、typed owner或新APK。

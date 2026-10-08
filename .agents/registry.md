@@ -103,3 +103,5 @@
 - docs/validation/2026-10-07-three-platform/android-owned-state-validation.json — 资源完整身份、错代停止、未知保留与同次快照验收
 
 - docs/validation/2026-10-07-three-platform/android-lease-disposition-validation.json — Go原子租约完成、Kotlin领取状态和关闭重入红绿
+
+- docs/validation/2026-10-07-three-platform/android-jni-preclaim-validation.json — JNI领取前异常红绿、独立审阅及ARM64链接边界

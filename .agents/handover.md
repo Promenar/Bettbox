@@ -2179,3 +2179,34 @@ Go/Kotlin初始RED exit1，Kotlin重入RED exit1；最终Go三项GREEN及全star
 
 ### HLG
 标准append dry-run后apply记录。
+
+## 2026-10-08T21:16:57+08:00 · Android JNI领取前异常收尾与实际链接
+
+type: maintenance
+scope: ["android-native"]
+status: done
+tags: ["android", "jni", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 094051450f16845d35f62c9f7e138c2974674497006f1cc19646471abd6dab38
+
+### Summary
+生产JNI领取前异常保留未知责任，拒绝后续启动并避免停止误报成功。
+
+### Changed
+core.cpp检查删除与claim异常，helper提供粘滞标记；新增六项函数表夹具及PDEC操作。
+
+### Validation
+修复前1/2/3失败，4/5/6通过；修复后六项ASAN通过，既有17项释放与9项故障通过，NDK28/API26 ARM64实际JNI链接exit0；独立审阅未发现P1/P2。公开回执 docs/validation/2026-10-07-three-platform/android-jni-preclaim-validation.json。
+
+### Next
+完成带配置版本的Go/JNI/Kotlin owner联合接线，再重建Android APK并设备验收；macOS准备匹配profile后验证完整应用；iOS保持开发版及发行研究。
+
+### Risks
+函数表不代表真实JVM/CheckJNI，当前Boolean入口无完整请求资源身份；未知状态不允许重试删除。并发准入、真实节点、邀请返佣及支付业务尚未闭环。
+
+### DIA
+已同步架构、平台验证、CHANGELOG、registry与公开回执。
+
+### HLG
+通过append dry-run及apply追加本记录。

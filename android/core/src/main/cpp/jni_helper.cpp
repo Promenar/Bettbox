@@ -6,7 +6,7 @@
 #include <atomic>
 
 static JavaVM *global_vm;
-// 线程分离失败不能由后续成功回调清洗；本次库生命周期保留未知责任。
+// 线程收尾、引用释放或FD移交未知不能由后续成功清洗；库生命周期保留责任。
 static std::atomic<bool> cleanup_unknown{false};
 
 static jclass c_string;
@@ -128,6 +128,7 @@ bool jni_finish_thread_checked(scoped_jni *jni) {
 }
 
 bool jni_cleanup_unknown() { return cleanup_unknown.load(); }
+void jni_mark_cleanup_unknown() { cleanup_unknown.store(true); }
 
 void jni_detach_thread(scoped_jni *jni) {
     jni_finish_thread_checked(jni);

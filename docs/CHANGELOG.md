@@ -263,3 +263,7 @@ Android 原生配置回执解析器支持 `tunConfigurationReserved` 与 `tunCle
 
 - 增加Go回调租约的原子完成状态及Kotlin FD领取快照，修复重复Once调用洗白已知释放失败及关闭回调重入提前确认。
 - Go三项及完整startup race、Kotlin六组与两个重入子场景、Android ARM64核心编译通过。实际JNI/owner与APK另验。
+
+## [Unreleased] - JNI领取前异常收尾 (2026-10-08)
+
+JNI实际启动入口对领取前global ref删除检查并清除异常，失败保存库生命周期cleanup unknown；Java claim异常同样保存移交未知。未知责任阻断后续启动，stop仍尝试Go资源回收但不得报告整体成功。六项公开函数表ASAN场景修复前有三项失败，修复后全部通过；既有17项释放、9项故障回归及NDK28/API26 ARM64生产JNI链接通过。该证据不覆盖真实JVM/CheckJNI、并发准入、typed owner或新APK。

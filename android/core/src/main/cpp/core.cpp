@@ -14,10 +14,17 @@ static bool clear_callback_exception(JNIEnv *env) {
 #include "jni_helper.h"
 #include "libclash.h"
 
+// 删除只尝试一次；异常不能证明引用已释放，也不能安全地重复删除。
+static void release_preclaim_callback(JNIEnv *env, jobject callback) {
+    if (!callback) return;
+    del_global(callback);
+    if (clear_callback_exception(env)) jni_mark_cleanup_unknown();
+}
+
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_appshub_bettbox_core_Core_startNativeTun(JNIEnv *env, jobject, jobject lease, jobject cb) {
-    if (!lease) return JNI_FALSE;
+    if (!lease || jni_cleanup_unknown()) return JNI_FALSE;
     const jint pending_fd = env->CallIntMethod(lease, m_fd_lease_peek);
     if (clear_callback_exception(env) || pending_fd < 0) return JNI_FALSE;
 
@@ -26,13 +33,16 @@ Java_com_appshub_bettbox_core_Core_startNativeTun(JNIEnv *env, jobject, jobject 
         if (!cb) return JNI_FALSE;
         interface = new_global(cb);
         if (clear_callback_exception(env) || !interface) {
-            if (interface) del_global(interface);
+            release_preclaim_callback(env, interface);
             return JNI_FALSE;
         }
     }
     const jint fd = env->CallIntMethod(lease, m_fd_lease_claim);
-    if (clear_callback_exception(env) || fd < 0) {
-        if (interface) del_global(interface);
+    const bool claim_failed = clear_callback_exception(env);
+    // Java领取抛异常时，无法从返回值确认FD是否已经移交。
+    if (claim_failed) jni_mark_cleanup_unknown();
+    if (claim_failed || fd < 0) {
+        release_preclaim_callback(env, interface);
         return JNI_FALSE;
     }
     // 从领取开始，FD与global ref均由Go接管，包括失败返回路径。
@@ -42,7 +52,9 @@ Java_com_appshub_bettbox_core_Core_startNativeTun(JNIEnv *env, jobject, jobject 
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_appshub_bettbox_core_Core_stopNativeTun(JNIEnv *) {
-    return stopTun() ? JNI_TRUE : JNI_FALSE;
+    // 未知JNI责任不阻止Go收回已知资源，但不能报告整体清理成功。
+    const bool stopped = stopTun();
+    return stopped && !jni_cleanup_unknown() ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C"

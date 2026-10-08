@@ -209,3 +209,5 @@ Android TUN预留固定同次VPN模式：VPN成功须进入构造并保留resour
 Android State提供值身份TunOwnership（epoch/configRevision/generation）。受管start只接纳已收口状态，无身份start/stop不能替换或停止受管资源；受管stop要求完整身份相符。身份在进入构造前绑定，构造或回调收尾未知时保留，确认收尾后清空，非VPNfd0同样绑定。StartReport和OwnedStopReport在同一状态锁内复制完成事实及残余身份；OwnedIdentity只表示当前态，不能用来拼接完成回执。State不发行代次、不校验外层请求授权，实际JNI/owner接线另验。
 
 Go OnceLease用atomic状态区分Held/Released/Unknown，回调执行中不发布完成，panic后Unknown粘滞，重复sync.Once调用不清洗失败。Kotlin TunFDLease提供同步不可变处置快照；CLAIMED只表示已交接，不表示Go释放。关闭进行中用closing阻止重入提前确认，完成后才发布RELEASED，失败为UNKNOWN；数字FD不重试。新快照尚未进入实际typed JNI桥。
+
+JNI实际启动入口对领取前global ref删除检查并清除异常，失败保存库生命周期cleanup unknown；Java claim异常同样保存移交未知。未知责任阻断后续启动，stop仍尝试Go资源回收但不得报告整体成功。六项公开函数表ASAN场景修复前有三项失败，修复后全部通过；既有17项释放、9项故障回归及NDK28/API26 ARM64生产JNI链接通过。该证据不覆盖真实JVM/CheckJNI、并发准入、typed owner或新APK。

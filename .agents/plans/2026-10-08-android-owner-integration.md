@@ -117,3 +117,7 @@ State增加epoch/configRevision/generation值身份，不自行发行代次。�
 ## 输入租约完成事实
 
 Go OnceLease增加并发安全的held/released/unknown值状态；释放panic粘滞unknown，第二次Once调用不能洗成成功。Kotlin TunFDLease同步快照区分UNCLAIMED/CLAIMED/RELEASED/UNKNOWN，本地close成功仅在RELEASED表示已关闭；CLAIMED不证明Go收尾。保留旧领取和关闭合同，不重试数字FD。主控独占Go及PDEC/脚本/文档；Kotlin施工独占TunFDLease.kt和公开Fixture，先可编译RED再实施；未施工者独立审阅，主控执行Go race与缓存JVM夹具。无真实FD/Android设备，新状态仅供typed桥回执，不能自行发布运行状态。
+
+## JNI领取前失败收尾
+
+生产startNativeTun的领取前引用删除须检查ExceptionCheck/Clear；删除后异常粘滞标记JNI cleanup unknown，不重试引用。claim发生Java异常时FD移交归属未确认，同样阻断；普通claim负值且无异常仍由Kotlinfinally收尾未领取FD。JNI未知期间禁止新start，stop仍尝试Go旧资源收口，但结果不得报告整体清理成功。主控独占core.cpp/jni_helper及PDEC；公开JNI函数表夹具独占施工后由主控RED/GREEN/ASAN验证，独立审阅及实际NDK链接。该Boolean链路拒绝洗白未知，不替代带request/resource身份的typed桥或实际CheckJNI。
