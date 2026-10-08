@@ -3419,3 +3419,34 @@ record-fingerprint: 1a7b2577aedd8109e999e9758a91ca9ddf4b847fa5ad5269d7636152743c
 
 ### HLG
 标准append预演后应用，保留bettbox-three-platform-release总体continuity。
+
+## 2026-10-09T06:56:04+08:00 · macOS框架错误固定诊断与完整开发候选切换
+
+type: maintenance
+scope: ["Bettbox", "macOS", "Flutter"]
+status: partial
+tags: ["macos", "diagnosis", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 01168c0bfeaeca3eb0b66fad91ee867dee1793402b984d899293d0354fda67f8
+
+### Summary
+修复release模式Flutter框架错误诊断静默丢弃；完整本机开发候选已正常切换并启动，黑屏根因和三端发行仍未完成。
+
+### Changed
+main在binding后/runApp前安装固定框架失败报告，controller不覆盖；不格式化异常/stack/library，sink异常自行收口。旧包保存在build/macos-local-development-before-framework-error-20261009。
+
+### Validation
+旧策略2项真实FlutterError红；3项定向含实际widget build失败绿，完整Flutter298通过1跳过，analyze退出0。最终完整macOS构建源和锁未漂移，AppleDevelopment签名及严格验签通过，旧74583/74591/74592正常退出；新6081/6087/6089启动，firstFrame有标记、0框架失败，日志600。独立只读审阅无P1/P2。
+
+### Next
+解锁后观察新候选实际窗口并定位黑屏；继续Android唯一owner/general/UDP/task、双通道completion/ACK及服务端实际业务和发行全路径。
+
+### Risks
+固定框架日志不覆盖所有异步/PlatformDispatcher错误，真实release未主动注入故障。首帧不证明画面/账户/代理正常；仅AppleDevelopment开发签名，未公证/发布。旧包和新会话保留，无付款或系统权限放宽。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、PDEC、registry、实施计划和公开证据。
+
+### HLG
+标准append预演并应用，保留总体continuity。

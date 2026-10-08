@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-09",
+  "scope": "Flutter框架错误固定诊断与完整macOS开发候选，不是黑屏修复或发行验收",
+  "source_base_commit": "764834370f464e53489852b316b405bf3941bed7",
+  "source_sha256": {
+    "lib/main.dart": "e2b13dc20af4b7fa96c1e7b9095865eddc28a81814288ac8b3b069e038482aab",
+    "lib/controller.dart": "8c257af4d4afd729ca53b5a05176c76a1b0a706ab9c2202d50a292c7101f1f7c",
+    "lib/common/framework_error_reporter.dart": "9278f5f4015faead7a0f776a9a728ac938b9a25e9163c6f741e685459fae7a0e",
+    "test/common/framework_error_reporter_test.dart": "d0f20307ec462d07747f4b4d5942ce720e1f48e886af0f0b0e997a150a0f1b76"
+  },
+  "red_tests": {
+    "framework_callback_fixed_marker_missing": true,
+    "diagnostic_sink_exception_escape": true,
+    "exit_code": 1
+  },
+  "green_tests": {
+    "direct_and_widget_tests_passed": 3,
+    "flutter_full_passed": 298,
+    "flutter_full_skipped": 1,
+    "flutter_full_exit": 0,
+    "analyze_exit": 0,
+    "analyze_issues": 0,
+    "after_import_cleanup_targeted_exit": 0
+  },
+  "independent_review": {
+    "agent": "macos_local_seal",
+    "P1_P2": 0,
+    "read_only": true
+  },
+  "build": {
+    "exit_code": 0,
+    "source_unchanged": true,
+    "locks_unchanged": true,
+    "commands_succeeded": true,
+    "elapsed_seconds": 50.8,
+    "build_channel": "local-macos-development"
+  },
+  "seal": {
+    "passed": true,
+    "signingmode": "apple-development",
+    "entitlement_profile": "local-development",
+    "distribution": "non-distribution",
+    "host_sha256": "407d0e5e3b4e82311bb013a520f15a93d054d5bb552793d596c5fc54711d1252",
+    "host_cdhash": "0356c9cbec228380a004aa3987ea838b18ddef7a"
+  },
+  "old_exit": {
+    "normal_exit_command_code": 0,
+    "sent_exit_marker": true,
+    "old_pids_absent": [
+      74583,
+      74591,
+      74592
+    ],
+    "previous_bundle": "build/macos-local-development-before-framework-error-20261009/Bettbox.app"
+  },
+  "launch": {
+    "processes": {
+      "Bettbox": [
+        6081
+      ],
+      "BettboxCoreSupervisor": [
+        6087
+      ],
+      "BettboxCore": [
+        6089
+      ]
+    },
+    "host_sha256": "407d0e5e3b4e82311bb013a520f15a93d054d5bb552793d596c5fc54711d1252",
+    "stages": [
+      {
+        "stage": "singleInstance",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "singleInstance",
+        "phase": "complete",
+        "elapsed_ms": 27
+      },
+      {
+        "stage": "version",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "version",
+        "phase": "complete",
+        "elapsed_ms": 1
+      },
+      {
+        "stage": "configuration",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "corePreload",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "configuration",
+        "phase": "complete",
+        "elapsed_ms": 1
+      },
+      {
+        "stage": "corePreload",
+        "phase": "complete",
+        "elapsed_ms": 1645
+      },
+      {
+        "stage": "dashboardAssets",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "dashboardAssets",
+        "phase": "complete",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "rustBridge",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "rustBridge",
+        "phase": "complete",
+        "elapsed_ms": 1
+      },
+      {
+        "stage": "androidBridge",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "androidBridge",
+        "phase": "complete",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "window",
+        "phase": "begin",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "window",
+        "phase": "complete",
+        "elapsed_ms": 5
+      },
+      {
+        "stage": "application",
+        "phase": "complete",
+        "elapsed_ms": 0
+      },
+      {
+        "stage": "firstFrame",
+        "phase": "complete",
+        "elapsed_ms": 0
+      }
+    ],
+    "framework_error_markers": 0,
+    "first_frame_callback": true,
+    "startup_failed_count": 0,
+    "private_log_mode": "0o600",
+    "window_verified": false,
+    "release_verified": false
+  },
+  "candidate": "build/macos-local-development/Bettbox.app",
+  "screen_locked": true,
+  "black_screen_root_cause_confirmed": false,
+  "release_verified": false,
+  "boundary": [
+    "只覆盖Flutter框架捕获错误，不覆盖全部未处理异步或PlatformDispatcher错误",
+    "测试执行于Flutter test环境，真实Release候选没有主动注入框架故障",
+    "真实候选启动到首帧且0框架失败标记，不证明窗口正常或排除所有错误",
+    "仅Apple Development本机签名，未Developer ID公证或公开发布",
+    "Android完整owner/ACK、实际有效VPN及服务端完整业务仍待验收"
+  ]
+}

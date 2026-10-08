@@ -196,3 +196,6 @@
 
 - .agents/plans/2026-10-09-inbound-partial-ownership.md — 命名监听部分创建责任、别名及核心失败传播范围
 - docs/validation/2026-10-07-three-platform/inbound-partial-ownership-validation.json — 实际socket红绿、生产错误、独立审阅及ARM64编译证据
+
+- .agents/plans/2026-10-09-macos-framework-error-diagnosis.md — Flutter框架失败隐私诊断及完整macOS候选验收边界
+- docs/validation/2026-10-07-three-platform/macos-framework-error-validation.json — 真实框架红绿、Release构建/开发签名、旧退出与新首帧证据

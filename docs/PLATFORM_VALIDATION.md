@@ -459,3 +459,12 @@ ServicePlugin 返回 VpnPlugin 的真实受理结果；Dart Service.startVpn 对
 11项命名顶层race回归（含真实Realm部分对象和16个删除别名子用例）、5项既有检查式关闭回归、核心完整CGO0测试通过。实际Android ARM64 c-shared编译成功，四个加载段16KiB对齐。独立审阅发现的4项别名问题均有真实socket红绿证据，最终复核无新增P1/P2。证据见 `validation/2026-10-07-three-platform/inbound-partial-ownership-validation.json`。
 
 成功setup的全局ApplyConfig副作用未做本轮集成验证；通用general重建、UDP runtime及全部协议内部任务、Android完整唯一owner/ACK和设备有效流量未完成。运行中的APK未替换，macOS界面工具仍报告锁屏，黑屏未验收，三端发行目标保持未完成。
+
+
+## macOS框架错误诊断候选
+
+AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈，发行模式静默丢弃框架错误。在binding初始化后、runApp之前安装统一框架入口，所有模式只输出固定 `[界面] framework failed`，诊断sink异常被捕获；控制器不覆盖入口，不读取异常、堆栈、library或上下文资料。旧共用入口的2项红回归、真实组件构建失败等3项定向回归通过；Flutter完整298项通过1项跳过、analyze无问题。
+
+最终源码完整macOS构建成功且源和锁未漂移。旧宿主/两层内核经正常退出通道确认消失，旧包保留在 `build/macos-local-development-before-framework-error-20261009/Bettbox.app`。新 `build/macos-local-development/Bettbox.app` 经Apple Development嵌套签名及严格验签，实际启动宿主/两层内核存在，初始化返回并到达首帧回调，观测窗口内0框架失败标记；私有日志权限600且仅非LLM提取固定类别。证据见 `validation/2026-10-07-three-platform/macos-framework-error-validation.json`。
+
+工具仍报告锁屏，实际画面和黑屏根因未确认。该入口只覆盖Flutter框架捕获错误，未对真实Release候选主动注入故障，不覆盖所有异步/PlatformDispatcher异常。签名仍是本机开发，未公证、公开发布或完成代理/账户全路径。

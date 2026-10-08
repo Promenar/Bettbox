@@ -14,7 +14,6 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/dialog.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1349,12 +1348,6 @@ class AppController {
   }
 
   Future<void> init() async {
-    FlutterError.onError = (details) {
-      if (kDebugMode) {
-        commonPrint.log(details.stack.toString());
-      }
-    };
-
     vpn_service.service?.addNativeEventCallback((method, arguments) async {
       if (method == 'vpnStartFailed') {
         globalState.showNotifier('Failed, Please try again later');

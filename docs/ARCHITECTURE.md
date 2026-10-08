@@ -313,3 +313,8 @@ HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避�
 ### 命名监听登记责任
 
 `PatchInboundListenersChecked` 在 `inboundMux` 内先登记对象再执行 Listen。创建失败或 panic 保留对象和未确认标记；任一未确认名称阻止新构造，只有显式 `StopListenerChecked` 关闭确认可移除责任。配置相同和候选对象别名使用统一实际对象，保留名称纳入引用清单；替换、删除关闭成功均原子移除该对象全部名称，关闭失败保留旧对象。此登记仅证明已记录资源的 Close 结果，协议内部任务、general监听和全局UDP须由完整 owner另行治理。
+
+
+### Flutter框架失败诊断
+
+主入口在binding初始化后、runApp前安装 `FrameworkErrorReporter`，控制器初始化不覆盖此入口。处理器所有模式使用固定失败标记，不格式化或记录异常、堆栈、library、上下文和账户资料，同步诊断输出异常自行收口。框架捕获错误仍由Flutter默认ErrorWidget处理；该诊断不承诺处理全部未捕获异步异常，也不把首帧回调等同可见画面验收。

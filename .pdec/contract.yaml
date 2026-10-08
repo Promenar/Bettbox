@@ -3154,6 +3154,48 @@
       ],
       "verification": "命名监听部分创建登记及生产配置失败传播的Android ARM64 c-shared编译；离线依赖，不安装APK，不证明设备全路径",
       "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "test-framework-error-reporting": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "--no-pub",
+        "test/common/framework_error_reporter_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": []
+    },
+    "exit-macos-development-candidate": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "build/macos-local-development/Bettbox.app/Contents/MacOS/Bettbox",
+        "--exit"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "artifacts": [],
+      "verification": "完整新构建通过后通过旧应用正常退出通道停止旧候选；检查旧宿主和子进程确已退出，不强杀/绕过未知资源，不更改系统代理"
+    },
+    "launch-macos-framework-error-candidate": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "build/macos-local-development/Bettbox.app/Contents/MacOS/Bettbox"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/macos-framework-error/launch.json",
+        ".test/macos-framework-error/startup-private.log"
+      ],
+      "verification": "旧宿主/子进程正常退出，严格验签后以前台受控exec会话启动新开发候选；600日志仅提取固定启动阶段和framework失败计数，不证明窗口或有效VPN"
     }
   },
   "deployment": {
@@ -3444,7 +3486,7 @@
     "lib/plugins/smart_stop_completion.dart": "c6b5ae168471e9e9aed8cb1d42ab13b7497d249db7dde24f240783d450c6466a",
     "test/plugins/smart_stop_completion_test.dart": "06c60b886df21b2e3c6e0d0a6ae424854e4e596fe8cf854084f020346bd92a23",
     "lib/manager/smart_auto_stop_manager.dart": "02450fb7f9a9e4f257f78fb4fe7cd15f49edb24233bff0cbae24743365af4c67",
-    "lib/main.dart": "897e8bb7d96ecb5a09bd395902d4cddc7200a93b41600b3809f1fb46c40ef1c0",
+    "lib/main.dart": "e2b13dc20af4b7fa96c1e7b9095865eddc28a81814288ac8b3b069e038482aab",
     "lib/manager/smart_auto_stop_policy.dart": "536a50f70573dfb78450d171911617ea78bf86f808ff5a2d258231494981c6f1",
     "test/manager/smart_auto_stop_policy_test.dart": "f3dba8591c76b514b558b3c84beb08abda3c263e5fc1ca273305235e064c5c62",
     "test/plugins/android_smart_resume_test.dart": "900bfe852d29d1d934b8736eb7de8bb50f0e2e2572eefc2b71fa39a9a609f02c",
@@ -3499,7 +3541,10 @@
     "core/Clash.Meta/listener/listener.go": "f15be2217197239dbd6b5fdf3e3c204e575e99d64c1f1aa4d4c1dc16af208492",
     "core/Clash.Meta/listener/inbound_patch_test.go": "b82fd436e65d360fd5d240d8574a0e27c99379af99f31d6b74c19cf282c87d34",
     "core/Clash.Meta/listener/inbound_checked.go": "880df83f3cb74cd8395141a914a21059d22ee94eb922adf604fae4bef356a1f3",
-    "core/inbound_apply_action_test.go": "c67919052b35d7488381abb5bded710b5c42cbad3bbeccc1adb47d70852266f9"
+    "core/inbound_apply_action_test.go": "c67919052b35d7488381abb5bded710b5c42cbad3bbeccc1adb47d70852266f9",
+    "lib/controller.dart": "8c257af4d4afd729ca53b5a05176c76a1b0a706ab9c2202d50a292c7101f1f7c",
+    "lib/common/framework_error_reporter.dart": "9278f5f4015faead7a0f776a9a728ac938b9a25e9163c6f741e685459fae7a0e",
+    "test/common/framework_error_reporter_test.dart": "d0f20307ec462d07747f4b4d5942ce720e1f48e886af0f0b0e997a150a0f1b76"
   },
   "platform_extensions": {
     "android": {
@@ -3575,6 +3620,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "903fb72fc983caea4c77ddb994967987fbd4d24ccdcd6d08e1ceb05d87d14e81"
+    "contract_digest": "1f996d0e52600173602e5562051fbebfc93c14e779a33d7d6cb4f8cc806646bc"
   }
 }

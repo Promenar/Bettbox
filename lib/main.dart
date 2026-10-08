@@ -21,6 +21,7 @@ import 'clash/core.dart';
 import 'clash/lib.dart';
 import 'common/common.dart';
 import 'common/external_control.dart';
+import 'common/framework_error_reporter.dart';
 import 'common/network_matcher.dart';
 import 'common/startup_trace.dart';
 import 'models/models.dart';
@@ -32,6 +33,7 @@ final _startupTrace = StartupTrace(report: commonPrint.log);
 Future<void> main(List<String> args) async {
   globalState.isService = false;
   WidgetsFlutterBinding.ensureInitialized();
+  FrameworkErrorReporter(report: commonPrint.log).install();
 
   if (system.isDesktop &&
       (args.contains('--exit') || args.contains('--restart'))) {
