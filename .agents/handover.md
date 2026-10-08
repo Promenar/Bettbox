@@ -2148,3 +2148,34 @@ State不发行generation、不校验外层配置授权。未接入真实JNI/设�
 
 ### HLG
 标准append dry-run后apply记录。
+
+## 2026-10-08T18:25:54+08:00 · Android输入租约处置与重入完成事实
+
+type: development
+scope: ["Bettbox", "Android"]
+status: in_progress
+tags: ["android", "tun", "ownership", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 7fb09fcfd16703caad578c198455106a0f854d49d295d6ba8add1c9bf20f13bf
+
+### Summary
+Go与Kotlin租约增加真实完成/领取状态，封闭重复Once及关闭回调重入的提前确认。
+
+### Changed
+Go原子Held/Released/Unknown；Kotlin同步快照与closing门禁，不重试数字FD，CLAIMED不证明Go释放。Kotlin两文件由原生子Agent施工，主控Go及测试集成，独立只读复审P2关闭。
+
+### Validation
+Go/Kotlin初始RED exit1，Kotlin重入RED exit1；最终Go三项GREEN及全startup race exit0，Kotlin六组和两重入子场景exit0，Android ARM64核心编译exit0。
+
+### Next
+将领取快照、Go FD采纳/释放及JNI checked引用收尾纳入同次typed桥回执，接入版本化实际start/stop与唯一owner。
+
+### Risks
+新快照尚未由真实JNI桥采用。公开替身无实际FD/设备，没有新APK；macOS profile与支付/上游外部条件待确认。
+
+### DIA
+已同步架构、CHANGELOG、平台验收、计划、registry和PDEC说明。
+
+### HLG
+标准append dry-run后apply记录。

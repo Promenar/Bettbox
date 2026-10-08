@@ -101,3 +101,5 @@
 - docs/validation/2026-10-07-three-platform/android-tun-mode-validation.json — 实际State非VPN fd0报告、固定模式与双向拒绝回归
 
 - docs/validation/2026-10-07-three-platform/android-owned-state-validation.json — 资源完整身份、错代停止、未知保留与同次快照验收
+
+- docs/validation/2026-10-07-three-platform/android-lease-disposition-validation.json — Go原子租约完成、Kotlin领取状态和关闭重入红绿

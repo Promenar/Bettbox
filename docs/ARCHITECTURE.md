@@ -207,3 +207,5 @@ Android State 的 `RejectInputWithCleanup` 独立清理未进入构造的新输�
 Android TUN预留固定同次VPN模式：VPN成功须进入构造并保留resource/lease；非VPN fd0成功仅有running且无三项责任。两者不可互相冒充，options消费者修改不能改变已固定模式。实际唯一owner尚未接入生产VpnPlugin。
 
 Android State提供值身份TunOwnership（epoch/configRevision/generation）。受管start只接纳已收口状态，无身份start/stop不能替换或停止受管资源；受管stop要求完整身份相符。身份在进入构造前绑定，构造或回调收尾未知时保留，确认收尾后清空，非VPNfd0同样绑定。StartReport和OwnedStopReport在同一状态锁内复制完成事实及残余身份；OwnedIdentity只表示当前态，不能用来拼接完成回执。State不发行代次、不校验外层请求授权，实际JNI/owner接线另验。
+
+Go OnceLease用atomic状态区分Held/Released/Unknown，回调执行中不发布完成，panic后Unknown粘滞，重复sync.Once调用不清洗失败。Kotlin TunFDLease提供同步不可变处置快照；CLAIMED只表示已交接，不表示Go释放。关闭进行中用closing阻止重入提前确认，完成后才发布RELEASED，失败为UNKNOWN；数字FD不重试。新快照尚未进入实际typed JNI桥。

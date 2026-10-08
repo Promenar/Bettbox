@@ -143,3 +143,5 @@ TUN 配置预留验证入口：`test-android-tun-reservation`、`test-android-co
 `test-android-rejected-input` 验证独立拒绝输入清理；完整状态模块 race 使用 `test-android-startup-full`。公开替身不操作真实 FD/VPN。
 
 `test-android-owned-state`验证受管State完整身份；全模块race使用`test-android-startup-full`，Android核心编译使用`compile-android-tun-reservation-core`。
+
+租约处置验证使用`test-android-lease-disposition`、`test-android-fd-lease`、`test-android-startup-full`和`compile-android-tun-reservation-core`。缓存JVM夹具只操作公开数字与关闭计数。

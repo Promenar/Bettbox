@@ -258,3 +258,8 @@ Android 原生配置回执解析器支持 `tunConfigurationReserved` 与 `tunCle
 ### Android资源身份（2026-10-08）
 
 增加State资源完整身份与匹配停止，阻止迟到旧代stop及无身份旁路停止新受管资源。十项回归、完整startup race和Android ARM64核心编译通过；真实JNI/owner及APK尚未接线验收。
+
+### Android输入处置事实（2026-10-08）
+
+- 增加Go回调租约的原子完成状态及Kotlin FD领取快照，修复重复Once调用洗白已知释放失败及关闭回调重入提前确认。
+- Go三项及完整startup race、Kotlin六组与两个重入子场景、Android ARM64核心编译通过。实际JNI/owner与APK另验。

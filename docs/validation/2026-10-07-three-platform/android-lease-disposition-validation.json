@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "baseline": "b3a5394acb392fa6cada396f354f8b7666363c37",
+  "source_sha256": {
+    "core/androidstartup/state.go": "a1f65b3fccae5ae65f7d6c0fd379f38d364c8a52539069e0ba0bdd9a25215106",
+    "core/androidstartup/lease_disposition.go": "fb825166f088f2b61fdb1aafecdadc1e21501adbdd5cee13e17afc50a44b1852",
+    "core/androidstartup/lease_disposition_test.go": "02448aca5caa2b17bd3476bfb594cc1379bf7680d8e632dc8d71dd8815fbba8d",
+    "android/core/src/main/java/com/appshub/bettbox/core/TunFDLease.kt": "35601d506ad20be9bee7f7303f6b773da04312d0a098a0e21bc23983dae68f51",
+    "android/core/src/test/kotlin/com/appshub/bettbox/core/TunFDLeaseFixture.kt": "37e8e5260309c37dea1ac9be9528753a1f6734d2d93f4dcabb7c005447096cce"
+  },
+  "validation": {
+    "go_red_exit": 1,
+    "kotlin_red_exit": 1,
+    "kotlin_reentrant_red_exit": 1,
+    "go_green_exit": 0,
+    "go_tests": 3,
+    "full_startup_race_exit": 0,
+    "kotlin_final_green_exit": 0,
+    "kotlin_legacy_groups": 6,
+    "kotlin_reentrant_subcases": 2,
+    "android_core_build_exit": 0
+  },
+  "review": "独立复审确认重入提前释放P2关闭，无新确认P1/P2",
+  "boundary": [
+    "Go状态仅证明lease回调返回或panic；生产JNI删除另由checked release保证",
+    "CLAIMED不证明Go已经关闭FD",
+    "Kotlin公开数字/关闭计数，没有实际Android FD",
+    "真实JNI typed桥与Native owner尚未采用新快照，未生成新APK"
+  ]
+}

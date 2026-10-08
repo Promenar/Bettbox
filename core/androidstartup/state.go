@@ -4,6 +4,7 @@ package androidstartup
 import (
 	"errors"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -19,17 +20,27 @@ func Snapshot[T any](mu *sync.Mutex, read func() T) T {
 }
 
 type OnceLease struct {
-	once    sync.Once
-	release func()
+	disposition atomic.Uint32
+	once        sync.Once
+	release     func()
 }
 
 func NewOnceLease(release func()) *OnceLease { return &OnceLease{release: release} }
 func (l *OnceLease) Release() {
 	if l != nil {
 		l.once.Do(func() {
+			completed := false
+			defer func() {
+				if completed {
+					l.disposition.Store(uint32(LeaseReleased))
+				} else {
+					l.disposition.Store(uint32(LeaseUnknown))
+				}
+			}()
 			if l.release != nil {
 				l.release()
 			}
+			completed = true
 		})
 	}
 }
@@ -296,7 +307,7 @@ func releaseLease(lease *OnceLease) (panicked bool) {
 		}
 	}()
 	lease.Release()
-	return false
+	return lease.Disposition() == LeaseUnknown
 }
 
 // StopLocked 的内部逻辑只由同一把状态锁的持有者调用，不重入 Stop。

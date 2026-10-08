@@ -248,3 +248,5 @@ TUN 配置预留模块的红绿、独立审阅及核心编译证据见 `validati
 模式核验证据见 `validation/2026-10-07-three-platform/android-tun-mode-validation.json`，只证明模块和核心编译，未证明设备或发行包。
 
 资源身份回归与同次完成快照证据见 `validation/2026-10-07-three-platform/android-owned-state-validation.json`；公开Resource不代表真实FD/JVM/设备。
+
+输入处置与重入红绿证据见 `validation/2026-10-07-three-platform/android-lease-disposition-validation.json`；没有实际Android FD/Android JVM/CheckJNI或新APK验收。

@@ -113,3 +113,7 @@ State 提供独立 RejectInputWithCleanup：拒绝新输入不调用 stop/open�
 ## State资源身份实施包
 
 State增加epoch/configRevision/generation值身份，不自行发行代次。带身份start不得替换未收口资源；拒绝只释放本次输入，保留旧runtime。带身份stop只接受完整匹配的当前责任；无身份旧stop不得停止受管资源。身份在进入构造前绑定，构造/输入/引用收尾未知时保留，确认所有收尾后清空；非VPNfd0同样绑定。旧legacy模式自身行为保留，向受管模式切换须先收口。主控独占state.go/owned_state.go及测试/PDEC，独立审阅后执行定向和完整startup race；实际JNI/Native owner暂不激活此入口。
+
+## 输入租约完成事实
+
+Go OnceLease增加并发安全的held/released/unknown值状态；释放panic粘滞unknown，第二次Once调用不能洗成成功。Kotlin TunFDLease同步快照区分UNCLAIMED/CLAIMED/RELEASED/UNKNOWN，本地close成功仅在RELEASED表示已关闭；CLAIMED不证明Go收尾。保留旧领取和关闭合同，不重试数字FD。主控独占Go及PDEC/脚本/文档；Kotlin施工独占TunFDLease.kt和公开Fixture，先可编译RED再实施；未施工者独立审阅，主控执行Go race与缓存JVM夹具。无真实FD/Android设备，新状态仅供typed桥回执，不能自行发布运行状态。

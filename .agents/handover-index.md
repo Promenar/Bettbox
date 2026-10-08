@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T18:16:04+08:00
+> generated_at: 2026-10-08T18:25:54+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-08T13:32:53+08:00 | in_progress | ["Bettbox", "Android", "macOS"] | Android f881880正式构建安装与跨层owner接线边界 | `.agents/handover.md` · `2026-10-08T13:32:53+08:00` · `fp:3cb6c5e3ad` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T18:16:04+08:00 | in_progress | ["Bettbox", "Android"] | AndroidState资源身份及同次完成回执 | `.agents/handover.md` · `2026-10-08T18:16:04+08:00` · `fp:c5a59ee06f` |
+| three-platform-release | resume | 2026-10-08T18:25:54+08:00 | in_progress | ["Bettbox", "Android"] | Android输入租约处置与重入完成事实 | `.agents/handover.md` · `2026-10-08T18:25:54+08:00` · `fp:7fb09fcfd1` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T18:25:54+08:00 | iso | in_progress | resume | ["Bettbox", "Android"] | ["android", "tun", "ownership", "validation"] | Android输入租约处置与重入完成事实 | `.agents/handover.md` · `2026-10-08T18:25:54+08:00` · `fp:7fb09fcfd1` |
 | 2026-10-08T18:16:04+08:00 | iso | in_progress | resume | ["Bettbox", "Android"] | ["android", "tun", "ownership", "validation"] | AndroidState资源身份及同次完成回执 | `.agents/handover.md` · `2026-10-08T18:16:04+08:00` · `fp:c5a59ee06f` |
 | 2026-10-08T18:07:51+08:00 | iso | in_progress | resume | ["Bettbox", "Android"] | ["android", "tun", "configuration", "validation"] | Android预留模式核验与真实owner接线合同 | `.agents/handover.md` · `2026-10-08T18:07:51+08:00` · `fp:bd9d14b0ba` |
 | 2026-10-08T18:02:39+08:00 | iso | in_progress | resume | ["Bettbox", "Android"] | ["android", "tun", "ownership", "validation"] | Android拒绝输入独立收尾与旧连接保留 | `.agents/handover.md` · `2026-10-08T18:02:39+08:00` · `fp:1abee142d8` |
