@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-10-08T21:45:34.333122+08:00",
+  "base_commit": "8ded02e608f8309d4af51785bde59b0a0ec7b7ab",
+  "sources_sha256": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeTunProtocol.kt": "3620415fb7533e955765e888f2ca2ff2268ce75877073b04add75845496eb4d8",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeTunProtocolFixture.kt": "c7b29d134e61aa89268488b82db7a6fd134a2fded2955a01f38b07b6cea3d67c",
+    "core/android_tun_owned_test.go": "c1ea30a0ea7f22e819682312419c0e09372b7e2f923f7a96953f8d7addfd8d44",
+    "scripts/check_android_tun_protocol.py": "cb2b169df361b6be89991cecb3700a293654c788f010a088ed4bce838b75a2a0"
+  },
+  "validation": {
+    "compilable_stub_red_fixture_exit": 1,
+    "producer_bridge_tests_exit": 0,
+    "actual_producer_public_receipts": 9,
+    "Kotlin_direct_consumer_exit": 0,
+    "config_protocol_regression_exit": 0
+  },
+  "public_wire_sha256": "a0ccdc427deeb6177f5bc41f000eac23b24986b27de68caa50d12fb05e751675",
+  "independent_review": "对照Go生产者未发现确定P1/P2，主控复核真实跨语言夹具",
+  "limits": [
+    "公共Go Resource与Kotlin JVM夹具，没有真实FD/Android JNI/CheckJNI",
+    "错误码为固定全局白名单，未按operation/outcome分区",
+    "generation发行及唯一owner/VpnPlugin采用尚未完成",
+    "没有新APK或实际业务验收"
+  ]
+}

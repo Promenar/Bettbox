@@ -2272,3 +2272,34 @@ core.cpp新增owned start/stop及C回执转换释放；Core新增Raw方法；Own
 
 ### HLG
 通过append dry-run/apply追加交接。
+
+## 2026-10-08T21:45:34+08:00 · Android Kotlin启停回执解析与跨语言完成核验
+
+type: maintenance
+scope: ["android-native"]
+status: done
+tags: ["android", "protocol", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 4e20f814bd383c61f6581b46aaf53123c0c506fcd3b4e1cdfd1d9b841c2077d8
+
+### Summary
+实现严格TUN回执与finally后完成对象，禁止字段和本地FD处置矛盾时发布完成。
+
+### Changed
+NativeTunProtocol绑定请求及资源身份并严格解析固定JSON；completion升级本地/协议未知为blocked，保留可解析原生快照。Go真实桥公开wire测试、Kotlin直接消费及PDEC已登记。
+
+### Validation
+可编译RED占位fixture失败，最终Kotlin解析/完成夹具通过；Go真实生产桥生成九项公开start/stop/rejected/failed/unknown回执并由Kotlin消费exit0，既有配置parser回归exit0；独立审阅未发现P1/P2。回执 docs/validation/2026-10-07-three-platform/android-tun-protocol-validation.json。
+
+### Next
+把NativeTunCompletion接入实际Android唯一owner和VpnPlugin，收敛旧配置/启停旁路，再完整APK/模拟器与有效上游协议流量验证。macOS匹配profile、iOS开发版研究及服务端邀请返佣/支付业务继续。
+
+### Risks
+仍未采用到产品启停流程；公开Resource和JVM不能替代真实FD/Android/CheckJNI。错误码未按operation分区。完整发行与业务目标未完成。
+
+### DIA
+已同步架构、CHANGELOG、平台验证、registry及公开回执。
+
+### HLG
+经append dry-run/apply追加事实链。

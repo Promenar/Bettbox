@@ -2394,6 +2394,95 @@
       "artifacts": [
         ".test/android-owned-tun-invocation/receipt.json"
       ]
+    },
+    "test-tun-protocol-red": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_tun_protocol.py",
+        "--output-name",
+        "android-tun-protocol-red"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/android-tun-protocol-red/receipt.json"
+      ]
+    },
+    "test-tun-protocol-green": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_tun_protocol.py",
+        "--output-name",
+        "android-tun-protocol-green"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/android-tun-protocol-green/receipt.json"
+      ]
+    },
+    "test-android-owned-tun-wire": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=30s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestAndroidOwnedTunBridge",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "CGO0 Darwin真实生产适配器与内存/os.Pipe fixture编译测试，GOPROXY/GOSUMDBoff，只读mod；不代表race或宿主身份/系统代理验收"
+    },
+    "test-tun-protocol-wire": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_tun_protocol.py",
+        "--output-name",
+        "android-tun-protocol-wire",
+        "--wire-input",
+        ".test/three-platform-release/android-tun-wire-public.json"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/android-tun-protocol-wire/receipt.json"
+      ]
+    },
+    "test-config-protocol-after-tun": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-config-protocol-after-tun"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/android-config-protocol-after-tun/receipt.json"
+      ],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
     }
   },
   "deployment": {
@@ -2645,11 +2734,14 @@
     "core/androidstartup/lease_disposition_test.go": "02448aca5caa2b17bd3476bfb594cc1379bf7680d8e632dc8d71dd8815fbba8d",
     "android/core/src/test/cpp/jni_preclaim_fixture.cpp": "781ae95863ebe1056e5f640e94e81449fee2a5f205791e9515ab576e4848f71d",
     "core/android_tun_owned.go": "66c433923f2140ed64eb22b1b6b016a8589ae379c4fa5ab4d7778242f6e79bf4",
-    "core/android_tun_owned_test.go": "83346dac106438e1ab39bd6fdce454841c98ac90b59a1314e59f47bd9a101484",
+    "core/android_tun_owned_test.go": "c1ea30a0ea7f22e819682312419c0e09372b7e2f923f7a96953f8d7addfd8d44",
     "android/core/src/main/java/com/appshub/bettbox/core/OwnedTunInvocation.kt": "3b5fa8bbbd1721e7cfc9d4c07564b6e4edeaebdaf7b7d26cdf1c8781ab67d2c5",
     "android/core/src/test/kotlin/com/appshub/bettbox/core/OwnedTunInvocationFixture.kt": "b362317a0c631e55e5fbfafda0d127b4dc432fa8909b982e6f34333c25496a86",
     "android/core/src/test/cpp/jni_owned_tun_fixture.cpp": "a2a9c445258e388eb0188a387e1bde524b6ad530ebca9c9296baeaed43c22671",
-    "scripts/check_android_owned_tun_invocation.py": "7bd5e1317aeb1ea22ae11bbe5c658483027ff093c4eacbc0fa2614576e326fe9"
+    "scripts/check_android_owned_tun_invocation.py": "7bd5e1317aeb1ea22ae11bbe5c658483027ff093c4eacbc0fa2614576e326fe9",
+    "scripts/check_android_tun_protocol.py": "cb2b169df361b6be89991cecb3700a293654c788f010a088ed4bce838b75a2a0",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeTunProtocol.kt": "3620415fb7533e955765e888f2ca2ff2268ce75877073b04add75845496eb4d8",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeTunProtocolFixture.kt": "c7b29d134e61aa89268488b82db7a6fd134a2fded2955a01f38b07b6cea3d67c"
   },
   "platform_extensions": {
     "android": {
@@ -2725,6 +2817,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "7f76e3f3f202d3fef0f782dfd2c68aef7ee1a7ee5d9b8da8c9e995ac57438652"
+    "contract_digest": "a1fa0dceb87bafa90520d174b3e16e0e1edf23722cf6ad00e037ed2ecc884769"
   }
 }

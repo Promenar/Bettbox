@@ -129,3 +129,7 @@ Go OnceLease增加并发安全的held/released/unknown值状态；释放panic粘
 ## JNI与Core原始回执通路实施状态
 
 Android新增startOwnedTunNative/stopOwnedTunNative JNI入口，传递epoch/configRevision/generation至Go；领取前失败收尾检查引用删除，普通负claim调用空负输入取得Go报告，Java领取异常或JNI清理未知不进入新启动。Go C堆回执始终在Java字符串转换后释放，stop先尝试Go按身份收尾，JNI未知时返回null。Core新增Raw调用，OwnedTunInvocation在finally关闭未领FD之后捕获不可变输入快照，异常/null/关闭失败粘滞阻断。九项生产JNI函数表ASAN、六项Invocation JVM行为、完整Core/TunInterface对公开Android SDK jar编译、旧17+6+9项JNI回归和NDK同次头链接通过。该验证未执行Core/ParcelFileDescriptor的实际运行；严格owner解析、VpnPlugin采用、并发事务及旧旁路收敛仍未完成，不能声明新入口已启用或发行包可用。
+
+## Kotlin启停回执与最终完成核验
+
+主控独占NativeTunProtocol与公开Fixture/PDEC。解析固定Go十四字段及两组大小写敏感身份字段，限制大小/深度、拒绝重复键/尾随值/错误类型/数值溢出/非法Unicode/转义；校验请求身份、operation、outcome/phase/资源组合。完成对象在Core Raw的finally后核验：成功start必须是CLAIMED且模式与残余资源匹配，本地UNKNOWN/bridgeBlocked/null/协议错误统一unknown+blocked，保留可解析的原生资源责任，不自行发布UI。先编译RED，再实现GREEN与既有config协议回归，独立审阅后记录。实际唯一owner与VpnPlugin采用另包完成。

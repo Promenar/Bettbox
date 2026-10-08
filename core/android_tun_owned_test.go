@@ -2,7 +2,9 @@ package main
 
 import (
 	"core/androidstartup"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 )
@@ -169,4 +171,54 @@ func TestAndroidOwnedTunBridgeStopRequiresBothIdentities(t *testing.T) {
 			t.Fatalf("内部漂移丢失责任: %+v", result)
 		}
 	})
+}
+
+// 公开生产桥回执供Kotlin消费者直接验证，不执行真实FD或业务网络。
+func TestAndroidOwnedTunBridgeWireReceipts(t *testing.T) {
+	type wireCase struct {
+		Receipt    string `json:"receipt"`
+		Epoch      int64  `json:"epoch"`
+		Revision   int64  `json:"revision"`
+		Generation int64  `json:"generation"`
+		Operation  string `json:"operation"`
+		Vpn        bool   `json:"vpn"`
+		Outcome    string `json:"outcome"`
+	}
+	var cases []wireCase
+	add := func(r androidOwnedTunResult, vpn bool) {
+		data, err := json.Marshal(r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cases = append(cases, wireCase{string(data), r.Request.Epoch, r.Request.ConfigRevision, r.Request.Generation, r.Operation, vpn, r.Outcome})
+	}
+	b, o := bridgeFixture(t)
+	add(bridgeStart(b, o, &ownedBridgeResource{}), true)
+	old := o
+	old.Generation++
+	add(b.stop(old), true)
+	stale := o
+	stale.ConfigRevision++
+	add(b.start(stale, 8, nil, nil, func(*androidTunReservation) androidTunOpen { return nil }), true)
+	add(b.stop(o), true)
+	b, o = bridgeFixture(t)
+	b.coordinator.options.Enable = false
+	add(b.start(o, 0, nil, nil, func(*androidTunReservation) androidTunOpen { return nil }), false)
+	add(b.stop(o), false)
+	b, o = bridgeFixture(t)
+	bridgeStart(b, o, &ownedBridgeResource{fail: true})
+	add(b.stop(o), true)
+	b, o = bridgeFixture(t)
+	add(b.start(o, 7, nil, nil, func(*androidTunReservation) androidTunOpen {
+		return func(*androidstartup.OnceLease) (androidstartup.Resource, error) {
+			return nil, errors.New("公开构造失败")
+		}
+	}), true)
+	b, o = bridgeFixture(t)
+	add(b.start(o, 7, nil, nil, func(*androidTunReservation) androidTunOpen { panic("公开准备失败") }), true)
+	encoded, err := json.Marshal(cases)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("PUBLIC_TUN_WIRE=" + string(encoded))
 }
