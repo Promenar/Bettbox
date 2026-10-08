@@ -1,0 +1,60 @@
+{
+  "scope": "Android arm64正式签名构建实际尝试，失败于APK构建网络边界；未生成或验签发行APK",
+  "source_commit": "545d06b130dbdf1252d0d6f975e8f35fbb1d29e8",
+  "target": "android-arm64-release",
+  "status": "failed",
+  "phase": "android-release-build",
+  "failure_reason": "任务代理失败、取消或时间预算耗尽",
+  "approved_contract_digest": "a42411dcf92524fd469e07383f198472e4cf76691f00bbdbd1c5fd4cee586168",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "gradle_help_verified": true,
+  "official_tls_probes": [
+    {
+      "host": "plugins.gradle.org",
+      "status": 303
+    },
+    {
+      "host": "plugins-artifacts.gradle.org",
+      "status": 200
+    },
+    {
+      "host": "repo.maven.apache.org",
+      "status": 200
+    },
+    {
+      "host": "services.gradle.org",
+      "status": 307
+    },
+    {
+      "host": "github.com",
+      "status": 302
+    },
+    {
+      "host": "release-assets.githubusercontent.com",
+      "status": 200
+    }
+  ],
+  "network_event_counts": {
+    "overload": 13,
+    "queue-expired": 47,
+    "upstream-unavailable": 0,
+    "header-timeout": 0,
+    "header-too-large": 0,
+    "header-malformed": 0,
+    "target-outside-allowlist": 1,
+    "relay-failed": 0,
+    "resolution-slot-expired": 0,
+    "nonofficial-jcenter": 0,
+    "nonofficial-jitpack": 0,
+    "outside-other": 1
+  },
+  "network_connections": 465,
+  "network_lease_stopped": true,
+  "cleanup_verified": true,
+  "remaining_owned_process_count": 0,
+  "signature_verified": false,
+  "release_verified": false,
+  "receipt_sha256": "a60752285ba826d95bca85e812ec34bf1ce67f06f325cd5280d7a0bf804f37e6",
+  "next": "增加固定脱敏请求类别诊断，明确拒绝原因；不自动扩展域名或降级HTTPS。随后正式构建、安装及有效业务流量验收。"
+}

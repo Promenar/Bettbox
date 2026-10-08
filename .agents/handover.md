@@ -1280,3 +1280,34 @@ journal未接入正常App/default路径与真实SC写入恢复；不抵抗同UID
 
 ### HLG
 本记录通过标准append dry-run及apply追加，索引由脚本重建。
+
+## 2026-10-08T09:47:16+08:00 · Android正式APK构建实际失败与网络边界定位
+
+type: validation
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["android", "release", "dependency-network"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: ca03d4048b34a6ef77ff6b7ed31468960565d5e654358bd8b1f9971c468ba4fc
+
+### Summary
+执行当前545d06b正式Android arm64构建，真实进展为排除工具链/TLS/Gradle help/Go核心阶段，APK阶段失败；完整Goal保持active。
+
+### Changed
+新增公开脱敏实际构建回执及平台验收说明，未修改客户端、签名身份、网络白名单或系统配置。
+
+### Validation
+PDEC release approved；首次入口缺Flutter PATH预检退出，显式任务PATH后实际执行。正式构建task session77754终态exit1，网络事件outside-other1/target-outside-allowlist1；上游不可用及relay失败0。源码/锁未漂移；执行器确认Gradle归属进程退出、任务网络租约关闭。未生成正式APK，不宣称签名通过。
+
+### Next
+补充固定类别请求拒绝诊断区分非CONNECT和未知域名，不输出请求正文/任意host；针对真实原因修复或依必要授权处理官方域名范围。完成正式APK安装和有效业务验收；Mac native消费授权与App接线继续。
+
+### Risks
+一次越界事件并不证明新增官方域名；不得猜测放宽白名单。构建已有overload13/queue-expired47，但它们不会触发全任务失败。发行签名及实际业务验证尚未完成。
+
+### DIA
+已同步PlatformValidation、registry和公开脱敏回执；无生产或代码行为改变。
+
+### HLG
+通过标准append dry-run/apply记录执行失败、终态和下一步。

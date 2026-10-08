@@ -47,3 +47,5 @@
 - docs/validation/2026-10-07-three-platform/macos-sc-backend-validation.json — HTTP-only事务、SystemConfiguration SDK只读验收及stored字典恢复边界
 
 - docs/validation/2026-10-07-three-platform/macos-protected-journal-validation.json — 受保护journal源摘要、实际红绿回归及验收边界
+
+- docs/validation/2026-10-07-three-platform/android-release-build-attempt.json — Android正式APK实际构建失败阶段、网络固定事件及退出证明

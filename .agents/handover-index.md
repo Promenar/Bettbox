@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T09:32:49+08:00
+> generated_at: 2026-10-08T09:47:16+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T09:32:49+08:00 | done | ["Bettbox", "macOS"] | macOS受保护journal及跨实例目录同步验收 | `.agents/handover.md` · `2026-10-08T09:32:49+08:00` · `fp:a936cfd7ee` |
+| three-platform-release | resume | 2026-10-08T09:47:16+08:00 | partial | ["Bettbox", "Android"] | Android正式APK构建实际失败与网络边界定位 | `.agents/handover.md` · `2026-10-08T09:47:16+08:00` · `fp:ca03d4048b` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T09:47:16+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["android", "release", "dependency-network"] | Android正式APK构建实际失败与网络边界定位 | `.agents/handover.md` · `2026-10-08T09:47:16+08:00` · `fp:ca03d4048b` |
 | 2026-10-08T09:32:49+08:00 | iso | done | resume | ["Bettbox", "macOS"] | ["journal", "proxy", "three-platform-release"] | macOS受保护journal及跨实例目录同步验收 | `.agents/handover.md` · `2026-10-08T09:32:49+08:00` · `fp:a936cfd7ee` |
 | 2026-10-08T09:14:50+08:00 | iso | progress | resume | ["Bettbox", "macOS", "three-platform-release"] | ["proxy", "sdk", "release"] | macOS SystemConfiguration SDK候选及HTTP-only事务验收 | `.agents/handover.md` · `2026-10-08T09:14:50+08:00` · `fp:8cab1f6bde` |
 | 2026-10-08T09:00:15+08:00 | iso | progress | resume | ["Bettbox", "macOS", "three-platform-release"] | ["supervisor", "preflight", "release"] | macOS未发行预检恢复及同代原生停止证据 | `.agents/handover.md` · `2026-10-08T09:00:15+08:00` · `fp:0278d31720` |

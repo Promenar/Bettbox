@@ -176,3 +176,5 @@ macOS预检恢复：`confirmPreflightStopped(generation)` 只在原生SDK worker
 macOS系统代理后端候选：SystemConfiguration使用当前NetworkSet、非等待配置锁、独立Commit/Apply和运行Proxies双读；白名单合并保留认证及未知键，PAC/WPAD仅写启用位，HTTP-only事务不写SOCKS并拒绝其启用/未知运行状态。当前34项Swift测试及真实SDK只读数量验收通过，未改变配置签名；仅有动态Proxies字典不证明网络或代理流量。真实服务认证均unknown，start被拒绝；生产journal候选见下文；native消费授权、Flutter注册与实际写入/恢复尚未实现验收。HTTP-only journal为schema3，旧2拒绝自动恢复。回执 `docs/validation/2026-10-07-three-platform/macos-sc-backend-validation.json`。
 
 macOS受保护journal候选：native固定路径、0700目录/0600单链接文件、ACL与路径inode校验、生命周期flock及稳定安装owner ID；schema3采用有界canonical JSON。临时文件先fsync/F_FULLFSYNC再原子发布，目录同步失败保留未知状态并拒绝重用backend。新建或重新打开的完整目录链同步自身和父目录后才发布owner ID。46项Swift测试覆盖真实文件与跨进程锁、损坏拒绝和fake配置恢复；未接入正常App，也不声称抵抗同UID或root篡改。回执 `docs/validation/2026-10-07-three-platform/macos-protected-journal-validation.json`。
+
+Android正式arm64 APK实际构建尝试：官方Java TLS、Gradle help、Go核心与锁定pub依赖通过，APK构建阶段因任务代理拒绝越出批准范围的请求失败；1次outside-other事件尚不能区分未知目标和非CONNECT请求。任务进程退出、网络租约停止、源码和锁无漂移已确认。没有正式APK验签结果，禁止视为发行通过。回执 `validation/2026-10-07-three-platform/android-release-build-attempt.json`。
