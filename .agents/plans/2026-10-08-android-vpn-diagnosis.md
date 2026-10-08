@@ -30,3 +30,15 @@
 ## 协议对照执行事实
 
 受限同源探针7项Go测试、执行器3项测试及两轮独立审阅通过；真实抽样2AnyTLS/2Hysteria2均失败，后者固定分类为authentication，尚不能归因密码或额度。服务器ClashMeta构建两个协议时从relayTag提取密码覆盖面板参数；下一步只读核对同步源节点与订阅输出的认证字段一致性，再判断上游条件，不自动续费或修改生产账户。安全脱敏回执见registry。Android失败处理三缺口仍需实际复现及修复。
+
+
+## 原生FD与回调合同
+
+实际Service通过establish.detachFd移交描述符，不保留原FD；因此不采用“Service原FD+Go dup”假设。Kotlin在JNI入口前持有局部FD租约，取消时关闭；JNI入口开始后无条件移交Go，Go在NativeTun采纳前负责关闭，采纳后由Listener唯一关闭。JNI global ref由OnceLease、完整callback由CallbackGate保护；保护失败必须经Kotlin Boolean、JNI(I)Z、C整数结果及Go RawConn.Control外层错误完整传回。配置快照锁释放后才取得生命周期锁；Kotlin代际锁不得跨native调用。
+
+sing_tun新增受限入口NewWithNativeFDOwnership(options,tunnel,adopted,additions...)，返回Listener、初始化错误及首次cleanup错误；保留原Stack选择。内部在l.tunIf登记后同步adopted；失败关闭成功时返回nil Listener，失败关闭错误时保留部分Listener与首次错误，禁止第二次Close掩盖。普通New及NewWithTun保持当前行为。此阶段文件所有权仅server.go与native_fd_ownership_test.go；主控在接线冻结后登记PDEC和验收，施工不执行系统网络调用。
+
+当前生产启动函数的4个实际函数体在公开替身依赖夹具中执行：listener失败仍返回成功/提交时间、未配置fd0仍提交、配置nil的正FD重入锁不能返回，3项均实际失败。此证据覆盖控制流，未编译Android ABI，不替代后续JNI/设备验收。Kotlin建立后取消的detached FD泄漏及旧代保护读可变Service为源码事实，须补实际回归。
+
+
+监听器所有权入口已完成8项回归与独立复审，未接Android ABI。Kotlin租约还需在native调用异常时确知JNI是否领取FD；优先评估JNI通过本代局部FDLease.claim领取并记录标记，Kotlin finally仅关闭未领取FD，杜绝异常后double-close。所有权合同测试不能替代实际构造采纳路径；接线验收须覆盖采纳前失败、采纳后失败及system/gvisor/mixed选择。

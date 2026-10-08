@@ -195,3 +195,13 @@ Android正式arm64 APK实际构建尝试：官方Java TLS、Gradle help、Go核�
 受限工具 `core/cmd/nodeprobe` 使用当前 Mihomo 依赖，最多探测两条 AnyTLS 与两条 Hysteria2，仅请求固定 Cloudflare HTTPS trace；不监听、不修改路由或服务配置。规范字段白名单拒绝大小写/下划线别名、嵌套链路及证书绕过，日志静默，原始订阅只由本机执行器传入 stdin。7项Go测试覆盖真实TLS拒绝、固定目标和请求期限；字段别名绕过已用失败测试复现。执行器3项回归覆盖启动前序列化失败、真实子进程超时及非超时异常回收；旧控制流在相同夹具中出现2项失败。两轮独立只读审阅的P1/P2已关闭。
 
 真实执行3.87秒、exit0并确认退出，抽样两条AnyTLS均为transport类失败，两条Hysteria2均为authentication类失败。该分类不包含原始错误，也不证明密码或额度原因；四条共同失败使上游授权、订阅转换与协议配置成为下一步核验路径，Android原生失败处理仍需独立复现。回执 `validation/2026-10-07-three-platform/node-protocol-probe.json` 保存源码、依赖与二进制摘要。此项不证明全部节点、Android JNI/TUN、Mac物理直连或发行验收通过。
+
+
+### 2026-10-08 上游订阅与原生所有权
+
+三个CloudBridge上游缓存均有用量快照且显示过期、未耗尽；分别用客户端和同步器声明的User-Agent只读获取当前订阅，HTTP均为500/500/403，无用量头或可解析节点。实时有效期未知，无法比较认证字段；不能将HTTP失败归因具体密码或额度。已请用户在后台核验有效订阅，未付款、续费或改变同步配置。回执 `validation/2026-10-07-three-platform/upstream-subscription-status.json`。
+
+生产Android启动的4个实际函数体在公开依赖替身中运行，3项失败回归确认监听器失败仍成功/计时、未配置fd0仍计时及配置nil的正FD重入锁。此项只覆盖控制流，未编译JNI或建立真实TUN，生产接线修复待验；回执 `validation/2026-10-07-three-platform/android-tun-control-flow-red.json`。
+
+
+`sing_tun.NewWithNativeFDOwnership` 新入口保留原配置与Stack，在NativeTun采纳且登记后同步通知；必须提供采纳回调。构造失败关闭成功则清空，关闭失败则保留部分Listener及首次错误；旧入口的清理行为保持兼容。8项Go测试通过，首次关闭错误丢失与nil回调预检均有实际红/绿回归，并完成未施工者独立复审。测试使用真实Listener.Close和替身Stack；有效NativeTun构造、采纳后的失败、三种栈运行及Android JNI尚未验收，不能称Android修复已完成。回执 `validation/2026-10-07-three-platform/native-fd-ownership-contract.json`。

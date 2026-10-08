@@ -156,7 +156,42 @@ func checkTunName(tunName string) (ok bool) {
 }
 
 func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Listener, err error) {
-	return newListener(options, tunnel, nil, additions...)
+	return newListener(options, tunnel, nil, nil, additions...)
+}
+
+type nativeFDOwnership struct {
+	adopted    func()
+	adoptOnce  sync.Once
+	cleanupErr error
+}
+
+func (o *nativeFDOwnership) adopt() {
+	if o != nil {
+		o.adoptOnce.Do(func() {
+			if o.adopted != nil {
+				o.adopted()
+			}
+		})
+	}
+}
+
+// NewWithNativeFDOwnership 保留原生 FD 的配置和栈选择。
+// adopted 必须非空，在 NativeTun 已接管 FD 且 Listener 已登记 tunIf 后同步调用。
+// 构造失败时已执行一次资源清理；cleanupErr 非空时保留部分 Listener，
+// 调用方必须保存该清理结果，不能再次 Close 掩盖首次错误或直接关闭已采纳的 FD。
+func NewWithNativeFDOwnership(options LC.Tun, tunnel C.Tunnel, adopted func(), additions ...inbound.Addition) (l *Listener, err error, cleanupErr error) {
+	if options.FileDescriptor <= 0 {
+		return nil, E.New("原生 TUN 需要正数 FD"), nil
+	}
+	if adopted == nil {
+		return nil, E.New("原生 TUN 需要采纳回调"), nil
+	}
+	if _, ok := tunnel.(P.Tunnel); !ok {
+		return nil, E.New("原生 TUN 需要有效的 Mihomo tunnel"), nil
+	}
+	ownership := &nativeFDOwnership{adopted: adopted}
+	l, err = newListener(options, tunnel, nil, ownership, additions...)
+	return l, err, ownership.cleanupErr
 }
 
 // NewWithTun 使用调用方提供的包流，不创建系统设备、不写入系统路由或 DNS。
@@ -176,14 +211,14 @@ func NewWithTun(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, additions ...
 	options.FileDescriptor = 0
 	options.GSO = false
 	options.Device = "packet-flow"
-	l, err := newListener(options, tunnel, injected, additions...)
+	l, err := newListener(options, tunnel, injected, nil, additions...)
 	if err != nil {
 		_ = injected.Close()
 	}
 	return l, err
 }
 
-func newListener(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, additions ...inbound.Addition) (l *Listener, err error) {
+func newListener(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, ownership *nativeFDOwnership, additions ...inbound.Addition) (l *Listener, err error) {
 	if len(additions) == 0 {
 		additions = []inbound.Addition{
 			inbound.WithInName("DEFAULT-TUN"),
@@ -375,8 +410,11 @@ func newListener(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, additions ..
 	}
 	defer func() {
 		if err != nil {
-			l.Close()
-			l = nil
+			if ownership != nil {
+				l, ownership.cleanupErr = cleanupFailedListener(l, true)
+			} else {
+				l, _ = cleanupFailedListener(l, false)
+			}
 		}
 	}()
 
@@ -529,6 +567,7 @@ func newListener(options LC.Tun, tunnel C.Tunnel, injected tun.Tun, additions ..
 		}
 	}
 	l.tunIf = tunIf
+	ownership.adopt()
 
 	if injected == nil {
 		l.dnsServerIp = dnsServerIp
@@ -720,6 +759,16 @@ func parseRange[T constraints.Integer](uidRanges []ranges.Range[T], rangeList []
 		uidRanges = append(uidRanges, ranges.New(T(start), T(end)))
 	}
 	return uidRanges, nil
+}
+
+// cleanupFailedListener 汇总构造失败时的实际资源关闭结果。
+func cleanupFailedListener(l *Listener, preserveOwnership bool) (*Listener, error) {
+	if l != nil {
+		if err := l.Close(); err != nil && preserveOwnership {
+			return l, err
+		}
+	}
+	return nil, nil
 }
 
 func (l *Listener) Close() error {

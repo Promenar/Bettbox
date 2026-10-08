@@ -115,3 +115,6 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 
 
 协议诊断在本机使用当前离线Go依赖：`GOTOOLCHAIN=local GOWORK=off GOPROXY=off go test -mod=readonly ./cmd/nodeprobe` 与对应build项均在core目录执行；二进制保存 `.test/android-node-probe/nodeprobe`。执行器回归为 `python3 -m unittest scripts/tests/test_probe_node_subscription.py`；真实探测入口为 `python3 scripts/probe_node_subscription.py`，需本机已安装PyYAML、受保护开发账户及已构建探针，缺失时拒绝而不自动安装或创建账户。执行前要求PDEC无漂移且execution_ready=true。只输出脱敏回执，不付款、不发布、不改系统网络；结果不能代替Android或macOS发行验收。
+
+
+原生FD合同验收为 `GOTOOLCHAIN=local GOWORK=off GOPROXY=off go test -mod=readonly -v github.com/metacubex/mihomo/listener/sing_tun`，cwd为core，使用项目当前替换依赖。测试不创建系统TUN；真实JNI/FD/三栈及设备流量另验。构造源与测试摘要登记在契约中。

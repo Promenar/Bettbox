@@ -1,0 +1,20 @@
+{
+  "source_sha256": {
+    "core/Clash.Meta/listener/sing_tun/server.go": "45ab9154f8cbe68a88dd8d9ef8f3f415cb64ef5a701952693f737a17b6d073d8",
+    "core/Clash.Meta/listener/sing_tun/native_fd_ownership_test.go": "b6eb26423dcb67e788b9be9f71668702584b4dddf4ba534156c42fea99b390ea"
+  },
+  "go_test_exit_code": 0,
+  "test_functions_passed": 8,
+  "actual_red_regressions": [
+    "首次Listener.Close错误丢失",
+    "nil采纳回调未提前拒绝"
+  ],
+  "independent_review": "施工与复审分离；已报告P2关闭，未发现新P1/P2。",
+  "production_close_path_exercised": true,
+  "native_tun_resource": "替身Stack，未建立实际TUN或触碰FD",
+  "constructor_adoption_path_verified": false,
+  "system_gvisor_mixed_runtime_verified": false,
+  "android_bridge_integrated": false,
+  "legacy_cleanup_semantics_preserved": true,
+  "boundary": "新增监听器构造合同；不证明Android JNI结果、FD接线、三栈运行或真实VPN修复。"
+}

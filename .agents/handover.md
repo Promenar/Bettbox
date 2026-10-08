@@ -1559,3 +1559,34 @@ Go7项测试和离线构建exit0；字段别名红例已复现。执行器3项�
 
 ### HLG
 使用标准append先dry-run后apply记录，保留现有事实链。
+
+## 2026-10-08T12:19:43+08:00 · 上游订阅只读失效证据与原生FD构造合同
+
+type: development
+scope: ["android", "core", "nosla"]
+status: in_progress
+tags: ["vpn", "ownership", "upstream", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 404d55d9617716e65cf103a8148f536185b7f4e6b7cfad8a323cf1704ed29f7a
+
+### Summary
+三上游两种UA均HTTP500/500/403，无当前可解析节点；缓存均过期。新增原生FD感知构造入口，8项回归和独立复审通过，完整目标保持active。
+
+### Changed
+sing_tun server.go新增NewWithNativeFDOwnership，保留Stack、同步采纳与部分资源首次关闭错误；必填callback提前拒绝。PDEC测试项及源摘要已登记。
+
+### Validation
+生产启动4函数体公开替身夹具3项实际失败（listener错误仍成功、无配置fd0仍计时、nil配置正FD重入）；非Android ABI。真实Listener.Close首次错误丢失实际红后绿；nilcallback提前拒绝实际红后绿；最终8函数通过。未施工者独立复审P2闭合。Go依赖离线只读，格式和diff检查通过。
+
+### Next
+接线Kotlin FD局部租约、JNI领取标记、Boolean start/stop/protect、Go State/CallbackGate/Shutdown与Listener；覆盖真实构造采纳前/后错误及system/gvisor/mixed。运营方核验有效上游订阅。macOS联合系统代理、签名、支付外部条件继续。
+
+### Risks
+缓存过期不证明实时有效期或密码原因；没有新订阅无法核对认证。有效NativeTun构造、三栈、JNI及完整VPN尚未覆盖；不自动续费/付款、不公共发布。原正式Android APK仍为候选。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、SERVER_DEPLOYMENT、PDEC README、诊断计划及registry；新增3份脱敏回执。
+
+### HLG
+标准append dry-run后apply，保留事实链和生产/替身边界。

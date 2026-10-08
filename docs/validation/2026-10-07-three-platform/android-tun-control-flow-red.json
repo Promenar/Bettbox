@@ -1,0 +1,23 @@
+{
+  "production_source_sha256": "e581e6443009ee6b7f59aa2c7b74a2000570798efffd58efdc414c6b2e446a62",
+  "extracted_functions": [
+    "handleStopTun",
+    "handleStartTun",
+    "handleGetRunTime",
+    "startTUN"
+  ],
+  "fixture_sha256": {
+    "go.mod": "aa54e529d694876d0d245eea3080f60a506ee880387381f2237b9a2b06bc3c12",
+    "fixture.go": "414544ed0549d1899e9d82f75b3a21a75524282bc7e7aabeb4a4dcd695fcc1b3",
+    "fixture_test.go": "4e9cb1b7ed30446f2ab5ac9b5996af297300a1cc8ad3da5787b09dd73f298d83"
+  },
+  "go_test_exit_code": 1,
+  "failed_tests": [
+    "TestListenerFailureRejected",
+    "TestUnconfiguredZeroFDRejected",
+    "TestZMissingConfigCompletes"
+  ],
+  "missing_config_deadline_milliseconds": 120,
+  "boundary": "执行生产函数体控制流；listener与JNI类型为公开替身，非Android ABI实测。夹具进程已退出，未创建真实FD/VPN。",
+  "implementation_fixed": false
+}

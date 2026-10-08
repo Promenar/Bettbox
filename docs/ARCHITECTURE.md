@@ -166,3 +166,6 @@ macOS受保护journal候选：native固定路径、0700目录/0600单链接文�
 
 
 受限协议诊断入口为 `core/cmd/nodeprobe`，通过当前Mihomo适配器直接请求固定HTTPS目标，无监听、系统路由或代理配置写入。`scripts/probe_node_subscription.py` 仅使用受保护开发账户，禁止重定向，抽样最多4节点；秘密输入只在进程内存/stdin传递，输出固定类别和匿名序号。子进程总预算45秒，所有异常路径回收并关闭管道；诊断不替代Android VPN或macOS系统代理验收。输入与进程治理测试及执行项登记于PDEC。
+
+
+原生FD构造合同：`sing_tun.NewWithNativeFDOwnership` 只接受正FD与必填同步采纳回调，返回Listener、初始化错误及首个cleanup错误，保留原Stack选择。部分资源清理失败时将Listener及首错一起保留；调用者不得再次关闭同一数字FD或用第二次Close清洗错误。Android Service实际通过detachFd移交，不保留原FD；JNI前取消由Kotlin局部租约负责，JNI/Go接线和完整代际保护待实现。监听器入口的8项测试与独立复审通过，未证明有效设备构造或完整启动。

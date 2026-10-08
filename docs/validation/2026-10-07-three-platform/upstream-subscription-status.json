@@ -1,0 +1,60 @@
+{
+  "read_only": true,
+  "configuration_changed": false,
+  "upstream_count": 3,
+  "cached_usage": [
+    {
+      "index": 0,
+      "snapshot_present": true,
+      "quota_present": true,
+      "exhausted": false,
+      "expired": true
+    },
+    {
+      "index": 1,
+      "snapshot_present": true,
+      "quota_present": true,
+      "exhausted": false,
+      "expired": true
+    },
+    {
+      "index": 2,
+      "snapshot_present": true,
+      "quota_present": true,
+      "exhausted": false,
+      "expired": true
+    }
+  ],
+  "fresh_requests": [
+    {
+      "user_agent": "客户端现有声明",
+      "http_statuses": [
+        500,
+        500,
+        403
+      ]
+    },
+    {
+      "user_agent": "同步器源码声明",
+      "http_statuses": [
+        500,
+        500,
+        403
+      ]
+    }
+  ],
+  "fresh_usage_header_present": [
+    false,
+    false,
+    false
+  ],
+  "fresh_expiry_state": "未知：未返回用量头",
+  "fresh_node_counts": [
+    0,
+    0,
+    0
+  ],
+  "credential_consistency_verified": false,
+  "secrets_reported": false,
+  "boundary": "缓存过期不能替代实时有效期；HTTP失败不能确认具体上游账户原因。尚无有效订阅可供真实代理验收。"
+}

@@ -85,3 +85,6 @@ curl --fail --silent --show-error --resolve api.bingcn.site:443:216.23.116.56 ht
 5. NoSLA Caddy 在 DNS 缓存窗口固定转发至 https://170.106.143.23:8443，transport http 指定 tls_server_name cloud.bingcn.site，保留正确的请求 Host 并保持证书验证；不能使用经过 Cloudflare 的业务域名作为上游，避免循环。源为唯一可写主节点。完成公网、订阅和队列验证后解除维护窗口。
 
 源主机、源数据、镜像和备份未删除；过渡代理退役需在观察期确认后单独执行。
+
+
+2026-10-08只读上游验收：三个CloudBridge上游源当前分别返回500、500、403；客户端与同步器两种声明UA结果相同，均无可解析节点/用量头。缓存快照显示过期、未耗尽，不能据此确认实时账户原因。NoSLA迁移完成不代表外部节点服务可用；需运营方安全核验或恢复有效上游订阅，禁止在聊天中提供带令牌链接。脱敏证据见 `validation/2026-10-07-three-platform/upstream-subscription-status.json`。
