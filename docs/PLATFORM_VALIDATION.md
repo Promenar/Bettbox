@@ -188,3 +188,10 @@ Android正式arm64 APK实际构建尝试：官方Java TLS、Gradle help、Go核�
 正式APK拒绝定位已由固定类别证实：maven.google.com为唯一越界目标类别，非CONNECT及未知域名类别为0。Google官方确认其为Maven仓库HTTPS别名，项目任务代理接入后94项回归通过；真实正式APK未由这些测试证明。回执 `validation/2026-10-07-three-platform/android-google-maven-rejection.json`。
 
 正式Android arm64候选：源码ebc7d3c，APK SHA77a1cea24278a4756be5a0c6eb377aa2d4abf70e035880d6bb4ce9a5c9dcd105，单一正式证书与本机身份锚一致。Go核心/头、包内核心、全native ELF及16KiB zipalign通过；源码与依赖锁无漂移，任务代理及构建进程清理确认。候选保存在 `build/releases/android/Bettbox-arm64-ebc7d3c.apk`。Pixel_7 API36安装成功，回读APK摘要一致，首页/登录页真实显示，观察日志致命/JNI/native崩溃标记0；实际页大小4096，未做真实16KiB设备测试。未登录、未验证有效订阅/VPN/邀请注册/支付，release_verified保持false。回执 `validation/2026-10-07-three-platform/android-formal-apk-validation.json`。
+
+
+### 2026-10-08 同源核心协议探测
+
+受限工具 `core/cmd/nodeprobe` 使用当前 Mihomo 依赖，最多探测两条 AnyTLS 与两条 Hysteria2，仅请求固定 Cloudflare HTTPS trace；不监听、不修改路由或服务配置。规范字段白名单拒绝大小写/下划线别名、嵌套链路及证书绕过，日志静默，原始订阅只由本机执行器传入 stdin。7项Go测试覆盖真实TLS拒绝、固定目标和请求期限；字段别名绕过已用失败测试复现。执行器3项回归覆盖启动前序列化失败、真实子进程超时及非超时异常回收；旧控制流在相同夹具中出现2项失败。两轮独立只读审阅的P1/P2已关闭。
+
+真实执行3.87秒、exit0并确认退出，抽样两条AnyTLS均为transport类失败，两条Hysteria2均为authentication类失败。该分类不包含原始错误，也不证明密码或额度原因；四条共同失败使上游授权、订阅转换与协议配置成为下一步核验路径，Android原生失败处理仍需独立复现。回执 `validation/2026-10-07-three-platform/node-protocol-probe.json` 保存源码、依赖与二进制摘要。此项不证明全部节点、Android JNI/TUN、Mac物理直连或发行验收通过。

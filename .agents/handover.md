@@ -1528,3 +1528,34 @@ record-fingerprint: f36c81c87d191b1f2682209f22f18a6c334b746cb3218355dd5b23459e86
 
 ### HLG
 结构化append先dry-run再apply，保留失败证据与下一关键路径。
+
+## 2026-10-08T12:00:34+08:00 · 同源受限协议探测及真实节点失败边界
+
+type: development
+scope: ["android", "core", "pdec"]
+status: in_progress
+tags: ["vpn", "protocol", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 8a18467eda6456a6e6ee5039f886dd0b10f226ee6138d4e73fe23d61fa983608
+
+### Summary
+完成受限同源AnyTLS/Hysteria2探针和安全执行器；真实4节点全部失败，目标保持active。
+
+### Changed
+新增core/cmd/nodeprobe和scripts/probe_node_subscription.py及进程回归测试；PDEC使用公开可复现执行入口。
+
+### Validation
+Go7项测试和离线构建exit0；字段别名红例已复现。执行器3项回归通过，旧控制流同夹具2项失败。独立只读审阅P1/P2闭合。真实执行3.87秒exit0确认退出，2AnyTLS transport、2Hysteria2 authentication，秘密未进入输出。
+
+### Next
+只读核验上游同步源/订阅认证一致性与授权条件；复现Android启动错误、protect结果及重入锁缺口。macOS系统代理联合接线、签名及支付外部条件持续处理。
+
+### Risks
+认证类为文本固定分类，不确认密码/额度根因；仅4节点，非Android JNI/TUN或Mac物理直连验收。Android/macOS发行未完成，iOS保留开发与研究范围；不自动付款或公开发布。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、PDEC README、诊断计划及registry；新增脱敏回执。
+
+### HLG
+使用标准append先dry-run后apply记录，保留现有事实链。

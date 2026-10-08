@@ -972,6 +972,66 @@
       "timeout_seconds": 240,
       "artifacts": [],
       "verification": "公开字符串；验证真实TextInput通道不请求纠错/建议，不登录、不发送邮件、不读取凭据。"
+    },
+    "test-nodeprobe": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "./cmd/nodeprobe"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": []
+    },
+    "build-nodeprobe": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-o",
+        "../.test/android-node-probe/nodeprobe",
+        "./cmd/nodeprobe"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/android-node-probe/nodeprobe"
+      ]
+    },
+    "probe-node-subscription": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/probe_node_subscription.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": [
+        ".test/android-node-probe/receipt.json"
+      ]
+    },
+    "test-nodeprobe-executor": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "scripts/tests/test_probe_node_subscription.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": []
     }
   },
   "deployment": {
@@ -1160,7 +1220,11 @@
     "test/xboard/account_input_test.dart": "93effa65074685c105b8ec01178490ad3c06bb08ce206aa7b26203edad2f8fe5",
     "lib/views/account/login_page.dart": "a7bc34b75b3800817eaf97c15e8276760563533181caf160710b91cc080c2424",
     "lib/views/account/register_page.dart": "6562ab291e5bea2d890ee09ec771c7382c08fb95e9d33bb05eb82072329f1fcd",
-    "lib/views/account/forget_page.dart": "b0551a36eeaa66205953c506208ea888bcadbaf56f9c4bc2b9660a87e72a084a"
+    "lib/views/account/forget_page.dart": "b0551a36eeaa66205953c506208ea888bcadbaf56f9c4bc2b9660a87e72a084a",
+    "core/cmd/nodeprobe/main.go": "b10ffb8a03cacbd03db1fe8c764ffa27d63cc1b550459bcfbfa6c6e332a74f6c",
+    "core/cmd/nodeprobe/main_test.go": "6a277e9496fb6241413bfd3f473688d270c832d654423a3143a3b0b156967e6e",
+    "scripts/probe_node_subscription.py": "5b65f1415d762e3c5de66b8594275d8cdbce7c404d72eb3960cc7f133a562576",
+    "scripts/tests/test_probe_node_subscription.py": "46ea2c29f2270d399ea4bbb9b31fc0a9dbef5b55a68260216e7c5f46d217c28f"
   },
   "platform_extensions": {
     "android": {
@@ -1236,6 +1300,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "14d517d104d61f50c8ae5a82abae9f20bb1febe03610d456671eba39cebf8eaa"
+    "contract_digest": "33d781d5d7db4d104e6bfa47b662f57aa76ac3f748fb3769bed2302dcd0e8bbb"
   }
 }

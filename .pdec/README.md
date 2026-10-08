@@ -112,3 +112,6 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 正式构建真实拒绝maven.google.com后，按既有本项目官方依赖授权加入该精确HTTPS别名；[Google官方仓库说明](https://developer.android.com/build/remote-repositories)确认其与已批准dl.google.com仓库对应。任务代理共十个官方主机，其他未知目标继续拒绝，未改变系统配置。
 
 `boot-android-release-emulator`仅启动既有Pixel_7并固定5554端口；Android安装/启动登记在platform_extensions.android_release_install/launch，安装前绑定APK SHA与AVD名。正式com.appshub.bettbox与debug包并存，不卸载或清除调试数据。模拟器作为日常开发进程保留；构建任务进程和网络租约已独立清理。
+
+
+协议诊断在本机使用当前离线Go依赖：`GOTOOLCHAIN=local GOWORK=off GOPROXY=off go test -mod=readonly ./cmd/nodeprobe` 与对应build项均在core目录执行；二进制保存 `.test/android-node-probe/nodeprobe`。执行器回归为 `python3 -m unittest scripts/tests/test_probe_node_subscription.py`；真实探测入口为 `python3 scripts/probe_node_subscription.py`，需本机已安装PyYAML、受保护开发账户及已构建探针，缺失时拒绝而不自动安装或创建账户。执行前要求PDEC无漂移且execution_ready=true。只输出脱敏回执，不付款、不发布、不改系统网络；结果不能代替Android或macOS发行验收。

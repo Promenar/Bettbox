@@ -1,0 +1,58 @@
+{
+  "binary_sha256": "82a63e566df89153927d26f2fce94446f826b85a9423aeef2692f309e0f8a4d5",
+  "exit_code": 0,
+  "exit_confirmed": true,
+  "elapsed_seconds": 3.87,
+  "results": [
+    {
+      "index": 0,
+      "protocol": "anytls",
+      "stage": "request",
+      "error_class": "transport",
+      "trace_present": false
+    },
+    {
+      "index": 1,
+      "protocol": "anytls",
+      "stage": "request",
+      "error_class": "transport",
+      "trace_present": false
+    },
+    {
+      "index": 2,
+      "protocol": "hysteria2",
+      "stage": "request",
+      "error_class": "authentication",
+      "trace_present": false
+    },
+    {
+      "index": 3,
+      "protocol": "hysteria2",
+      "stage": "request",
+      "error_class": "authentication",
+      "trace_present": false
+    }
+  ],
+  "secrets_reported": false,
+  "boundary": "macOS独立核心协议探测；不证明Android JNI/TUN或系统代理通过。",
+  "probe_source_sha256": {
+    "core/cmd/nodeprobe/main.go": "b10ffb8a03cacbd03db1fe8c764ffa27d63cc1b550459bcfbfa6c6e332a74f6c",
+    "core/cmd/nodeprobe/main_test.go": "6a277e9496fb6241413bfd3f473688d270c832d654423a3143a3b0b156967e6e",
+    "scripts/probe_node_subscription.py": "5b65f1415d762e3c5de66b8594275d8cdbce7c404d72eb3960cc7f133a562576",
+    "scripts/tests/test_probe_node_subscription.py": "46ea2c29f2270d399ea4bbb9b31fc0a9dbef5b55a68260216e7c5f46d217c28f"
+  },
+  "core_input_sha256": {
+    "core/go.mod": "a668af77c5528bce28bf4530a1f443992db432e0a5bbda6de74af77654ccce43",
+    "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b"
+  },
+  "verification": {
+    "go_tests_passed": 7,
+    "executor_tests_passed": 3,
+    "executor_legacy_regression_failures": 2,
+    "canonical_alias_red_confirmed": true,
+    "independent_review": "已报告P1/P2均关闭，未发现新P1/P2；只读源码复核。",
+    "upstream_root_cause_confirmed": false,
+    "android_release_verified": false
+  },
+  "interpretation": "四个抽样节点在独立核心中也失败；authentication仅为固定错误分类，不代表已确认密码或额度原因。未测全23节点，不证明物理直连或Android JNI/TUN。"
+}

@@ -53,3 +53,5 @@
 - docs/validation/2026-10-07-three-platform/android-release-build-attempt.json — Android正式APK实际构建失败阶段、网络固定事件及退出证明
 
 - docs/validation/2026-10-07-three-platform/android-formal-apk-validation.json — 正式Android候选证书、产物/安装摘要、真实界面及未验收业务边界
+
+- docs/validation/2026-10-07-three-platform/node-protocol-probe.json — 受限同源协议探测、源摘要、回归与真实失败边界
