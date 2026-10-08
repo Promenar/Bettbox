@@ -150,3 +150,5 @@
 
 - .agents/plans/2026-10-09-android-single-owner-adoption.md — Android完整owner/配置/双channel/Dart/退出联合采用合同
 - docs/validation/2026-10-07-three-platform/android-a35d73f-apk-validation.json — 正式签名构建/回读与运行/停止更新基础设备验证，发行另验
+
+- docs/validation/2026-10-07-three-platform/android-legacy-admission-validation.json — Android公共旧配置与监听资源准入红绿及配置并发race范围

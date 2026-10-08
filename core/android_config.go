@@ -55,6 +55,15 @@ const (
 	androidConfigErrorUnconfigured        = "unconfigured"
 )
 
+// 调用方持有runLock；已接受的状态、提交责任或资源均禁止旧写入旁路。
+func androidLegacyConfigWriteErrorLocked() error {
+	c := &productionAndroidConfigCoordinator
+	if c.hasDesiredState || c.configured || c.blocked || c.lastAttempted != 0 || c.tunReservation != nil {
+		return errors.New("Android配置由原生所有者管理")
+	}
+	return nil
+}
+
 // androidOwnedConfigResult 是 Go owner 与 JNI 共享的固定十字段回执。
 type androidOwnedConfigResult struct {
 	Outcome           string                   `json:"outcome"`

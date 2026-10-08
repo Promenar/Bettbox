@@ -44,6 +44,11 @@ var (
 )
 
 func handleInitClash(paramsString string) bool {
+	runLock.Lock()
+	defer runLock.Unlock()
+	if androidLegacyConfigWriteErrorLocked() != nil {
+		return false
+	}
 	var params = InitParams{}
 	err := json.Unmarshal([]byte(paramsString), &params)
 	if err != nil {
@@ -60,6 +65,9 @@ func handleInitClash(paramsString string) bool {
 func handleStartListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
+	if androidLegacyConfigWriteErrorLocked() != nil {
+		return false
+	}
 	isRunning = true
 	updateListeners()
 	resolver.ResetConnection()
@@ -69,6 +77,9 @@ func handleStartListener() bool {
 func handleStopListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
+	if androidLegacyConfigWriteErrorLocked() != nil {
+		return false
+	}
 	isRunning = false
 	return listener.StopListenerChecked() == nil
 }
@@ -90,6 +101,9 @@ func handleForceGc(forceFreeOSMemory bool) {
 func handleShutdown() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
+	if androidLegacyConfigWriteErrorLocked() != nil {
+		return false
+	}
 	isRunning = false
 	if listener.StopListenerChecked() != nil {
 		return false
@@ -551,6 +565,11 @@ func handleGetMode() string {
 }
 
 func handleSetState(params string) error {
+	runLock.Lock()
+	defer runLock.Unlock()
+	if err := androidLegacyConfigWriteErrorLocked(); err != nil {
+		return err
+	}
 	return state.ApplyJSON([]byte(params))
 }
 
@@ -597,24 +616,34 @@ func handleCrash() {
 }
 
 func handleUpdateConfig(bytes []byte) string {
+	runLock.Lock()
+	defer runLock.Unlock()
+	if err := androidLegacyConfigWriteErrorLocked(); err != nil {
+		return err.Error()
+	}
 	var params = &UpdateParams{}
 	err := json.Unmarshal(bytes, params)
 	if err != nil {
 		return err.Error()
 	}
-	updateConfig(params)
+	updateConfigLocked(params)
 	return ""
 }
 
 func handleSetupConfig(bytes []byte) string {
+	runLock.Lock()
+	defer runLock.Unlock()
+	if err := androidLegacyConfigWriteErrorLocked(); err != nil {
+		return err.Error()
+	}
 	var params = defaultSetupParams()
 	err := UnmarshalJson(bytes, params)
 	if err != nil {
 		log.Errorln("unmarshalRawConfig error %v", err)
-		_ = setupConfig(defaultSetupParams())
+		_ = setupConfigLocked(defaultSetupParams())
 		return err.Error()
 	}
-	err = setupConfig(params)
+	err = setupConfigLocked(params)
 	if err != nil {
 		return err.Error()
 	}

@@ -2861,3 +2861,34 @@ a35d73f正式签名APK重试成功并同源安装。设备确认运行更新可�
 
 ### HLG
 标准append归档成功/失败、只读联合调查及设备边界。Goal保持active；候选release_verified=false。
+
+## 2026-10-09T03:34:52+08:00 · Android公共旧配置及监听入口门禁红绿与并发复核
+
+type: maintenance
+scope: ["Bettbox", "Android", "core"]
+status: partial
+tags: ["android", "owner", "legacy-admission", "race"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 6744d1c2a59ae7547cc79e60d8d1266f8cfb241a73952720f6b2c18ec848f320
+
+### Summary
+封闭已接受owned状态、提交责任、配置、阻断或TUN预留后旧init/state/setup/update及监听启停/shutdown。整体发行目标未完成。
+
+### Changed
+公共入口均在同一runLock内检查与操作；setup/update使用Locked原语避免嵌套锁，owned driver直接内部原语。增加reservation-only、合法setup、直接update实际配置不变量、32轮并发采用及实际登记监听拒绝测试。同步架构、平台验证、CHANGELOG、采用计划和注册表。
+
+### Validation
+旧setState在4阶段失败复现；旧stopListener实际关闭登记资源并改变状态的回归失败复现。修复后CGO0主包完整回归exit0，ok core0.901s；CGO1配置竞争race exit0，ok core2.001s。race在新增listener门禁之前运行，不覆盖!cgo监听测试。独立只读两轮源码复审无确定P1，主控核对当前diff、测试终态及证据范围；PDEC重新校验。
+
+### Next
+继续完整Kotlin原生owner、原用户停止意图、runtime epoch及Dart/JNI同实例证明、legacy TUN封闭、双channel immutable completion与ACK退出联合接线；同源APK设备与有效节点HTTPS另验。Mac仍锁屏，解锁后定位全黑窗口；支付商配置问题待用户回复。
+
+### Risks
+公共旧写拒绝不等于完整owner采用。void update拒绝不返回错误，上层不得包装成功。无新APK、macOS渲染、完整业务或发行验收；现有a35设备只证明更新资格基础路径。用户.video_agent保持未读取未改动。
+
+### DIA
+已同步docs/ARCHITECTURE.md、PLATFORM_VALIDATION.md、CHANGELOG.md、验证JSON、联合采用计划及registry。
+
+### HLG
+使用标准append dry-run后apply追加阶段证据；完整目标保持active。

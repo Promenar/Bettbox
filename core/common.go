@@ -199,6 +199,9 @@ func readFile(path string) ([]byte, error) {
 func updateConfig(params *UpdateParams) {
 	runLock.Lock()
 	defer runLock.Unlock()
+	if androidLegacyConfigWriteErrorLocked() != nil {
+		return
+	}
 	updateConfigLocked(params)
 }
 
@@ -368,6 +371,14 @@ func commitSetupConfigLocked(prepared *preparedSetupConfig) {
 func setupConfig(params *SetupParams) error {
 	runLock.Lock()
 	defer runLock.Unlock()
+	if err := androidLegacyConfigWriteErrorLocked(); err != nil {
+		return err
+	}
+	return setupConfigLocked(params)
+}
+
+// 调用方持有runLock并已核验入口；owned driver直接使用prepare/commit原语。
+func setupConfigLocked(params *SetupParams) error {
 	prepared, err := prepareSetupConfigLocked(params)
 	if err != nil {
 		return err

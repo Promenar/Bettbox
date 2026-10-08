@@ -2774,6 +2774,29 @@
         "build/macos-local-development/seal.json"
       ],
       "verification": "核对完整构建来源、实际Dart/宿主摘要与空开发权利后使用唯一现有AppleDevelopment身份，新目录不覆盖，保留固定Core/helper，不读私钥，不发行/公证。"
+    },
+    "test-android-legacy-admission-race": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestProductionAndroidConfig.*Legacy|^TestProductionAndroidConfigRejectsLegacyMutations",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "CGO1缓存内Go race：实际公共配置入口、TUN预留单独门禁及并发owned采用；不启动系统TUN或联网。"
     }
   },
   "deployment": {
@@ -2861,7 +2884,7 @@
     "core/state/state.go": "38ab490b6738db46c3f7f6b9d5110ccaf72fa66c0561496d86f6c6d44211b554",
     "core/state/snapshot.go": "b283decb2a81c398e7a33be75eb7cca5aa9d269ea016cfd7891642b99bc9bfb3",
     "core/state/snapshot_test.go": "cf4b18579a8c0fcf2aa9fec293b948731ad057baf83cd041289d0ced78d0845c",
-    "core/hub.go": "864d0be57cd89cf8a04b99e70532ffecc56920805ce7dc4b2ff12f47d13c1e2d",
+    "core/hub.go": "80fb677041d9eb5da5c64c533f0a36674d99959b6a9c5d439e5e9fb8bd0b0d2b",
     "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
     "core/lib_android.go": "8e038a4de68b3f02d07a82260b3c45c21c1f648323dcef7238fd347ff8c1e1b0",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
@@ -2885,7 +2908,7 @@
     "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e",
     "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b",
     "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
-    "core/common.go": "509139f98aa95541907b5df5b12c6667027e778df6720f3a7527d448ae695b75",
+    "core/common.go": "2b64ff2722e17b9fba7ededc0880e715abbb22fdab36f086249e5423f35171c6",
     "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
     "scripts/check_macos_supervisor.py": "4ed0575901bbee77d4ca3f20e077ca39b36f74faf82306442ff00816cb44b770",
     "scripts/tests/test_check_macos_supervisor.py": "0f3f0148087b01798b54f2f65dde610ff3d61225e657afd30e9240a49cacff81",
@@ -3002,8 +3025,8 @@
     "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
     "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
     "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d",
-    "core/android_config.go": "c8f9b41be924505be423bb516cdc2391278124095204e818277602b8c41f29a9",
-    "core/android_config_test.go": "ef16be14f655b7c3fcd28c72dd1590356a42bcb45613bd329124801f3e10b31a",
+    "core/android_config.go": "5ee17ce475ed4b91cc163fcff9318901de361b6c07fa7cd9ec77729d5cc907a0",
+    "core/android_config_test.go": "669b874ad05abd0b1891f8fb9f2500e12021ad53872136f235b0f25ffcf7a3d7",
     "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
     "scripts/check_android_config_protocol.py": "4afd0904c291eb16cfbd5a1be79e3be58373ab085a92d282997cedd5da4a87dc",
     "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "51b38eeba4eaa7a3d443bbf9ac92bdb2d284ce7f927d46500bd181b657489f76",
@@ -3073,7 +3096,8 @@
     "android/app/src/main/kotlin/com/appshub/bettbox/services/ForegroundPublication.kt": "90388d223a2ef2a5dda0c547453b1974f3cf81bf3d84eba4ad9fffae96e7a4b8",
     "android/app/src/main/kotlin/com/appshub/bettbox/receivers/PackageReplacedReceiver.kt": "b2a4494f9bb084d6ef7dc2f613c5b17cfff1bcae863c6ccae68eaa28003c47ea",
     "android/app/src/main/kotlin/com/appshub/bettbox/PackageRestartEligibility.kt": "0a5344f78a6b097df651554b382895bc33401942a05de1260e7c76d88c392b08",
-    "android/app/src/test/kotlin/com/appshub/bettbox/PackageRestartFixture.kt": "66528906ce198afc149567342d5cb6701ca42f8a68e2f69a6e434fbe152a23d0"
+    "android/app/src/test/kotlin/com/appshub/bettbox/PackageRestartFixture.kt": "66528906ce198afc149567342d5cb6701ca42f8a68e2f69a6e434fbe152a23d0",
+    "core/android_legacy_lifecycle_test.go": "473e8d4080d6f97468fb0fdcb52dd673037f489e4f45711bd283de9b165ca390"
   },
   "platform_extensions": {
     "android": {
@@ -3149,6 +3173,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "9189ee5f777775a3970efe5f043ecffa892a42ae182b49948dc3127ee02cf85a"
+    "contract_digest": "ea4514ea5329977c2bbe1ef08cca50633d9d4b76fe138f261b707bb0f32ec3e7"
   }
 }

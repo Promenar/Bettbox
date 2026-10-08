@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/netip"
+	"sync"
 	"testing"
 
 	"core/state"
@@ -447,5 +449,117 @@ func TestAndroidConfigReceiptEncodingFailureBlocksAndPreservesStamp(t *testing.T
 	status := coordinator.snapshotLocked()
 	if !status.Blocked || status.ErrorCode != androidConfigErrorReceiptEncoding || status.ConfigRevision != 7 {
 		t.Fatalf("编码失败只伪造单次blocked回执: %+v", status)
+	}
+}
+
+// 直接调用生产公共入口，验证已接受的配置身份不会被旧写入污染。
+func TestProductionAndroidConfigRejectsLegacyMutations(t *testing.T) {
+	for _, phase := range []string{"staged", "entered", "configured", "blocked", "reservation"} {
+		t.Run(phase, func(t *testing.T) {
+			withProductionAndroidConfigFixture(t)
+			var staged androidOwnedConfigResult
+			if err := json.Unmarshal([]byte(commitAndroidOwnedConfigJSON(androidConfigEpoch, 0, androidConfigKindState, `{}`)), &staged); err != nil {
+				t.Fatal(err)
+			}
+			assertStagedStateResult(t, staged)
+			runLock.Lock()
+			switch phase {
+			case "entered":
+				productionAndroidConfigCoordinator.hasDesiredState = false
+				productionAndroidConfigCoordinator.lastAttempted = 1
+			case "configured":
+				productionAndroidConfigCoordinator.hasDesiredState = false
+				productionAndroidConfigCoordinator.configured = true
+			case "reservation":
+				productionAndroidConfigCoordinator.hasDesiredState = false
+				productionAndroidConfigCoordinator.tunReservation = &androidTunReservation{epoch: androidConfigEpoch, revision: 1}
+			case "blocked":
+				productionAndroidConfigCoordinator.hasDesiredState = false
+				productionAndroidConfigCoordinator.blocked = true
+			}
+			before := state.Snapshot()
+			oldVersion := version
+			runLock.Unlock()
+			t.Cleanup(func() { runLock.Lock(); version = oldVersion; runLock.Unlock() })
+			if err := handleSetState(`{"current-profile-name":"PUBLIC_LEGACY_INTRUSION"}`); err == nil {
+				t.Fatal("已接受owned配置后旧setState仍获准写入")
+			}
+			if state.Snapshot().CurrentProfileName != before.CurrentProfileName {
+				t.Fatal("拒绝旧写仍污染实际状态")
+			}
+			if handleInitClash(`{"version":"PUBLIC_LEGACY_INIT"}`) || version != oldVersion {
+				t.Fatal("旧init不得覆盖已接受的配置运行时")
+			}
+			if message := handleUpdateConfig([]byte(`{}`)); message == "" {
+				t.Fatal("旧update不得报告应用成功")
+			}
+			if message := handleSetupConfig([]byte(`{`)); message == "" || currentConfig != nil || currentRawConfig != nil {
+				t.Fatal("畸形旧setup不得回退写默认配置")
+			}
+			if message := handleSetupConfig([]byte(`{"config":{}}`)); message == "" || currentConfig != nil || currentRawConfig != nil {
+				t.Fatal("合法旧setup不得覆盖owned配置")
+			}
+			currentConfig = &config.Config{General: &config.General{}}
+			requestedPort := 12345
+			updateConfig(&UpdateParams{MixedPort: &requestedPort})
+			if currentConfig.General.MixedPort != 0 {
+				t.Fatal("直接旧update包装器修改了实际配置")
+			}
+			currentConfig = nil
+			if err := setupConfig(defaultSetupParams()); err == nil || currentConfig != nil {
+				t.Fatal("直接旧setup包装器不得旁路写入")
+			}
+		})
+	}
+}
+
+func TestProductionAndroidConfigAllowsUnadoptedLegacyState(t *testing.T) {
+	withProductionAndroidConfigFixture(t)
+	if err := handleSetState(`{"current-profile-name":"PUBLIC_LEGACY_ALLOWED"}`); err != nil {
+		t.Fatal(err)
+	}
+	if state.Snapshot().CurrentProfileName != "PUBLIC_LEGACY_ALLOWED" {
+		t.Fatal("尚未采用owned的状态写入应保持工作")
+	}
+}
+
+// 竞争允许旧请求先于采用提交；采用返回后任何旧请求均不得再污染状态。
+func TestProductionAndroidConfigConcurrentLegacyAdoption(t *testing.T) {
+	for attempt := 0; attempt < 32; attempt++ {
+		t.Run(fmt.Sprint(attempt), func(t *testing.T) {
+			withProductionAndroidConfigFixture(t)
+			start := make(chan struct{})
+			var wg sync.WaitGroup
+			var legacyErr error
+			var ownedWire string
+			wg.Add(2)
+			go func() {
+				defer wg.Done()
+				<-start
+				legacyErr = handleSetState(`{"current-profile-name":"PUBLIC_BEFORE_ADOPTION"}`)
+			}()
+			go func() {
+				defer wg.Done()
+				<-start
+				ownedWire = commitAndroidOwnedConfigJSON(androidConfigEpoch, 0, androidConfigKindState, `{}`)
+			}()
+			close(start)
+			wg.Wait()
+			var owned androidOwnedConfigResult
+			if err := json.Unmarshal([]byte(ownedWire), &owned); err != nil {
+				t.Fatal(err)
+			}
+			assertStagedStateResult(t, owned)
+			before := state.Snapshot().CurrentProfileName
+			if legacyErr == nil && before != "PUBLIC_BEFORE_ADOPTION" {
+				t.Fatal("采用前受理的旧请求没有完成写入")
+			}
+			if err := handleSetState(`{"current-profile-name":"PUBLIC_AFTER_ADOPTION"}`); err == nil {
+				t.Fatal("并发采用完成后旧写入仍获准")
+			}
+			if state.Snapshot().CurrentProfileName != before {
+				t.Fatal("并发采用后拒绝请求仍污染状态")
+			}
+		})
 	}
 }

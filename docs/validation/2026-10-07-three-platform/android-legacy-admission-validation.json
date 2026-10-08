@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-09",
+  "scope": "Android owned配置采用后公共旧配置及监听/shutdown准入",
+  "source_sha256": {
+    "core/android_config.go": "5ee17ce475ed4b91cc163fcff9318901de361b6c07fa7cd9ec77729d5cc907a0",
+    "core/android_config_test.go": "669b874ad05abd0b1891f8fb9f2500e12021ad53872136f235b0f25ffcf7a3d7",
+    "core/android_legacy_lifecycle_test.go": "473e8d4080d6f97468fb0fdcb52dd673037f489e4f45711bd283de9b165ca390",
+    "core/common.go": "2b64ff2722e17b9fba7ededc0880e715abbb22fdab36f086249e5423f35171c6",
+    "core/hub.go": "80fb677041d9eb5da5c64c533f0a36674d99959b6a9c5d439e5e9fb8bd0b0d2b"
+  },
+  "red": {
+    "config_before_guard": {
+      "exit_code": 1,
+      "cases": [
+        "staged",
+        "entered",
+        "configured",
+        "blocked"
+      ],
+      "failure": "旧setState仍受理"
+    },
+    "listener_before_guard": {
+      "exit_code": 1,
+      "test": "TestProductionAndroidOwnedRejectsLegacyListenerAndShutdown",
+      "failure": "旧stopListener尝试关闭登记资源并改变isRunning"
+    }
+  },
+  "green": {
+    "main_package": {
+      "command": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go test -mod=readonly -count=1 -timeout=120s -tags with_gvisor .",
+      "cwd": "core",
+      "exit_code": 0,
+      "result": "ok core 0.901s"
+    },
+    "config_race": {
+      "command": "CGO_ENABLED=1 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go test -mod=readonly -race -count=1 -timeout=90s -tags with_gvisor -run '^TestProductionAndroidConfig.*Legacy|^TestProductionAndroidConfigRejectsLegacyMutations' -v .",
+      "cwd": "core",
+      "exit_code": 0,
+      "result": "ok core 2.001s",
+      "coverage": [
+        "5种拒绝状态含reservation-only",
+        "合法及畸形setup拒绝",
+        "直接update的真实MixedPort不变量",
+        "32轮公共入口并发竞争",
+        "未采用legacy state正向路径"
+      ],
+      "source_note": "race运行后hub新增监听/shutdown门禁；该证据只覆盖配置竞争，不代表监听race"
+    }
+  },
+  "not_verified": [
+    "完整Kotlin唯一owner接线",
+    "legacy TUN旁路封闭",
+    "runtime epoch及FFI/JNI同实例证明",
+    "双channel completion/ACK退出",
+    "新APK及同源设备验收",
+    "有效节点HTTPS"
+  ],
+  "release_verified": false,
+  "independent_review": {
+    "executor": "原生只读android_package_restart_review",
+    "scope": "配置门禁及新增监听/shutdown、锁顺序与测试清理",
+    "confirmed_p1": false,
+    "tests_run_by_reviewer": false,
+    "boundary": "只读源码复审；测试终态由主控确认"
+  }
+}

@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T03:19:06+08:00
+> generated_at: 2026-10-09T03:34:52+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -9,7 +9,7 @@
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
-| bettbox-three-platform-release | resume | 2026-10-08T23:11:09+08:00 | done | ["Bettbox", "Android", "Go", "Dart"] | 后台检查式监听停止实际接线与Go FFI验收 | `.agents/handover.md` · `2026-10-08T23:11:09+08:00` · `fp:ee0c053aa8` |
+| bettbox-three-platform-release | resume | 2026-10-09T03:34:52+08:00 | partial | ["Bettbox", "Android", "core"] | Android公共旧配置及监听入口门禁红绿与并发复核 | `.agents/handover.md` · `2026-10-09T03:34:52+08:00` · `fp:6744d1c2a5` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
 | three-platform-release | resume | 2026-10-09T03:19:06+08:00 | partial | ["Bettbox", "Android"] | Android a35d73f签名候选更新基础设备验收与完整owner采用计划 | `.agents/handover.md` · `2026-10-09T03:19:06+08:00` · `fp:6056af5196` |
 
@@ -17,6 +17,7 @@
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T03:34:52+08:00 | iso | partial | resume | ["Bettbox", "Android", "core"] | ["android", "owner", "legacy-admission", "race"] | Android公共旧配置及监听入口门禁红绿与并发复核 | `.agents/handover.md` · `2026-10-09T03:34:52+08:00` · `fp:6744d1c2a5` |
 | 2026-10-09T03:19:06+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["apk", "device", "package-restart", "owner", "review"] | Android a35d73f签名候选更新基础设备验收与完整owner采用计划 | `.agents/handover.md` · `2026-10-09T03:19:06+08:00` · `fp:6056af5196` |
 | 2026-10-09T02:43:34+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["package-restart", "storage", "regression", "review"] | Android更新恢复资格候选与存储初始化失败闭环 | `.agents/handover.md` · `2026-10-09T02:43:34+08:00` · `fp:82c482bf37` |
 | 2026-10-09T02:28:18+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["foreground", "package-restart", "regression", "review"] | Android首次前台发布确认候选与更新资格前提 | `.agents/handover.md` · `2026-10-09T02:28:18+08:00` · `fp:b44b2b2bd0` |

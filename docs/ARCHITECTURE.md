@@ -250,7 +250,7 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 ### macOS本机开发安全存储准入
 
-正式 XboardSecureStore 使用 FlutterSecureStorage 默认 DP 路径。显式本机开发构建须同时满足 macOS、APP_ENV=local-macos-development 与 BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true；默认构造使用独立 service com.appshub.bettbox.local-development.xboard 的文件 Keychain。平台或渠道不符时拒绝初始化，不自动回退或迁移既有凭据。开发后端仅对锁定插件特定整数 -34018 删除错误执行同键读取确认，条目确已不存在才成功；其它错误、读取失败或仍存在均失败。调用方显式注入 FlutterSecureStorage 时，其配置属于调用方信任边界。完整开发候选将公开 App 链接与 Versions/Current 精确绑定到已核验的 A 版本，在源准入、复制后和签后检查。候选采用独立空权利文件和目录，正式 Release 权利保持。完整首页已启动；实际插件会话和冷启动持久化尚待验收。原生诊断脚本只操作新 UUID 合成键并公开状态码/比对，不读取业务秘密。
+正式 XboardSecureStore 使用 FlutterSecureStorage 默认 DP 路径。显式本机开发构建须同时满足 macOS、APP_ENV=local-macos-development 与 BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true；默认构造使用独立 service com.appshub.bettbox.local-development.xboard 的文件 Keychain。平台或渠道不符时拒绝初始化，不自动回退或迁移既有凭据。开发后端仅对锁定插件特定整数 -34018 删除错误执行同键读取确认，条目确已不存在才成功；其它错误、读取失败或仍存在均失败。调用方显式注入 FlutterSecureStorage 时，其配置属于调用方信任边界。完整开发候选将公开 App 链接与 Versions/Current 精确绑定到已核验的 A 版本，在源准入、复制后和签后检查。候选采用独立空权利文件和目录，正式 Release 权利保持。进程已启动，但全黑窗口尚未定位；实际主界面、插件会话和冷启动持久化尚待验收。原生诊断脚本只操作新 UUID 合成键并公开状态码/比对，不读取业务秘密。
 
 ### Android 智能停止回执
 
@@ -271,4 +271,4 @@ BootReceiver 的开机自启合同独立。文件方案不承诺目录的断电�
 
 ### Android 唯一所有者采用边界
 
-owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapter，主后台配置和退出尚未共用唯一 owner。公共 hub setState/setup/update、直接 FFI quickStart 以及 legacy 生命周期没有 Android owned 采用后的完整拒绝门禁；darwin 的 ownedListenerMode 不承担这个职责。完整采用须原子收敛实际配置写、用户停止意图、同次 options/资源身份、双 channel 不可变完成消费与 ACK 退出准入，执行合同见 `.agents/plans/2026-10-09-android-single-owner-adoption.md`。
+owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapter，主后台配置和退出尚未共用唯一 owner。公共 hub init/state/setup/update 与监听启停/shutdown 已在 runLock 内按已接受状态、提交责任、阻断和 TUN 预留拒绝旧入口；畸形 setup 在拒绝之后才解析，不能回退写默认配置。直接 setup/update 包装器同样拒绝，内部 prepare/commit/updateConfigLocked 保留给 owned driver。update 的 void 包装器拒绝时不执行，不能被上层包装成成功。legacy TUN、双通道与带身份 lifecycle 接线尚待采用；darwin 的 ownedListenerMode 不承担 Android 门禁职责。完整采用须原子收敛实际配置写、用户停止意图、同次 options/资源身份、双 channel 不可变完成消费与 ACK 退出准入，执行合同见 `.agents/plans/2026-10-09-android-single-owner-adoption.md`。
