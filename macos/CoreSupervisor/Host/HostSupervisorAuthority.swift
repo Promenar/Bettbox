@@ -78,6 +78,7 @@ final class HostSupervisorAuthority {
     private var preparationComplete = false
     private var pendingReserve: (generation: UInt64, reply: Reply)?
     private var proxyOperation: UUID?
+    private var pendingProxyStarts: Set<UUID> = []
     private var proxyClear = false
     init(facts: SSIHostFacts, authority: SSIHostProofAuthority, proxy: HostSystemProxyCoordinating,
          replyQueue: DispatchQueue = .main,
@@ -223,7 +224,9 @@ final class HostSupervisorAuthority {
 
     private func beginReserve(generation: UInt64, reply: @escaping Reply) throws {
         guard case .clear = coldState else { try fail("system_proxy_recovery_required") }
-        guard proxyClear, proxyOperation == nil else { try fail("system_proxy_recovery_required") }
+        guard proxyClear, proxyOperation == nil, pendingProxyStarts.isEmpty else {
+            try fail("system_proxy_recovery_required")
+        }
         guard busy == nil else { try fail("sdk_busy") }
         guard ticket == nil || ticket!.stopped else { try fail("stop_unconfirmed") }
         let value = Ticket(try authority.reserveLaunch(generation: generation), generation); ticket = value
@@ -261,7 +264,7 @@ final class HostSupervisorAuthority {
     }
 
     private func beginActivation(_ fields: [String: Any], reply: @escaping Reply) throws {
-        guard case .clear = coldState, proxyOperation == nil else {
+        guard case .clear = coldState, proxyOperation == nil, pendingProxyStarts.isEmpty else {
             try fail("system_proxy_recovery_required")
         }
         let value = try handle(fields["handle"], core: true)
@@ -295,13 +298,22 @@ final class HostSupervisorAuthority {
                             if self.proxyOperation == operation { self.proxyOperation = nil }
                             self.respond(reply, .failure(HostSupervisorFailure(code: "revoked"))); return
                         }
-                        self.proxy.start(context.capability) { [weak self, weak value] result in
-                            self?.state.async { [weak self, weak value] in
-                                guard let self, let value else { return }
+                        self.pendingProxyStarts.insert(operation)
+                        self.proxy.start(context.capability) { [weak self, value] result in
+                            self?.state.async { [weak self, value] in
+                                guard let self else { return }
+                                self.pendingProxyStarts.remove(operation)
                                 guard self.proxyOperation == operation, self.ticket === value,
                                       value.endpoint == context.endpoint else {
                                     context.lease.invalidate()
-                                    self.respond(reply, .failure(HostSupervisorFailure(code: "revoked"))); return
+                                    value.activeProxyResult = nil
+                                    if result.status == .applied || result.status == .recoveryRequired {
+                                        self.proxyClear = false; self.coldState = .blocked
+                                        self.respond(reply, .failure(HostSupervisorFailure(code: "system_proxy_recovery_required")))
+                                    } else {
+                                        self.respond(reply, .failure(HostSupervisorFailure(code: "revoked")))
+                                    }
+                                    return
                                 }
                                 self.proxyOperation = nil
                                 if result.status == .applied && context.lease.isCurrent() {
@@ -362,13 +374,20 @@ final class HostSupervisorAuthority {
             respond(reply, .failure(HostSupervisorFailure(code: "system_proxy_recovery_required"))); return
         }
         proxyOperation = nil
-        if safe(result) { clearProxyResponsibility(value) } else { proxyClear = false; coldState = .blocked }
+        let settled = pendingProxyStarts.isEmpty
+        let effectiveSafe = safe(result) && settled
+        if effectiveSafe { clearProxyResponsibility(value) }
+        else { proxyClear = false; coldState = .blocked }
         if nilOnSuccess {
-            if safe(result) { respond(reply, .success(nil)) }
+            if effectiveSafe { respond(reply, .success(nil)) }
             else { respond(reply, .failure(HostSupervisorFailure(code: "system_proxy_recovery_required"))) }
             return
         }
-        do { respond(reply, .success(try wire(result))) }
+        let reported = safe(result) && !settled
+            ? SafeResult(status: .recoveryRequired, generation: result.generation,
+                         changedGroups: result.changedGroups, unresolvedGroups: result.unresolvedGroups)
+            : result
+        do { respond(reply, .success(try wire(reported))) }
         catch let error as HostSupervisorFailure { respond(reply, .failure(error)) }
         catch { respond(reply, .failure(HostSupervisorFailure(code: "system_proxy_recovery_required"))) }
     }
@@ -484,7 +503,8 @@ final class HostSupervisorAuthority {
                     let fields = try dictionary(arguments, ["generation"])
                     let generation = UInt64(try integer(fields["generation"], maximum: Int64.max))
                     // 未发行reservation的SDK已终止并内部撤销，才能证明预检无进程所有权。
-                    let stopped = busy == nil && proxyOperation == nil && proxyClear && ticket.map { value in
+                    let stopped = busy == nil && proxyOperation == nil && pendingProxyStarts.isEmpty &&
+                        proxyClear && ticket.map { value in
                         value.generation == generation && value.revoked && value.stopped &&
                         !value.issuedReservation && value.helper == nil && value.core == nil &&
                         !value.helperProofEverIssued && !value.coreAttempted
@@ -492,7 +512,8 @@ final class HostSupervisorAuthority {
                     respond(reply, .success(stopped))
                 case "confirmStopped":
                     let fields = try dictionary(arguments, ["launch", "generation"]), value = try matching(fields)
-                    let stopped = busy == nil && proxyOperation == nil && proxyClear && value.endpoint == nil && value.revoked &&
+                    let stopped = busy == nil && proxyOperation == nil && pendingProxyStarts.isEmpty &&
+                        proxyClear && value.endpoint == nil && value.revoked &&
                         value.helper.map(gone) == true &&
                         (!(value.coreAttempted || value.helperProofEverIssued) || value.core.map(gone) == true)
                     value.stopped = stopped; respond(reply, .success(stopped))

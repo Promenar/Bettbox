@@ -191,6 +191,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "concurrencyLimitDesc": MessageLookupByLibrary.simpleMessage("延迟测试的最大并发数量"),
     "confirm": MessageLookupByLibrary.simpleMessage("确定"),
     "connection": MessageLookupByLibrary.simpleMessage("活跃连接"),
+    "connectionStateUnconfirmed": MessageLookupByLibrary.simpleMessage(
+      "连接状态尚未确认，请重试。",
+    ),
     "connections": MessageLookupByLibrary.simpleMessage("连接"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage("查看当前连接数据"),
     "connectionsSort": MessageLookupByLibrary.simpleMessage("连接排序"),
@@ -453,6 +456,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "loopback": MessageLookupByLibrary.simpleMessage("回环解锁工具"),
     "loopbackDesc": MessageLookupByLibrary.simpleMessage("用于 UWP 回环解锁"),
     "loose": MessageLookupByLibrary.simpleMessage("宽松"),
+    "macTunUnavailable": MessageLookupByLibrary.simpleMessage(
+      "当前 macOS 构建尚未提供 TUN，请使用系统代理。",
+    ),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("重新获取 IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("内存信息"),
@@ -787,6 +793,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemFont": MessageLookupByLibrary.simpleMessage("系统字体"),
     "systemProxy": MessageLookupByLibrary.simpleMessage("系统代理"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("设置系统代理"),
+    "systemProxyRecoveryRequired": MessageLookupByLibrary.simpleMessage(
+      "连接停止或系统代理恢复尚未确认。应用将保持打开，请重试。",
+    ),
     "tab": MessageLookupByLibrary.simpleMessage("标签页"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP并发"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage("开启后允许 TCP 并发连接"),

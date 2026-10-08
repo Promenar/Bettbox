@@ -365,6 +365,16 @@ class GlobalState {
       if (iosClash.status.connected) await startUpdateTasks(tasks);
       return;
     }
+    if (system.isMacOS) {
+      if (!await clashService!.startListener()) {
+        throw StateError(appLocalizations.connectionStateUnconfirmed);
+      }
+      startTime = clashService!.macStartedAt;
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      await prefs?.setBool('is_vpn_running', true);
+      await startUpdateTasks(tasks);
+      return;
+    }
     startTime ??= DateTime.now();
     if (system.isAndroid && isService) {
       await clashLibHandler?.startListener();
@@ -388,7 +398,9 @@ class GlobalState {
       await syncIOSVpnState();
       return;
     }
-    startTime = await clashLib?.getRunTime();
+    startTime = system.isMacOS
+        ? clashService!.macStartedAt
+        : await clashLib?.getRunTime();
   }
 
   void updateWakelockState(bool enabled) {
@@ -414,6 +426,17 @@ class GlobalState {
     if (system.isIOS) {
       await iosClash.stopVpn(cancelPending: cancelIOSPendingStart);
       applyIOSVpnStatus(iosClash.status);
+      return;
+    }
+    if (system.isMacOS) {
+      if (!await clashService!.stopListener()) {
+        throw StateError(appLocalizations.connectionStateUnconfirmed);
+      }
+      startTime = null;
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      await prefs?.setBool('is_vpn_running', false);
+      await prefs?.setBool('is_tun_running', false);
+      stopUpdateTasks();
       return;
     }
     startTime = null;

@@ -762,5 +762,8 @@
   "xbInviteWebsiteUnavailable": "招待用ウェブサイトを利用できません。コードはコピーできます。後で更新するか、サポートにお問い合わせください。",
   "xbInviteLoadError": "招待情報を読み込めません。後でもう一度お試しください。",
   "xbInviteRefresh": "更新",
-  "xbOpenCashierFailed": "支払いページを開けません。再試行するか、別の支払い方法を選択してください。"
+  "xbOpenCashierFailed": "支払いページを開けません。再試行するか、別の支払い方法を選択してください。",
+  "connectionStateUnconfirmed": "接続状態を確認できません。再試行してください。",
+  "systemProxyRecoveryRequired": "接続の停止またはシステムプロキシの復元を確認できません。アプリを開いたまま再試行してください。",
+  "macTunUnavailable": "この macOS ビルドでは TUN を利用できません。システムプロキシを使用してください。"
 }

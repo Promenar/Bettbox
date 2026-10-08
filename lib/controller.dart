@@ -698,6 +698,9 @@ class AppController {
   }
 
   Future<Result<bool>> _requestAdmin(bool enableTun) async {
+    if (system.isMacOS && enableTun) {
+      throw appLocalizations.macTunUnavailable;
+    }
     final realTunEnable = _ref.read(realTunEnableProvider);
     if (enableTun != realTunEnable && realTunEnable == false) {
       final code = await system.authorizeCore();
@@ -1114,6 +1117,34 @@ class AppController {
     final exitLock = Completer<void>();
     _exitLock = exitLock;
     globalState.isExiting = true;
+
+    if (system.isMacOS) {
+      try {
+        // 只有恢复与内核所有权收尾确认后，才结束界面及系统集成。
+        if (!await clashService!.shutdown()) {
+          globalState.showNotifier(
+            appLocalizations.systemProxyRecoveryRequired,
+          );
+          return;
+        }
+        await globalState.handleBackground();
+        final prefs = await preferences.sharedPreferencesCompleter.future;
+        await prefs?.setBool('is_vpn_running', false);
+        await prefs?.setBool('is_tun_running', false);
+        await savePreferences();
+        await macOS?.updateDns(true);
+        stopWakelockAutoRecovery();
+        await trayManager.destroy();
+        await system.exit();
+      } catch (_) {
+        globalState.showNotifier(appLocalizations.systemProxyRecoveryRequired);
+      } finally {
+        globalState.isExiting = false;
+        _exitLock = null;
+        if (!exitLock.isCompleted) exitLock.complete();
+      }
+      return;
+    }
 
     try {
       if (system.isDesktop) {

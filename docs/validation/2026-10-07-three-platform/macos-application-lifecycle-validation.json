@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "scope": "正常macOS Application接线、配置就绪和偏好兑现；构建不等于发行验收",
+  "source_sha256": {
+    "lib/clash/supervisor/supervisor_application.dart": "46e61a4e27a76c7b7282f0b325d83f360aeddeb1a576ce87d98012a1449c86b5",
+    "test/clash/supervisor/supervisor_application_test.dart": "253c2793607f5ace7b53397532751a279bcd1aedad6efba267c1658d564a9517",
+    "lib/clash/service.dart": "eebd5e28f18af658db1ada2a348312eabe13cb1ca4f94b9225c686e029f859f4",
+    "lib/state.dart": "101e4e8a24b6ebba9d39a424d9aeb6e0c83ffa3d3bbd2abbaa34f46170d6c794",
+    "lib/controller.dart": "5dc9cfdf3e1c4c97586b783e9355634ba3d3703f32af458966c34694a1c302e9",
+    "lib/manager/proxy_manager.dart": "687bccd0561f853dc88e2a4a4cbb393c144e422682756d5e95b9163ae18f03a2",
+    "lib/common/system.dart": "12898544d27d2a5dcc6912a5c45a42af552713bbc0db5ae39d67e608dd875da0",
+    "test/common/macos_core_privilege_test.dart": "e07c3ac24193b30f98dd49f8707e64ef52e75f8e224f7b39e33407d1421e2730"
+  },
+  "validation": {
+    "flutter_tests": 219,
+    "flutter_exit_code": 0,
+    "analyze_exit_code": 0,
+    "analyze_result": "No issues found",
+    "independent_review": "未发现新增P1/P2，原生子Agent只读复核",
+    "build": {
+      "commands_succeeded": true,
+      "source_unchanged": true,
+      "locks_unchanged": true,
+      "requested_signing_mode": "unsigned",
+      "core_identity": {
+        "cdhash": "d4f4b36a9e40eea35bd11eaed2170f05a3ea16fc",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "49f787883a1f1324f536972fbec2002004ce71b57f02d8931188c25c7ef19b10",
+        "signingmode": "adhoc"
+      }
+    }
+  },
+  "evidence_sha256": {
+    "macos-application-config-ready-red.log": "0be7225d5a90146fd90d05d43826d95409331a64adbf4f753531858f23f4fabf",
+    "macos-preference-retry-red.log": "54d88be2a9f2a7446d16b52d44ce8df592eaab7f6c198658fb620d8525ff935a",
+    "macos-application-final-flutter.log": "c5be51aad8fbe9091f4dbebac943e3166ad3e3525a52ff182984441c40caf1ed",
+    "macos-application-final-analyze.log": "500ad6713e743485f1589f9d5de731049369c554c6cbecaecd2c830753a039a3",
+    "macos-application-full-build.log": "f125db1df6ce013698438dedb75463160584902504a3963ed68a7849fcd3c17c"
+  },
+  "release_verified": false,
+  "unverified": [
+    "系统原生授权",
+    "实际系统代理写入及恢复",
+    "正常界面启停/退出",
+    "上游节点协议代理流量",
+    "Developer ID签名及公证"
+  ],
+  "macos_tun_available": false
+}

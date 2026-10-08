@@ -1745,3 +1745,34 @@ Host复用同份schema4核心，Session全部收尾经过恢复门禁；本阶�
 
 ### HLG
 使用标准append dry-run/apply，索引由工具重建。
+
+## 2026-10-08T14:59:04+08:00 · macOS正常应用生命周期接线与完整构建
+
+type: development
+scope: ["Bettbox", "macOS"]
+status: done
+tags: ["macos", "supervisor", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 8adf1a7ad6f62f93e1dec1e6a6cb1cb9617cbe36adac9b27be1e40e3d76bee2c
+
+### Summary
+用户裁定优先Android与macOS，iOS保留开发版研究。正常Application配置、偏好及停止退出链已接线，完整unsigned Release构建通过；未声明发行可用。
+
+### Changed
+空受保护journal严格判空后免SC锁恢复；Host迟到SC start阻断提前确认恢复。Application统一生命周期队列、代次初始化/配置事实及偏好失败重试；Service/State/Controller/ProxyManager接入。macOS旧root/setuid入口删除，TUN明确不可用。
+
+### Validation
+Core64项通过；Host SDK定向编译和迟到SC夹具通过；当前Flutter全量219项通过，flutter analyze退出0且No issues found。完整Release构建退出0，171.4MB，manifest source_unchanged=true、locks_unchanged=true、requested_signing_mode=unsigned。P1配置就绪和P2同值偏好重试均先实测红例后修复。独立只读审阅无新增P1/P2。
+
+### Next
+实施最小Authorization Services原生引用/SC session生命周期与取消测试，再独立审阅、完整签名候选交互，验证SC生效恢复和网络流量。Android联合配置owner与上游协议、邀请网页归属、真实支付仍待验证。
+
+### Risks
+普通进程SC锁实测permissionDenied。unsigned产物不代表DeveloperID/公证或可分发发行；真实授权/SC写入、普通界面启停退出、上游流量未验收。支付外部商户条件与iOS团队签名尚缺。禁止读取.video_agent、账户私密内容或将OS认证信息输出。
+
+### DIA
+已同步平台验收、架构、变更记录、registry、PDEC及实施计划；新增三份公开脱敏回执。
+
+### HLG
+使用标准append先dry-run再apply记录；索引由工具重建。

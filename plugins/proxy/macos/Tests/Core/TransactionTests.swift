@@ -74,6 +74,43 @@ final class TransactionTests: XCTestCase {
         XCTAssertFalse(store.record!.entries[0].ownedGroups.contains(.socks))
     }
 
+    func testEmptyOwnedJournalRecoveryDoesNotRequestSystemConfigurationLock() {
+        for failure in [BackendFailure.permissionDenied, BackendFailure.busy] {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            backend.lockFailure = failure
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.recover(generation: 1).status, .idle)
+            XCTAssertTrue(store.acquired)
+            XCTAssertEqual(backend.lockAttempts, 0)
+            XCTAssertEqual(backend.stages, 0)
+        }
+    }
+
+    func testUnreadableOrUnownedJournalCannotClaimIdleWithoutConfigurationLock() {
+        for unavailable in [false, true] {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            if unavailable { store.loadFailure = true } else { store.acquired = true }
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.recover(generation: 1).status, unavailable ? .recoveryRequired : .busy)
+            XCTAssertEqual(backend.lockAttempts, 0)
+            XCTAssertEqual(backend.stages, 0)
+        }
+    }
+
+    func testNonemptyJournalStillRequiresConfigurationLockAndPreservesEvidence() throws {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let original = try encoder.encode(store.record)
+        let attempts = backend.lockAttempts
+        backend.lockFailure = .permissionDenied
+        XCTAssertEqual(transaction.recover(generation: 2).status, .permissionDenied)
+        XCTAssertEqual(backend.lockAttempts, attempts + 1)
+        XCTAssertEqual(try encoder.encode(store.record), original)
+    }
+
     func testInitialStopDoesNotTouchAnyConfiguration() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)

@@ -818,5 +818,8 @@
   "xbInviteWebsiteUnavailable": "邀请网页暂不可用，可先复制邀请码。请稍后刷新或联系客服。",
   "xbInviteLoadError": "邀请信息暂时无法加载，请稍后重试。",
   "xbInviteRefresh": "刷新",
-  "xbOpenCashierFailed": "无法打开支付页面，请重试或选择其他支付方式。"
+  "xbOpenCashierFailed": "无法打开支付页面，请重试或选择其他支付方式。",
+  "connectionStateUnconfirmed": "连接状态尚未确认，请重试。",
+  "systemProxyRecoveryRequired": "连接停止或系统代理恢复尚未确认。应用将保持打开，请重试。",
+  "macTunUnavailable": "当前 macOS 构建尚未提供 TUN，请使用系统代理。"
 }

@@ -64,9 +64,12 @@ private final class ProxyCoordinator: HostSystemProxyCoordinating {
     var restoreResult = SafeResult(status: .restored, generation: 2, changedGroups: 3)
     var holdPreparation = false
     var holdRecovery = false
+    var holdStart = false
     private var preparation: ((SafeResult) -> Void)?
     private var recovery: ((SafeResult) -> Void)?
+    private var pendingStart: ((SafeResult) -> Void)?
     let recoveryEntered = DispatchSemaphore(value: 0)
+    let startEntered = DispatchSemaphore(value: 0)
     private(set) var starts: [EndpointEvidence] = []
     private(set) var restores = 0
     private(set) var recoveries = 0
@@ -90,7 +93,13 @@ private final class ProxyCoordinator: HostSystemProxyCoordinating {
         completion?(result)
     }
     func start(_ capability: CredentialBlindEndpointCapability, completion: @escaping (SafeResult) -> Void) {
-        lock.lock(); starts.append(capability.endpoint); let result = startResult; lock.unlock(); completion(result)
+        lock.lock(); starts.append(capability.endpoint)
+        if holdStart { pendingStart = completion; lock.unlock(); startEntered.signal(); return }
+        let result = startResult; lock.unlock(); startEntered.signal(); completion(result)
+    }
+    func completeStart() {
+        lock.lock(); let completion = pendingStart; pendingStart = nil; let result = startResult; lock.unlock()
+        completion?(result)
     }
     func restore(completion: @escaping (SafeResult) -> Void) {
         lock.lock(); restores += 1; let result = restoreResult; lock.unlock(); completion(result)
@@ -368,6 +377,39 @@ private func fixture(deadline: TimeInterval = 5, proxy: ProxyCoordinator = Proxy
         require(raceDone.wait(timeout: .now() + 1) == .success && code(raceActivation!) != nil,
                 "恢复后的迟到SDK不能重新发布激活")
         require(raceProxy.startCount == 0, "恢复后迟到SDK不得调用SC start")
+
+        let lateProxy = ProxyCoordinator(); lateProxy.holdStart = true
+        let (lateFacts, lateBridge) = fixture(proxy: lateProxy)
+        let lateLaunch = fields(invoke(lateBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String
+        let lateStop: [String: Any] = ["launch": lateLaunch, "generation": 1]
+        let lateHelper = fields(invoke(lateBridge, "bindSupervisor", lateStop.merging(["pid": 12]) { _, new in new }))["handle"] as! String
+        let lateCore = fields(invoke(lateBridge, "bindCoreChain", ["handle": lateHelper, "pid": 13]))["handle"] as! String
+        let lateActivationDone = DispatchSemaphore(value: 0)
+        var lateActivation: Result<Any?, HostSupervisorFailure>?
+        lateBridge.call("activateOwnedSystemProxy", arguments: activation.merging(["handle": lateCore]) { _, new in new }) {
+            lateActivation = $0; lateActivationDone.signal()
+        }
+        require(lateProxy.startEntered.wait(timeout: .now() + 1) == .success,
+                "迟到夹具必须先证明SC start已投递且completion未消费")
+        let supersedingRecovery = fields(invoke(lateBridge, "recoverSystemProxy", [:]))
+        require(supersedingRecovery["status"] as? String == "recoveryRequired" &&
+                Set(supersedingRecovery.keys) == ["status", "transactionGeneration", "changedGroups", "unresolvedGroups"],
+                "旧SC start未settle时即使recover底层idle也必须返回固定recoveryRequired wire")
+        lateProxy.completeStart()
+        require(lateActivationDone.wait(timeout: .now() + 1) == .success &&
+                code(lateActivation!) == "system_proxy_recovery_required",
+                "迟到applied不得发布active且必须保留恢复责任")
+        require(code(invoke(lateBridge, "reserveSupervisorLaunch", ["generation": 2])) ==
+                "system_proxy_recovery_required", "迟到applied后不得重新授权新reservation")
+        require(!truth(invoke(lateBridge, "confirmStopped", lateStop)),
+                "迟到applied后不得重新授权停止确认")
+        require(fields(invoke(lateBridge, "recoverSystemProxy", [:]))["status"] as? String == "idle",
+                "旧start已settle后必须由显式retry recover释放责任")
+        _ = invoke(lateBridge, "revokeLaunch", lateStop)
+        lateFacts.set(12, .absent); lateFacts.set(13, .absent)
+        require(truth(invoke(lateBridge, "confirmStopped", lateStop)), "retry recover后才可完成停止确认")
+        require(fields(invoke(lateBridge, "reserveSupervisorLaunch", ["generation": 2]))["generation"] as? UInt64 == 2,
+                "retry recover清责并确认停止后才可发行新代次")
         _ = proxyFacts
         print("HostSupervisorAuthority 测试完成")
     }

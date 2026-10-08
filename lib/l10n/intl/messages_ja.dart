@@ -213,6 +213,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("確定"),
     "connection": MessageLookupByLibrary.simpleMessage("アクティブ接続"),
+    "connectionStateUnconfirmed": MessageLookupByLibrary.simpleMessage(
+      "接続状態を確認できません。再試行してください。",
+    ),
     "connections": MessageLookupByLibrary.simpleMessage("接続"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage("現在の通信接続データを表示"),
     "connectionsSort": MessageLookupByLibrary.simpleMessage("接続並び替え"),
@@ -508,6 +511,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "loopback": MessageLookupByLibrary.simpleMessage("ループバック解除ツール"),
     "loopbackDesc": MessageLookupByLibrary.simpleMessage("UWPアプリのループバック制限を解除"),
     "loose": MessageLookupByLibrary.simpleMessage("ルーズ"),
+    "macTunUnavailable": MessageLookupByLibrary.simpleMessage(
+      "この macOS ビルドでは TUN を利用できません。システムプロキシを使用してください。",
+    ),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IPを再取得"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("メモリ情報"),
@@ -887,6 +893,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemFont": MessageLookupByLibrary.simpleMessage("システムフォント"),
     "systemProxy": MessageLookupByLibrary.simpleMessage("システムプロキシ"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("システムプロキシの設定"),
+    "systemProxyRecoveryRequired": MessageLookupByLibrary.simpleMessage(
+      "接続の停止またはシステムプロキシの復元を確認できません。アプリを開いたまま再試行してください。",
+    ),
     "tab": MessageLookupByLibrary.simpleMessage("タブ"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP並列接続"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage("TCPの同時並列接続を許可"),

@@ -6648,6 +6648,36 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Connection state is unconfirmed. Please retry.`
+  String get connectionStateUnconfirmed {
+    return Intl.message(
+      'Connection state is unconfirmed. Please retry.',
+      name: 'connectionStateUnconfirmed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connection shutdown or system proxy recovery is unconfirmed. The app will remain open. Please retry.`
+  String get systemProxyRecoveryRequired {
+    return Intl.message(
+      'Connection shutdown or system proxy recovery is unconfirmed. The app will remain open. Please retry.',
+      name: 'systemProxyRecoveryRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `TUN is not available in this macOS build. Use the system proxy.`
+  String get macTunUnavailable {
+    return Intl.message(
+      'TUN is not available in this macOS build. Use the system proxy.',
+      name: 'macTunUnavailable',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

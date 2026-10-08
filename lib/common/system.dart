@@ -84,6 +84,8 @@ class System {
 
   Future<AuthorizeCode> authorizeCore() async {
     if (system.isAndroid || system.isIOS) return AuthorizeCode.none;
+    // macOS受控会话不能经旧文件权限路径提升内核。
+    if (system.isMacOS) return AuthorizeCode.error;
 
     if (await checkIsAdmin()) return AuthorizeCode.none;
 
@@ -91,51 +93,6 @@ class System {
       if (await windows?._isHelperHealthy() ?? false) return AuthorizeCode.none;
       final result = await windows?.registerService();
       return result == true ? AuthorizeCode.success : AuthorizeCode.error;
-    }
-
-    if (system.isMacOS) {
-      final corePath = appPath.corePath;
-      var quarantineCleared = true;
-
-      final xattrCheck = await Process.run('/usr/bin/xattr', [
-        '-p',
-        'com.apple.quarantine',
-        corePath,
-      ]);
-      if (xattrCheck.exitCode == 0) {
-        final removeResult = await Process.run('/usr/bin/xattr', [
-          '-d',
-          'com.apple.quarantine',
-          corePath,
-        ]);
-        if (removeResult.exitCode == 0) {
-          commonPrint.log('Cleared quarantine attribute from BettboxCore');
-        } else {
-          quarantineCleared = false;
-          commonPrint.log(
-            'Failed to clear quarantine attribute: ${removeResult.stderr}',
-          );
-        }
-      }
-
-      final escapedPath = _shellEscape(corePath);
-      final shell = 'chown root:admin $escapedPath && chmod u+s $escapedPath';
-      final result = await Process.run('osascript', [
-        '-e',
-        'do shell script "$shell" with administrator privileges',
-      ]);
-
-      if (result.exitCode != 0) {
-        if (!quarantineCleared) {
-          globalState.showNotifier(
-            'Failed to authorize BettboxCore. Try: xattr -dr com.apple.quarantine /Applications/Bettbox.app',
-          );
-        } else {
-          globalState.showNotifier(appLocalizations.tunEnableRequireAdmin);
-        }
-        return AuthorizeCode.error;
-      }
-      return AuthorizeCode.success;
     }
 
     if (Platform.isLinux) {

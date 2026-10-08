@@ -41,6 +41,7 @@ final class FakeConfiguration: ConfigurationBackend {
     var commits = 0
     var applies = 0
     var lockCount = 0
+    var lockAttempts = 0
     private var pending: [String: [ProxyGroup: GroupValue]] = [:]
 
     init(_ services: [ServiceSnapshot] = [publicService()]) {
@@ -51,6 +52,7 @@ final class FakeConfiguration: ConfigurationBackend {
         })
     }
     func lock() throws {
+        lockAttempts += 1
         if let failure = lockFailure { throw failure }
         guard !locked else { throw BackendFailure.busy }
         locked = true; lockCount += 1
@@ -119,6 +121,7 @@ final class FakeJournal: JournalBackend {
     var record: OwnershipJournal?
     var legacyRecord: LegacyOwnershipJournalV3?
     var acquired = false
+    var loadFailure = false
     var persistFailure: JournalPhase?
     var clearFailure = false
     var completedProgressSaveFailure = false
@@ -131,6 +134,7 @@ final class FakeJournal: JournalBackend {
     func releaseOwnership() { acquired = false }
     func load() throws -> LoadedOwnershipJournal? {
         precondition(acquired)
+        if loadFailure { throw JournalFailure.unavailable }
         if let legacyRecord { return .legacyV3(legacyRecord) }
         return record.map(LoadedOwnershipJournal.current)
     }

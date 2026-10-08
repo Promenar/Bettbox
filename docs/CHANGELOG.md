@@ -2,6 +2,7 @@
 
 ## 2026-10-08 — Android、macOS 交付验证
 
+- macOS空受保护journal恢复免SC锁，读取/所有权未知保持失败；真实非阻塞SC权限探测与64项核心回归通过。Host迟到SC完成独立门禁经实际红绿及独立复核，未知不允许释放owner。
 - macOS Host使用同份SC事务核心；显式恢复期间新启动立即拒绝，恢复未知不清洗旧owner。实际SDK编译、原生夹具和7项工具测试通过，完整Runner及真实系统代理另验。
 - macOS Session全部收尾经过无proof恢复门禁，恢复冲突保留Core/stdin；底层恢复单次操作保持到真实完成，不由调用者超时清洗。24项Session、5项严格解析与独立回审通过，Flutter全量200项通过；正常Application接线与真实系统配置另验。
 
@@ -202,3 +203,5 @@
 Android 原生启停接线：Go State/CallbackGate/FDLease、Kotlin 显式领取租约及 JNI Boolean 已接入；输入关闭失败阻断新启动，protect 失败传回 socket 创建方。实际 ARM64 Go 核心及生产 JNI 编译链接通过，纯 Go race 与 Kotlin 租约6例通过，独立静态审阅未发现新增 P1/P2。完整 Service 代际保护、有效 NativeTun 构造和设备启动/停止行为尚待验收，不能将该编译产物作为可用发行版。回执为 `docs/validation/2026-10-07-three-platform/android-tun-abi-validation.json`。
 
 Android 生命周期候选接入完整工作门禁、独立绑定/启动意图及主进程停止锁恢复；旧通知无法修改新代共享状态。两个生产gate/controller协程夹具入口通过，原4项独立审阅发现静态闭合；JNI helper/OnLoad九项故障夹具通过。完整工程及设备行为待验，回执分别为 `android-vpn-lifecycle-validation.json`、`android-jni-failure-validation.json`（位于 `docs/validation/2026-10-07-three-platform/`）。
+
+- macOS Application按代次分别确认内核初始化与配置就绪，代理偏好兑现失败后同值会真实重试；停止和退出先确认代理恢复及所属入口撤销。219项Flutter测试、静态分析和完整unsigned Release构建通过；TUN旧提权入口已删除，真实系统授权和流量仍待验证。

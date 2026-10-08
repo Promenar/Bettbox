@@ -223,6 +223,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("확인"),
     "connection": MessageLookupByLibrary.simpleMessage("활성 연결"),
+    "connectionStateUnconfirmed": MessageLookupByLibrary.simpleMessage(
+      "연결 상태를 확인할 수 없습니다. 다시 시도해 주세요.",
+    ),
     "connections": MessageLookupByLibrary.simpleMessage("연결"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage("현재 연결 데이터 보기"),
     "connectionsSort": MessageLookupByLibrary.simpleMessage("연결 정렬"),
@@ -522,6 +525,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "loopback": MessageLookupByLibrary.simpleMessage("루프백 해제 도구"),
     "loopbackDesc": MessageLookupByLibrary.simpleMessage("UWP 앱 루프백 제한 해제"),
     "loose": MessageLookupByLibrary.simpleMessage("여유있게"),
+    "macTunUnavailable": MessageLookupByLibrary.simpleMessage(
+      "이 macOS 빌드에서는 TUN을 사용할 수 없습니다. 시스템 프록시를 사용해 주세요.",
+    ),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IP 다시 가져오기"),
     "maximize": MessageLookupByLibrary.simpleMessage("최대화"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("메모리 정보"),
@@ -897,6 +903,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemFont": MessageLookupByLibrary.simpleMessage("시스템 글꼴"),
     "systemProxy": MessageLookupByLibrary.simpleMessage("시스템 프록시"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("시스템 프록시 설정"),
+    "systemProxyRecoveryRequired": MessageLookupByLibrary.simpleMessage(
+      "연결 종료 또는 시스템 프록시 복원을 확인할 수 없습니다. 앱을 열린 상태로 유지합니다. 다시 시도해 주세요.",
+    ),
     "tab": MessageLookupByLibrary.simpleMessage("탭"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP 동시 연결"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(

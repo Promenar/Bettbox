@@ -272,6 +272,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
     "connection": MessageLookupByLibrary.simpleMessage("Active"),
+    "connectionStateUnconfirmed": MessageLookupByLibrary.simpleMessage(
+      "Connection state is unconfirmed. Please retry.",
+    ),
     "connections": MessageLookupByLibrary.simpleMessage("Connections"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "View active connections",
@@ -646,6 +649,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "UWP loopback unlocking tool",
     ),
     "loose": MessageLookupByLibrary.simpleMessage("Loose"),
+    "macTunUnavailable": MessageLookupByLibrary.simpleMessage(
+      "TUN is not available in this macOS build. Use the system proxy.",
+    ),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Refresh IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Maximize"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("Memory"),
@@ -1112,6 +1118,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemFont": MessageLookupByLibrary.simpleMessage("System Font"),
     "systemProxy": MessageLookupByLibrary.simpleMessage("System Proxy"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("Set system proxy"),
+    "systemProxyRecoveryRequired": MessageLookupByLibrary.simpleMessage(
+      "Connection shutdown or system proxy recovery is unconfirmed. The app will remain open. Please retry.",
+    ),
     "tab": MessageLookupByLibrary.simpleMessage("Tab"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP Concurrent"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(

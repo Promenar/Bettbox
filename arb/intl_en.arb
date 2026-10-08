@@ -817,5 +817,8 @@
   "xbInviteWebsiteUnavailable": "The invitation website is unavailable. You can copy the code. Refresh later or contact support.",
   "xbInviteLoadError": "Invitation information could not be loaded. Please try again later.",
   "xbInviteRefresh": "Refresh",
-  "xbOpenCashierFailed": "Could not open the payment page. Try again or choose another payment method."
+  "xbOpenCashierFailed": "Could not open the payment page. Try again or choose another payment method.",
+  "connectionStateUnconfirmed": "Connection state is unconfirmed. Please retry.",
+  "systemProxyRecoveryRequired": "Connection shutdown or system proxy recovery is unconfirmed. The app will remain open. Please retry.",
+  "macTunUnavailable": "TUN is not available in this macOS build. Use the system proxy."
 }

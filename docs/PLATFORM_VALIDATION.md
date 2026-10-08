@@ -1,6 +1,8 @@
 # 共享客户端与平台验收
 
-2026-10-08 当前Android正式候选为f881880，同源构建/正式验签/安装回读通过；DIRECT模式本机HTTP代理200与Chrome HTTPS通过，两轮停止均确认tun0和7890消失，设置已恢复规则模式。上游节点协议代理、邀请网页注册归属和真实付款未验收。macOS schema4核心61项、Session恢复门禁24项与严格回执5项通过并完成独立复审；宿主同份核心SDK编译与夹具检查通过，Flutter全量200项通过；正常Application接线正在实施，尚无可分发完整应用。iOS按用户裁定保留开发版与发行方案研究，当前交付优先Android/macOS。详见各独立公开回执。
+2026-10-08 当前Android正式候选为f881880，同源构建/正式验签/安装回读通过；DIRECT模式本机HTTP代理200与Chrome HTTPS通过，两轮停止均确认tun0和7890消失，设置已恢复规则模式。上游节点协议代理、邀请网页注册归属和真实付款未验收。macOS schema4核心64项、Session恢复门禁24项与严格回执5项通过并完成独立复审；宿主同份核心SDK编译与夹具检查通过，当前Application接线回归与Flutter全量219项通过，静态分析无问题；完整macOS Release Runner构建成功（171.4MB），源码和锁文件前后相同。构建为unsigned模式，系统授权、真实SC写入、正常界面启停/退出及上游代理流量未验收，不能作为可用发行版。iOS按用户裁定保留开发版与发行方案研究，当前交付优先Android/macOS。详见各独立公开回执。
+
+普通宿主只获取非阻塞SC锁时真实返回permissionDenied，签名比较确认系统偏好未变；空受保护journal恢复已改为免SC锁，64项核心回归及独立复核通过。非空journal仍需要原权限与CAS验证。Host追加迟到SC start未终结门禁，定向SDK编译和夹具通过；原始scope4/Host回执保留各自版本，当前证据见 `validation/2026-10-07-three-platform/macos-empty-journal-validation.json` 与 `macos-host-late-sc-validation.json`。完整Runner已构建通过；系统授权、实际SC写入及正常界面运行另验。macOS旧root/setuid路径已删除，当前TUN入口明确拒绝并提示使用系统代理。
 
 2026-10-08 Android VPN 路径实测：23 个订阅节点加载，首页显示自动及8个地域；系统授权后建立 `tun0`。直连模式核心代理 HTTPS 200、浏览器显示 trace；默认代理及香港全局路径失败，停止后同URL恢复，`tun0`撤销、应用回到就绪，任务ADB转发已移除。23个TCP端点可连接、12个AnyTLS TLS证书验证通过，但这些不证明协议认证或节点转发。订阅密码均不等于开发用户UUID；辅助Mihomo仅VMess，不作为相同协议对照。代理节点流量仍未通过，见 `validation/2026-10-07-three-platform/android-vpn-path-validation.json`。
 

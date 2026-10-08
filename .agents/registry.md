@@ -70,3 +70,7 @@
 - docs/validation/2026-10-07-three-platform/macos-sc-schema4-validation.json — schema4来源摘要、61项回归、独立回审与真实系统接线边界
 - docs/validation/2026-10-07-three-platform/macos-session-recovery-gate-validation.json — Session恢复冲突/底层单次操作红绿、24+5项验证及正常应用接线边界
 - docs/validation/2026-10-07-three-platform/macos-host-system-proxy-validation.json — Host恢复/启动授权接线、SDK编译及隔离夹具证据
+- docs/validation/2026-10-07-three-platform/macos-empty-journal-validation.json — 真实SC锁权限、空记录恢复红绿及严格nil边界
+- docs/validation/2026-10-07-three-platform/macos-host-late-sc-validation.json — 已投递SC完成乱序、保守恢复与独立复核
+
+- docs/validation/2026-10-07-three-platform/macos-application-lifecycle-validation.json — Application配置与偏好状态回归、219项Flutter、静态分析及完整unsigned Runner构建边界

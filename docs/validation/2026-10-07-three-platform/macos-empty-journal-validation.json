@@ -1,0 +1,30 @@
+{
+  "scope": "macos-owned-empty-journal-recovery",
+  "status": "passed",
+  "source_base_commit": "41f9930b75d522306f90116e40799a65cccd8204",
+  "source_sha256": {
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "2d08061c5f483ff5fbcd53d11483a8d1011698a9169bade6d7851f8eb2a6dcb8",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "77a9334fee9c55499e28aff346f04b649102ea09ca307e3d3c7eb4588bd891a2",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "d0a928b22f639e710844dfc8327673359aff7be693e98115f7e6172d2a783cb5",
+    "scripts/probe_macos_sc_lock.py": "91d40596591029274a22439f99b75890b378fdecfa965e6233667db9918f93d2"
+  },
+  "real_sc_lock_probe": {
+    "preferencesUnchanged": true,
+    "status": "permissionDenied",
+    "systemConfigurationWritten": false,
+    "unlocked": true
+  },
+  "red": {
+    "tests": 64,
+    "assertion_failures": 5,
+    "failed_test_cases": 2,
+    "boundary": "首轮夹具曾因journal非Equatable编译失败；改为保留JSON字节比较后运行上述语义红。"
+  },
+  "green": {
+    "tests": 64,
+    "failures": 0
+  },
+  "independent_review": "独立只读复核Transaction与真实ProtectedJournalBackend，ENOENT以外错误不得视为空，ownership持续保留。",
+  "system_proxy_written": false,
+  "boundary": "idle仅证明受保护journal没有本owner待恢复记录，不证明全系统代理为空或具备SC写权限。"
+}

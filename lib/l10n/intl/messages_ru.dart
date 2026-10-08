@@ -271,6 +271,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Подтвердить"),
     "connection": MessageLookupByLibrary.simpleMessage("Соединения"),
+    "connectionStateUnconfirmed": MessageLookupByLibrary.simpleMessage(
+      "Состояние подключения не подтверждено. Повторите попытку.",
+    ),
     "connections": MessageLookupByLibrary.simpleMessage("Соединения"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "Просмотр текущих соединений",
@@ -652,6 +655,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Инструмент для разблокировки UWP loopback",
     ),
     "loose": MessageLookupByLibrary.simpleMessage("Максимальная"),
+    "macTunUnavailable": MessageLookupByLibrary.simpleMessage(
+      "TUN недоступен в этой сборке macOS. Используйте системный прокси.",
+    ),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Развернуть"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("Память"),
@@ -1128,6 +1134,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemProxy": MessageLookupByLibrary.simpleMessage("Системный прокси"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "Настроить системный прокси",
+    ),
+    "systemProxyRecoveryRequired": MessageLookupByLibrary.simpleMessage(
+      "Остановка подключения или восстановление системного прокси не подтверждены. Приложение останется открытым. Повторите попытку.",
     ),
     "tab": MessageLookupByLibrary.simpleMessage("Вкладки"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP параллелизм"),

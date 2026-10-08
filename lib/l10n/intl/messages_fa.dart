@@ -268,6 +268,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("تایید"),
     "connection": MessageLookupByLibrary.simpleMessage("اتصال فعال"),
+    "connectionStateUnconfirmed": MessageLookupByLibrary.simpleMessage(
+      "وضعیت اتصال تأیید نشده است. دوباره تلاش کنید.",
+    ),
     "connections": MessageLookupByLibrary.simpleMessage("اتصالات"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "مشاهده اتصالات فعال شبکه",
@@ -645,6 +648,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "رفع محدودیت Loopback برای برنامه‌های UWP",
     ),
     "loose": MessageLookupByLibrary.simpleMessage("باز"),
+    "macTunUnavailable": MessageLookupByLibrary.simpleMessage(
+      "TUN در این نسخه macOS در دسترس نیست. از پراکسی سیستم استفاده کنید.",
+    ),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("دریافت مجدد IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("بزرگ کردن"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("اطلاعات حافظه"),
@@ -1137,6 +1143,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemProxy": MessageLookupByLibrary.simpleMessage("پروکسی سیستم"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "تنظیمات پروکسی سیستم",
+    ),
+    "systemProxyRecoveryRequired": MessageLookupByLibrary.simpleMessage(
+      "قطع اتصال یا بازیابی پراکسی سیستم تأیید نشده است. برنامه باز می‌ماند. دوباره تلاش کنید.",
     ),
     "tab": MessageLookupByLibrary.simpleMessage("زبانه"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("اتصال همزمان TCP"),

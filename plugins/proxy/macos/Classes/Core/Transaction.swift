@@ -16,7 +16,7 @@ final class ProxyTransaction {
     deinit { if ownsJournal { journal.releaseOwnership() } }
 
     func recover(generation: UInt64) -> SafeResult {
-        operation(generation) { try self.recoverLoaded(generation) }
+        operation(generation, emptyJournalIsIdle: true) { try self.recoverLoaded(generation) }
     }
 
     func stop(generation: UInt64) -> SafeResult { recover(generation: generation) }
@@ -146,11 +146,16 @@ final class ProxyTransaction {
         }
     }
 
-    private func operation(_ generation: UInt64, body: () throws -> SafeResult) -> SafeResult {
+    private func operation(_ generation: UInt64, emptyJournalIsIdle: Bool = false,
+                           body: () throws -> SafeResult) -> SafeResult {
         serial.lock()
         defer { serial.unlock() }
         do {
             if !ownsJournal { try journal.acquireOwnership(); ownsJournal = true }
+            // 仅已独占且严格读取的空记录可免系统锁；无权读取不是空记录。
+            if emptyJournalIsIdle, try journal.load() == nil {
+                return SafeResult(status: .idle, generation: generation)
+            }
             try configuration.lock()
             defer { configuration.unlockDiscardingStagedChanges() }
             return try body()

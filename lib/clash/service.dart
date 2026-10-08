@@ -53,6 +53,7 @@ class ClashService extends ClashHandlerInterface {
           onRevoked: revoked,
         ),
         onEvent: clashMessage.dispatch,
+        onRuntimeChanged: (startedAt) => globalState.startTime = startedAt,
       );
       unawaited(
         _macApplication!.initialize().then<void>(
@@ -63,6 +64,38 @@ class ClashService extends ClashHandlerInterface {
     } else {
       _initTransport();
     }
+  }
+
+  DateTime? get macStartedAt => _macApplication?.startedAt;
+
+  Future<bool> setMacSystemProxyPreference({
+    required bool enabled,
+    required List<String> bypass,
+  }) async {
+    if (!Platform.isMacOS) return false;
+    return _macApplication!.setSystemProxyPreference(
+      enabled: enabled,
+      bypass: bypass,
+    );
+  }
+
+  @override
+  Future<bool> startListener() async {
+    if (!Platform.isMacOS) return super.startListener();
+    final settings = globalState.config.networkProps;
+    if (!await setMacSystemProxyPreference(
+      enabled: settings.systemProxy,
+      bypass: settings.bypassDomain,
+    )) {
+      return false;
+    }
+    return _macApplication!.startRuntime();
+  }
+
+  @override
+  Future<bool> stopListener() async {
+    if (!Platform.isMacOS) return super.stopListener();
+    return _macApplication!.stopRuntime();
   }
 
   Future<void> _initTransport() async {
@@ -266,7 +299,11 @@ class ClashService extends ClashHandlerInterface {
   @override
   destroy() async {
     _isDestroying = true;
-    if (Platform.isMacOS) return _macApplication!.shutdown();
+    if (Platform.isMacOS) {
+      final stopped = await _macApplication!.shutdown();
+      if (!stopped) _isDestroying = false;
+      return stopped;
+    }
     final server = await serverCompleter.future;
     await server.close();
     await _deleteSocketFile();
@@ -324,7 +361,11 @@ class ClashService extends ClashHandlerInterface {
   @override
   shutdown() async {
     _isDestroying = true;
-    if (Platform.isMacOS) return _macApplication!.shutdown();
+    if (Platform.isMacOS) {
+      final stopped = await _macApplication!.shutdown();
+      if (!stopped) _isDestroying = false;
+      return stopped;
+    }
     if (system.isWindows) {
       await helperClient.stopCore();
     }

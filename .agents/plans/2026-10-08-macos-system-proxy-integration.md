@@ -55,3 +55,13 @@ SupervisorApplication统一串行运行、代理偏好、配置、restart/shutdo
 Go专用owner会在initClash/setupConfig/updateConfig/shutdown前关闭endpoint，故这四类RPC都必须先恢复SC和关闭入口，配置成功再按最新运行/代理偏好重建入口；旧startListener/stopListener明确被拒绝，Mac Service必须覆盖。state仅实际成功后提交运行时间与prefs，ProxyManager转交偏好且不调用networksetup。macOS退出失败保留窗口/tray、恢复责任并允许重试，不能finally无条件exit或先清停止标记。
 
 冷空journal当前仍先configuration.lock；permissionDenied/busy可能阻断未接管的应用，这是源码确定的顺序及未验证运行风险。判空免SC锁如需采用须独立Core失败回归和审阅，Host包不能隐式改语义。SC写入权限、Authorization Services与真实生效独立验证，不采用root/setuid回退。
+
+## 冷启动权限实测与空记录恢复
+
+普通宿主非阻塞SCPreferencesLock真实返回permissionDenied，signature未变。recover/stop必须先在串行锁及已取得journal独占权下严格加载；仅可信nil允许返回idle且不获取SC锁。有记录、读取失败、损坏或所有权未知不得据此跳过恢复；非空记录仍保留原双读/CAS及权限门禁。start必须获取SC锁。三项针对性回归先真实失败再实施，保持同份Runner核心。探测脚本仅锁/释放/签名比较，不stage/commit/apply或提升权限。
+
+旧macOS authorizeCore源码仍有chown/chmod setuid路径，必须在任何完整Runner交互前移除；固定入口先拒绝，不初始化路径插件或权限进程。基线危险权限调用不执行，替代证据为已读取的旧源码、移除diff、实际macOS公开入口拒绝测试及静态分析。TUN保留未实现边界，界面以国际化提示拒绝，不借此把系统代理升级为完整VPN验收。
+
+## 正常应用集中验证
+
+配置就绪以初始化和有效配置两项代次事实确认，冷启动update不能创建配置事实；偏好只在最新意图实际成功后确认，失败同值必须重试。当前219项Flutter测试全部通过、静态分析无问题，完整unsigned Release构建成功且源码和锁文件保持一致。SDK警告不作为行为验收。系统代理Authorization Services须独立计划、夹具验证、审阅与签名Runner交互；实际SC写入、恢复、普通界面流量和退出未验证。macOS TUN为明确不可用边界。
