@@ -190,3 +190,6 @@
 
 - .agents/plans/2026-10-09-android-start-admission.md — 原生启动请求拒绝传播及受理/连接完成边界
 - docs/validation/2026-10-07-three-platform/android-start-admission-validation.json — Dart 平台回执红绿、原生编译及未覆盖设备边界
+
+- .agents/plans/2026-10-09-realm-listener-lifecycle.md — Realm多地址创建、HTTP任务、关闭错误及完整owner边界
+- docs/validation/2026-10-07-three-platform/realm-listener-lifecycle-validation.json — 实际loopback关闭、部分创建、已运行关闭失败红绿与ARM64编译证据

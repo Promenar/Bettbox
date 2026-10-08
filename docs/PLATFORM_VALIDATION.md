@@ -443,3 +443,10 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 ServicePlugin 返回 VpnPlugin 的真实受理结果；Dart Service.startVpn 对 false/null 抛错，阻止调用方继续写入运行偏好和启动更新任务。真实回归在修复前两项失败、两项通过，修复后关联22项及完整Flutter295项通过（1项跳过），静态分析无问题，实际离线Release Kotlin工程编译成功。独立只读审阅与主控复核完成。
 
 证据见 `validation/2026-10-07-three-platform/android-start-admission-validation.json`。mock channel 不证明设备原生响应或完整 GlobalState 路径；true只表示受理，提前计时、先行监听器和唯一owner/ACK仍待联合接线。没有生成、安装或发布新APK。macOS黑屏窗口仍因锁屏无法观察，未判定修复。
+
+
+## Realm HTTP监听生命周期
+
+实际loopback已复现关闭后旧HTTP连接继续响应和多地址失败遗失已绑定端口。候选持有真实HTTP Server、Serve/reaper及已准入handler，关闭先撤销准入并确认socket关闭，再收尾Server/任务/session；部分关闭未知返回对象和错误。独立审阅发现的已Serve关闭失败等待，以及聚合错误丢弃真实失败，均保留实际红绿回归。9项顶层race测试及9个分类子用例、上层检查式关闭回归通过。实际Android ARM64核心编译成功，ELF加载段均16KiB对齐。
+
+证据见 `validation/2026-10-07-three-platform/realm-listener-lifecycle-validation.json`。这不证明HTTP/TLS依赖全部内部任务或证书watcher退出，也不证明完整listener owner、其它协议及全局UDP runtime关闭。全局Patch失败资源登记、Android唯一owner/ACK和设备流量待集成；APK未替换，发行未验收。

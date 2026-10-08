@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-09",
+  "scope": "Realm HTTP监听实际生命周期，非完整Android owner",
+  "baseline_sha": "d182c170849c922e7284cedd3d4a105553bdebe2",
+  "baseline_server_sha256": "2161c61d7cebb90dbf2c047620d56f78afdda338600026dee96f23278354c9b4",
+  "source_sha256": {
+    "core/Clash.Meta/listener/hysteria2_realm/server.go": "b7fdd76ec5e38c58ee8fc228e23644878eb4bf597d6ea26b1248d5d23cda71c8",
+    "core/Clash.Meta/listener/hysteria2_realm/server_test.go": "c5c9628bbc093a22fe5ae02de71fa9bac84afc9915dc639f82d545716a63c866"
+  },
+  "red_baseline": {
+    "exit_code": 1,
+    "failed": [
+      "TestRealmCloseExistingHTTPConnection",
+      "TestRealmPartialBindFailureReleasesEarlierPort"
+    ],
+    "observations": [
+      "真实HTTP keep-alive在Close后仍返回响应",
+      "第二地址绑定失败后第一真实端口无法重绑"
+    ]
+  },
+  "red_intermediate": {
+    "exit_code": 1,
+    "failed": [
+      "TestRealmJoinedCloseFailureIsNotDiscarded",
+      "TestRealmRunningCloseFailureReturnsResponsibility"
+    ],
+    "observations": [
+      "net.ErrClosed与真实失败聚合被忽略，部分对象丢失",
+      "实际已Serve的Close失败卡在HTTP Server等待；200ms确认后夹具释放Accept并回收关闭任务"
+    ]
+  },
+  "green": {
+    "realm_race_exit_code": 0,
+    "realm_top_level_tests": 9,
+    "error_classification_subtests": 9,
+    "parent_checked_stop_race_exit_code": 0,
+    "arm64_core_compile": {
+      "exit_code": 0,
+      "target": "android-arm64",
+      "source_sha256": {
+        "core/Clash.Meta/listener/hysteria2_realm/server.go": "b7fdd76ec5e38c58ee8fc228e23644878eb4bf597d6ea26b1248d5d23cda71c8",
+        "core/Clash.Meta/listener/hysteria2_realm/server_test.go": "c5c9628bbc093a22fe5ae02de71fa9bac84afc9915dc639f82d545716a63c866"
+      },
+      "artifacts_sha256": {
+        ".test/android-realm-core/libclash.so": "d5be749c13086540033086c9257d6c44834afb86c14b0842a7ec4f1ddd2fd9e8",
+        ".test/android-realm-core/libclash.h": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5"
+      },
+      "installed": false
+    },
+    "elf_machine": 183,
+    "load_alignment": [
+      16384,
+      16384,
+      16384,
+      16384
+    ]
+  },
+  "independent_review": "原生子Agent首次发现已Serve关闭失败等待缺口，修复后串行复审无新增P1/P2；主控核对真实结果、源码、ELF及摘要",
+  "boundaries": [
+    "仅Realm登记的HTTP服务、Serve/reaper、已准入handler和session关闭证据",
+    "不证明HTTP/TLS依赖全部内部任务或文件证书watcher退出",
+    "部分构造对象由工厂返回；全局Patch对失败资源的登记仍待完整owner接线",
+    "其它19种命名协议、general入口及全局UDP队列/NAT/dial/sender仍待联合采用",
+    "没有安装新APK、启动设备VPN或修改生产服务",
+    "macOS黑屏与三端业务全路径尚未完成"
+  ],
+  "release_verified": false
+}

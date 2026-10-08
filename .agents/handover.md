@@ -3357,3 +3357,34 @@ false/null之前提前计时和先行监听器尚待集成；不能用无身份�
 
 ### HLG
 使用标准append预演后追加，保持总体continuity。
+
+## 2026-10-09T06:29:29+08:00 · Realm HTTP实际资源收尾与关闭失败责任回归
+
+type: maintenance
+scope: ["Bettbox", "Android", "Go"]
+status: partial
+tags: ["android", "listener", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 60e27e43a7289d14d3731f2d00c38d4bef4186b2f6129733bbb7ce1693457f33
+
+### Summary
+Realm HTTP资源收尾候选已完成实际回归与独立复审；完整Android owner及三端发行目标保持未完成。
+
+### Changed
+保存HTTP Server和任务，handler准入锁阻断Add/Wait竞态；全地址绑定成功后发布，部分错误清理并在关闭未知时返回对象；先核对socket再进入Server.Close，分类聚合错误并在任务退出后清session。
+
+### Validation
+旧代码两项真实loopback失败；中间候选已Serve关闭失败等待与混合错误丢弃责任两项失败，夹具均回收。当前9项顶层及9项分类子用例race通过，上层TestChecked回归通过；实际Android ARM64编译退出0，四个ELF PT_LOAD对齐16384。独立复审无新增P1/P2，源摘要与产物一致。
+
+### Next
+完整listener资源组须登记部分对象；按20种命名协议、general和tunnel入口接入协议服务、握手任务及独立转发runtime，继续Android配置/TUN/completion/ACK、macOS窗口和服务端真实业务验收。
+
+### Risks
+全局Patch仍未登记失败资源；HTTP/TLS依赖全部内部任务、文件证书watcher及其它协议关闭不能由Realm测试证明。没有APK安装或生产变更；有效VPN、黑屏、真实商户、Apple团队及完整账户业务仍待验。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、PDEC、registry、总计划、Realm计划和公开证据。
+
+### HLG
+标准append预演并应用，保留总体continuity。

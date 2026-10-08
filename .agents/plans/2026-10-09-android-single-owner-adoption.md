@@ -55,3 +55,8 @@ commitOwnedConfig 的 kind5 输入为 {init,setup,state}；init 沿用 home-dir 
 完整服务采用 listener 包内受管资源组，直接使用真实协议工厂并保持已有协议、认证、端口及命名 inbound 能力。绑定、service 和任务在创建时登记；admission 关闭后不再接受连接或排队 UDP，关闭实际资源并等待相关任务。service START/STOP/STATUS 与 TUN 分清 request/resource 身份，不把 listener 混入旧 TUN FD0 字段；只有部分构造、关闭与任务责任都确认后才释放 reservation。
 
 executor 的 updateTunnels、controller PATCH 和包内 ReCreate/Patch 写入必须纳入 owner 准入；config apply 与服务构造分离。UDP 身份通过实际队列、NAT、dial、sender 与工作退出传递，不能仅覆写 Tunnel.NatTable。需要按锁定源码枚举命名协议及 sing/QUIC/KCP Close 语义，并以真实未完成握手、活动 TCP/UDP、QUIC、排队包及失败关闭证明 STOP；未知责任保持 blocked。
+
+
+## Realm协议资源生命周期
+
+Realm候选保存HTTP Server并等待Serve/reaper/已准入handler，成功关闭后撤销session；所有地址绑定通过才发布服务，失败清理不确认时返回部分对象。关闭先核对真实listener，再调用会等待Accept的Server.Close，混合已关闭与真实错误保留失败。真实keep-alive、部分绑定、已Serve关闭失败、SSE与Expect:100-continue正文取消、双地址及并发关闭已通过race和独立复审。仍须在完整资源组中登记工厂返回的部分对象；旧全局Patch失败路径不能作为owner完成证据，HTTP/TLS依赖内部任务和证书watcher待取证。

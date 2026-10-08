@@ -190,3 +190,6 @@ Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule �
 
 
 Android启动拒绝传播沿用本机Flutter测试、静态分析及既有离线Release Kotlin工程编译入口；仅刷新ServicePlugin、Dart包装器和新增公开回归的源码摘要，执行主机、网络和签名权限不扩展。没有安装或发行新APK。
+
+
+Realm生命周期沿用本机公开loopback/race验证，并登记实际Android ARM64 c-shared编译入口。仅新增两项相关操作及两份源码摘要，执行位置、离线依赖、设备和生产权限保持。编译产物位于任务独立目录，没有覆盖既有APK或安装。

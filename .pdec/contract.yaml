@@ -3044,6 +3044,49 @@
       ],
       "verification": "真实监听工厂顺序修复后的 Android ARM64 核心编译，离线，不安装或运行",
       "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "test-realm-listener-lifecycle": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "github.com/metacubex/mihomo/listener/hysteria2_realm"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实Realm HTTP loopback连接、部分绑定与任务收尾；仅本机公开夹具，不访问公网或证明全部协议停止"
+    },
+    "compile-android-realm-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-realm-core/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-realm-core/libclash.so",
+        ".test/android-realm-core/libclash.h"
+      ],
+      "verification": "Realm完整生命周期修复实际Android ARM64 c-shared核心编译；离线只读依赖，不安装或证明设备流量",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
     }
   },
   "deployment": {
@@ -3383,7 +3426,9 @@
     ".test/billing-laravel-public-source/app/Services/CouponService.php": "70356228079f62042333eb2196b47c171dc6017cc4761b6b0988d4ae9fdf3291",
     ".test/billing-laravel-public-source/app/Models/Coupon.php": "eea8958073ee738a581393bddbf8a5602f4f871017a2c2508ab0cd5e5d1c9c81",
     "server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php": "cffedc4cdfa51d8103542db3eb286e29ab2bec607466a5d2e1feeeaf2ec02041",
-    "test/plugins/android_start_admission_test.dart": "8530f7e2a790cbb49b4e750ea5ac2dacf2dd7f399f81690c4999d82e017f7624"
+    "test/plugins/android_start_admission_test.dart": "8530f7e2a790cbb49b4e750ea5ac2dacf2dd7f399f81690c4999d82e017f7624",
+    "core/Clash.Meta/listener/hysteria2_realm/server.go": "b7fdd76ec5e38c58ee8fc228e23644878eb4bf597d6ea26b1248d5d23cda71c8",
+    "core/Clash.Meta/listener/hysteria2_realm/server_test.go": "c5c9628bbc093a22fe5ae02de71fa9bac84afc9915dc639f82d545716a63c866"
   },
   "platform_extensions": {
     "android": {
@@ -3459,6 +3504,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "b9eaa61e6de602fd7a8b44945cb22f2a816abe3b1f3584f2f7bbbe1410025b93"
+    "contract_digest": "cbd6eb18c279b877470aa0be6300b11fd65b9677d7d94cda3e170e1e06622bab"
   }
 }
