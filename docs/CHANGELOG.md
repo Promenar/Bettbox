@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — Android JNI检查式释放
+
+- JNI注册释放回调增加固定状态，Go拒绝未确认结果并保留State责任；线程附着失败安全短路，分离未知粘滞保存，Protect/Resolve异常与空环境不触发非法Java调用。
+- 生产函数表17场景、既有JNI/配置桥26场景、Go状态race及同次Android ARM64 ABI/链接通过，独立复核关闭null状态合同缺陷；真实JVM/CheckJNI、TUN reservation、唯一owner及新APK另验。
+
 ## 2026-10-08 — Android启动报告与macOS启动准入
 
 - Android生产State增加最终启动报告；修复混合关闭故障下runtime误清、首错覆盖及Shutdown panic后重复伪成功。初始8项及混合6项失败复现，定向、race、core与Android原生编译通过；唯一owner及设备接线另验。

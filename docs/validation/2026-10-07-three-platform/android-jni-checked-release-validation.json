@@ -1,0 +1,860 @@
+{
+  "schema": 1,
+  "release_verified": false,
+  "actual_Android_JVM": false,
+  "baseline_source_sha": "ab664741324704bbdd6eabf3bac1cca42af32c18",
+  "sources_sha256": {
+    "core/android_bride.go": "270b71d0f23b86c0858a056f748f6453f0bc7b73310abfdbaf44899588e4220f",
+    "core/androidstartup/release_confirmation.go": "8bcc318336ebc6fbbd6e43b0ba011f4ca5e4eb4f026147b1bb371feee4bbf7b2",
+    "core/androidstartup/release_confirmation_test.go": "d95b53ec1f45626a5179f9acca89978e78bf1eb157eb1daeccdddbef0cab93b0",
+    "android/core/src/main/cpp/core.cpp": "d457f8abb11ea7111dcb0792d13a6e7121fd5b746229aeac92cf6088f204c0f8",
+    "android/core/src/main/cpp/jni_helper.cpp": "5dae7e9ce70bbe5b2d151e60e7a243bfe37c8867743757d1668c3c28bf3dc640",
+    "android/core/src/main/cpp/jni_helper.h": "f5e387d16e8ecba2c209828e7e4d9a8951a045eaa443cd3dc423da07a92722e9",
+    "android/core/src/test/cpp/jni_release_fixture.cpp": "d7cfe7feea2039254b00b5dbbca98d6e4f20b600aa458d9383fd608a434edd9c",
+    "scripts/check_android_jni_release.py": "417346c52b9a2588ae5624a933641b65ac5163e3f6c4e0f6dd8675ca0409978d"
+  },
+  "checks": {
+    "initial_old_native_red_cases": 12,
+    "initial_old_native_red_failed": 12,
+    "initial_red_exit": 1,
+    "expanded_old_native_red_cases": 17,
+    "expanded_old_native_red_failed": 16,
+    "expanded_old_native_red_signal_cases": [
+      5,
+      9,
+      10,
+      11,
+      13
+    ],
+    "expanded_old_native_red_passed_case": 16,
+    "expanded_red_exit": 1,
+    "current_native_green_cases": 17,
+    "current_native_green_failed": 0,
+    "current_native_green_exit": 0,
+    "go_confirmation_stub_red_exit": 1,
+    "go_confirmation_and_real_state_green_exit": 0,
+    "full_androidstartup_race_exit": 0,
+    "legacy_jni_failure_cases": 9,
+    "legacy_jni_failure_failed": 0,
+    "configuration_jni_cases": 17,
+    "configuration_jni_failed": 0,
+    "android_arm64_go_c_shared_exit": 0,
+    "android_production_jni_link_exit": 0
+  },
+  "public_fixture_results": {
+    "red": {
+      "actual_JVM": false,
+      "cases": [
+        {
+          "case": 1,
+          "counts": {
+            "attach": 0,
+            "case": 1,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 2,
+          "counts": {
+            "attach": 0,
+            "case": 2,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 3,
+          "counts": {
+            "attach": 0,
+            "case": 3,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 4,
+          "counts": {
+            "attach": 1,
+            "case": 4,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 5,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 6,
+          "counts": {
+            "attach": 1,
+            "case": 6,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 7,
+          "counts": {
+            "attach": 1,
+            "case": 7,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 8,
+          "counts": {
+            "attach": 0,
+            "case": 8,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 9,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 10,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 11,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 12,
+          "counts": {
+            "attach": 1,
+            "case": 12,
+            "checks": 1,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -1,
+            "get_env": 2,
+            "protect_jni": 1,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 1,
+          "passed": false
+        }
+      ],
+      "passed": false,
+      "phase": "red",
+      "schema": 1
+    },
+    "red-expanded": {
+      "actual_JVM": false,
+      "cases": [
+        {
+          "case": 1,
+          "counts": {
+            "attach": 0,
+            "case": 1,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 2,
+          "counts": {
+            "attach": 0,
+            "case": 2,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 3,
+          "counts": {
+            "attach": 0,
+            "case": 3,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 4,
+          "counts": {
+            "attach": 1,
+            "case": 4,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 5,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 6,
+          "counts": {
+            "attach": 1,
+            "case": 6,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 7,
+          "counts": {
+            "attach": 1,
+            "case": 7,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 8,
+          "counts": {
+            "attach": 0,
+            "case": 8,
+            "checks": 0,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": -1
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 9,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 10,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 11,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 12,
+          "counts": {
+            "attach": 1,
+            "case": 12,
+            "checks": 1,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 1,
+            "followup_result": -1,
+            "get_env": 2,
+            "protect_jni": 1,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 13,
+          "execution_unconfirmed": true,
+          "exit": -6,
+          "passed": false
+        },
+        {
+          "case": 14,
+          "counts": {
+            "attach": 0,
+            "case": 14,
+            "checks": 1,
+            "clears": 1,
+            "delete": 0,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 1,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 15,
+          "counts": {
+            "attach": 0,
+            "case": 15,
+            "checks": 1,
+            "clears": 1,
+            "delete": 0,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 1,
+            "result": 0
+          },
+          "exit": 1,
+          "passed": false
+        },
+        {
+          "case": 16,
+          "counts": {
+            "attach": 0,
+            "case": 16,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 17,
+          "counts": {
+            "attach": 0,
+            "case": 17,
+            "checks": 1,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 1,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 1,
+            "result": 0
+          },
+          "exit": 1,
+          "passed": false
+        }
+      ],
+      "fixture_sha256": "3f18438f5601ad6ecd70548c50641c018b16623fd0dddb46c3c843235377bedd",
+      "passed": false,
+      "phase": "red-expanded",
+      "schema": 1
+    },
+    "green": {
+      "actual_JVM": false,
+      "cases": [
+        {
+          "case": 1,
+          "counts": {
+            "attach": 0,
+            "case": 1,
+            "checks": 2,
+            "clears": 0,
+            "delete": 1,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 1
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 2,
+          "counts": {
+            "attach": 0,
+            "case": 2,
+            "checks": 1,
+            "clears": 1,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 3,
+          "counts": {
+            "attach": 0,
+            "case": 3,
+            "checks": 2,
+            "clears": 1,
+            "delete": 1,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 2
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 4,
+          "counts": {
+            "attach": 1,
+            "case": 4,
+            "checks": 2,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 1
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 5,
+          "counts": {
+            "attach": 1,
+            "case": 5,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 6,
+          "counts": {
+            "attach": 1,
+            "case": 6,
+            "checks": 2,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 2
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 7,
+          "counts": {
+            "attach": 0,
+            "case": 7,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 8,
+          "counts": {
+            "attach": 0,
+            "case": 8,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 0,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 9,
+          "counts": {
+            "attach": 1,
+            "case": 9,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 10,
+          "counts": {
+            "attach": 1,
+            "case": 10,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 11,
+          "counts": {
+            "attach": 0,
+            "case": 11,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 12,
+          "counts": {
+            "attach": 1,
+            "case": 12,
+            "checks": 4,
+            "clears": 0,
+            "delete": 1,
+            "detach": 1,
+            "failed": 0,
+            "followup_result": 2,
+            "get_env": 2,
+            "protect_jni": 1,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 13,
+          "counts": {
+            "attach": 1,
+            "case": 13,
+            "checks": 0,
+            "clears": 0,
+            "delete": 0,
+            "detach": 1,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 14,
+          "counts": {
+            "attach": 0,
+            "case": 14,
+            "checks": 1,
+            "clears": 1,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 15,
+          "counts": {
+            "attach": 0,
+            "case": 15,
+            "checks": 1,
+            "clears": 1,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 16,
+          "counts": {
+            "attach": 0,
+            "case": 16,
+            "checks": 1,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        },
+        {
+          "case": 17,
+          "counts": {
+            "attach": 0,
+            "case": 17,
+            "checks": 1,
+            "clears": 0,
+            "delete": 0,
+            "detach": 0,
+            "failed": 0,
+            "followup_result": -3,
+            "get_env": 1,
+            "protect_jni": 0,
+            "resolve_jni": 0,
+            "result": 0
+          },
+          "exit": 0,
+          "passed": true
+        }
+      ],
+      "fixture_sha256": "ac5d97d8c59aeb4588c880ad1fff620256b978b281416218ff40b6632dd095e7",
+      "passed": true,
+      "phase": "green",
+      "schema": 1
+    }
+  },
+  "artifacts_sha256": {
+    ".test/android-checked-release-abi/libclash.so": "e5ccdc225785beb8f2054cbf66bcf3e2ef8464196599f3c2eae3a9db6870935d",
+    ".test/android-checked-release-abi/libclash.h": "0b9bb2d8afec346b888a461241148e7b573d18c19714130cc795c62617523a68",
+    ".test/android-checked-release-abi/libcore.so": "8d06524716d9cf7367a5f98d7d400c18a94fac3a2e9d8be71a8f4caaf9276361"
+  },
+  "logs_sha256": {
+    ".test/three-platform-release/android-jni-release-go-red.log": "f0d7a8a6a6cae69bbc96c883b9558c3accac06d5d778cc3062028455ac3fc0ff",
+    ".test/three-platform-release/android-jni-release-go-green.log": "304cd20ef938e14b76e8a0650d6e58cc532e328ce6864ff780fbc6fd0c121841",
+    ".test/three-platform-release/android-jni-release-startup-race.log": "d17a4ced69da1e4857b5e5b6acd588449a8ecacd38d16af73cb0cdc298d7c3e0",
+    ".test/three-platform-release/android-jni-release-fixture-red.log": "5d50738b637924f32b1c02d8cad115469dff682eb665a51dbb68944a7eada4ee",
+    ".test/three-platform-release/android-jni-release-expanded-red.log": "bc19e4ff5f43dd156ffe232bf97707c1fd1d8f56942f4a722985d2ffe4292c16",
+    ".test/three-platform-release/android-jni-release-fixture-green.log": "93487524b678be63fa9967bb6c321b2f1d2810e6398b3d24108f6d7d597afeea",
+    ".test/three-platform-release/android-jni-release-abi-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".test/three-platform-release/android-jni-release-production-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".test/three-platform-release/android-jni-release-legacy-green.log": "fbb44050dae52dabff0b2d44497dfd0f03684f32ce7c6c1e0d042daf9a87b2d9",
+    ".test/three-platform-release/android-jni-release-config-green.log": "1d09e99be9ca0d976562ed8407643da0bf3c6dfd34cdd03f0596c0b584e923af"
+  },
+  "independent_review": "独立源码诊断、红夹具施工、主控实施与独立只读审阅分离；null分支ABI违约P2已修正并通过最终17项验收；无剩余确认P1/P2。",
+  "boundaries": [
+    "释放成功仅表示有效env上的合法DeleteGlobalRef调用结束、没有报告异常且任务线程finish确认；SDK没有独立删除回执",
+    "DeleteGlobalRef异常等分支为合成JNI表故障，不证明真实VM会产生此错误",
+    "公共函数表及ASAN不是实际JVM/CheckJNI或Android设备；Go状态回归使用公开Resource",
+    "原有JNI preclaim失败、suspend/shutdown及完整owner仍无完整typed收尾合同，未由本包验收",
+    "TUN配置reservation/epoch核验、HTTP/FFI/quickStart收敛、Dart完成回执及生命周期换代未实现",
+    "未重建安装新APK，未改变系统DNS/代理/签名权利或操作用户数据"
+  ],
+  "primary_sources": [
+    "https://docs.oracle.com/en/java/javase/26/docs/specs/jni/functions.html#deleteglobalref",
+    "https://docs.oracle.com/en/java/javase/24/docs/specs/jni/invocation.html#getenv",
+    "https://docs.oracle.com/en/java/javase/24/docs/specs/jni/invocation.html#detachcurrentthread"
+  ]
+}

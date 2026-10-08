@@ -18,7 +18,9 @@ extern int jni_catch_exception(JNIEnv *env);
 
 extern void jni_attach_thread(scoped_jni *jni);
 
-extern void jni_detach_thread(const scoped_jni *env);
+extern bool jni_finish_thread_checked(scoped_jni *jni);
+extern bool jni_cleanup_unknown();
+extern void jni_detach_thread(scoped_jni *jni);
 
 extern void release_string(char **str);
 

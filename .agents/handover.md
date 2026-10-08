@@ -1962,3 +1962,34 @@ State新增同锁最终StartReport，旧bool从报告派生；未知资源、lea
 
 ### HLG
 通过已安装HLG append dry-run后apply追加事实链并重建索引；只记录当前进展和后续边界，不声明Goal完成。
+
+## 2026-10-08T17:48:26+08:00 · Android注册JNI释放确认与线程收尾
+
+type: maintenance
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "jni", "release", "handover"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 87ea148cce9b84f1eb4617243d285b21014bdd9443e868505c3c261f3dde0469
+
+### Summary
+JNI注册释放回调及Go固定状态判定前置条件闭合；Goal保持active，完整TUN版本reservation/Native owner/设备及发行验收未完成。前一Goal轮ab664741提交及实际macOS探针/启动拒绝证据属于progress，本轮有实际代码与红绿验证进展。
+
+### Changed
+release_object_func由void改int，C非空对象0未Delete/1合法Delete调用无异常且线程finish确认/2后置或已有线程责任未知；C null不Delete返回0，Go nil为本地无义务短路。Go非空仅精确1接受，失败由既有OnceLease/State捕获并保留。线程helper只对EDETACHED附着，空env安全拒绝，分离失败atomic粘滞；Protect/Resolve安全短路、保存线程责任和owned字符串，删除原始ExceptionDescribe。联合计划采用锁内配置reservation、锁外TUN构造及完成核验，禁止runLock跨Java回调/drain。
+
+### Validation
+旧生产12-case公开JNI表RED 12/12失败；ab664741精确旧CPP及旧真实Go头对最终17-case RED有16失败，5个独立测试进程异常终止，case16旧Protect空interface本已通过。新生产注册回调17-case ASAN GREEN全通过。Go新判定占位nil实现/真实State RED失败，实际判定与State GREEN和全startup race通过；NDK28/API26 Android ARM64新Go c-shared头及生产JNI链接通过。实际既有9-case JNI故障、17-case配置桥ASAN回归通过。独立源码诊断、RED夹具施工、主控实施与独立审阅分离；null ABI状态P2已关闭，无剩余确认P1/P2。
+
+### Next
+在runLock内发行TUN config reservation和不可变快照，释放锁后构造/采纳FD，最终核对stamp；reservation/活跃TUN期间拒绝配置mutation，统一owner先收口。整合preclaim ref/FD完成事实、HTTP/FFI/quickStart、Dart回执及epoch生命周期，再构建正式候选做实际JVM/CheckJNI和设备启停。macOS匹配profile/启动、有效节点及支付商权限依赖保持。
+
+### Risks
+公共JNI表与ASAN不是实际JVM；合成DeleteGlobalRef异常不能外推真实SDK可能性，成功只证明合法调用无报告异常/任务finish，不伪造VM独立删除回执。Go释放panic在State/Shutdown边界捕获不跨C ABI；原有preclaim、suspend/shutdown及完整owner仍未验收。现有APK未包含修改，新libclash/libcore仅任务编译产物，不能称可用发行版。未修改系统代理/DNS/权利，不安装新APK，不读用户.video_agent或秘密。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC说明、联合计划和registry，新增checked-release脱敏源/回执/日志摘要与边界。
+
+### HLG
+使用HLG append先dry-run后apply追加事实并重建索引；记录当前progress及下一联合接线依赖。

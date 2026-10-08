@@ -3,8 +3,11 @@
 #include <cstdlib>
 #include <malloc.h>
 #include <cstring>
+#include <atomic>
 
 static JavaVM *global_vm;
+// 线程分离失败不能由后续成功回调清洗；本次库生命周期保留未知责任。
+static std::atomic<bool> cleanup_unknown{false};
 
 static jclass c_string;
 static jmethodID m_new_string;
@@ -93,29 +96,41 @@ jstring jni_new_string(JNIEnv *env, const char *str) {
 int jni_catch_exception(JNIEnv *env) {
     const int result = env->ExceptionCheck();
     if (result) {
-        env->ExceptionDescribe();
         env->ExceptionClear();
     }
     return result;
 }
 
 void jni_attach_thread(scoped_jni *jni) {
+    jni->env = nullptr;
+    jni->require_release = 0;
     JavaVM *vm = global_java_vm();
-    if (vm->GetEnv(reinterpret_cast<void **>(&jni->env), JNI_VERSION_1_6) == JNI_OK) {
-        jni->require_release = 0;
+    if (!vm) return;
+    const jint status = vm->GetEnv(reinterpret_cast<void **>(&jni->env), JNI_VERSION_1_6);
+    if (status == JNI_OK) return;
+    jni->env = nullptr;
+    if (status != JNI_EDETACHED) return;
+    if (vm->AttachCurrentThread(&jni->env, nullptr) != JNI_OK) {
+        jni->env = nullptr;
         return;
     }
-    if (vm->AttachCurrentThread(&jni->env, nullptr) != JNI_OK) {
-        abort();
-    }
+    // 即使异常VM给出空env，成功附着仍须同步分离。
     jni->require_release = 1;
 }
 
-void jni_detach_thread(const scoped_jni *env) {
+bool jni_finish_thread_checked(scoped_jni *jni) {
+    if (!jni->require_release) return true;
+    jni->require_release = 0;
     JavaVM *vm = global_java_vm();
-    if (env->require_release) {
-        vm->DetachCurrentThread();
-    }
+    const bool finished = vm && vm->DetachCurrentThread() == JNI_OK;
+    if (!finished) cleanup_unknown.store(true);
+    return finished;
+}
+
+bool jni_cleanup_unknown() { return cleanup_unknown.load(); }
+
+void jni_detach_thread(scoped_jni *jni) {
+    jni_finish_thread_checked(jni);
 }
 
 void release_string(char **str) {

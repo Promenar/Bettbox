@@ -133,3 +133,5 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 同步配置验证登记test-android-owned-config、test-android-owned-options、test-android-config-protocol-green、compile-android-owned-config-core/jni及test/run-android-config-jni。公开JSON与函数表不使用账户、VPN或网络；产物保存在独立.test/android-owned-config-abi，不覆盖已安装APK来源。state race和全Core回归复用已登记入口。
 
 启动报告验收入口：`test-android-start-report`、`test-android-start-report-first-error` 和 `test-android-startup-full` 使用公开内存资源执行真实生产State/Shutdown及race；`compile-android-start-report-core/jni` 在独立目录编译Android ARM64生产ABI，不安装或启动VPN。macOS候选启动通过已安装CUA工具入口登记，不能将该登记值当作CLI命令。封装工具回归只签公开无权利夹具；真实App的profile和启动另验。
+
+JNI检查式释放验收使用任务独立产物：`compile-jni-release-red-expanded` 绑定ab664741公开旧源/旧真实Go头，`compile-jni-release-green` 使用当前Go生成头及生产JNI，runner逐个执行17个公开case并关闭测试进程core dump，不记录原始stderr。Go固定状态与真实State回归由 `test-android-jni-release-confirmation` 执行；Android实际新c-shared/JNI由 `compile-android-checked-release-core/jni` 构建，既有9/17 JNI负例在同任务目录回归。结果不外推真实JVM或设备。

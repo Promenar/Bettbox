@@ -89,3 +89,5 @@
 
 - docs/validation/2026-10-07-three-platform/android-start-report-validation.json — 生产State/Shutdown红绿、race、编译链接及TUN接线边界
 - docs/validation/2026-10-07-three-platform/macos-profile-admission-validation.json — 真实候选启动拒绝分类、profile缺口和封装准入回归
+
+- docs/validation/2026-10-07-three-platform/android-jni-checked-release-validation.json — 注册JNI释放完成状态、线程收尾红绿及实际ABI边界

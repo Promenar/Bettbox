@@ -147,7 +147,7 @@ Android 启停基础：实际 `androidstartup` 包含15个新增资源/回调测
 
 Android 协调候选的15个场景已使用离线 Kotlin 2.1.0 缓存编译并在JVM实际运行通过，覆盖许可/绑定撤销、已进入JNI所有权、迟到成功清理、停止失败保留、原FD关闭不确定、bootstrap/restart和旧服务身份。夹具使用编译器POM依赖的coroutines 1.6.4，未核对App最终解析版本；候选尚未接入Android实际后台服务，smart行为未实现。公开回执 `validation/2026-10-07-three-platform/android-coordinator-jvm.json`。
 
-Android 联合候选已补 smart、权限请求归属和 Service lease，尚未接入实际客户端。旧 Doze 回调在同一 Service 被新 lease 复用时影响新连接的问题，经生产 JVM helper 修复前失败、修复后通过；23 个协调场景和权限/stamp夹具使用离线 Kotlin 2.1.0 编译运行通过。20 个 Go helper/静态接线测试经 CGO1 race通过，其中1项仅检查源码接线；编译器夹具 coroutines 1.6.4 不代表App最终解析版本。JNI既有线程附着失败会abort，不能宣称所有失败均返回false。Dart配置排空、真实AndroidBackend/JNI/系统VPN及节点流量另验。公开回执 `validation/2026-10-07-three-platform/android-backend-helper-validation.json`。
+Android 联合候选已补 smart、权限请求归属和 Service lease，尚未接入实际客户端。旧 Doze 回调在同一 Service 被新 lease 复用时影响新连接的问题，经生产 JVM helper 修复前失败、修复后通过；23 个协调场景和权限/stamp夹具使用离线 Kotlin 2.1.0 编译运行通过。20 个 Go helper/静态接线测试经 CGO1 race通过，其中1项仅检查源码接线；编译器夹具 coroutines 1.6.4 不代表App最终解析版本。该回执所验JNI版本在线程附着失败时会abort，不能宣称其所有失败均返回false；当前checked-release处理见下文。Dart配置排空、真实AndroidBackend/JNI/系统VPN及节点流量另验。公开回执 `validation/2026-10-07-three-platform/android-backend-helper-validation.json`。
 
 macOS native身份候选使用当前SDK编译通过，9项fake生命周期测试及强制断言失败检测通过。执行器22项mock与真实owned进程组超时清理探针通过；真实签名宿主/core候选在launch准入失败，并保留cleanup_failed，未发送HELLO。独立固定sleep探针实际确认Foundation Process为child建立独立进程组且该探针child自然exit0；不能用宿主组watchdog证明覆盖core。宿主/core身份与匿名管道验收须在明确child创建/回收合同后执行。公开回执 `validation/2026-10-07-three-platform/macos-native-launch-validation.json`。
 
@@ -236,3 +236,5 @@ Android同步配置中间层：Go生产入口以runLock执行epoch/revision CAS�
 Android生产启动报告：`State.StartWithInputCleanupReport` 在同一状态锁内执行旧资源收口、新资源构造、输入清理和最终状态捕获。输入失败先固化首码，资源Close失败保留resource/lease及已启动runtime；release panic只保留其指针责任，不伪造JNI释放确认。Shutdown先关闭回调准入并等待所有pin，再仅尝试一次释放；listener/release panic转为稳定错误，重复Close保持失败。8项初始报告及6项混合故障在修复前失败；最终定向7项、完整startup race、core回归和Android ARM64 Go/JNI编译链接通过。尚未接带版本TUN入口或重建APK；回执 `validation/2026-10-07-three-platform/android-start-report-validation.json`。
 
 用户所见黑色窗口经当前进程路径与CUA截图确认来自 `build/macos-flutter-supervisor/Bettbox.app`。探针入口 `integration_test/macos_supervisor_probe.dart` 使用 `SizedBox.shrink`，没有客户端业务页面；空窗口不计入完整应用UI或发行验收。
+
+Android注册JNI释放回调使用固定int状态：0未Delete、1删除调用和任务线程finish确认、2后置或既有线程责任未知；非空对象仅1接受，Go nil callback为无释放义务短路。异常清理不打印原文；仅EDETACHED附着，空env安全拒绝，Detach失败以atomic sticky保存，Protect/Resolve不继续调用Java或接受线程收尾未知。当前17个生产函数表ASAN场景、既有9个JNI故障和17个配置桥场景、Go实际State/race以及同次NDK生成头与JNI链接通过。旧公开源码扩展17场景有16失败、5个测试进程异常终止；这不是设备故障率。原preclaim、完整owner及真实CheckJNI/设备另验。回执 `validation/2026-10-07-three-platform/android-jni-checked-release-validation.json`。

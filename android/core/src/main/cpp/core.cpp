@@ -56,18 +56,38 @@ static jmethodID m_tun_interface_protect;
 static jmethodID m_tun_interface_resolve_process;
 
 
-static void release_jni_object_impl(void *obj) {
-    ATTACH_JNI();
-    del_global(static_cast<jobject>(obj));
+// 显式finish参与返回判定，析构仅作为所有提前返回的同一次保底收尾。
+struct callback_thread_scope {
+    scoped_jni value{};
+    callback_thread_scope() { jni_attach_thread(&value); }
+    ~callback_thread_scope() { jni_detach_thread(&value); }
+    bool finish() { return jni_finish_thread_checked(&value); }
+};
+
+static int release_jni_object_impl(void *obj) {
+    if (!obj) return jni_cleanup_unknown() ? 2 : 0;
+    callback_thread_scope thread;
+    JNIEnv *env = thread.value.env;
+    int result = 0;
+    if (env && !clear_callback_exception(env)) {
+        del_global(static_cast<jobject>(obj));
+        result = clear_callback_exception(env) ? 2 : 1;
+    }
+    if (!thread.finish() || jni_cleanup_unknown()) return 2;
+    return result;
 }
 
 static int call_tun_interface_protect_impl(void *tun_interface, const int fd) {
-    ATTACH_JNI();
-    if (!tun_interface) return 0;
-    const jboolean protected_socket = env->CallBooleanMethod(static_cast<jobject>(tun_interface),
-                        m_tun_interface_protect, fd);
-    if (clear_callback_exception(env)) return 0;
-    return protected_socket == JNI_TRUE ? 1 : 0;
+    callback_thread_scope thread;
+    JNIEnv *env = thread.value.env;
+    int result = 0;
+    if (env && !clear_callback_exception(env) && tun_interface && !jni_cleanup_unknown()) {
+        const jboolean protected_socket = env->CallBooleanMethod(static_cast<jobject>(tun_interface),
+                            m_tun_interface_protect, fd);
+        if (!clear_callback_exception(env) && protected_socket == JNI_TRUE) result = 1;
+    }
+    if (!thread.finish() || jni_cleanup_unknown()) return 0;
+    return result;
 }
 
 static const char *
@@ -75,20 +95,26 @@ call_tun_interface_resolve_process_impl(void *tun_interface, int protocol,
                                         const char *source,
                                         const char *target,
                                         const int uid) {
-    ATTACH_JNI();
+    callback_thread_scope thread;
+    JNIEnv *env = thread.value.env;
+    const auto fail = [&]() -> const char * { thread.finish(); return strdup(""); };
+    if (!env) return fail();
+    if (clear_callback_exception(env) || !tun_interface || jni_cleanup_unknown()) return fail();
     if (env->PushLocalFrame(8) < 0) {
         clear_callback_exception(env);
-        return strdup("");
+        return fail();
     }
     const auto sourceString = new_string(source);
     if (!sourceString || clear_callback_exception(env)) {
         env->PopLocalFrame(nullptr);
-        return strdup("");
+        clear_callback_exception(env);
+        return fail();
     }
     const auto targetString = new_string(target);
     if (!targetString || clear_callback_exception(env)) {
         env->PopLocalFrame(nullptr);
-        return strdup("");
+        clear_callback_exception(env);
+        return fail();
     }
     const auto packageName = reinterpret_cast<jstring>(env->CallObjectMethod(static_cast<jobject>(tun_interface),
                                                                        m_tun_interface_resolve_process,
@@ -98,15 +124,18 @@ call_tun_interface_resolve_process_impl(void *tun_interface, int protocol,
                                                                        uid));
     if (clear_callback_exception(env) || !packageName) {
         env->PopLocalFrame(nullptr);
-        return strdup("");
+        clear_callback_exception(env);
+        return fail();
     }
     const auto result = get_string(packageName);
-    if (clear_callback_exception(env)) {
+    const bool failed = clear_callback_exception(env);
+    env->PopLocalFrame(nullptr);
+    const bool frame_failed = clear_callback_exception(env);
+    const bool finished = thread.finish();
+    if (failed || frame_failed || !finished || jni_cleanup_unknown()) {
         free(const_cast<char *>(result));
-        env->PopLocalFrame(nullptr);
         return strdup("");
     }
-    env->PopLocalFrame(nullptr);
     return result;
 }
 
