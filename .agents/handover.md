@@ -3481,3 +3481,34 @@ HTTP/SOCKS/Mixed外层accepted/HTTP管道和处理任务接入完整收尾，再
 
 ### HLG
 通过标准append dry-run/apply追加，索引重建；完整目标与剩余边界保持。
+
+## 2026-10-09T07:29:45+08:00 · TCP真实协议会话收尾与逐请求认证回归
+
+type: maintenance
+scope: ["Bettbox", "core", "Android"]
+status: partial
+tags: ["three-platform", "listener", "authentication", "race"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: b977fe75817159b44e1f7cea55844202aaee7dbd1e3c28cf989890e049879a05
+
+### Summary
+HTTP、SOCKS和Mixed实际TCP工厂采用公共资源责任机制；修复复用连接中先前认证成功导致后续错误认证请求被接受的缺陷。总体三端和服务端发行目标未完成。
+
+### Changed
+实际handler、内部pipe、异步路由及Peek任务在同一scope准入和登记。保留原始TCP动态类型、keep-alive和合法用户变化；撤销后不降级异步任务，未知关闭或任务未退出保留责任。详细来源见tcp-protocol-lifecycle-validation.json与实施计划。
+
+### Validation
+旧工厂真实关闭回归失败并检测数据竞争；旧HTTP/Mixed错误认证请求返回200，修复后403。7项实际工厂、5项scope、1项拒绝路径及既有20项握手回归通过；相关模块完整race、完整core CGO0回归通过。独立只读终审无新增P1/P2。当前14项源码哈希与回执一致，PDEC execution_ready=true且既有操作无漂移。有效契约后Android ARM64 c-shared编译成功，四个PT_LOAD均16KiB；未安装APK。
+
+### Next
+完成HTTP Transport及证书watcher内部任务退出取证，扩展其余协议/UDP所有权及Android完整owner/ACK接线。macOS黑屏须实际窗口诊断；CUA报告锁屏，应用与两个子进程存活不证明界面正确。继续账户、订阅、邀请、支付和有效VPN全路径。
+
+### Risks
+拒绝fallback动态观察有界50ms；TCP UDP Associate控制连接不是UDP runtime验收。当前libclash.so不是发行APK；macOS仅开发签名且黑屏根因未确认，iOS真实VPN和发行条件、支付商权限与真实支付未验证。无生产变更。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、PDEC README、registry、计划和验证回执。
+
+### HLG
+通过结构化append追加事实链并重建索引，保留后续发行工作。

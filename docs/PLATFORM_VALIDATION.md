@@ -475,3 +475,12 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 真实loopback旧实现的三项回归失败，确认socket Read残留、任务未退出误报成功以及结果通道竞争。20项握手顶层回归覆盖已交接连接读写、父取消、自然Accept故障、迟到raw与包装对象、未知关闭显式重试、阻塞Close预算、不并发重试、轮次单调、nil/typed nil、panic/logger故障和不可比较包装类型。common/net、HTTP及命名监听完整race回归通过；SOCKS、Mixed、Reality编译通过，三包没有专门测试。核心完整CGO0回归和实际Android ARM64 c-shared编译成功，四个加载段均16KiB对齐。独立终审无剩余P1/P2。
 
 证据见 `validation/2026-10-07-three-platform/handshake-listener-lifecycle-validation.json`。仅补齐已锁定testify的模块摘要，模块版本未变。没有安装新APK或切换macOS候选；外层协议连接/管道/任务、Android唯一owner/ACK和有效VPN待完成，macOS黑屏和三端发行仍未验收。
+
+
+## HTTP、SOCKS、Mixed TCP协议会话
+
+真实工厂旧实现复现关闭成功后accepted/TLS连接遗留、阻塞delegate未退出误报及closed标记race。新工厂采用公共scope并登记handler、HTTP pipe/route/Peek；7项顶层工厂回归覆盖CONNECT、SOCKS5、未完成TLS、未知任务显式重试、三次请求共用一条上游route、Upgrade双向通信、SOCKS4和UDP Associate的TCP控制连接。5项scope回归确认真实accepted动态类型、主handler退出后仍等待子任务、迟到pipe/任务拒绝、自然故障、正常EOF prune及内部pipe混合关闭错误的责任保留。
+
+认证红回归证明HTTP/Mixed在成功请求之后错误用户仍得到200；逐请求核验后返回403，合法用户切换保持两条身份正确的路由。拒绝接口回归要求pipe关闭错误，超时不能过关；执行信号对fallback做50ms有界观测。完整公共net/HTTP/listener race、既有20项握手回归、核心完整CGO0和最终Android ARM64编译通过，四个加载段均16KiB。SOCKS/Mixed本包没有独立测试，实际工厂行为由listener包回归覆盖。独立终审无新增P1/P2，回执见 `validation/2026-10-07-three-platform/tcp-protocol-lifecycle-validation.json`。
+
+未验证Transport私有任务或证书watcher完全退出；全部协议、UDP和Android唯一owner/ACK及设备有效VPN仍待完成。APK、运行中的macOS包和生产支付未替换，黑屏与三端发行未验收。

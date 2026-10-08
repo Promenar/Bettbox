@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-09",
+  "scope": "真实HTTP/SOCKS/Mixed的accepted、handler、已登记HTTP pipe/route/Peek收尾及逐请求认证，不是全部依赖任务或VPN验收",
+  "source_base_commit": "a8eacf239bb4e6314af6056572cc54432cb2fbdd",
+  "source_sha256": {
+    "core/Clash.Meta/common/net/listener.go": "d4b38ebf33d89626ec42c0d6900f8b64c04d0995c43706e4a299af16a9335ec2",
+    "core/Clash.Meta/common/net/listener_scope.go": "98954cd04a3959cfc3fdd77a4758c12dd21821edb34cc8f2d16811ef9c819800",
+    "core/Clash.Meta/common/net/listener_scope_test.go": "0ba84ac8aefa7a81c8c821d7abaed4fafdea05eb3d7a8ac04523e26b7ac71d05",
+    "core/Clash.Meta/listener/tcp/scope.go": "cef9cfedd61c9e298df3097e683d1bd8de98243ee68fa09902f10cf1316e0561",
+    "core/Clash.Meta/listener/http/server.go": "97c2515046ed1e2d3fd1b9066e91e6100666874f69c92e775fffb1019acaa4eb",
+    "core/Clash.Meta/listener/http/proxy.go": "ac2283998b8d36027307c26e971003785398577279fbc50569c8dc77c566e51e",
+    "core/Clash.Meta/listener/http/client.go": "ee57f9e296f7b4c108ace1d57a2cbcfbde15c80f6eafb61e477924da0e9634c6",
+    "core/Clash.Meta/listener/http/upgrade.go": "c8e3a42870b4842104e53f2c7e0bd5deae9b3d4661b6355cc8912a4d3805fe46",
+    "core/Clash.Meta/listener/http/lifecycle.go": "8675ec0b6628221db494edbe2c9e231238b1f7604f67c4d43763728652cae90f",
+    "core/Clash.Meta/listener/http/lifecycle_test.go": "2ec35b93cc7c29a59bd2cf19448f74cd996d13333cfaca9980f1bde8d42e4e68",
+    "core/Clash.Meta/listener/http/credential_blind.go": "06d3a91142c7359ec71cd96dc637a5ed267ebfe77e4037b20c5afd26c8e213d3",
+    "core/Clash.Meta/listener/socks/tcp.go": "5c3cc7b807bfd0d20c8a693cd71170ecb8485a7e8386bd09b8d867d1d1784191",
+    "core/Clash.Meta/listener/mixed/mixed.go": "db2098f61ca73f8a684012837e69bc9814a2263aec838ef56de73f19b6153667",
+    "core/Clash.Meta/listener/tcp_protocol_lifecycle_test.go": "59386a03b8a18e6fe90fce6f30812304331e188a874ed941eebdfda0a739340f"
+  },
+  "red": {
+    "real_factory_accepted_and_tls_residual_and_unfinished_delegate": true,
+    "closed_bool_race_detected": true,
+    "exit_code": 1,
+    "http_and_mixed_auth_failure_after_success_returned_200": true,
+    "auth_red_exit": 1
+  },
+  "green": {
+    "tcp_protocol_top_level_tests": 7,
+    "managed_scope_top_level_tests": 5,
+    "http_owned_reject_top_level_tests": 1,
+    "existing_handshake_top_level_tests": 20,
+    "common_net_http_listener_full_race_exit": 0,
+    "http_strengthened_assertions_race_exit": 0,
+    "core_full_cgo0_exit": 0,
+    "socks_mixed_reality_compile_exit": 0,
+    "socks_mixed_have_package_local_tests": false,
+    "auth_failed_request_status": 403,
+    "auth_user_switch_route_count": 2,
+    "three_request_keep_alive_route_count": 1,
+    "upgrade_bidirectional": true,
+    "socks4_and_socks5_and_udp_tcp_control": true
+  },
+  "independent_review": {
+    "agent": "android_listener_owner_design",
+    "final_P1_P2": 0,
+    "read_only": true,
+    "pipe_half_close_equivalent_to_original": true,
+    "test_assertions_strengthened": true
+  },
+  "build": {
+    "exit_code": 0,
+    "executor_os": "macos",
+    "executor_arch": "arm64",
+    "target_os": "android",
+    "target_arch": "arm64",
+    "ndk": "28.2.13676358",
+    "api": 26,
+    "pdec_ready_before_accepted_build": true,
+    "path": ".test/android-tcp-protocol-core/libclash.so",
+    "sha256": "781eaebafca462b96a6affb057c0c2216bb30583456093bcdf7240e059ebaa96",
+    "header_sha256": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5",
+    "load_alignment": [
+      16384,
+      16384,
+      16384,
+      16384
+    ],
+    "installed": false
+  },
+  "boundaries": [
+    "fallback不执行的动态观测为50ms有界窗口，源码同时确认接口拒绝不降级",
+    "HTTP Transport私有read/write/dial任务无公开join，本层不证明这些内部任务完全退出",
+    "证书watcher、全部命名协议、general、UDP runtime及完整Android owner/ACK仍待联合治理",
+    "未安装APK、切换macOS候选、修改生产支付或发布发行版",
+    "macOS黑屏和实际有效VPN全路径未验收"
+  ]
+}

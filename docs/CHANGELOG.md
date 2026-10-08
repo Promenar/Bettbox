@@ -1,5 +1,9 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 — TCP协议会话收尾与逐请求认证
+
+- HTTP/SOCKS/Mixed实际工厂采用公共会话责任，关闭accepted连接并等待handler及登记的HTTP pipe/route/Peek任务；未知任务和Close失败保留责任。修复复用连接较早认证成功允许后续认证失败请求进入代理的问题。真实工厂、认证、连接复用、Upgrade及scope/race回归、核心测试和Android ARM64编译通过；完整Transport/watcher/UDP及平台owner和发行仍未验收。
+
 ## 2026-10-09 — 公共握手监听资源与任务收尾
 
 - 修复Reality公共握手监听器关闭结果通道竞争、待交付连接遗留和未退出任务误报成功；真实连接交接保留动态类型，逐资源关闭账本保留失败/阻塞责任，显式后续关闭才重试。20项握手回归、相关模块race、核心完整测试及Android ARM64编译通过；未安装新APK，完整owner/有效VPN和macOS黑屏未验收。

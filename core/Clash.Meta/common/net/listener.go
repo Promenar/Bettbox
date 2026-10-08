@@ -98,6 +98,9 @@ type handshakeRecord struct {
 	result    *handshakeCloseSlot
 	conn      net.Conn
 	taskEnded bool
+	tasks     int
+	extra     []*handshakeCloseSlot
+	scope     *ListenerScope
 }
 
 type handleContextListener struct {
@@ -116,6 +119,7 @@ type handleContextListener struct {
 	round    uint64
 	listener *handshakeCloseSlot
 	handle   func(context.Context, net.Conn) (net.Conn, error)
+	serve    func(*ListenerScope, net.Conn)
 	panicLog func(any)
 }
 
@@ -158,6 +162,11 @@ func (l *handleContextListener) init() {
 				l.cleanup(r, 0)
 				return
 			}
+			r.tasks = 1
+			if l.serve != nil {
+				ctx, cancel := context.WithCancel(l.ctx)
+				r.scope = &ListenerScope{owner: l, record: r, ctx: ctx, cancel: cancel}
+			}
 			l.workers.Add(1)
 			l.mu.Unlock()
 			go l.handshake(r, c)
@@ -195,10 +204,16 @@ func (l *handleContextListener) handshake(r *handshakeRecord, raw net.Conn) {
 		}
 		l.mu.Lock()
 		r.taskEnded = true
+		r.tasks--
 		l.mu.Unlock()
 		l.prune(r)
 		l.workers.Done()
 	}()
+	if l.serve != nil {
+		defer r.scope.stop()
+		l.serve(r.scope, raw)
+		return
+	}
 	conn, err := l.handle(l.ctx, raw)
 	l.mu.Lock()
 	if !handshakeConnNil(conn) {
@@ -228,7 +243,7 @@ func (l *handleContextListener) cleanup(r *handshakeRecord, round uint64) []*han
 	if round == 0 && l.closed {
 		round = l.round
 	}
-	slots := []*handshakeCloseSlot{r.raw}
+	slots := append([]*handshakeCloseSlot{r.raw}, r.extra...)
 	if r.result != nil && r.result != r.raw {
 		slots = append(slots, r.result)
 	}
@@ -244,10 +259,10 @@ func (l *handleContextListener) cleanup(r *handshakeRecord, round uint64) []*han
 func (l *handleContextListener) prune(r *handshakeRecord) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	if !r.taskEnded {
+	if !r.taskEnded || r.tasks != 0 {
 		return
 	}
-	slots := []*handshakeCloseSlot{r.raw}
+	slots := append([]*handshakeCloseSlot{r.raw}, r.extra...)
 	if r.result != nil && r.result != r.raw {
 		slots = append(slots, r.result)
 	}

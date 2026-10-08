@@ -216,20 +216,26 @@ func (t blindOwnedTunnel) HandleTCPConn(c net.Conn, metadata *C.Metadata) {
 	defer t.finish(c, false) // CONNECT移交的accepted socket由owned集合继续管理。
 	t.delegate.HandleTCPConn(c, metadata)
 }
-func (t blindOwnedTunnel) startOwnedTCPConn(c net.Conn, metadata *C.Metadata) {
+func (t blindOwnedTunnel) startOwnedTCPConn(c net.Conn, metadata *C.Metadata) bool {
 	if !t.register(c) {
-		return
+		return false
 	}
 	go func() { defer t.finish(c, true); t.delegate.HandleTCPConn(c, metadata) }()
+	return true
 }
 
 // 专用包装器在启动内部路由前同步登记。
-func startHTTPRoute(tunnel C.Tunnel, c net.Conn, metadata *C.Metadata) {
+func startHTTPRoute(tunnel C.Tunnel, c net.Conn, metadata *C.Metadata) bool {
+	if owned, ok := tunnel.(interface {
+		StartOwnedTCPConn(net.Conn, *C.Metadata) bool
+	}); ok {
+		return owned.StartOwnedTCPConn(c, metadata)
+	}
 	if owned, ok := tunnel.(blindOwnedTunnel); ok {
-		owned.startOwnedTCPConn(c, metadata)
-		return
+		return owned.startOwnedTCPConn(c, metadata)
 	}
 	go tunnel.HandleTCPConn(c, metadata) // 原入口行为不变。
+	return true
 }
 
 func (c *blindConn) startWatcher(watch func()) bool {

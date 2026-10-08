@@ -196,3 +196,6 @@ Realm生命周期沿用本机公开loopback/race验证，并登记实际Android 
 
 
 公共握手生命周期使用本机公开loopback/race，协议回归从core主模块运行以采用生产依赖替换；core/go.sum仅补齐内核已锁定testify的go.mod校验项。官方依赖补齐保留TLS和sum校验，不修改版本或系统网络；实际编译产物在独立 `.test/android-handshake-core/`，不安装设备或覆盖发行候选。资源Close预算与任务收尾回归不代替完整owner/设备验收。
+
+
+TCP协议会话沿用本机公开loopback/race、core完整CGO0和NDK28/API26编译；契约通用系统枚举登记执行主机macOS，cross_compile明确实际Android ARM64产物，回执分别列出主机与目标。产物在独立 `.test/android-tcp-protocol-core/`，不安装APK或覆盖发行候选。只刷新相关源码和新回归摘要，不改既有操作字段、依赖版本或网络权限。

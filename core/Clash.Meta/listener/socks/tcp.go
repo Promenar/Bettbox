@@ -15,6 +15,7 @@ import (
 	authStore "github.com/metacubex/mihomo/listener/auth"
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/reality"
+	TCP "github.com/metacubex/mihomo/listener/tcp"
 	"github.com/metacubex/mihomo/ntp"
 	"github.com/metacubex/mihomo/transport/socks4"
 	"github.com/metacubex/mihomo/transport/socks5"
@@ -25,7 +26,7 @@ import (
 type Listener struct {
 	listener net.Listener
 	addr     string
-	closed   bool
+	server   *N.ManagedTCPServer
 }
 
 // RawAddress implements C.Listener
@@ -40,8 +41,7 @@ func (l *Listener) Address() string {
 
 // Close implements C.Listener
 func (l *Listener) Close() error {
-	l.closed = true
-	return l.listener.Close()
+	return l.server.Close()
 }
 
 func defaultConfig(addr string) LC.AuthServer {
@@ -124,28 +124,18 @@ func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunn
 		listener: l,
 		addr:     config.Listen,
 	}
-	go func() {
-		for {
-			c, err := l.Accept()
-			if err != nil {
-				if sl.closed {
-					break
-				}
-				continue
+	sl.server = N.NewManagedTCPServer(context.Background(), l, func(scope *N.ListenerScope, c net.Conn) {
+		store := config.AuthStore
+		if isDefault || store == authStore.Default {
+			if !inbound.IsRemoteAddrDisAllowed(c.RemoteAddr()) {
+				return
 			}
-			store := config.AuthStore
-			if isDefault || store == authStore.Default { // only apply on default listener
-				if !inbound.IsRemoteAddrDisAllowed(c.RemoteAddr()) {
-					_ = c.Close()
-					continue
-				}
-				if inbound.SkipAuthRemoteAddr(c.RemoteAddr()) {
-					store = authStore.Nil
-				}
+			if inbound.SkipAuthRemoteAddr(c.RemoteAddr()) {
+				store = authStore.Nil
 			}
-			go handleSocks(c, tunnel, store, additions...)
 		}
-	}()
+		handleSocks(c, TCP.NewScopeTunnel(scope, tunnel), store, additions...)
+	}, nil)
 
 	return sl, nil
 }

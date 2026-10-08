@@ -202,3 +202,6 @@
 
 - .agents/plans/2026-10-09-handshake-listener-lifecycle.md — 公共握手准入、交接、逐资源异步关闭责任与协议边界
 - docs/validation/2026-10-07-three-platform/handshake-listener-lifecycle-validation.json — 真实socket红绿、20项回归、独立终审与ARM64编译证据
+
+- .agents/plans/2026-10-09-tcp-protocol-lifecycle.md — 三类实际TCP工厂、HTTP pipe/任务、逐请求认证及全资源边界
+- docs/validation/2026-10-07-three-platform/tcp-protocol-lifecycle-validation.json — 真实工厂/认证红绿、连接复用、scope任务和ARM64编译证据

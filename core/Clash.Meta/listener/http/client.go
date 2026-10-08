@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/metacubex/mihomo/adapter/inbound"
-	N "github.com/metacubex/mihomo/common/net"
 	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/transport/socks5"
 
@@ -33,10 +32,17 @@ func newClient(srcConn net.Conn, tunnel C.Tunnel, additions []inbound.Addition) 
 					return nil, socks5.ErrAddressNotSupported
 				}
 
-				left, right := N.Pipe()
+				left, right, err := newHTTPPipe(tunnel)
+				if err != nil {
+					return nil, err
+				}
 
 				routeConn, routeMetadata := inbound.NewHTTP(dstAddr, srcConn, right, additions...)
-				startHTTPRoute(tunnel, routeConn, routeMetadata)
+				if !startHTTPRoute(tunnel, routeConn, routeMetadata) {
+					_ = left.Close()
+					_ = right.Close()
+					return nil, errors.New("HTTP路由准入已撤销")
+				}
 
 				return left, nil
 			},

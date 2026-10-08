@@ -325,3 +325,12 @@ HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避�
 Reality使用的公共握手监听器以内部责任记录传递结果，Accept在与撤销准入相同的锁中核对取消状态并提交交接，保留实际net.Conn动态类型。未交付raw socket与返回包装对象分别登记；conn+error、无效返回和panic均清理资源，日志只接收固定诊断。自然Accept失败取消握手并关闭待交付资源，唯一发布者等待所有握手发送者退出后结束结果通道。
 
 资源Close由逐对象异步账本持有，一秒总预算覆盖实际Close与任务退出；未知错误、混合聚合错误、阻塞或panic均返回未确认并保留责任。轮次单调，同轮和旧轮次不重试，未完成任务不并发重试；显式后续Close可以确认退出并重试失败。任务退出后再次收集迟到包装对象；已确认失败握手记录及时释放。已经交付的连接归外层消费者，本层不关闭它们，也不承诺HTTP管道、所有协议service/watcher、全局UDP或完整VPN收尾。
+
+
+### HTTP、SOCKS、Mixed TCP会话收尾
+
+三个工厂直接采用公共ManagedTCPServer责任机制，保持accepted TCP/TLS/Reality动态类型。每个会话scope拥有原始连接、HTTP pipe两端及已登记子任务；主handler结束先撤销scope准入并取消，全部handler/route/Peek任务和资源确认后才释放记录。pipe创建与任务Add在同一准入锁中，拒绝不会降级到传统异步入口。正常EOF也执行清理；未知关闭及阻塞任务保留责任，沿用单调轮次与总预算。
+
+ScopeTunnel委派真实阻塞TCP路由并提供HTTP的context、pipe及子任务登记。CONNECT与SOCKS处理器属于主任务，普通HTTP与Upgrade内部route单独登记；EOF回调的Peek在启动前准入，owned Upgrade使用资源账本而不创建额外AfterFunc。认证每个请求独立核验，较早成功不能授权后续失败；合法用户切换仍关闭idle连接以隔离复用。CredentialBlind认证输出边界保持。
+
+HTTP Transport私有read/write/dial任务没有公开join；此机制只确认已登记任务与资源，证书watcher、UDP runtime和其它协议仍需独立收尾，不据TCP socket关闭宣称完整VPN停止。

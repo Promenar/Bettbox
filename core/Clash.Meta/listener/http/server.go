@@ -6,12 +6,14 @@ import (
 	"net"
 
 	"github.com/metacubex/mihomo/adapter/inbound"
+	N "github.com/metacubex/mihomo/common/net"
 	"github.com/metacubex/mihomo/component/ca"
 	"github.com/metacubex/mihomo/component/ech"
 	C "github.com/metacubex/mihomo/constant"
 	authStore "github.com/metacubex/mihomo/listener/auth"
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/reality"
+	TCP "github.com/metacubex/mihomo/listener/tcp"
 	"github.com/metacubex/mihomo/ntp"
 
 	"github.com/metacubex/tls"
@@ -20,7 +22,7 @@ import (
 type Listener struct {
 	listener net.Listener
 	addr     string
-	closed   bool
+	server   *N.ManagedTCPServer
 }
 
 // RawAddress implements C.Listener
@@ -35,8 +37,7 @@ func (l *Listener) Address() string {
 
 // Close implements C.Listener
 func (l *Listener) Close() error {
-	l.closed = true
-	return l.listener.Close()
+	return l.server.Close()
 }
 
 func New(addr string, tunnel C.Tunnel, additions ...inbound.Addition) (*Listener, error) {
@@ -126,29 +127,18 @@ func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunn
 		addr:     config.Listen,
 	}
 
-	go func() {
-		for {
-			conn, err := hl.listener.Accept()
-			if err != nil {
-				if hl.closed {
-					break
-				}
-				continue
+	hl.server = N.NewManagedTCPServer(context.Background(), l, func(scope *N.ListenerScope, conn net.Conn) {
+		store := config.AuthStore
+		if isDefault || store == authStore.Default {
+			if !inbound.IsRemoteAddrDisAllowed(conn.RemoteAddr()) {
+				return
 			}
-
-			store := config.AuthStore
-			if isDefault || store == authStore.Default { // only apply on default listener
-				if !inbound.IsRemoteAddrDisAllowed(conn.RemoteAddr()) {
-					_ = conn.Close()
-					continue
-				}
-				if inbound.SkipAuthRemoteAddr(conn.RemoteAddr()) {
-					store = authStore.Nil
-				}
+			if inbound.SkipAuthRemoteAddr(conn.RemoteAddr()) {
+				store = authStore.Nil
 			}
-			go HandleConn(conn, tunnel, store, additions...)
 		}
-	}()
+		HandleConn(conn, TCP.NewScopeTunnel(scope, tunnel), store, additions...)
+	}, nil)
 
 	return hl, nil
 }

@@ -27,7 +27,7 @@ func isUpgradeRequest(req *http.Request) bool {
 }
 
 func handleUpgrade(conn net.Conn, request *http.Request, tunnel C.Tunnel, additions ...inbound.Addition) {
-	handleUpgradeContext(context.Background(), false, conn, request, tunnel, additions...)
+	handleUpgradeContext(ownedHTTPContext(tunnel), false, conn, request, tunnel, additions...)
 }
 
 // 专用入口取消时关闭内部pipe；原入口不净化Trailer且维持原行为。
@@ -51,12 +51,23 @@ func handleUpgradeContext(ctx context.Context, blind bool, conn net.Conn, reques
 		return
 	}
 
-	left, right := N.Pipe()
-	stopCancel := context.AfterFunc(ctx, func() { _ = left.Close(); _ = right.Close() })
-	defer stopCancel()
+	left, right, pipeErr := newHTTPPipe(tunnel)
+	if pipeErr != nil {
+		return
+	}
+	if _, owned := tunnel.(interface {
+		NewOwnedPipe() (net.Conn, net.Conn, error)
+	}); !owned {
+		stopCancel := context.AfterFunc(ctx, func() { _ = left.Close(); _ = right.Close() })
+		defer stopCancel()
+	}
 
 	routeConn, routeMetadata := inbound.NewHTTP(dstAddr, conn, right, additions...)
-	startHTTPRoute(tunnel, routeConn, routeMetadata)
+	if !startHTTPRoute(tunnel, routeConn, routeMetadata) {
+		_ = left.Close()
+		_ = right.Close()
+		return
+	}
 
 	var bufferedLeft *N.BufferedConn
 	if request.TLS != nil {
@@ -64,7 +75,7 @@ func handleUpgradeContext(ctx context.Context, blind bool, conn net.Conn, reques
 			ServerName: request.URL.Hostname(),
 		})
 
-		ctx, cancel := context.WithTimeout(context.Background(), C.DefaultTLSTimeout)
+		ctx, cancel := context.WithTimeout(ctx, C.DefaultTLSTimeout)
 		defer cancel()
 		if tlsConn.HandshakeContext(ctx) != nil {
 			_ = left.Close()

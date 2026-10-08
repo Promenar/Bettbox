@@ -36,14 +36,13 @@ func HandleConn(c net.Conn, tunnel C.Tunnel, store auth.AuthStore, additions ...
 	inUserIdx := len(additions) - 1
 	client := newClient(c, tunnel, additions)
 	defer client.CloseIdleConnections()
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ownedHTTPContext(tunnel))
 	defer cancel()
 	peekMutex := sync.Mutex{}
 
 	conn := N.NewBufferedConn(c)
 
 	authenticator := store.Authenticator()
-	trusted := authenticator == nil // disable authenticate if lru is nil
 	lastUser := ""
 
 	for {
@@ -59,9 +58,8 @@ func HandleConn(c net.Conn, tunnel C.Tunnel, store auth.AuthStore, additions ...
 		keepAlive := strings.TrimSpace(strings.ToLower(request.Header.Get("Proxy-Connection"))) == "keep-alive"
 
 		resp, user := authenticate(request, authenticator) // always call authenticate function to get user
-		if resp == nil {
-			trusted = true
-		}
+		// 每个请求独立认证，连接中较早的成功不能授权后来的失败请求。
+		trusted := resp == nil
 		additions[inUserIdx] = inbound.WithInUser(user)
 
 		if trusted {
@@ -105,14 +103,14 @@ func HandleConn(c net.Conn, tunnel C.Tunnel, store auth.AuthStore, additions ...
 				request = request.WithContext(ctx)
 
 				startBackgroundRead := func() {
-					go func() {
+					startHTTPTask(tunnel, func() {
 						peekMutex.Lock()
 						defer peekMutex.Unlock()
 						_, err := conn.Peek(1)
 						if err != nil {
 							cancel()
 						}
-					}()
+					})
 				}
 				if request.Body == nil || request.Body == http.NoBody {
 					startBackgroundRead()
