@@ -238,3 +238,8 @@ Android 生命周期候选接入完整工作门禁、独立绑定/启动意图�
 - macOS Application按代次分别确认内核初始化与配置就绪，代理偏好兑现失败后同值会真实重试；停止和退出先确认代理恢复及所属入口撤销。219项Flutter测试、静态分析和完整unsigned Release构建通过；TUN旧提权入口已删除，真实系统授权和流量仍待验证。
 
 - macOS系统代理采用原生Authorization Services默认权限参数及同步资源生命周期，明确取消保持cancelled，已撤销请求在授权前拒绝，运行双读后撤销禁止提交；关闭不确定结果阻断虚假恢复。76项基线测试先确认3处失败，修复后84项通过，SDK宿主和完整unsigned Runner构建通过；真实OS认证和代理流量未验收。
+
+### Android TUN 配置预留模块（2026-10-08）
+
+- 增加配置版本预留、同次 options 复制、启动/停止报告核验与未知责任保留。
+- 六项模块回归、完整 core CGO0 测试和 Android ARM64 核心编译通过；core race 因离线 CGO 依赖缺失未启动。真实 TUN/JNI 接线和新 APK 尚未验收。

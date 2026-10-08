@@ -1352,7 +1352,7 @@
         "-tags",
         "with_gvisor",
         "-run",
-        "^Test.*AndroidConfig",
+        "^Test.*AndroidConfig|^TestAndroidVpnOptions",
         "-v",
         "."
       ],
@@ -1915,6 +1915,97 @@
       "timeout_seconds": 60,
       "artifacts": [],
       "verification": "公开函数表JNI夹具17场景，不替代CheckJNI/设备"
+    },
+    "test-android-tun-reservation": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestAndroidConfigTunReservation",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实配置协调器的TUN预留与配置副作用门禁，公开driver；不启动JVM或系统TUN。"
+    },
+    "test-android-tun-reservation-race": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestAndroidConfigTunReservation",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实配置协调器的TUN预留与配置副作用门禁，公开driver；不启动JVM或系统TUN。"
+    },
+    "test-android-config-reservation-regression": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^Test.*AndroidConfig|^TestAndroidVpnOptions",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "CGO0本机离线依赖，实际生产同步配置入口与公开driver fixture；不启用VPN，不代表Android JVM/Native owner或完整业务"
+    },
+    "compile-android-tun-reservation-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-tun-reservation-abi/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-tun-reservation-abi/libclash.so",
+        ".test/android-tun-reservation-abi/libclash.h"
+      ],
+      "verification": "本机NDK28/API26 Android ARM64实际生产core c-shared离线编译；独立输出保留已有ABI产物，不安装/启用VPN，不证明JVM或设备行为",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
     }
   },
   "deployment": {
@@ -2143,7 +2234,7 @@
     "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
     "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
     "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d",
-    "core/android_config.go": "cb2c3ce45effbe80d1422a8afe9c38acb3ca82f406a62ea7f14882e607ac46e6",
+    "core/android_config.go": "c8f9b41be924505be423bb516cdc2391278124095204e818277602b8c41f29a9",
     "core/android_config_test.go": "ef16be14f655b7c3fcd28c72dd1590356a42bcb45613bd329124801f3e10b31a",
     "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
     "scripts/check_android_config_protocol.py": "4afd0904c291eb16cfbd5a1be79e3be58373ab085a92d282997cedd5da4a87dc",
@@ -2155,7 +2246,9 @@
     "core/androidstartup/release_confirmation.go": "8bcc318336ebc6fbbd6e43b0ba011f4ca5e4eb4f026147b1bb371feee4bbf7b2",
     "core/androidstartup/release_confirmation_test.go": "d95b53ec1f45626a5179f9acca89978e78bf1eb157eb1daeccdddbef0cab93b0",
     "scripts/check_android_jni_release.py": "417346c52b9a2588ae5624a933641b65ac5163e3f6c4e0f6dd8675ca0409978d",
-    "android/core/src/test/cpp/jni_release_fixture.cpp": "d7cfe7feea2039254b00b5dbbca98d6e4f20b600aa458d9383fd608a434edd9c"
+    "android/core/src/test/cpp/jni_release_fixture.cpp": "d7cfe7feea2039254b00b5dbbca98d6e4f20b600aa458d9383fd608a434edd9c",
+    "core/android_tun_reservation.go": "69485d1f3fc1887b89db9820fb3e412a3867e85e69dc4b58bf1d926eb02092d8",
+    "core/android_tun_reservation_test.go": "016285b17e3b204a8f966092ec1de1da541acd5a6ff5bf56eb8c35ad3ec33179"
   },
   "platform_extensions": {
     "android": {
@@ -2231,6 +2324,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "706de0f755f77d1e0c4941302d049b1b7cf4ca113e79c1123f998e13f9c3816e"
+    "contract_digest": "c92e84d949a03b9d1f0d5372609061dac8b1d83b0605bd9aa4347260cdbea6c1"
   }
 }

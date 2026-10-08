@@ -109,6 +109,7 @@ func (productionAndroidConfigDriver) optionsLocked(value state.State) (*state.An
 }
 
 type androidConfigCoordinator struct {
+	tunReservation  *androidTunReservation
 	driver          androidConfigDriver
 	epoch           int64
 	lastApplied     int64
@@ -294,6 +295,9 @@ func (c *androidConfigCoordinator) commitLocked(expectedEpoch, expectedRevision 
 	}
 	if c.blocked {
 		return c.rejectedLocked(androidConfigErrorBlocked)
+	}
+	if c.tunReservation != nil {
+		return c.rejectedLocked(androidConfigErrorTunReserved)
 	}
 	if !c.configured && c.driver.configPresentLocked() {
 		return c.rejectedLocked(androidConfigErrorLegacyConfigPresent)

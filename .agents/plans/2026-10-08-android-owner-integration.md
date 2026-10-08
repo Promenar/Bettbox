@@ -93,3 +93,7 @@ runLock不能跨Java回调、TUN构造或回调drain等待。带版本TUN准入�
 线程finish失败保存本Go库生命周期的JNI桥cleanupUnknown，不能只把protect/resolve结果转换0/空串后遗忘附着线程责任。后续checked release即使删除调用结束也返回2，State保留未知并阻断新代。C resolve缺函数返回nullptr，与malloc返回约定一致；固定异常清理禁止ExceptionDescribe原文。
 
 Checked JNI释放桥已闭合：release_object_func为int，非空对象0表示未Delete、1表示合法Delete调用无异常且任务finish确认、2表示后置或已有线程责任未知。C空对象不Delete返回0；Go nilcallback是本地无义务成功短路。Go实际调用仅精确1接受，其余经现有OnceLease/State受捕获panic保留失败，不越C ABI。线程helper只在EDETACHED附着，处理空env，分离失败atomic sticky；Protect/Resolve异常短路并保留owned字符串约定。17个真实生产回调的公共函数表ASAN场景、9个既有JNI故障及17个配置桥场景通过；Go State/race及同次Android ABI链接通过。实际JVM/CheckJNI、preclaim全清理回执、reservation和owner接线尚未完成。
+
+## 配置预留模块实施状态
+
+协调器已实现锁内 reserve/finishStart/finishStop：epoch/revision/pointer 身份匹配，同次 options 复制，预留期间 commit 在 ENTERED 前拒绝；正常启动必须同时证明 resource、lease 与 running，清理未知永久保留责任，干净失败和确认停止解除。旧回执不得释放新预留。六项回归、全 core CGO0 和 Android ARM64 核心编译通过；独立审阅发现的缺 lease 条件已用单独红绿关闭。core race 因离线 CGO 依赖缺失未启动。lib_android/JNI、配置旁路、Native codec 错误码和 owner 接线仍为下一关键路径；模块没有对设备发布运行状态。

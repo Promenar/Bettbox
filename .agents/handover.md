@@ -1993,3 +1993,34 @@ release_object_func由void改int，C非空对象0未Delete/1合法Delete调用�
 
 ### HLG
 使用HLG append先dry-run后apply追加事实并重建索引；记录当前progress及下一联合接线依赖。
+
+## 2026-10-08T17:55:11+08:00 · Android配置预留模块与TUN接线边界
+
+type: development
+scope: ["Bettbox", "Android"]
+status: in_progress
+tags: ["android", "tun", "configuration", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 87e5e66bde8696c27594678715f53197b645ce2fa90dde716f472145f28408ae
+
+### Summary
+实现配置协调器TUN预留及报告核验，完整三端目标仍在推进。
+
+### Changed
+同锁绑定epoch/revision与options复制；commit在预留期拒绝ENTERED；未知收尾保留责任；仅确认停止或干净启动失败解除。
+
+### Validation
+初始RED exit1、缺lease单独RED exit1、最终六项GREEN exit0、全core CGO0 exit0、Android ARM64核心编译exit0。独立复审P2关闭。
+
+### Next
+接入lib_android真实TUN和JNI typed回执，同步Native codec错误码并收敛旧配置旁路，完成唯一owner及设备验收。
+
+### Risks
+core race因离线certstore CGO依赖缺失未启动。没有新APK或实际JVM/CheckJNI；macOS profile与上游/支付条件仍待确认。
+
+### DIA
+已同步架构、变更日志、平台验收、联合计划、registry和PDEC说明。
+
+### HLG
+通过标准append dry-run/apply记录，不直接编辑事实链。

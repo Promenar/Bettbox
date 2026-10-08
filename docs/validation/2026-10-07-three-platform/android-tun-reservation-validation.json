@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "baseline": "86ecd4d7c7823342b3483de1078c2f521a4b439c",
+  "source_sha256": {
+    "core/android_config.go": "c8f9b41be924505be423bb516cdc2391278124095204e818277602b8c41f29a9",
+    "core/android_tun_reservation.go": "69485d1f3fc1887b89db9820fb3e412a3867e85e69dc4b58bf1d926eb02092d8",
+    "core/android_tun_reservation_test.go": "016285b17e3b204a8f966092ec1de1da541acd5a6ff5bf56eb8c35ad3ec33179"
+  },
+  "validation": {
+    "initial_red_exit": 1,
+    "missing_lease_red_exit": 1,
+    "targeted_green_exit": 0,
+    "targeted_tests": 6,
+    "full_core_cgo0_exit": 0,
+    "android_arm64_core_build_exit": 0,
+    "core_race": "未启动：离线缓存缺少 github.com/tailscale/certstore 的CGO依赖，未下载或联网放宽"
+  },
+  "artifacts": {
+    ".test/android-tun-reservation-abi/libclash.so": "ee3ed61e380df5405216c121d0f7a2d3b497f9cb1f8174a35999a7ebd8561632"
+  },
+  "review": "独立只读复审确认缺lease P2已关闭，无新确认P1/P2",
+  "boundary": [
+    "预留方法仅在配置协调器实现，尚未接入lib_android真实TUN入口",
+    "旧FFI/HTTP/quickStart仍须收敛，不能证明全路径版本保护",
+    "新增固定错误码尚未同步原生客户端codec",
+    "未运行真实JVM/CheckJNI，未构建或安装新APK"
+  ]
+}

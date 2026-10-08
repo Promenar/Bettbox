@@ -238,3 +238,5 @@ Android生产启动报告：`State.StartWithInputCleanupReport` 在同一状态�
 用户所见黑色窗口经当前进程路径与CUA截图确认来自 `build/macos-flutter-supervisor/Bettbox.app`。探针入口 `integration_test/macos_supervisor_probe.dart` 使用 `SizedBox.shrink`，没有客户端业务页面；空窗口不计入完整应用UI或发行验收。
 
 Android注册JNI释放回调使用固定int状态：0未Delete、1删除调用和任务线程finish确认、2后置或既有线程责任未知；非空对象仅1接受，Go nil callback为无释放义务短路。异常清理不打印原文；仅EDETACHED附着，空env安全拒绝，Detach失败以atomic sticky保存，Protect/Resolve不继续调用Java或接受线程收尾未知。当前17个生产函数表ASAN场景、既有9个JNI故障和17个配置桥场景、Go实际State/race以及同次NDK生成头与JNI链接通过。旧公开源码扩展17场景有16失败、5个测试进程异常终止；这不是设备故障率。原preclaim、完整owner及真实CheckJNI/设备另验。回执 `validation/2026-10-07-three-platform/android-jni-checked-release-validation.json`。
+
+TUN 配置预留模块的红绿、独立审阅及核心编译证据见 `validation/2026-10-07-three-platform/android-tun-reservation-validation.json`。预留尚未接入真实启动链，core race 缺离线依赖，不能据此声明设备竞态、CheckJNI 或发行包通过。
