@@ -251,3 +251,9 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 ### macOS本机开发安全存储准入
 
 正式 XboardSecureStore 使用 FlutterSecureStorage 默认 DP 路径。显式本机开发构建须同时满足 macOS、APP_ENV=local-macos-development 与 BETTBOX_MACOS_DEVELOPMENT_KEYCHAIN=true；默认构造使用独立 service com.appshub.bettbox.local-development.xboard 的文件 Keychain。平台或渠道不符时拒绝初始化，不自动回退或迁移既有凭据。开发后端仅对锁定插件特定整数 -34018 删除错误执行同键读取确认，条目确已不存在才成功；其它错误、读取失败或仍存在均失败。调用方显式注入 FlutterSecureStorage 时，其配置属于调用方信任边界。完整开发候选将公开 App 链接与 Versions/Current 精确绑定到已核验的 A 版本，在源准入、复制后和签后检查。候选采用独立空权利文件和目录，正式 Release 权利保持。完整首页已启动；实际插件会话和冷启动持久化尚待验收。原生诊断脚本只操作新 UUID 合成键并公开状态码/比对，不读取业务秘密。
+
+### Android 智能停止回执
+
+smartStop 在 VpnWorkGate 中串行关闭，只有关闭和同代生命周期提交成功才返回成功；Handler 实际投递前再次检查 generation。关闭/挂起监听卸载失败、JNI 挂起调用抛异常及旧代提交均不确认，旧异常不得阻断新代。Core.suspended 的 Boolean 只表达 JNI void 调用是否抛异常，不表示 engine ACK。
+
+Service/Vpn 的 Dart 包装器仅接受 true。SmartAutoStopManager 使用 completeSmartStop，将同一 Dart 会话及原生挂起状态作为显示清理准入，在同步 commit 内设置智能停止标记并清时间/流量。该会话对象不是完整 native owner token；智能恢复、唯一 owner、带身份 ACK 与真实设备交错另行验收。

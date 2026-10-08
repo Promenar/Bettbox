@@ -311,3 +311,9 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 2026-10-09，`build/macos-local-development/Bettbox.app` 完成完整 main 入口构建与 Apple Development 封装，CUA 确认实际首页与导航显示，系统代理和 TUN 关闭、无配置。空白 supervisor 探针已结束，不能把探针黑色窗口当作产品界面。公开回执为 `validation/2026-10-07-three-platform/macos-local-development-launch.json`。
 
 构建命令为 `python3 scripts/validate_desktop.py --target macos-arm64 --execute --unsigned-macos --local-development-keychain`；封装命令为 `python3 scripts/seal_macos_candidate.py --signing-mode apple-development --local-development`。执行前须通过 PDEC。开发 Keychain 使用独立 service 与显式构建开关；正式默认 DP 路径保持。封装清单保留 launch_validated=false，实际启动证据由上述独立回执承载。候选未公证、不可作为正式发行；真实插件写读、会话冷启动、系统代理恢复与有效上游流量尚待验收。
+
+## Android 智能停止候选
+
+实际 Dart 包装器 red 两项失败，修复后 12 项 channel 回归与生产 Kotlin gate/lifecycle 的协程屏障夹具通过；release Kotlin 工程编译退出0。公开证据为 `validation/2026-10-07-three-platform/android-smart-stop-validation.json`。失败、空回执、旧代投递和会话换代禁止成功清理。完整 Flutter 与静态分析结果由回执承载。未安装新 APK，实际 Handler/JNI/设备交错与智能恢复未验；不能升级为 VPN 或发行通过。
+
+当前同源独立协议探测见 `validation/2026-10-07-three-platform/node-protocol-observation-2026-10-09.json`。抽样两条 AnyTLS 传输失败及两条 Hysteria2 认证失败只证明相同协议在独立核心也失败，不能确定密码、额度或上游配置根因。

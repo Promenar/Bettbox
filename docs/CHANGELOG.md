@@ -1,5 +1,11 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 — Android 智能停止完成确认
+
+- 两条 smartStop channel 等待串行原生关闭与同代 SUSPENDED 提交，实际 Handler 投递时拒绝已换代回执；关闭/释放/调用异常保持失败或阻断。Dart 包装器拒绝 false/null，业务调用方在挂起确认及同一会话核验后同步提交显示状态，禁止预先清运行时间与流量。
+- 实际 Dart red 复现两项失败、修复后 12 项 channel 回归和生产 Kotlin 协程夹具通过，Android release Kotlin 工程编译成功。完整回归结果见公开回执；JNI void 挂起调用不等于 engine ACK，新 APK、设备交错、智能恢复和有效代理流量另验。
+- 同源独立核心最新抽样两条 AnyTLS 为传输失败、两条 Hysteria2 为认证失败，不据此猜测密码或额度，不自动续费。
+
 ## 2026-10-09 — macOS 完整本机开发候选
 
 - 增加显式本机开发存储后端与独立 Keychain service，限定平台和构建渠道；特定删除错误须同键读取证实不存在，不读迁移或批量清理正式条目。

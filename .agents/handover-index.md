@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T00:35:28+08:00
+> generated_at: 2026-10-09T00:50:29+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-08T23:11:09+08:00 | done | ["Bettbox", "Android", "Go", "Dart"] | 后台检查式监听停止实际接线与Go FFI验收 | `.agents/handover.md` · `2026-10-08T23:11:09+08:00` · `fp:ee0c053aa8` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-09T00:35:28+08:00 | partial | ["Bettbox", "macOS"] | macOS开发存储与封装来源绑定收口 | `.agents/handover.md` · `2026-10-09T00:35:28+08:00` · `fp:09a07a67bd` |
+| three-platform-release | resume | 2026-10-09T00:50:29+08:00 | partial | ["Bettbox", "Android"] | Android智能停止回执和显示提交候选 | `.agents/handover.md` · `2026-10-09T00:50:29+08:00` · `fp:71bf477498` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T00:50:29+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["android", "vpn", "smart-stop", "validation"] | Android智能停止回执和显示提交候选 | `.agents/handover.md` · `2026-10-09T00:50:29+08:00` · `fp:71bf477498` |
 | 2026-10-09T00:35:28+08:00 | iso | partial | resume | ["Bettbox", "macOS"] | ["macos", "keychain", "review"] | macOS开发存储与封装来源绑定收口 | `.agents/handover.md` · `2026-10-09T00:35:28+08:00` · `fp:09a07a67bd` |
 | 2026-10-09T00:31:17+08:00 | iso | partial | resume | ["Bettbox", "macOS"] | ["macos", "keychain", "validation"] | macOS完整开发候选启动与空白探针定位 | `.agents/handover.md` · `2026-10-09T00:31:17+08:00` · `fp:572967697e` |
 | 2026-10-09T00:09:23+08:00 | iso | partial | resume | ["Bettbox", "macOS"] | ["macos", "keychain", "release"] | macOS开发Keychain实际原生准入与重复删除缺陷 | `.agents/handover.md` · `2026-10-09T00:09:23+08:00` · `fp:9004e9f69c` |

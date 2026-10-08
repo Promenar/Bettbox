@@ -8,7 +8,8 @@ import 'package:flutter/services.dart';
 
 import '../clash/lib.dart';
 
-typedef NativeEventCallback = Future<void> Function(String method, dynamic arguments);
+typedef NativeEventCallback =
+    Future<void> Function(String method, dynamic arguments);
 
 class Service {
   static final Service _instance = Service._internal();
@@ -62,7 +63,13 @@ class Service {
     return completed;
   }
 
-  Future<bool?> smartStop() => methodChannel.invokeMethod<bool>('smartStop');
+  Future<bool?> smartStop() async {
+    final completed = await methodChannel.invokeMethod<bool>('smartStop');
+    if (completed != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    return completed;
+  }
 
   Future<bool?> smartResume() async {
     final options = await clashLib?.getAndroidVpnOptions();
@@ -93,14 +100,18 @@ class Service {
   }
 
   Future<bool> isServiceEngineRunning() async {
-    return await methodChannel.invokeMethod<bool>('isServiceEngineRunning') ?? false;
+    return await methodChannel.invokeMethod<bool>('isServiceEngineRunning') ??
+        false;
   }
 
   Future<bool> getStatus() async {
     return await methodChannel.invokeMethod<bool>('status') ?? false;
   }
 
-  Future<void> updateNotificationSpeed(String profileName, String speedInfo) async {
+  Future<void> updateNotificationSpeed(
+    String profileName,
+    String speedInfo,
+  ) async {
     await methodChannel.invokeMethod<void>('updateNotificationSpeed', {
       'profileName': profileName,
       'speedInfo': speedInfo,
@@ -111,7 +122,8 @@ class Service {
     await methodChannel.invokeMethod<void>('restoreNotification');
   }
 
-  Future<bool?> reconnectIpc() => methodChannel.invokeMethod<bool>('reconnectIpc');
+  Future<bool?> reconnectIpc() =>
+      methodChannel.invokeMethod<bool>('reconnectIpc');
 }
 
 Service? get service =>

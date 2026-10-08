@@ -6,6 +6,7 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/common/network_matcher.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/plugins/service.dart';
+import 'package:bett_box/plugins/smart_stop_completion.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
@@ -157,7 +158,6 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
         final isRunning =
             ref.read(runTimeProvider) != null || globalState.isStart;
         if (isRunning) {
-          ref.read(isSmartStoppedProvider.notifier).set(true);
           commonPrint.log('Smart Auto Stop: Stopping ...');
           await _stopVpn();
         }
@@ -191,20 +191,24 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
 
   Future<void> _stopVpn() async {
     if (system.isAndroid) {
-      // Android: Enable smart-stop mode (Blank notification)
-      // This keeps the service alive but stops the VPN logic
-      await service?.setSmartStopped(true);
-      await service?.smartStop();
-
-      // Update Dart state to look "stopped"
-      globalState.startTime = null;
-      clashCore.resetTraffic();
-      ref.read(trafficsProvider.notifier).clear();
-      ref.read(totalTrafficProvider.notifier).value = Traffic();
-      ref.read(runTimeProvider.notifier).value = null;
+      // Android 保留服务；只有原生停止确认后才清理运行显示。
+      await completeSmartStop(
+        stop: () async => service?.smartStop(),
+        isSuspended: () async => await service?.isSmartStopped() ?? false,
+        currentSession: () => globalState.startTime,
+        commit: () {
+          ref.read(isSmartStoppedProvider.notifier).set(true);
+          globalState.startTime = null;
+          clashCore.resetTraffic();
+          ref.read(trafficsProvider.notifier).clear();
+          ref.read(totalTrafficProvider.notifier).value = Traffic();
+          ref.read(runTimeProvider.notifier).value = null;
+        },
+      );
     } else {
       // Desktop: Full stop
       await globalState.appController.updateStatus(false);
+      ref.read(isSmartStoppedProvider.notifier).set(true);
     }
   }
 

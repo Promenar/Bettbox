@@ -1,0 +1,39 @@
+{
+  "binary_sha256": "82a63e566df89153927d26f2fce94446f826b85a9423aeef2692f309e0f8a4d5",
+  "exit_code": 0,
+  "exit_confirmed": true,
+  "elapsed_seconds": 2.78,
+  "results": [
+    {
+      "index": 0,
+      "protocol": "anytls",
+      "stage": "request",
+      "error_class": "transport",
+      "trace_present": false
+    },
+    {
+      "index": 1,
+      "protocol": "anytls",
+      "stage": "request",
+      "error_class": "transport",
+      "trace_present": false
+    },
+    {
+      "index": 2,
+      "protocol": "hysteria2",
+      "stage": "request",
+      "error_class": "authentication",
+      "trace_present": false
+    },
+    {
+      "index": 3,
+      "protocol": "hysteria2",
+      "stage": "request",
+      "error_class": "authentication",
+      "trace_present": false
+    }
+  ],
+  "secrets_reported": false,
+  "boundary": "macOS独立核心协议探测；不证明Android JNI/TUN或系统代理通过。",
+  "observed_at": "2026-10-08T16:48:17.953973+00:00"
+}

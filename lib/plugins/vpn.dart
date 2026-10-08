@@ -87,7 +87,13 @@ class Vpn {
     return await methodChannel.invokeMethod<bool>('isSmartStopped') ?? false;
   }
 
-  Future<bool?> smartStop() => methodChannel.invokeMethod<bool>('smartStop');
+  Future<bool?> smartStop() async {
+    final completed = await methodChannel.invokeMethod<bool>('smartStop');
+    if (completed != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    return completed;
+  }
 
   Future<bool?> smartResume(AndroidVpnOptions options) async {
     return await methodChannel.invokeMethod<bool>('smartResume', {

@@ -51,3 +51,7 @@ Go施工独占core/lib_android.go、core/android_bride.go、core/tun/tun.go、co
 Go配置只在runLock下复制必要primitive字段，释放后才进入State生命周期锁。原生FD租约在进入State前创建并在所有提前拒绝路径收回；未采纳关闭失败保留首错并阻止新代启动。CallbackGate先关准入后等pin，再释放一次JNI引用；闭门handler作为拒绝socket保护哨兵，成功关闭后才清空，未知关闭保留。监听器初始化期间必须可保护socket，resolver不读取未同步listener指针。
 
 验收：现有State/CallbackGate回归、新增输入关闭失败及RawConn.Control保护false/异常逻辑回归；JNI生成头和Kotlin真实编译后做候选APK构建、安装回读、失败启动/停止/重新启动设备验证。有效上游恢复后才验证代理出口；三栈有效constructor采纳路径仍需有界失败夹具与设备证据。
+
+## 智能停止完成确认
+
+生产 smartStop 的两条 MethodChannel 入口须等待同代 nativeGate 关闭和 SUSPENDED 状态提交；关闭、挂起监听释放、JNI 挂起调用异常或旧代提交失败均返回 false，保留阻断责任。Dart 两包装器仅接受 true，调用方不预置 isSmartStopped，未确认时不得清空运行时间或流量。恢复启动资格和唯一 owner/ACK 保持后续联合验收范围，不以该阶段替代代理流量验证。主控独占 VpnPlugin、ServicePlugin、Core.suspended、Dart 两包装器和两调用方、相关回归/PDEC/文档；独立 Agent 只读串行复核。先运行实际包装器 red，再执行 gate/JVM、release Kotlin、完整 Flutter 与 analyze。

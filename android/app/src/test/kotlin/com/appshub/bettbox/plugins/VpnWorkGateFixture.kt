@@ -12,6 +12,7 @@ object VpnWorkGateFixture {
     fun main(args: Array<String>) = runBlocking {
         check(!VpnWorkGate().stop({ true }, { false }, { it })) { "关闭失败不能返回停止成功" }
         stopResponseWaitsForCloseAndCommit()
+        smartStopRetainsFailureAndWaitsForSuspension()
         val gate = VpnWorkGate()
         val state = VpnLifecycle<Any>()
         val established = CompletableDeferred<Unit>()
@@ -51,6 +52,33 @@ object VpnWorkGateFixture {
         recoveryWaitsAndRejectsRevokedIntent()
         inputCloseFailureCannotBeClearedByOldStop()
         println("VPN work gate fixture passed")
+    }
+
+    private suspend fun smartStopRetainsFailureAndWaitsForSuspension() = kotlinx.coroutines.coroutineScope {
+        for (closed in listOf(false, true)) {
+            val state = VpnLifecycle<Any>()
+            val ticket = checkNotNull(state.begin(Any()))
+            check(state.started(ticket))
+            val generation = state.invalidate()
+            val entered = CompletableDeferred<Unit>()
+            val release = CompletableDeferred<Unit>()
+            var smartStopped = false
+            val reply = async {
+                VpnWorkGate().stop({ state.generation == generation }, {
+                    entered.complete(Unit); release.await(); closed
+                }, {
+                    val committed = state.stopped(generation, it, suspended = true)
+                    if (committed) smartStopped = true
+                    committed
+                })
+            }
+            entered.await()
+            check(!reply.isCompleted && !smartStopped)
+            release.complete(Unit)
+            check(reply.await() == closed && smartStopped == closed)
+            check(state.phase == if (closed) VpnLifecycle.Phase.SUSPENDED else VpnLifecycle.Phase.BLOCKED)
+            check((state.begin(Any()) != null) == closed)
+        }
     }
 
     private suspend fun stopResponseWaitsForCloseAndCommit() = kotlinx.coroutines.coroutineScope {

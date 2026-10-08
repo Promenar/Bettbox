@@ -2582,3 +2582,34 @@ record-fingerprint: 09a07a67bda03d235e8f50b38dbc6f50d7622ec3613444fda69017603c31
 
 ### HLG
 标准append追加当前阶段、复核和未完成边界。
+
+## 2026-10-09T00:50:29+08:00 · Android智能停止回执和显示提交候选
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["android", "vpn", "smart-stop", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 71bf477498406795797bb06cfeab998e2ab01720ef2b773f23941febeed7cdf0
+
+### Summary
+修复智能停止提前返回成功及Dart提前提交显示状态。两native channel等待串行关闭和同代提交，Handler实际投递拒绝旧代；同会话及原生挂起确认后同步设置smart状态和清运行显示。
+
+### Changed
+VpnPlugin/ServicePlugin完成回执，Core.suspended返回JNI调用是否抛异常；Dart两个包装器拒绝false/null，completeSmartStop与manager/main阻断失败或换会话清理。旧Throwable只影响同代。公开同源协议观测更新：AnyTLS两传输失败，Hysteria2两认证失败。
+
+### Validation
+实际Dart包装器red2失败、green12项通过；生产Kotlin gate/lifecycle两公开协程fixture通过；实际Android release Kotlin编译退出0。最终源256Flutter完整回归（含实际Go FFI）和analyze无问题，diff检查通过。独立审阅读取实际源关闭提前provider、Handler旧代及Dart微任务间隙；普通通知异常被startForeground内部捕获，审阅撤回该常规异常归因，Throwable保护作为防御边界。初始Kotlin构建包装误把signing_environment返回dict用作context manager而退出，未执行编译；按实际API修正后编译通过，秘密无回显。
+
+### Next
+提交推送候选并核对SHA；完成唯一native owner、带身份engine ACK、智能恢复和新APK设备交错。macOS登录表单等待用户本机输入，随后验证插件会话/冷启动。
+
+### Risks
+无新APK安装或智能停止设备证明。JNI void挂起无异常不表示engine ACK；Dart会话对象不是完整owner token。上游协议失败未确定凭据或额度根因，不自动续费。整体发行目标未完成。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、PDEC README、registry、实施计划和公开两项回执。
+
+### HLG
+标准append记录该开发候选、实测、独立复核与剩余边界。

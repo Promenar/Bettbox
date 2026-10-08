@@ -132,7 +132,6 @@ Future<void> _service(List<String> flags) async {
           if (shouldStop && !isSmartStopped) {
             final isRunning = await vpn?.getStatus() ?? false;
             if (isRunning) {
-              await vpn?.setSmartStopped(true);
               await vpn?.smartStop();
             }
           } else if (!shouldStop && isSmartStopped) {

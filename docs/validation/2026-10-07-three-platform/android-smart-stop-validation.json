@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-09",
+  "stage": "source-and-kotlin-candidate",
+  "sources": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "351732b59ce841bde26eace7b93e575cd9068262799b32c809447e600e2edb1d",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "db63c8ebb2770ff956eea90ae0d1b711777e9f64d4061787a9dbe594e010e861",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "1f7cbafcb4072b366f83df586f3372ad3859e3d3bee9cae9504194a5750a7e26",
+    "lib/plugins/smart_stop_completion.dart": "8ae046e82ee7f7623c18a91640af3ad6df398ab21e07cd32299ed1eaf76fa66b",
+    "lib/manager/smart_auto_stop_manager.dart": "0796fde8a119a4b6633d36acf488a8dbb6c2f37164609029b75f27225ba07235"
+  },
+  "dart_red_failed_cases": 2,
+  "dart_channel_tests": 12,
+  "jvm_gate_fixture_entrypoints": 2,
+  "release_kotlin_compile_exit_code": 0,
+  "flutter_tests": 256,
+  "flutter_analyze": "passed-final-source",
+  "independent_source_review": "最终源通过；native与Dart提交边界已复核",
+  "device_smart_stop_verified": false,
+  "new_apk_installed": false,
+  "remaining": [
+    "唯一native owner与带身份engine ACK",
+    "实际Handler/JNI/设备交错",
+    "智能恢复完成确认",
+    "有效代理流量与发行验收"
+  ],
+  "boundary": "JNI void挂起调用只核验未抛异常；Dart会话对象不是完整owner token。"
+}

@@ -126,3 +126,6 @@
 - docs/validation/2026-10-07-three-platform/macos-development-keychain-validation.json — 本机原生覆盖写/重复删除诊断、六项工具回归及完整App待验边界
 
 - docs/validation/2026-10-07-three-platform/macos-local-development-launch.json — 完整本机开发候选构建、封装和实际首页启动证据；会话与发行另验
+
+- docs/validation/2026-10-07-three-platform/android-smart-stop-validation.json — 智能停止回执、会话显示提交及 Kotlin 编译候选证据；设备另验
+- docs/validation/2026-10-07-three-platform/node-protocol-observation-2026-10-09.json — 同源独立协议探测的公开分类结果；上游根因未定

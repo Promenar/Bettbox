@@ -108,13 +108,13 @@ object Core {
         return started && !inputCleanupFailed.get()
     }
 
-    fun suspended(value: Boolean) {
-        runCatching {
+    fun suspended(value: Boolean): Boolean {
+        return runCatching {
             Log.d("Core", "suspended called with value: $value")
             suspend(if (value) 1 else 0)
             Log.d("Core", "suspend JNI call completed")
         }.onFailure {
             Log.e("Core", "TUN 挂起调用失败")
-        }
+        }.isSuccess
     }
 }

@@ -2973,7 +2973,7 @@
     "core/android_bride.go": "270b71d0f23b86c0858a056f748f6453f0bc7b73310abfdbaf44899588e4220f",
     "core/tun/tun.go": "f10d11aa419543c7d6cb7d57c6036cbad4e2a739523a07889091dfd16404590c",
     "core/androidstartup/socket_protect_test.go": "290e41d493c0e21ab97356b902d7564fe46e5fd4bd30fbacdc33460e30f89f98",
-    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "ee83781b608da1a0f8acfa4cd8814db955c8194f38e25a9b3dbe251e86b5c6ba",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "1f7cbafcb4072b366f83df586f3372ad3859e3d3bee9cae9504194a5750a7e26",
     "android/core/src/main/java/com/appshub/bettbox/core/TunInterface.kt": "c0a1e9c1cc1c4e255d030f2843405a79fabdaf45cdb0d7eae2a7a9ed6781a3d3",
     "android/core/src/main/java/com/appshub/bettbox/core/TunFDLease.kt": "35601d506ad20be9bee7f7303f6b773da04312d0a098a0e21bc23983dae68f51",
     "android/core/src/test/kotlin/com/appshub/bettbox/core/TunFDLeaseFixture.kt": "37e8e5260309c37dea1ac9be9528753a1f6734d2d93f4dcabb7c005447096cce",
@@ -2985,9 +2985,9 @@
     "scripts/check_android_vpn_work_gate.py": "ae20f570820d3f4e0d9df87bbd9468846cac41e2beda59367634c7f0cdf27b48",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
-    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "33df2cbc38d71ed71b1f33af873d0f4c2bd4a1fb3810ad192951d50247cb80d7",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "5e0c5c4349662155139da87805837823bafd9642ae8899747130099940fa5110",
     "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "4a54de20794463effa8ffd5035e5158b19d187496d8ae8171617a89b24c001f4",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "350d0d61e191bf52e2ab11bb228ecee352bb058675470547fc270e1c8253ff94",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "351732b59ce841bde26eace7b93e575cd9068262799b32c809447e600e2edb1d",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "bd97efec4ac22e018eb49a2ed96fa50a16749697556ec4ef15a5de7c6bf47122",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BaseServiceInterface.kt": "8f4e1095b5fe1966720ac966d673a172a7ff6ac539e60c0cf4750689ab1cd9fc",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxService.kt": "c6a65dbb9ac2755546c0a546dd94c389c0e38a227f3b73806ebf7adc317ed416",
@@ -3037,11 +3037,11 @@
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09",
     "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequestsFixture.kt": "f5406bd2d9d885bf6984ceca96021ffd3c86b387820dc26b5711f4fb6a861417",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "4cd873d2694b19323c75eb1e7f905e19e821148e7b373e966b7247f80d949973",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "db63c8ebb2770ff956eea90ae0d1b711777e9f64d4061787a9dbe594e010e861",
     "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "b08e8eaae8f0e7bc4de787556c79a1fca4eaa6176c69bb31d64338a222038e6f",
-    "test/plugins/android_stop_completion_test.dart": "bc9272223660c892a71b811c7c06e90c45490b7868dbf3cf7059a24b7c5411d9",
-    "lib/plugins/service.dart": "6cb46d477d3e01de4cf15ba983812cbe2902be2928b1bfcb7db4afc75ddf1ad9",
-    "lib/plugins/vpn.dart": "b34d903ca3cd8dc651a53ac88e923093dd3059ac5af3db70da590e49c5c14fc7",
+    "test/plugins/android_stop_completion_test.dart": "75e44abdc1069658e468e3b0ca3e5d8c392152a4980ed8d5987089c288628c65",
+    "lib/plugins/service.dart": "ac469057e218de59d8657636c58548cb7580721ee6f87d532884f789ec843c50",
+    "lib/plugins/vpn.dart": "5e30637d3179181c12a9040eb650503a95f0df1408b51b2deceb7f23647eecf3",
     "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
     "core/shutdown_listener_confirmation_test.go": "8528438392c7df42d090dcfc7d9494bbbcf90786c9cf111fb86559feb452f648",
     "lib/clash/lib.dart": "530cbe0d527983cef562665eae2c775fda06500ead66995b9a5f018ff3cc9cf7",
@@ -3060,7 +3060,11 @@
     "test/xboard/macos_development_storage_test.dart": "68a25c6b8d4bfb40dac25af74db7f5b359715436646353adf18b7c5a8cfd799c",
     "macos/Runner/LocalDevelopment.entitlements": "97704a8960b4facceef54397a08fb5d0a456247c3627359215aa2a27df22656c",
     "lib/xboard/storage_backend.dart": "a562821814cd82a72ef33bc3bbc2479924d66fc746df8a19b83f46a14dfe1ce2",
-    "lib/xboard/secure_store.dart": "5167785747cbf8311864caa4843890b23880b93bf6f14b6cafeecca63c05fe30"
+    "lib/xboard/secure_store.dart": "5167785747cbf8311864caa4843890b23880b93bf6f14b6cafeecca63c05fe30",
+    "lib/plugins/smart_stop_completion.dart": "8ae046e82ee7f7623c18a91640af3ad6df398ab21e07cd32299ed1eaf76fa66b",
+    "test/plugins/smart_stop_completion_test.dart": "06c60b886df21b2e3c6e0d0a6ae424854e4e596fe8cf854084f020346bd92a23",
+    "lib/manager/smart_auto_stop_manager.dart": "0796fde8a119a4b6633d36acf488a8dbb6c2f37164609029b75f27225ba07235",
+    "lib/main.dart": "12c5f4ea0b923d9db3dd6271df579333dc8f4f9a0ff4e5cc1d1530973f35d6c8"
   },
   "platform_extensions": {
     "android": {
@@ -3136,6 +3140,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "d850f8993039d19c45fb8d4b6fb4c428dab8632b55e89747705ea250bea6ee25"
+    "contract_digest": "400c5f9adb18a5d5c51dba4f34c4e6e2325197017c3667a4d6106a2c4bba516e"
   }
 }

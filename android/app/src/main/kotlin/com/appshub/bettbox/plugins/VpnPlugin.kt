@@ -63,9 +63,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private val stopResultHandler = Handler(Looper.getMainLooper())
     private val unconfirmedConnections = mutableSetOf<ServiceConnection>()
 
-    internal fun completeStopResult(result: MethodChannel.Result, completed: Boolean) {
+    internal fun completeStopResult(result: MethodChannel.Result, completed: Boolean, current: () -> Boolean = { true }) {
         stopResultHandler.post {
-            runCatching { result.success(completed) }
+            runCatching { result.success(completed && current()) }
                 .onFailure { android.util.Log.e("VpnPlugin", "停止完成响应投递失败") }
         }
     }
@@ -191,8 +191,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
 
             "smartStop" -> {
-                handleSmartStop()
-                result.success(true)
+                handleSmartStop { completed, generation ->
+                    completeStopResult(result, completed) { smartStopReceiptCurrent(generation) }
+                }
             }
 
             "smartResume" -> {
@@ -804,9 +805,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private fun currentGeneration(): Long = lifecycle.generation
 
-    fun handleSmartStop() {
+    fun handleSmartStop(completion: ((Boolean, Long) -> Unit)? = null) {
         val stopGeneration = GlobalState.runLock.withLock {
-            if (lifecycle.phase == VpnLifecycle.Phase.IDLE && !startRequested) return
+            if (lifecycle.phase == VpnLifecycle.Phase.IDLE && !startRequested &&
+                !localCleanupFailed && !GlobalState.isCurrentlyStopping()) {
+                completion?.invoke(true, currentGeneration())
+                return
+            }
             startRequested = false
             intents.cancelIntent()
             GlobalState.updateIsStopping(true)
@@ -814,27 +819,51 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             lifecycle.invalidate()
         }
         lifecycleScope.launch {
-            withContext(NonCancellable) {
-                nativeGate.run {
-                    if (GlobalState.runLock.withLock { currentGeneration() != stopGeneration }) return@run
-                    val stopped = Core.stopTun() && !localCleanupFailed
-                    if (stopped) {
-                        suspendModule?.uninstall()
-                        suspendModule = null
-                        Core.suspended(true)
-                    }
-                    GlobalState.runLock.withLock {
-                        if (lifecycle.stopped(stopGeneration, stopped, suspended = true)) {
-                            GlobalState.isSmartStopped = true
-                            GlobalState.updateIsStopping(false)
-                            GlobalState.updateRunState(RunState.STOP)
+            var completed = false
+            try {
+                withContext(NonCancellable) {
+                    completed = nativeGate.stop(current = {
+                        GlobalState.runLock.withLock {
+                            lifecycle.phase == VpnLifecycle.Phase.STOPPING && currentGeneration() == stopGeneration
                         }
-                    }
-                    if (stopped) startForeground()
+                    }, close = {
+                        if (!Core.stopTun() || localCleanupFailed) false else {
+                            check(suspendModule?.uninstall() != false) { "挂起监听释放未确认" }
+                            suspendModule = null
+                            Core.suspended(true)
+                        }
+                    }, commit = { stopped ->
+                        GlobalState.runLock.withLock {
+                            if (lifecycle.stopped(stopGeneration, stopped, suspended = true)) {
+                                GlobalState.isSmartStopped = true
+                                GlobalState.updateIsStopping(false)
+                                GlobalState.updateRunState(RunState.STOP)
+                                true
+                            } else false
+                        }
+                    })
+                    if (completed) startForeground()
                     else android.util.Log.e("VpnPlugin", "智能停止失败，保持启动阻断")
                 }
+            } catch (_: Throwable) {
+                completed = false
+                GlobalState.runLock.withLock {
+                    if (currentGeneration() == stopGeneration) {
+                        localCleanupFailed = true
+                        markBlocked()
+                    }
+                }
+                android.util.Log.e("VpnPlugin", "智能停止完成未确认，保持资源责任")
+            } finally {
+                completion?.invoke(completed, stopGeneration)
             }
         }
+    }
+
+    internal fun smartStopReceiptCurrent(generation: Long): Boolean = GlobalState.runLock.withLock {
+        lifecycle.generation == generation &&
+            (lifecycle.phase == VpnLifecycle.Phase.IDLE ||
+             lifecycle.phase == VpnLifecycle.Phase.SUSPENDED && GlobalState.isSmartStopped)
     }
 
     fun handleSmartResume(options: VpnOptions): Boolean {

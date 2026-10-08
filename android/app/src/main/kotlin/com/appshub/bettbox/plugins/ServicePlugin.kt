@@ -63,8 +63,9 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 VpnPlugin.handleStop(force = true) { VpnPlugin.completeStopResult(result, it) }
             }
             "smartStop" -> {
-                VpnPlugin.handleSmartStop()
-                result.success(true)
+                VpnPlugin.handleSmartStop { completed, generation ->
+                    VpnPlugin.completeStopResult(result, completed) { VpnPlugin.smartStopReceiptCurrent(generation) }
+                }
             }
             "smartResume" -> {
                 val data = call.argument<String>("data")

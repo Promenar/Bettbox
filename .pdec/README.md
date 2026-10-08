@@ -163,3 +163,5 @@ Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例�
 ## 完整 macOS 本机开发渠道
 
 `build-macos-local-development` 使用显式 `--unsigned-macos --local-development-keychain` 构建完整 main 入口，固定 APP_ENV=local-macos-development 和开发存储标记。`seal-macos-local-development` 使用现有唯一 Apple Development 身份、独立空权利文件与固定新目录 `build/macos-local-development/Bettbox.app`，拒绝覆盖；按清单校验实际宿主和 App.framework/Versions/A/App、原生 Core/helper 字节。封装成功不声明启动、公证或发行通过。启动记录另存公开回执，正式默认存储与 Release 权利保持。
+
+智能停止沿用 test-android-stop-dart、test-android-vpn-work-gate、compile-android-stop-response-adapter 与完整 test-flutter/analyze 操作。测试使用公开 channel/会话对象与协程屏障，实际 Android release Kotlin 编译使用既有安全签名注入，不回显凭据。该阶段不安装新 APK，不把 JNI void 挂起无异常作为 engine ACK。
