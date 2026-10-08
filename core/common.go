@@ -119,20 +119,22 @@ func sideUpdateExternalProvider(p cp.Provider, bytes []byte) error {
 	}
 }
 
-func updateListeners() {
+func updateListeners() error {
 	// 专用进程不启用订阅中的普通监听器；默认平台入口保持原行为。
 	if ownedListenerMode.Load() {
-		return
+		return nil
 	}
 	if !isRunning {
-		return
+		return nil
 	}
 	if currentConfig == nil {
-		return
+		return nil
 	}
 	listeners := currentConfig.Listeners
 	general := currentConfig.General
-	listener.PatchInboundListeners(listeners, tunnel.Tunnel, true)
+	if err := listener.PatchInboundListenersChecked(listeners, tunnel.Tunnel, true); err != nil {
+		return err
+	}
 	listener.SetAllowLan(general.AllowLan)
 	inbound.SetSkipAuthPrefixes(general.SkipAuthPrefixes)
 	inbound.SetAllowedIPs(general.LanAllowedIPs)
@@ -149,6 +151,7 @@ func updateListeners() {
 	if !features.Android {
 		listener.ReCreateTun(general.Tun, tunnel.Tunnel)
 	}
+	return nil
 }
 
 func stopListeners() {
@@ -196,20 +199,19 @@ func readFile(path string) ([]byte, error) {
 	return data, err
 }
 
-func updateConfig(params *UpdateParams) {
+func updateConfig(params *UpdateParams) error {
 	runLock.Lock()
 	defer runLock.Unlock()
-	if androidLegacyConfigWriteErrorLocked() != nil {
-		return
+	if err := androidLegacyConfigWriteErrorLocked(); err != nil {
+		return err
 	}
-	updateConfigLocked(params)
+	return updateConfigLocked(params)
 }
 
 // 调用者持有runLock；保留updateConfig既有更新顺序和行为。
-func updateConfigLocked(params *UpdateParams) {
+func updateConfigLocked(params *UpdateParams) error {
 	if currentConfig == nil {
-		log.Infoln("[APP] updateConfig called before setupConfig")
-		return
+		return errors.New("核心尚未配置")
 	}
 	general := currentConfig.General
 	wasDebug := general.LogLevel == log.DEBUG
@@ -293,7 +295,7 @@ func updateConfigLocked(params *UpdateParams) {
 		general.Tun.DisableICMPForwarding = *params.Tun.DisableICMPForwarding
 	}
 
-	updateListeners()
+	return updateListeners()
 }
 
 type preparedSetupConfig struct {
@@ -357,15 +359,18 @@ func prepareSetupConfigLocked(params *SetupParams) (*preparedSetupConfig, error)
 }
 
 // 准备成功后才发布已复制的配置；保留现有成功应用顺序。
-func commitSetupConfigLocked(prepared *preparedSetupConfig) {
+func commitSetupConfigLocked(prepared *preparedSetupConfig) error {
 	currentConfig = prepared.parsed
 	currentRawConfig = prepared.params.Config
 	constant.DefaultTestURL = prepared.params.TestURL
 	hub.ApplyConfig(currentConfig)
 	patchSelectGroup(prepared.params.SelectedMap)
-	updateListeners()
+	if err := updateListeners(); err != nil {
+		return err
+	}
 	runtime.GC()
 	debug.FreeOSMemory()
+	return nil
 }
 
 func setupConfig(params *SetupParams) error {
@@ -383,8 +388,7 @@ func setupConfigLocked(params *SetupParams) error {
 	if err != nil {
 		return err
 	}
-	commitSetupConfigLocked(prepared)
-	return nil
+	return commitSetupConfigLocked(prepared)
 }
 
 func UnmarshalJson(data []byte, v any) error {

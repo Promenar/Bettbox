@@ -271,7 +271,7 @@ BootReceiver 的开机自启合同独立。文件方案不承诺目录的断电�
 
 ### Android 唯一所有者采用边界
 
-owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapter，主后台配置和退出尚未共用唯一 owner。公共 hub init/state/setup/update 与监听启停/shutdown 已在 runLock 内按已接受状态、提交责任、阻断和 TUN 预留拒绝旧入口；畸形 setup 在拒绝之后才解析，不能回退写默认配置。直接 setup/update 包装器同样拒绝，内部 prepare/commit/updateConfigLocked 保留给 owned driver。update 的 void 包装器拒绝时不执行，不能被上层包装成成功。legacy TUN、双通道与带身份 lifecycle 接线尚待采用；darwin 的 ownedListenerMode 不承担 Android 门禁职责。完整采用须原子收敛实际配置写、用户停止意图、同次 options/资源身份、双 channel 不可变完成消费与 ACK 退出准入，执行合同见 `.agents/plans/2026-10-09-android-single-owner-adoption.md`。
+owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapter，主后台配置和退出尚未共用唯一 owner。公共 hub init/state/setup/update 与监听启停/shutdown 已在 runLock 内按已接受状态、提交责任、阻断和 TUN 预留拒绝旧入口；畸形 setup 在拒绝之后才解析，不能回退写默认配置。直接 setup/update 包装器同样拒绝，内部 prepare/commit/updateConfigLocked 保留给 owned driver。update 包装器返回真实错误；命名监听应用失败传播至启动、setup/update、Android owned driver及iOS更新，已进入副作用的失败不能声称回滚。legacy TUN、双通道与带身份 lifecycle 接线尚待采用；darwin 的 ownedListenerMode 不承担 Android 门禁职责。完整采用须原子收敛实际配置写、用户停止意图、同次 options/资源身份、双 channel 不可变完成消费与 ACK 退出准入，执行合同见 `.agents/plans/2026-10-09-android-single-owner-adoption.md`。
 
 ### Android 运行时配置身份
 
@@ -308,3 +308,8 @@ HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避�
 
 
 数据库异步队列隔离验收使用真实 Laravel DatabaseQueue 和 Worker，CheckOrder 的序列化补偿与 OrderHandleJob 消费分离，异常先释放重试，重复持久任务由独立进程消费；不以同步调用替代。临时 queue 配置恢复，生产 Redis/daemon 生命周期另验。
+
+
+### 命名监听登记责任
+
+`PatchInboundListenersChecked` 在 `inboundMux` 内先登记对象再执行 Listen。创建失败或 panic 保留对象和未确认标记；任一未确认名称阻止新构造，只有显式 `StopListenerChecked` 关闭确认可移除责任。配置相同和候选对象别名使用统一实际对象，保留名称纳入引用清单；替换、删除关闭成功均原子移除该对象全部名称，关闭失败保留旧对象。此登记仅证明已记录资源的 Close 结果，协议内部任务、general监听和全局UDP须由完整 owner另行治理。

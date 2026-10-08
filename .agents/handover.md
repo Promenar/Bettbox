@@ -3388,3 +3388,34 @@ Realm HTTP资源收尾候选已完成实际回归与独立复审；完整Android
 
 ### HLG
 标准append预演并应用，保留总体continuity。
+
+## 2026-10-09T06:44:07+08:00 · 命名监听部分创建责任与核心错误传播回归
+
+type: maintenance
+scope: ["Bettbox", "Android", "Go"]
+status: partial
+tags: ["android", "listener", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 1a7b2577aedd8109e999e9758a91ca9ddf4b847fa5ad5269d7636152743caf3c
+
+### Summary
+命名监听登记和核心失败传播候选通过实际回归、ARM64编译和独立终审；完整三端发行目标未完成。
+
+### Changed
+新增检查式Patch，Listen前登记并保留错误/panic对象；关闭失败不得覆盖/删除，未知责任阻止构造；统一别名canonical和保留引用，关闭确认后原子删除全部名称。start/update/setup及Android production driver/iOS更新传播错误。
+
+### Validation
+旧登记4项和旧生产传播3项真实loopback测试红。独立审阅4项别名P2均有红绿证据。11项命名race及16个删除子用例、5项既有检查式关闭、核心完整CGO0测试通过；Android ARM64 c-shared编译退出0，四个ELF加载段均16384对齐。最终独立复核无新增P1/P2。公开证据inbound-partial-ownership-validation.json。
+
+### Next
+按唯一owner总计划接入general、全部协议实际任务及独立UDP runtime、Android配置/TUN/completion/ACK；解锁后定位macOS黑屏，继续服务端业务和发行全路径。
+
+### Risks
+成功setup的全局ApplyConfig副作用未做本轮集成验证；命名Close登记不等于全部协议内部任务或完整owner退出。未安装APK或部署生产，macOS界面仍锁屏，真实VPN、商户、Apple团队及完整业务未验收。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、PDEC、registry、总计划、实施计划和公开证据。
+
+### HLG
+标准append预演后应用，保留bettbox-three-platform-release总体continuity。

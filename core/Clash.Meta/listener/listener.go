@@ -624,32 +624,10 @@ func PatchTunnel(tunnels []LC.Tunnel, tunnel C.Tunnel) {
 	}
 }
 
+// 兼容入口使用检查式实现；固定诊断不泄露协议配置或内部异常。
 func PatchInboundListeners(newListenerMap map[string]C.InboundListener, tunnel C.Tunnel, dropOld bool) {
-	inboundMux.Lock()
-	defer inboundMux.Unlock()
-
-	for name, newListener := range newListenerMap {
-		if oldListener, ok := inboundListeners[name]; ok {
-			if !oldListener.Config().Equal(newListener.Config()) {
-				_ = oldListener.Close()
-			} else {
-				continue
-			}
-		}
-		if err := newListener.Listen(tunnel); err != nil {
-			log.Errorln("Listener %s listen err: %s", name, err.Error())
-			continue
-		}
-		inboundListeners[name] = newListener
-	}
-
-	if dropOld {
-		for name, oldListener := range inboundListeners {
-			if _, ok := newListenerMap[name]; !ok {
-				_ = oldListener.Close()
-				delete(inboundListeners, name)
-			}
-		}
+	if PatchInboundListenersChecked(newListenerMap, tunnel, dropOld) != nil {
+		log.Errorln("命名监听应用未确认")
 	}
 }
 

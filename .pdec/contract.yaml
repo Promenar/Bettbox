@@ -3087,6 +3087,73 @@
       ],
       "verification": "Realm完整生命周期修复实际Android ARM64 c-shared核心编译；离线只读依赖，不安装或证明设备流量",
       "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "test-inbound-partial-ownership": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-run",
+        "^TestInboundPatch",
+        "github.com/metacubex/mihomo/listener"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "命名协议实际loopback部分构造、替换/删除错误责任；非完整listener drain或设备"
+    },
+    "test-core-inbound-apply": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestInboundApply",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "CGO0离线；真实loopback部分创建经生产start/update及Android coordinator传播，不运行setup ApplyConfig全局副作用或设备VPN。"
+    },
+    "compile-android-inbound-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-inbound-core/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-inbound-core/libclash.so",
+        ".test/android-inbound-core/libclash.h"
+      ],
+      "verification": "命名监听部分创建登记及生产配置失败传播的Android ARM64 c-shared编译；离线依赖，不安装APK，不证明设备全路径",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
     }
   },
   "deployment": {
@@ -3174,8 +3241,8 @@
     "core/state/state.go": "38ab490b6738db46c3f7f6b9d5110ccaf72fa66c0561496d86f6c6d44211b554",
     "core/state/snapshot.go": "b283decb2a81c398e7a33be75eb7cca5aa9d269ea016cfd7891642b99bc9bfb3",
     "core/state/snapshot_test.go": "cf4b18579a8c0fcf2aa9fec293b948731ad057baf83cd041289d0ced78d0845c",
-    "core/hub.go": "a2dd53922896ccad853aaf345e0ad7467a10b1486776966d461b66e6cb96ac53",
-    "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
+    "core/hub.go": "b2db37dae067bf9a974a52c80b84d64fc546619ae822d055ba92275256055711",
+    "core/lib_ios.go": "92de14c1ca74bb217f18d12ce8f1e1789b0c5838664a122a8dc08cc96438abec",
     "core/lib_android.go": "8e038a4de68b3f02d07a82260b3c45c21c1f648323dcef7238fd347ff8c1e1b0",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
     "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
@@ -3195,10 +3262,10 @@
     "core/owned_listener_contract.go": "19ba5b777a670aa3d9bdd2313856970c5de6843445707b8bf8c88f2ea5bbc435",
     "core/owned_listener_darwin.go": "02bc3e93bf341ef7d7a4ab7413c1a9209ed6f0e1ae39973ad0197bc25c7bc5cc",
     "core/owned_listener_test.go": "521c0422be07023ab7d7a55f7355378c9a7f9e7376a85a7aebe0db0eb097361e",
-    "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e",
+    "core/Clash.Meta/listener/stop_checked.go": "d208ebbe5dd87d3c6315b357005105771c75952c064a8e1234d4d078cf8d2718",
     "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b",
     "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
-    "core/common.go": "2b64ff2722e17b9fba7ededc0880e715abbb22fdab36f086249e5423f35171c6",
+    "core/common.go": "1cfcb2539b678ad69858c1218d3a70019b21485f9877a0d24795a214469a02f6",
     "core/constant.go": "cdb275ba6a90f4ff63173faabe238a95ac5904024088bacc223cf52ebd2f1442",
     "scripts/check_macos_supervisor.py": "4ed0575901bbee77d4ca3f20e077ca39b36f74faf82306442ff00816cb44b770",
     "scripts/tests/test_check_macos_supervisor.py": "0f3f0148087b01798b54f2f65dde610ff3d61225e657afd30e9240a49cacff81",
@@ -3315,7 +3382,7 @@
     "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
     "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
     "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d",
-    "core/android_config.go": "ca6f5d93d1d6ca38299e1c2cdb277ceac4806fcce8151402ded387213b18fb7b",
+    "core/android_config.go": "e30bdea35faa2dffd701851d08a502a34d051b79a3ad226a6878b82a574e599d",
     "core/android_config_test.go": "e3db6e48a30e45a513a42dd01c7a7c56b271d2ca9478bc3116533111024771f7",
     "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
     "scripts/check_android_config_protocol.py": "e3b34b21e83dd6dafd2493f3059bba120c9a03176f08eac195a2207f4b701313",
@@ -3428,7 +3495,11 @@
     "server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php": "cffedc4cdfa51d8103542db3eb286e29ab2bec607466a5d2e1feeeaf2ec02041",
     "test/plugins/android_start_admission_test.dart": "8530f7e2a790cbb49b4e750ea5ac2dacf2dd7f399f81690c4999d82e017f7624",
     "core/Clash.Meta/listener/hysteria2_realm/server.go": "b7fdd76ec5e38c58ee8fc228e23644878eb4bf597d6ea26b1248d5d23cda71c8",
-    "core/Clash.Meta/listener/hysteria2_realm/server_test.go": "c5c9628bbc093a22fe5ae02de71fa9bac84afc9915dc639f82d545716a63c866"
+    "core/Clash.Meta/listener/hysteria2_realm/server_test.go": "c5c9628bbc093a22fe5ae02de71fa9bac84afc9915dc639f82d545716a63c866",
+    "core/Clash.Meta/listener/listener.go": "f15be2217197239dbd6b5fdf3e3c204e575e99d64c1f1aa4d4c1dc16af208492",
+    "core/Clash.Meta/listener/inbound_patch_test.go": "b82fd436e65d360fd5d240d8574a0e27c99379af99f31d6b74c19cf282c87d34",
+    "core/Clash.Meta/listener/inbound_checked.go": "880df83f3cb74cd8395141a914a21059d22ee94eb922adf604fae4bef356a1f3",
+    "core/inbound_apply_action_test.go": "c67919052b35d7488381abb5bded710b5c42cbad3bbeccc1adb47d70852266f9"
   },
   "platform_extensions": {
     "android": {
@@ -3504,6 +3575,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "cbd6eb18c279b877470aa0be6300b11fd65b9677d7d94cda3e170e1e06622bab"
+    "contract_digest": "903fb72fc983caea4c77ddb994967987fbd4d24ccdcd6d08e1ceb05d87d14e81"
   }
 }

@@ -220,7 +220,10 @@ func iosExecute(action Action) (response []byte) {
 			result.error("设备、监听及权限参数需要停止后重新配置")
 			break
 		}
-		updateConfig(&params)
+		if err := updateConfig(&params); err != nil {
+			result.error(err.Error())
+			break
+		}
 		result.success("")
 	case asyncTestDelayMethod:
 		if err := iosValidateAction(action); err != nil {

@@ -73,8 +73,12 @@ func handleStartListener() bool {
 	if androidLegacyConfigWriteErrorLocked() != nil {
 		return false
 	}
+	previousRunning := isRunning
 	isRunning = true
-	updateListeners()
+	if err := updateListeners(); err != nil {
+		isRunning = previousRunning
+		return false
+	}
 	resolver.ResetConnection()
 	return true
 }
@@ -631,7 +635,9 @@ func handleUpdateConfig(bytes []byte) string {
 	if err != nil {
 		return err.Error()
 	}
-	updateConfigLocked(params)
+	if err := updateConfigLocked(params); err != nil {
+		return err.Error()
+	}
 	return ""
 }
 

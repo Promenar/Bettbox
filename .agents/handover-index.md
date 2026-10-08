@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T06:29:29+08:00
+> generated_at: 2026-10-09T06:44:07+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -9,7 +9,7 @@
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
-| bettbox-three-platform-release | resume | 2026-10-09T06:29:29+08:00 | partial | ["Bettbox", "Android", "Go"] | Realm HTTP实际资源收尾与关闭失败责任回归 | `.agents/handover.md` · `2026-10-09T06:29:29+08:00` · `fp:60e27e43a7` |
+| bettbox-three-platform-release | resume | 2026-10-09T06:44:07+08:00 | partial | ["Bettbox", "Android", "Go"] | 命名监听部分创建责任与核心错误传播回归 | `.agents/handover.md` · `2026-10-09T06:44:07+08:00` · `fp:1a7b2577ae` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
 | three-platform-release | resume | 2026-10-09T03:19:06+08:00 | partial | ["Bettbox", "Android"] | Android a35d73f签名候选更新基础设备验收与完整owner采用计划 | `.agents/handover.md` · `2026-10-09T03:19:06+08:00` · `fp:6056af5196` |
 
@@ -17,6 +17,7 @@
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T06:44:07+08:00 | iso | partial | resume | ["Bettbox", "Android", "Go"] | ["android", "listener", "release"] | 命名监听部分创建责任与核心错误传播回归 | `.agents/handover.md` · `2026-10-09T06:44:07+08:00` · `fp:1a7b2577ae` |
 | 2026-10-09T06:29:29+08:00 | iso | partial | resume | ["Bettbox", "Android", "Go"] | ["android", "listener", "release"] | Realm HTTP实际资源收尾与关闭失败责任回归 | `.agents/handover.md` · `2026-10-09T06:29:29+08:00` · `fp:60e27e43a7` |
 | 2026-10-09T06:14:53+08:00 | iso | partial | resume | ["Bettbox", "Android", "Dart"] | ["android", "admission", "release"] | Android启动受理拒绝跨层传播与实际回归 | `.agents/handover.md` · `2026-10-09T06:14:53+08:00` · `fp:953bce4a53` |
 | 2026-10-09T06:06:29+08:00 | iso | partial | resume | ["Bettbox", "server/billing"] | ["billing", "coupon", "three-platform-release"] | 真实优惠券和管理员付款业务验收 | `.agents/handover.md` · `2026-10-09T06:06:29+08:00` · `fp:e6a0cc8eb1` |

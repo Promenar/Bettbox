@@ -126,6 +126,9 @@ func StopListenerChecked() error {
 		for name, value := range inboundListeners {
 			if r.close(value) {
 				delete(inboundListeners, name)
+				delete(inboundUnconfirmed, name)
+			} else {
+				inboundUnconfirmed[name] = true
 			}
 		}
 	})

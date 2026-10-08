@@ -120,13 +120,14 @@ func (productionAndroidConfigDriver) prepareSetupLocked(params *SetupParams) (*p
 	return prepareSetupConfigLocked(params)
 }
 func (productionAndroidConfigDriver) commitSetupLocked(prepared *preparedSetupConfig, desired state.State) error {
-	commitSetupConfigLocked(prepared)
+	if err := commitSetupConfigLocked(prepared); err != nil {
+		return err
+	}
 	state.Replace(desired)
 	return nil
 }
 func (productionAndroidConfigDriver) updateLocked(params *UpdateParams) error {
-	updateConfigLocked(params)
-	return nil
+	return updateConfigLocked(params)
 }
 func (productionAndroidConfigDriver) replaceStateLocked(value state.State) error {
 	state.Replace(value)

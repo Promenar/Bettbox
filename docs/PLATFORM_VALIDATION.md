@@ -449,4 +449,13 @@ ServicePlugin 返回 VpnPlugin 的真实受理结果；Dart Service.startVpn 对
 
 实际loopback已复现关闭后旧HTTP连接继续响应和多地址失败遗失已绑定端口。候选持有真实HTTP Server、Serve/reaper及已准入handler，关闭先撤销准入并确认socket关闭，再收尾Server/任务/session；部分关闭未知返回对象和错误。独立审阅发现的已Serve关闭失败等待，以及聚合错误丢弃真实失败，均保留实际红绿回归。9项顶层race测试及9个分类子用例、上层检查式关闭回归通过。实际Android ARM64核心编译成功，ELF加载段均16KiB对齐。
 
-证据见 `validation/2026-10-07-three-platform/realm-listener-lifecycle-validation.json`。这不证明HTTP/TLS依赖全部内部任务或证书watcher退出，也不证明完整listener owner、其它协议及全局UDP runtime关闭。全局Patch失败资源登记、Android唯一owner/ACK和设备流量待集成；APK未替换，发行未验收。
+证据见 `validation/2026-10-07-three-platform/realm-listener-lifecycle-validation.json`。这不证明HTTP/TLS依赖全部内部任务或证书watcher退出，也不证明完整listener owner、其它协议及全局UDP runtime关闭。Android唯一owner/ACK和设备流量待集成；APK未替换，发行未验收。
+
+
+## 命名监听登记与配置失败传播
+
+检查式 Patch 在 Listen 前登记全部命名协议对象，部分创建失败或 panic 保留真实对象；关闭失败不得覆盖或删除旧对象，显式检查式停止确认后才解除未知责任。同配置复用按候选对象等价类统一实际对象，别名增删不得重复创建或提前关闭 socket，确认关闭后原子删除全部别名。生产 start/update 返回失败，Android coordinator 的真实更新进入后失败保留 unknown/blocked；setup 及 iOS 更新传播错误，不宣称配置回滚。
+
+11项命名顶层race回归（含真实Realm部分对象和16个删除别名子用例）、5项既有检查式关闭回归、核心完整CGO0测试通过。实际Android ARM64 c-shared编译成功，四个加载段16KiB对齐。独立审阅发现的4项别名问题均有真实socket红绿证据，最终复核无新增P1/P2。证据见 `validation/2026-10-07-three-platform/inbound-partial-ownership-validation.json`。
+
+成功setup的全局ApplyConfig副作用未做本轮集成验证；通用general重建、UDP runtime及全部协议内部任务、Android完整唯一owner/ACK和设备有效流量未完成。运行中的APK未替换，macOS界面工具仍报告锁屏，黑屏未验收，三端发行目标保持未完成。

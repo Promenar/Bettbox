@@ -59,4 +59,4 @@ executor 的 updateTunnels、controller PATCH 和包内 ReCreate/Patch 写入必
 
 ## Realm协议资源生命周期
 
-Realm候选保存HTTP Server并等待Serve/reaper/已准入handler，成功关闭后撤销session；所有地址绑定通过才发布服务，失败清理不确认时返回部分对象。关闭先核对真实listener，再调用会等待Accept的Server.Close，混合已关闭与真实错误保留失败。真实keep-alive、部分绑定、已Serve关闭失败、SSE与Expect:100-continue正文取消、双地址及并发关闭已通过race和独立复审。仍须在完整资源组中登记工厂返回的部分对象；旧全局Patch失败路径不能作为owner完成证据，HTTP/TLS依赖内部任务和证书watcher待取证。
+Realm候选保存HTTP Server并等待Serve/reaper/已准入handler，成功关闭后撤销session；所有地址绑定通过才发布服务，失败清理不确认时返回部分对象。关闭先核对真实listener，再调用会等待Accept的Server.Close，混合已关闭与真实错误保留失败。真实keep-alive、部分绑定、已Serve关闭失败、SSE与Expect:100-continue正文取消、双地址及并发关闭已通过race和独立复审。命名检查式Patch已在Listen前登记并保留部分对象，错误传播到核心配置及启动；完整资源组、general和转发runtime仍待接线，HTTP/TLS依赖内部任务和证书watcher待取证。

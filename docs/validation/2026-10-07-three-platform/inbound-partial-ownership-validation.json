@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-09",
+  "status": "candidate_verified_named_registration_only",
+  "release_verified": false,
+  "source_sha256": {
+    "core/Clash.Meta/listener/inbound_checked.go": "880df83f3cb74cd8395141a914a21059d22ee94eb922adf604fae4bef356a1f3",
+    "core/Clash.Meta/listener/listener.go": "f15be2217197239dbd6b5fdf3e3c204e575e99d64c1f1aa4d4c1dc16af208492",
+    "core/Clash.Meta/listener/stop_checked.go": "d208ebbe5dd87d3c6315b357005105771c75952c064a8e1234d4d078cf8d2718",
+    "core/Clash.Meta/listener/inbound_patch_test.go": "b82fd436e65d360fd5d240d8574a0e27c99379af99f31d6b74c19cf282c87d34",
+    "core/common.go": "1cfcb2539b678ad69858c1218d3a70019b21485f9877a0d24795a214469a02f6",
+    "core/hub.go": "b2db37dae067bf9a974a52c80b84d64fc546619ae822d055ba92275256055711",
+    "core/android_config.go": "e30bdea35faa2dffd701851d08a502a34d051b79a3ad226a6878b82a574e599d",
+    "core/lib_ios.go": "92de14c1ca74bb217f18d12ce8f1e1789b0c5838664a122a8dc08cc96438abec",
+    "core/inbound_apply_action_test.go": "c67919052b35d7488381abb5bded710b5c42cbad3bbeccc1adb47d70852266f9"
+  },
+  "red": {
+    "original_named_socket_tests": 4,
+    "original_production_error_tests": 3,
+    "review_alias_defects": 4,
+    "drop_alias_red_subcases": [
+      6,
+      11,
+      14
+    ]
+  },
+  "green": {
+    "listener_command": "GOPROXY=off GOSUMDB=off go test -p=2 -mod=readonly -race -count=1 -timeout=90s -run ^Test(InboundPatch|Checked) github.com/metacubex/mihomo/listener",
+    "listener_exit": 0,
+    "named_top_level_tests": 11,
+    "checked_top_level_tests": 5,
+    "drop_alias_subtests": 16,
+    "core_command": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off go test -p=2 -mod=readonly -count=1 -timeout=90s -tags with_gvisor .",
+    "core_exit": 0
+  },
+  "review": {
+    "agent": "android_listener_owner_design",
+    "initial_P2": 3,
+    "followup_P2": 1,
+    "final_new_P1_P2": 0,
+    "read_only": true
+  },
+  "artifact": {
+    "path": ".test/android-inbound-core/libclash.so",
+    "sha256": "4d0e2d9225cd95238da513cfd643d64d6f66a9a675510b8f1e2a5b5ba9bb1d13",
+    "header_sha256": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5",
+    "elf_class": 64,
+    "machine": 183,
+    "load_alignments": [
+      16384,
+      16384,
+      16384,
+      16384
+    ],
+    "compile_exit": 0,
+    "apk_installed": false
+  },
+  "boundaries": [
+    "setup ApplyConfig错误传播已静态审阅及编译，未运行成功setup的全局副作用集成测试",
+    "命名登记保留真实Realm部分创建对象；不证明全部协议内部任务退出",
+    "general ReCreate、全局UDP、Android唯一owner/typed ACK和设备有效VPN尚待接线验收",
+    "macOS界面因锁屏不可观察，未判定黑屏根因或修复",
+    "没有生产部署或真实付款"
+  ]
+}

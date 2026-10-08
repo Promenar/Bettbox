@@ -193,3 +193,6 @@
 
 - .agents/plans/2026-10-09-realm-listener-lifecycle.md — Realm多地址创建、HTTP任务、关闭错误及完整owner边界
 - docs/validation/2026-10-07-three-platform/realm-listener-lifecycle-validation.json — 实际loopback关闭、部分创建、已运行关闭失败红绿与ARM64编译证据
+
+- .agents/plans/2026-10-09-inbound-partial-ownership.md — 命名监听部分创建责任、别名及核心失败传播范围
+- docs/validation/2026-10-07-three-platform/inbound-partial-ownership-validation.json — 实际socket红绿、生产错误、独立审阅及ARM64编译证据
