@@ -306,8 +306,20 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private fun handleStartVpn(intent: VpnIntentController.Intent) {
-        GlobalState.getCurrentAppPlugin()?.requestVpnPermission {
-            handleStartService(intent)
+        scope.launch(Dispatchers.Main) {
+            if (!GlobalState.runLock.withLock { intents.current(intent) && startRequested }) return@launch
+            val app = GlobalState.getCurrentAppPlugin()
+            if (app == null) stopIntent(intent) else app.requestVpnPermission { granted ->
+                if (!granted) stopIntent(intent) else {
+                    val current = GlobalState.runLock.withLock {
+                        if (!intents.current(intent) || !startRequested || GlobalState.isCurrentlyStopping()) false else {
+                            GlobalState.initServiceEngine()
+                            true
+                        }
+                    }
+                    if (current) handleStartService(intent)
+                }
+            }
         }
     }
 
@@ -534,17 +546,14 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         
         scope.launch {
             try {
-                val prepareIntent = try {
-                    android.net.VpnService.prepare(BettboxApplication.getAppContext())
-                } catch (e: Exception) {
-                    null
-                }
+                val prepareIntent = android.net.VpnService.prepare(BettboxApplication.getAppContext())
 
                 if (prepareIntent != null) {
                     android.util.Log.w("VpnPlugin", "VPN permission required before start")
                     withContext(Dispatchers.Main) {
-                        GlobalState.getCurrentAppPlugin()?.requestVpnPermission {
-                            handleStartService(intent)
+                        val app = GlobalState.getCurrentAppPlugin()
+                        if (app == null) stopIntent(intent) else app.requestVpnPermission { granted ->
+                            if (granted) handleStartService(intent) else stopIntent(intent)
                         }
                     }
                     return@launch

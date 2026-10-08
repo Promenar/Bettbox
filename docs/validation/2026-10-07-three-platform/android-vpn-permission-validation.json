@@ -1,0 +1,50 @@
+{
+  "status": "passed",
+  "scope": "Android实际权限启动路径",
+  "source_sha256": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "6fb501fda7ffacf82f804a67d535a309eaabe5b98ba849ca5d8586ddee38ffec",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09"
+  },
+  "jvm_fixture": {
+    "passed": true,
+    "actual_Android": false,
+    "sources_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09",
+      "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequestsFixture.kt": "f5406bd2d9d885bf6984ceca96021ffd3c86b387820dc26b5711f4fb6a861417"
+    },
+    "compiler": "Kotlin2.0.21",
+    "json_library": "Gson2.10.1",
+    "fixture_stdout_sha256": "be875b7db94c482b17e615d3d3d406685ac4e01c5a686b1e83fdefddb36963c7",
+    "boundary": "生产权限控制器及公开 JVM 夹具；没有 JNI、Service 或设备验收"
+  },
+  "red": {
+    "stage": "fixture",
+    "exit_code": 1,
+    "implementation": "可编译旧回调行为占位，不是Android设备复现"
+  },
+  "android_release_kotlin": {
+    "exit_code": 0,
+    "source_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "6fb501fda7ffacf82f804a67d535a309eaabe5b98ba849ca5d8586ddee38ffec",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09"
+    },
+    "source_unchanged": true,
+    "diagnostic": {},
+    "offline_dependency_missing": false,
+    "boundary": "实际Android release Kotlin工程编译，秘密只在本机注入；非APK和设备验收"
+  },
+  "independent_review": "原Activity重挂接P1已修正并复审，无新增P1/P2",
+  "prior_attempts": {
+    "formal_apk": "为修正Activity接线主动中断，未生成本轮新APK",
+    "wrapper_compile": "任务代理未注入实际Gradle JVM，拒绝执行",
+    "unsigned_release_compile": "发行任务需要正式签名配置",
+    "debug_compile": "offline缓存缺少dynamic_color的四项AndroidX依赖"
+  },
+  "boundary": [
+    "未安装新APK",
+    "未执行设备授权拒绝、旋转和真实VPN流量",
+    "唯一配置生命周期owner仍待实施"
+  ]
+}

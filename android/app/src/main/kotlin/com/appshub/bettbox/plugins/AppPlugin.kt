@@ -27,7 +27,6 @@ import com.appshub.bettbox.R
 import com.appshub.bettbox.extensions.awaitResult
 import com.appshub.bettbox.extensions.getActionIntent
 import com.appshub.bettbox.models.Package
-import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -57,7 +56,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     private var cachedTaskId: Int? = null
     private lateinit var channel: MethodChannel
     private lateinit var scope: CoroutineScope
-    private var vpnCallBack: (() -> Unit)? = null
+    private val vpnPermissions = VpnPermissionRequests()
     private val packages = mutableListOf<Package>()
     private val chinaPackageCache = ConcurrentHashMap<String, Boolean>()
 
@@ -69,7 +68,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     companion object {
         private const val ICON_SIZE_DP = 48
-        private const val VPN_PERMISSION_REQUEST_CODE = 1001
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
         private const val CACHE_MAX_FILES = 500
         private const val PNG_MAGIC_SIZE = 8
@@ -185,6 +183,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        vpnPermissions.cancel()
         channel.setMethodCallHandler(null)
         scope.cancel()
     }
@@ -418,14 +417,23 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         }
     }
 
-    fun requestVpnPermission(callBack: () -> Unit) {
-        vpnCallBack = callBack
-        val intent = VpnService.prepare(BettboxApplication.getAppContext())
-        if (intent != null) {
-            activityRef?.get()?.startActivityForResult(intent, VPN_PERMISSION_REQUEST_CODE)
-            return
-        }
-        vpnCallBack?.invoke()
+    fun requestVpnPermission(completion: (Boolean) -> Unit) {
+        var intent: Intent? = null
+        vpnPermissions.request(
+            prepare = {
+                intent = VpnService.prepare(BettboxApplication.getAppContext())
+                intent != null
+            },
+            launch = { code ->
+                val activity = activityRef?.get()
+                val captured = intent
+                if (activity == null || captured == null) false else {
+                    activity.startActivityForResult(captured, code)
+                    true
+                }
+            },
+            completion = completion,
+        )
     }
 
     fun requestNotificationsPermission() {
@@ -501,11 +509,13 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     override fun onDetachedFromActivityForConfigChanges() {
         activityRef = null
+        isActivityAttached = false
     }
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activityRef = WeakReference(binding.activity)
+        onAttachedToActivity(binding)
     }
     override fun onDetachedFromActivity() {
+        vpnPermissions.cancel()
         channel.invokeMethod("exit", null)
         activityRef = null
         cachedTaskId = null
@@ -514,11 +524,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     private fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (!isActivityAttached) return false
-        if (requestCode == VPN_PERMISSION_REQUEST_CODE && resultCode == FlutterActivity.RESULT_OK) {
-            GlobalState.initServiceEngine()
-            vpnCallBack?.invoke()
-        }
-        return true
+        return vpnPermissions.result(requestCode, resultCode == Activity.RESULT_OK)
     }
 
     private fun onRequestPermissionsResultListener(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {

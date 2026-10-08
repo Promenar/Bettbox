@@ -1,5 +1,9 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — Android实际VPN授权路径
+
+- Android实际权限启动路径使用进程内动态请求码与同次弹窗共享结果；拒绝、无Activity、prepare/launch异常及正常detach/engine退出逐请求一次完成false。配置变更保留在途请求并向新Activity重新注册监听，迟到旧结果不完成新请求；授权成功先核验原始intent再初始化service engine。冷恢复后的权限请求切Main，prepare异常不再被当成授权成功。生产controller公开JVM回归及独立复审通过，实际Android release Kotlin工程离线编译退出0且源码不漂移；新APK安装、设备旋转/权限弹窗及真实VPN流量另验。
+
 ## 2026-10-08 — Android JNI检查式释放
 
 - JNI注册释放回调增加固定状态，Go拒绝未确认结果并保留State责任；线程附着失败安全短路，分离未知粘滞保存，Protect/Resolve异常与空环境不触发非法Java调用。

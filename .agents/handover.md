@@ -2303,3 +2303,34 @@ NativeTunProtocol绑定请求及资源身份并严格解析固定JSON；completi
 
 ### HLG
 经append dry-run/apply追加事实链。
+
+## 2026-10-08T22:11:12+08:00 · Android实际VPN授权路径与完整Kotlin工程编译
+
+type: development
+scope: ["Bettbox", "Android"]
+status: progress
+tags: ["android", "permission", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: a007f83489631c61d45197020d9e0c1ff21df90b0334aef0b6ec280a3271f75f
+
+### Summary
+Android实际权限启动路径使用进程内动态请求码与同次弹窗共享结果；拒绝、无Activity、prepare/launch异常及正常detach/engine退出逐请求一次完成false。配置变更保留在途请求并向新Activity重新注册监听，迟到旧结果不完成新请求；授权成功先核验原始intent再初始化service engine。冷恢复后的权限请求切Main，prepare异常不再被当成授权成功。生产controller公开JVM回归及独立复审通过，实际Android release Kotlin工程离线编译退出0且源码不漂移；新APK安装、设备旋转/权限弹窗及真实VPN流量另验。
+
+### Changed
+VpnPermissionRequests、AppPlugin、VpnPlugin及公开夹具；更新PDEC、架构与验收文档；纠正计划中不存在的NativeOperations/PreparedConfig实施状态。
+
+### Validation
+可编译占位RED fixture退出1；生产JVM GREEN退出0；独立审阅发现Activity重挂接P1后修复并复审。官方Gradle独立offline发行缓存+本机安全凭据注入，完整compileReleaseKotlin退出0，三个源文件摘要一致。
+
+### Next
+实现唯一配置与生命周期owner、封闭旧配置/启停旁路，生成并安装精确来源正式APK，验证设备权限/旋转/真实上游。
+
+### Risks
+正式整包构建在修正接线前主动中断；未安装新APK。debug缺少离线依赖，wrapper缺少任务代理被拒绝；不宣称发行通过。macOS完整候选profile、有效上游及支付商条件仍需解决。
+
+### DIA
+已同步README、CHANGELOG、ARCHITECTURE、PLATFORM_VALIDATION、registry、PDEC说明及实施计划。
+
+### HLG
+使用append先dry-run再apply记录，目标保持active。

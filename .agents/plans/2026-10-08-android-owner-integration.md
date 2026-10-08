@@ -6,7 +6,7 @@
 
 `ServicePlugin` 的启停方法立即返回 true；Dart 的 state、smart manager 和后台 main 存在提前提交运行状态的路径。原生 STOP 事件缺少请求关联，Dart 的早期清状态还会使 controller 的 STOP 分支失效。权限回调只有成功分支，缺少拒绝、无 Activity 和旧结果归属处理。
 
-配置候选 `AndroidNativeOperations` 与 `NativePreparedConfig` 已有进程唯一实例、operation Mutex、配置 journal、ENTERED/Applied 归属和30项夹具；尚未接入实际 App。其 borrowedFd/closeOriginalFd 不能直接覆盖实际 detachFd→TunFDLease→JNI领取→Go采纳合同。现有 VpnWorkGate/VpnLifecycle 的平台失效票据可保留，但不能与唯一 owner 竞争发行权威代次。
+当前生产目录不存在 `AndroidNativeOperations` 或 `NativePreparedConfig`；唯一配置与生命周期 owner 尚未实现。Core已有配置/TUN原始JNI通路及严格协议解析器，VpnPlugin仍使用旧Boolean启停。实际detachFd→TunFDLease→JNI领取→Go采纳合同必须保持。现有VpnWorkGate/VpnLifecycle的平台失效票据可保留，但不能与唯一owner竞争发行权威代次。
 
 前台 setup/update/setState、后台 quickStart、IPC reconnect、listener/shutdown及 HTTP patch/update均须纳入同一 owner。Go runLock 只防局部数据竞争；options与TUN快照尚无共同配置版本。上述为源码未封闭边界，尚无设备竞态复现。
 
@@ -133,3 +133,7 @@ Android新增startOwnedTunNative/stopOwnedTunNative JNI入口，传递epoch/conf
 ## Kotlin启停回执与最终完成核验
 
 主控独占NativeTunProtocol与公开Fixture/PDEC。解析固定Go十四字段及两组大小写敏感身份字段，限制大小/深度、拒绝重复键/尾随值/错误类型/数值溢出/非法Unicode/转义；校验请求身份、operation、outcome/phase/资源组合。完成对象在Core Raw的finally后核验：成功start必须是CLAIMED且模式与残余资源匹配，本地UNKNOWN/bridgeBlocked/null/协议错误统一unknown+blocked，保留可解析的原生资源责任，不自行发布UI。先编译RED，再实现GREEN与既有config协议回归，独立审阅后记录。实际唯一owner与VpnPlugin采用另包完成。
+
+## 实际权限路径收口
+
+AppPlugin使用VpnPermissionRequests在Activity主线程关联系统授权弹窗，共享同一在途弹窗且逐请求一次完成；拒绝、缺少Activity、prepare/launch异常、正常detach与engine退出均报告false。配置变更保留弹窗并重新注册Activity listener；进程唯一请求码不复用，旧结果不能完成新弹窗。VpnPlugin授权回调先核验原始intent，成功才初始化service engine并继续建立；拒绝停止匹配intent。冷恢复后的权限请求切回主线程，prepare异常走真实启动失败。主控独占controller/两处实际adapter/公开JVM夹具，先RED再GREEN并独立审阅；完整Android编译与设备授权弹窗另验。

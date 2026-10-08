@@ -111,3 +111,5 @@
 - docs/validation/2026-10-07-three-platform/android-owned-tun-jni-validation.json — JNI/Core原始启停回执、finally输入快照及未采用边界
 
 - docs/validation/2026-10-07-three-platform/android-tun-protocol-validation.json — Kotlin严格启停解析、finally完成核验及真实Go公开回执消费
+
+- docs/validation/2026-10-07-three-platform/android-vpn-permission-validation.json — 实际授权路径、公开JVM回归、独立复审及release Kotlin完整工程编译；设备另验

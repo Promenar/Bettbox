@@ -2483,6 +2483,54 @@
         ".test/android-config-protocol-after-tun/receipt.json"
       ],
       "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "test-vpn-permission-red": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_vpn_permission.py",
+        "--output-name",
+        "android-vpn-permission-red"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "缓存Kotlin编译并执行生产权限请求控制器公开夹具；非设备"
+    },
+    "test-vpn-permission-green": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_vpn_permission.py",
+        "--output-name",
+        "android-vpn-permission-green"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "缓存Kotlin编译并执行生产权限请求控制器公开夹具；非设备"
+    },
+    "compile-android-permission-adapter": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "../.test/android-build/gradle-home-lp_vc0bs/wrapper/dists/gradle-8.14-all/c2qonpi39x1mddn7hk5gh9iqj/gradle-8.14/bin/gradle",
+        ":app:compileReleaseKotlin",
+        "--offline",
+        "--no-daemon",
+        "--gradle-user-home",
+        "../.test/android-permission-gradle-home",
+        "-Ptarget-platform=android-arm64"
+      ],
+      "cwd": "android",
+      "timeout_seconds": 600,
+      "artifacts": [],
+      "verification": "缓存官方Gradle8.14直接入口、独立offline发行依赖缓存；既有signing_environment本机安全注入，仅Kotlin编译，不回显凭据、不打包或安装"
     }
   },
   "deployment": {
@@ -2696,7 +2744,7 @@
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
     "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "628fa79bb638beca4c4e17ab9429c36d888667cfdce6119a5bcc9f72a8bfe364",
     "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "4a54de20794463effa8ffd5035e5158b19d187496d8ae8171617a89b24c001f4",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "70f0348ffebccef69bafcb46c46cc56b85335ee11c64524c60446e0f221c54a5",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "6fb501fda7ffacf82f804a67d535a309eaabe5b98ba849ca5d8586ddee38ffec",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "bd97efec4ac22e018eb49a2ed96fa50a16749697556ec4ef15a5de7c6bf47122",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BaseServiceInterface.kt": "8f4e1095b5fe1966720ac966d673a172a7ff6ac539e60c0cf4750689ab1cd9fc",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxService.kt": "c6a65dbb9ac2755546c0a546dd94c389c0e38a227f3b73806ebf7adc317ed416",
@@ -2741,7 +2789,11 @@
     "scripts/check_android_owned_tun_invocation.py": "7bd5e1317aeb1ea22ae11bbe5c658483027ff093c4eacbc0fa2614576e326fe9",
     "scripts/check_android_tun_protocol.py": "cb2b169df361b6be89991cecb3700a293654c788f010a088ed4bce838b75a2a0",
     "android/app/src/main/kotlin/com/appshub/bettbox/NativeTunProtocol.kt": "3620415fb7533e955765e888f2ca2ff2268ce75877073b04add75845496eb4d8",
-    "android/app/src/test/kotlin/com/appshub/bettbox/NativeTunProtocolFixture.kt": "c7b29d134e61aa89268488b82db7a6fd134a2fded2955a01f38b07b6cea3d67c"
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeTunProtocolFixture.kt": "c7b29d134e61aa89268488b82db7a6fd134a2fded2955a01f38b07b6cea3d67c",
+    "scripts/check_android_vpn_permission.py": "7fca56dc6aca7fb56fd3bcdc44f98d5f71a85ae0c0b91439a9f7bdfca5fbb59d",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequestsFixture.kt": "f5406bd2d9d885bf6984ceca96021ffd3c86b387820dc26b5711f4fb6a861417",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853"
   },
   "platform_extensions": {
     "android": {
@@ -2817,6 +2869,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "a1fa0dceb87bafa90520d174b3e16e0e1edf23722cf6ad00e037ed2ecc884769"
+    "contract_digest": "2935647ec7848e5f8e50f9e4ddb8b520dd1d7092dfbd77202f0a960b7176bea5"
   }
 }

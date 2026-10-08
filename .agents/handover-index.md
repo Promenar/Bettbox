@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T21:45:34+08:00
+> generated_at: 2026-10-08T22:11:12+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-08T13:32:53+08:00 | in_progress | ["Bettbox", "Android", "macOS"] | Android f881880正式构建安装与跨层owner接线边界 | `.agents/handover.md` · `2026-10-08T13:32:53+08:00` · `fp:3cb6c5e3ad` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T21:45:34+08:00 | done | ["android-native"] | Android Kotlin启停回执解析与跨语言完成核验 | `.agents/handover.md` · `2026-10-08T21:45:34+08:00` · `fp:4e20f814bd` |
+| three-platform-release | resume | 2026-10-08T22:11:12+08:00 | progress | ["Bettbox", "Android"] | Android实际VPN授权路径与完整Kotlin工程编译 | `.agents/handover.md` · `2026-10-08T22:11:12+08:00` · `fp:a007f83489` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T22:11:12+08:00 | iso | progress | resume | ["Bettbox", "Android"] | ["android", "permission", "release"] | Android实际VPN授权路径与完整Kotlin工程编译 | `.agents/handover.md` · `2026-10-08T22:11:12+08:00` · `fp:a007f83489` |
 | 2026-10-08T21:45:34+08:00 | iso | done | resume | ["android-native"] | ["android", "protocol", "release"] | Android Kotlin启停回执解析与跨语言完成核验 | `.agents/handover.md` · `2026-10-08T21:45:34+08:00` · `fp:4e20f814bd` |
 | 2026-10-08T21:36:24+08:00 | iso | done | resume | ["android-native"] | ["android", "jni", "release"] | Android带身份TUN的JNI与Core原始回执通路 | `.agents/handover.md` · `2026-10-08T21:36:24+08:00` · `fp:69d7cecb9f` |
 | 2026-10-08T21:28:15+08:00 | iso | done | resume | ["android-native"] | ["android", "tun", "release"] | Android Go带身份TUN导出与生产配置预留接线 | `.agents/handover.md` · `2026-10-08T21:28:15+08:00` · `fp:6ed948b38e` |
