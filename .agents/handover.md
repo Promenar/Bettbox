@@ -3171,3 +3171,34 @@ record-fingerprint: bac5cc74e6f4663bf09e507aab4e8a2c889875f6118a76c2245bbbdc673c
 
 ### HLG
 标准append dry-run后apply，保留真实红绿和完整目标。
+
+## 2026-10-09T05:42:40+08:00 · 账务迁移与仓库记录共同事务候选验收
+
+type: maintenance
+scope: ["Bettbox", "server/billing"]
+status: partial
+tags: ["billing", "migration", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 5d4a502be0370b90c3867e1bcb2395fb5363dd6905fae53dcf013acac66aeb7c
+
+### Summary
+固定账务迁移命令在同一 SQLite 事务中提交或撤销 DDL 和 Migrator 仓库记录；整体三端发行目标未完成，生产保持未部署。
+
+### Changed
+新增 AtomicMigration 与默认计划的 billing:migrate。拒绝非 SQLite、已有事务、错误路径/连接；受限回滚拒绝外来最后批次或新增账务证据。精确清单新增两生产文件，公开回执和文档同步。
+
+### Validation
+无外层事务时真实仓库 INSERT 故障留下状态的 red 任务 cb1f6c6cca0a4bb695db71d9589bfa33；修复后真实 green 79b0e90b8b4d4345a326e5a7bfdf0796：55 输入、148 checks、51 迁移相关标签，源无漂移/清理确认。真实 ConsoleKernel 计划/up/down/失败固定回执/重复/外来批次/财务证据通过。9 项执行器回归、7 项 apply 安全检查通过。原生独立只读审阅无可确认 P1/P2，主控核对源码摘要与真实回执。PDEC ready=true；生产 ConsoleKernel 公开源码具有 Commands load 标记，但非实际自动注册证明。
+
+### Next
+验证生产命令自动注册及真实 Artisan 配置；真实框架业务并发、插件生命周期、未知下单恢复合同。Android 完整 owner 接线与有效节点 VPN、macOS 解锁后的黑屏与真实系统代理验收继续。
+
+### Risks
+fixture 手工注册命令，不证明生产自动发现；强杀、掉电、并发部署、生产停写/备份恢复尚未验收。重复已记录迁移不修复外部损坏 schema。四类准入 guard 未分别执行独立拒绝测试。认证/插件发现/网关 transport 为明确 stub。macOS 锁屏阻碍窗口观察；真实支付外部条件待满足，不产生真实付款。
+
+### DIA
+已同步 README、PLAN、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、公开证据、manifest、PDEC 与 registry。
+
+### HLG
+经标准 append dry-run 后 apply 追加当前记录，保留历史及生成索引。

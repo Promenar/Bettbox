@@ -80,4 +80,6 @@ checkout_worker.php 执行实际候选 OrderController.checkout，模型/请求/
 
 当前 Laravel SQLite grammar 不自动将迁移放入事务。候选 up/down 均在同一 SQLite 连接中将检查与全部 DDL 放入显式事务，真实 Migrator 隔离故障注入已验证撤销部分创建与部分删除。证据见 `docs/validation/2026-10-07-three-platform/laravel-migration-validation.json`。
 
-Migrator 的成功记录写入或删除发生在 up/down 返回之后，不能据此承诺 schema 与迁移仓库记录共同原子提交。异常发生后须核对两者再恢复，不能直接重跑；这两个仓库提交窗口、外层嵌套事务故障、进程强杀、掉电、Artisan 命令和生产备份恢复尚未验收。已有账务证据仍拒绝 down，不因异常或重复执行放宽。
+`billing:migrate` 默认仅输出计划；`--execute` 在同一 SQLite 顶层事务内执行固定候选文件和 Migrator 成功记录写入，`--execute --rollback` 仅接受最后批次单独属于候选且无新增账务证据。真实 ConsoleKernel 隔离调用、仓库 INSERT/DELETE 故障注入和完整快照核对通过；失败返回固定非零回执，不输出底层异常。重复执行遵循 Migrator 记录，不承担已记录但损坏 schema 的修复。生产命令自动发现、真实 Artisan 启动、schema 核对、停写/备份、强杀/掉电及并发部署仍待验收。
+
+证据见 `docs/validation/2026-10-07-three-platform/atomic-migrator-validation.json`：55 个冻结输入、148 项检查、51 个迁移相关检查标签，来源无漂移且临时资源清理确认。已有外层事务直接拒绝；迁移内部事务在命令的同连接外层事务中作为 savepoint。

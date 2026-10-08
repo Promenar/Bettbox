@@ -366,7 +366,7 @@
       "timeout_seconds": 300,
       "artifacts": [],
       "cross_compile": "SSH传输精确公开白名单，NoSLA既有镜像内Laravel框架，非交叉编译",
-      "verification": "禁网只读128MiB容器，空SQLite与临时环境；真实Migrator固定单文件批次/重复/回滚和上下行故障原子性；Kernel/Eloquent业务保持，支付transport与认证明确stub，不挂生产数据或配置"
+      "verification": "55个冻结公开输入；禁网只读128MiB空SQLite，固定单文件Migrator与真实ConsoleKernel；DDL/仓库INSERT与DELETE失败共同撤销；认证/插件发现/网关stub，不挂生产配置和数据；生产自动注册与强杀另验"
     },
     "test-android-release-signing": {
       "executor": "local-mac",
@@ -3080,9 +3080,9 @@
     "scripts/android_dependency_network.py": "025b56819537f984011196aa9e6dfa8fc3400369267dc131406800b9b8e4ad14",
     "scripts/tests/test_build_android.py": "20b1e4f6106097be2c4b538605187724d05b36cb42688a03c7731321b1e8cf28",
     "scripts/tests/test_android_dependency_network.py": "b25af8eeb09dad2cd2e3724bb110ccc7ddcee9d3cb0e6dcab979710bebbaeca0",
-    "server/tests/billing/run_laravel_isolated.py": "7c21a85839c70a5711543b2094b366a0109c8ff0f763d67aa0af1b51c997041d",
-    "server/tests/billing/test_laravel_isolated.py": "d138a6d64ce218d19e5fe0fe9375e9be77bc2b30a115e147aa3e7a22b3a7193e",
-    "server/tests/billing/laravel_check.php": "8fc399c0d8c0198ee2e182f3d3063c2e24b7443f3e31ee74159e84c01746ba65",
+    "server/tests/billing/run_laravel_isolated.py": "6bec69cc37747ea2ba1030b4e3b144941bab14d3803121636e263122ffb92389",
+    "server/tests/billing/test_laravel_isolated.py": "7ce2e0913eb0fa0f5c4b02fe3010a392f724e6e0066029cdcd50f16e97d7a03f",
+    "server/tests/billing/laravel_check.php": "7f614f9c80c8c3130c444b2263918f76ebef37af945064fe4b7effc54cd57a6f",
     "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
@@ -3373,8 +3373,10 @@
     "core/Clash.Meta/listener/http/server.go": "be1fede8dcc9cd5357eb6f427963f42d1a1d2b9cf9e8fc9a1917028b85f074ee",
     "core/Clash.Meta/listener/socks/tcp.go": "8e41983c91463919f6737ef934bfcf1d6378a720237e39cec07f7a4bbb5f5643",
     "core/Clash.Meta/listener/mixed/mixed.go": "8e24af972fb36f93398bed1f27c843502f8900eaeeb9c00e9272309b43a2e85e",
-    "server/tests/billing/laravel_migration_check.php": "393510118293e673d3b543cfefd25e178a7511e6fe3e70925ef1c9a5d437cd33",
-    "server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php": "f748a1c7fffbe1f3cef27f75803ae2a4b672e3a8654a6f3103536ff75bd76d0e"
+    "server/tests/billing/laravel_migration_check.php": "014c3f33bfee1c1d508666b4b9cb87644cc0e12760f9bdf93465c3eddd4105a0",
+    "server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php": "f748a1c7fffbe1f3cef27f75803ae2a4b672e3a8654a6f3103536ff75bd76d0e",
+    "server/patches/billing/overlay/app/Services/Billing/AtomicMigration.php": "a3e636b14eed17a8294db6b076550997e92217a65b5d05aa583bb597ce935a42",
+    "server/patches/billing/overlay/app/Console/Commands/BillingMigrate.php": "706ff6fc43f9bfcf77ff822973e5790221d19f866ec39c8a54a0553255c0d1ee"
   },
   "platform_extensions": {
     "android": {
@@ -3450,6 +3452,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "53cf7b4baf82c1446b8cb5ff42664fb8af32c61e6598de58ada57c458280a1ca"
+    "contract_digest": "1f7d0b508d521e00f63f8b0d52e26c14d802a5e7ad46e7467a4fb58553b1c7c0"
   }
 }

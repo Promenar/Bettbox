@@ -134,6 +134,56 @@ function fixtureMigrationLifecycle($db, string $candidate): void
         $failed = false;
         try { $migrator->run([$migrationPath]); } catch (Illuminate\Database\QueryException $error) { $failed = true; }
         fixtureCheck($failed && $snapshot()===$before && $repository->getRan()===[],'migration_migrator_failure_atomic');
+        $reset();
+        $base();
+        $repository->createRepository();
+        $pdo->exec("CREATE TRIGGER fixture_reject_migration_log BEFORE INSERT ON fixture_migrations BEGIN SELECT RAISE(ABORT,'PUBLIC_LOG_FAILURE'); END");
+        $before = $snapshot();
+        $failed = false;
+        try { App\Services\Billing\AtomicMigration::perform($db,$migrator,$migrationPath); }
+        catch (Illuminate\Database\QueryException $error) { $failed = true; }
+        fixtureCheck($failed && $snapshot()===$before,'migration_repository_insert_failure_atomic');
+        $pdo->exec('DROP TRIGGER fixture_reject_migration_log');
+        App\Services\Billing\AtomicMigration::perform($db,$migrator,$migrationPath);
+        $pdo->exec("CREATE TRIGGER fixture_reject_migration_delete BEFORE DELETE ON fixture_migrations BEGIN SELECT RAISE(ABORT,'PUBLIC_DELETE_FAILURE'); END");
+        $before = $snapshot();
+        $failed = false;
+        try { App\Services\Billing\AtomicMigration::perform($db,$migrator,$migrationPath,true); }
+        catch (Illuminate\Database\QueryException $error) { $failed = true; }
+        fixtureCheck($failed && $snapshot()===$before,'migration_repository_delete_failure_atomic');
+        $app = app();
+        $target = $app->basePath('database/migrations');
+        fixtureCheck(mkdir($target,0700,true),'migration_command_owned_directory');
+        fixtureCheck(copy($migrationPath,$target.'/'.basename($migrationPath))
+            && copy(dirname($migrationPath).'/billing_atomic_schema.sql',$target.'/billing_atomic_schema.sql'),'migration_command_frozen_files_installed');
+        $app->instance('migrator',$migrator);
+        $console = $app->make(Illuminate\Contracts\Console\Kernel::class);
+        $console->registerCommand(new App\Console\Commands\BillingMigrate());
+        $before = $snapshot();
+        fixtureCheck($console->call('billing:migrate',['--rollback'=>true])===0
+            && json_decode(trim($console->output()),true,512,JSON_THROW_ON_ERROR)===['mode'=>'plan','operation'=>'down','database_changed'=>false]
+            && $snapshot()===$before,'migration_command_plan_no_write');
+        fixtureCheck($console->call('billing:migrate',['--execute'=>true,'--rollback'=>true])===1
+            && json_decode(trim($console->output()),true,512,JSON_THROW_ON_ERROR)===['operation'=>'down','completed'=>false,'code'=>'migrationUnconfirmed']
+            && $snapshot()===$before,'migration_command_failure_fixed_and_atomic');
+        $pdo->exec('DROP TRIGGER fixture_reject_migration_delete');
+        fixtureCheck($console->call('billing:migrate',['--execute'=>true,'--rollback'=>true])===0
+            && $repository->getRan()===[] && !$schema->hasTable('v2_billing_mutex'),'migration_command_real_rollback');
+        fixtureCheck($console->call('billing:migrate',['--execute'=>true])===0
+            && $repository->getRan()===[App\Services\Billing\AtomicMigration::NAME],'migration_command_real_up');
+        $before = $snapshot();
+        fixtureCheck($console->call('billing:migrate',['--execute'=>true])===0
+            && json_decode(trim($console->output()),true,512,JSON_THROW_ON_ERROR)===['operation'=>'up','completed'=>true,'changed'=>false]
+            && $snapshot()===$before,'migration_command_repeat_noop');
+        $repository->log('PUBLIC_OTHER',$repository->getNextBatchNumber());
+        $before = $snapshot();
+        fixtureCheck($console->call('billing:migrate',['--execute'=>true,'--rollback'=>true])===1
+            && $snapshot()===$before,'migration_command_foreign_batch_retained');
+        $repository->delete((object)['migration'=>'PUBLIC_OTHER']);
+        $db->table('v2_billing_review')->insert(['order_id'=>1,'category'=>'PUBLIC_COMMAND_REVIEW','reason'=>'PUBLIC_TEST','created_at'=>1]);
+        $before = $snapshot();
+        fixtureCheck($console->call('billing:migrate',['--execute'=>true,'--rollback'=>true])===1
+            && $snapshot()===$before,'migration_command_financial_evidence_retained');
     } finally {
         // 只回收已声明为空的公开临时库；不作用于任何生产连接。
         $reset();

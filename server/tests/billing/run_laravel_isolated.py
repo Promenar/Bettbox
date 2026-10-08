@@ -33,10 +33,12 @@ PUBLIC_INPUTS = (
 CANDIDATE_INPUTS = (
     'server/patches/billing/overlay/app/Services/Billing/Atomic.php',
     'server/patches/billing/overlay/app/Services/Billing/Outbox.php',
+    'server/patches/billing/overlay/app/Services/Billing/AtomicMigration.php',
     'server/patches/billing/overlay/app/Services/OrderService.php',
     'server/patches/billing/overlay/app/Jobs/OrderHandleJob.php',
     'server/patches/billing/overlay/app/Console/Commands/CheckCommission.php',
     'server/patches/billing/overlay/app/Console/Commands/CheckOrder.php',
+    'server/patches/billing/overlay/app/Console/Commands/BillingMigrate.php',
     'server/patches/billing/overlay/app/Http/Controllers/V1/User/OrderController.php',
     'server/patches/billing/overlay/app/Http/Controllers/V1/Guest/PaymentController.php',
     'server/patches/billing/overlay/database/migrations/billing_atomic_schema.sql',
@@ -134,7 +136,11 @@ def result_summary(raw, hashes):
                 'migration_unexpected_RuntimeException_propagated', 'migration_unexpected_UnexpectedValueException_propagated',
                 'migration_migrator_exact_path', 'migration_migrator_batch_recorded',
                 'migration_migrator_repeat_noop', 'migration_migrator_rollback_history_preserved',
-                'migration_migrator_failure_atomic', 'migration_migrator_down_failure_atomic'}
+                'migration_migrator_failure_atomic', 'migration_migrator_down_failure_atomic',
+                'migration_repository_insert_failure_atomic','migration_repository_delete_failure_atomic',
+                'migration_command_plan_no_write','migration_command_failure_fixed_and_atomic',
+                'migration_command_real_rollback','migration_command_real_up','migration_command_repeat_noop',
+                'migration_command_foreign_batch_retained','migration_command_financial_evidence_retained'}
     required.update('migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'])
     if not required.issubset(checks) or value.get('environment_loaded') is not False or value.get('production_database_loaded') is not False:
         raise RunnerFailure('fixture_contract_incomplete')

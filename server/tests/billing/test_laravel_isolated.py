@@ -28,6 +28,10 @@ CHECKS += ['migration_unexpected_RuntimeException_propagated', 'migration_unexpe
            'migration_migrator_exact_path', 'migration_migrator_batch_recorded',
            'migration_migrator_repeat_noop', 'migration_migrator_rollback_history_preserved',
            'migration_migrator_failure_atomic', 'migration_migrator_down_failure_atomic']
+CHECKS += ['migration_repository_insert_failure_atomic','migration_repository_delete_failure_atomic',
+           'migration_command_plan_no_write','migration_command_failure_fixed_and_atomic',
+           'migration_command_real_rollback','migration_command_real_up','migration_command_repeat_noop',
+           'migration_command_foreign_batch_retained','migration_command_financial_evidence_retained']
 
 
 class LaravelIsolatedTest(unittest.TestCase):
@@ -123,7 +127,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 53)
+        self.assertEqual(len(receipt['source_hashes']), 55)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)

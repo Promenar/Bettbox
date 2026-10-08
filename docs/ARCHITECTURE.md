@@ -301,4 +301,4 @@ HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避�
 
 ### 账务 SQLite 迁移
 
-账务迁移通过固定连接的显式事务协调政策检查和所有 DDL，失败撤销部分创建或删除；Schema builder 与业务查询沿用该连接。已有支付尝试、人工核对、outbox 或新佣金日志时拒绝 down。Migrator 成功记录提交独立于迁移内部事务，部署恢复需先核对 schema 与迁移仓库，不将重跑视为自动恢复。
+账务迁移通过固定连接的显式事务协调政策检查和所有 DDL，失败撤销部分创建或删除；Schema builder 与业务查询沿用该连接。已有支付尝试、人工核对、outbox 或新佣金日志时拒绝 down。固定 `billing:migrate --execute` 将 Migrator 成功记录与迁移 DDL 纳入同连接外层事务，隔离仓库写入/删除故障已验证整体撤销。已有外层事务拒绝；默认仅计划。生产注册、停写/备份、强杀恢复与并发部署另验，不将重跑视为 schema 自动恢复。

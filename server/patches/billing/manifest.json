@@ -34,7 +34,9 @@
     "plugins/Fubei/README.md": "a258b97506e451490022fcec9052dfdd0bf99def2a67edba9ded8a597db7d553",
     "plugins/Fubei/RawNotification.php": "c3b0e8c3d2cb404771ccc98e593d67857db4d3a1f0dde996284beac693b1280c",
     "plugins/Fubei/Signature.php": "93f8cac4be9105845b35eb58a81c08b791c5913ac9e7d0b1fb3fa7987e26fecb",
-    "plugins/Fubei/config.json": "72b2592d1787c3a247d4e74bb63ee602bb367ab77982cd074272d9a8bc86b776"
+    "plugins/Fubei/config.json": "72b2592d1787c3a247d4e74bb63ee602bb367ab77982cd074272d9a8bc86b776",
+    "app/Services/Billing/AtomicMigration.php": "a3e636b14eed17a8294db6b076550997e92217a65b5d05aa583bb597ce935a42",
+    "app/Console/Commands/BillingMigrate.php": "706ff6fc43f9bfcf77ff822973e5790221d19f866ec39c8a54a0553255c0d1ee"
   },
   "activation": "candidate_not_deployed",
   "source_provenance": {

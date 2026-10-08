@@ -100,7 +100,7 @@ try {
     ];
     $appMap=[];
     foreach ($applicationClasses as $class) $appMap[$class]=fixtureFile($public,'app/'.str_replace('\\','/',substr($class,4)).'.php');
-    foreach (['Services/Billing/Atomic','Services/Billing/Outbox','Services/OrderService','Jobs/OrderHandleJob','Console/Commands/CheckCommission','Console/Commands/CheckOrder','Http/Controllers/V1/User/OrderController','Http/Controllers/V1/Guest/PaymentController'] as $class) {
+    foreach (['Services/Billing/Atomic','Services/Billing/Outbox','Services/Billing/AtomicMigration','Services/OrderService','Jobs/OrderHandleJob','Console/Commands/CheckCommission','Console/Commands/CheckOrder','Console/Commands/BillingMigrate','Http/Controllers/V1/User/OrderController','Http/Controllers/V1/Guest/PaymentController'] as $class) {
         $appMap['App\\'.str_replace('/','\\',$class)]=fixtureFile($candidate,'server/patches/billing/overlay/app/'.$class.'.php');
     }
     $appMap['Plugin\\Fubei\\Plugin']=fixtureFile($candidate,'server/plugins/Fubei/Plugin.php');
