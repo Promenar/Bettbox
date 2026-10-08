@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "scope": "生产setup准备/发布边界与Android ARM64 Go/JNI编译；完整Native owner未接线",
+  "source_base_sha": "88fb3de6c977a2a2d59424f2e655528af10a25b1",
+  "source_has_uncommitted_changes": true,
+  "source_sha256": {
+    "core/common.go": "811ad1fa629ade0d1a97c13771fcca618de0de039b37713a1ca35d2660472807",
+    "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d",
+    "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
+    "core/Clash.Meta/config/config.go": "2f79971a269b3b05de68347ee989b643dccb9e06430766b27ea5fc8511e5da05",
+    "core/Clash.Meta/hub/executor/executor.go": "851c99b8e3633604023b936dd7e243deb8e4c0e18556b7eb09d97a8c45a4b29c"
+  },
+  "validation": {
+    "red_exit_code": 1,
+    "red_subcases_failed": 7,
+    "green_exit_code": 0,
+    "green_subcases_passed": 13,
+    "core_package_regression_exit_code": 0,
+    "android_go_c_shared_compile_exit_code": 0,
+    "android_production_jni_link_exit_code": 0,
+    "android_api": 26,
+    "ndk": "28.2.13676358",
+    "independent_review": "独立只读审阅未发现新增P1/P2"
+  },
+  "evidence_sha256": {
+    "core-config-prepare-red.log": "3fa3fbbf3b224bc803a476b0e0ec5322a32cb7a99d3189c49f38afa6f77d99b3",
+    "core-config-prepare-green.log": "0f066cc6906d7eb13334b97c3a3177f5c33eedace46455a42e34959ba02bfe84",
+    "core-config-prepare-package-green.log": "fa673f0c772079a1f712a4aab8b2739d72fdc377ca9f5ebcc752c6a5c81a7641",
+    "core-config-prepare-android-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "core-config-prepare-android-jni.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "artifacts_sha256": {
+    ".test/android-config-prepare-abi/libclash.so": "d0fb4c8893caad8af8007b4bbf6bba6ac7307a07f93f5773859992bf24aef6c1",
+    ".test/android-config-prepare-abi/libclash.h": "a454fc2930e788d343586c12c5da3c7264ee80f7298d98615641f7ed75f37d43",
+    ".test/android-config-prepare-abi/libcore.so": "4d3a3b44a54ce08ed3427987bd7434d08cda14777e0bb7a2fcc1ee62937462d4"
+  },
+  "contract": "解析失败保留已发布配置指针及DefaultTestURL；输入副本隔离。ParseRawConfig不是纯prevalidate，缓存及候选资源完整回滚未证明。",
+  "release_verified": false,
+  "unverified": [
+    "真实成功ApplyConfig与provider加载",
+    "统一Native owner及epoch/revision/option采纳",
+    "Android真实JVM/CheckJNI/设备流程",
+    "有效上游节点、完整业务闭环及发行"
+  ]
+}

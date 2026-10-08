@@ -288,47 +288,86 @@ func updateConfig(params *UpdateParams) {
 	updateListeners()
 }
 
-func setupConfig(params *SetupParams) error {
-	runLock.Lock()
-	defer runLock.Unlock()
+type preparedSetupConfig struct {
+	params *SetupParams
+	parsed *config.Config
+}
 
-	if params.Config != nil && params.Config.ProxyGroup != nil {
-		for _, group := range params.Config.ProxyGroup {
-			if elm, ok := group["tolerance"]; ok {
-				switch v := elm.(type) {
-				case json.Number:
-					if i, err := v.Int64(); err == nil {
-						group["tolerance"] = int(i)
-					}
-				case float64:
-					group["tolerance"] = int(v)
-				case float32:
-					group["tolerance"] = int(v)
-				}
-			}
-		}
+func cloneSetupParams(params *SetupParams) (*SetupParams, error) {
+	if params == nil || params.Config == nil {
+		return nil, errors.New("配置参数无效")
 	}
-
-	constant.DefaultTestURL = params.TestURL
-	if params.OverrideTestUrl && params.Config != nil {
-		if params.Config.ProxyGroup != nil {
-			for _, group := range params.Config.ProxyGroup {
-				group["url"] = params.TestURL
-			}
-		}
-	}
-
-	var err error
-	currentConfig, err = config.ParseRawConfig(params.Config)
+	data, err := json.Marshal(params)
 	if err != nil {
-		return err
+		return nil, errors.New("配置参数无效")
 	}
-	currentRawConfig = params.Config
+	var copied SetupParams
+	if err := UnmarshalJson(data, &copied); err != nil || copied.Config == nil {
+		return nil, errors.New("配置参数无效")
+	}
+	for index, group := range copied.Config.ProxyGroup {
+		// JSON复制不能把原浮点数变成Number后改变既有截断语义。
+		if elm, ok := params.Config.ProxyGroup[index]["tolerance"]; ok {
+			switch v := elm.(type) {
+			case json.Number:
+				if i, err := v.Int64(); err == nil {
+					group["tolerance"] = int(i)
+				}
+			case float64:
+				group["tolerance"] = int(v)
+			case float32:
+				group["tolerance"] = int(v)
+			case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+				group["tolerance"] = v
+			}
+		}
+	}
+	if copied.OverrideTestUrl {
+		for _, group := range copied.Config.ProxyGroup {
+			if group != nil {
+				group["url"] = copied.TestURL
+			}
+		}
+	}
+	return &copied, nil
+}
+
+// 调用者持有runLock；解析存在自身临时状态与资源行为，并非纯校验。
+func prepareSetupConfigLocked(params *SetupParams) (*preparedSetupConfig, error) {
+	copied, err := cloneSetupParams(params)
+	if err != nil {
+		return nil, err
+	}
+	previousURL := constant.DefaultTestURL
+	constant.DefaultTestURL = copied.TestURL
+	defer func() { constant.DefaultTestURL = previousURL }()
+	parsed, err := config.ParseRawConfig(copied.Config)
+	if err != nil {
+		return nil, err
+	}
+	return &preparedSetupConfig{params: copied, parsed: parsed}, nil
+}
+
+// 准备成功后才发布已复制的配置；保留现有成功应用顺序。
+func commitSetupConfigLocked(prepared *preparedSetupConfig) {
+	currentConfig = prepared.parsed
+	currentRawConfig = prepared.params.Config
+	constant.DefaultTestURL = prepared.params.TestURL
 	hub.ApplyConfig(currentConfig)
-	patchSelectGroup(params.SelectedMap)
+	patchSelectGroup(prepared.params.SelectedMap)
 	updateListeners()
 	runtime.GC()
 	debug.FreeOSMemory()
+}
+
+func setupConfig(params *SetupParams) error {
+	runLock.Lock()
+	defer runLock.Unlock()
+	prepared, err := prepareSetupConfigLocked(params)
+	if err != nil {
+		return err
+	}
+	commitSetupConfigLocked(prepared)
 	return nil
 }
 

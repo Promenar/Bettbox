@@ -1869,3 +1869,34 @@ handler/action八子场景真实red全部失败，green全部通过，core包CGO
 
 ### HLG
 标准append先dry-run再apply追加交接事实，不重写历史。
+
+## 2026-10-08T16:01:54+08:00 · Android配置准备层发布边界与解析副作用核验
+
+type: development
+scope: ["Bettbox"]
+status: done
+tags: ["android", "go", "config", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: a0f161c0589c179eb8fcb713acacd9e219939ca24c88c5524bfe73c8d5449c0e
+
+### Summary
+setup准备层复制输入、局部解析并在成功后发布；nil固定拒绝，失败保留旧配置及默认探测URL。
+
+### Changed
+common.go准备与提交函数、生产早失败及数值复制回归；联合计划将ParseRawConfig划入ENTERED，明确geodata/fake-IP及候选资源无法假设全回滚。PDEC登记独立Android ABI编译。
+
+### Validation
+七个原场景真实red全部失败，十三个green场景通过，core全包CGO0/with_gvisor回归exit0。NDK28/API26 Android ARM64实际Go c-shared及生产JNI链接exit0。独立只读审阅无新增P1/P2。回执core-config-prepare-validation.json。
+
+### Next
+在准备层上实现统一Go提交、STAGED与initial composite、epoch/revision及options快照，连接唯一Native owner和HTTP路径；真实CheckJNI与设备启停另验。
+
+### Risks
+ParseRawConfig临时全局、geodata文件和持久fake-IP副作用未完全隔离，ENTERED后未知必须保留责任。没有成功ApplyConfig、JVM或最终App新产物验收；有效上游和支付外部条件尚未关闭。
+
+### DIA
+已同步架构、平台验证、CHANGELOG、联合计划、PDEC说明、registry及公开回执。
+
+### HLG
+标准append dry-run/apply追加事实，保留历史。

@@ -225,3 +225,8 @@ Android 生命周期候选接入完整工作门禁、独立绑定/启动意图�
 ### 2026-10-08 生产监听停止回执
 
 Go handleStopListener及stopListener action使用既有StopListenerChecked，在真实登记对象Close均确认时才返回true；isRunning=false仅停止新监听更新准入。handler/action共8个公开替身场景在修复前均失败，修复后通过，core包CGO0/with_gvisor回归通过。回执 `validation/2026-10-07-three-platform/core-listener-stop-action-validation.json` 保存实际源码与日志摘要。夹具未创建socket/TUN或写系统代理，不证明全部连接drain、provider/controller或Android Service结束。既有Android APK与macOS签名候选未包含此后源修改，须按最终集成版本重建验收。
+
+
+### 2026-10-08 配置准备层
+
+生产setup的7个早失败场景真实red后修复；13个场景（包含数值及深复制）与core包回归通过。NDK28/API26实际Android ARM64 Go c-shared及生产JNI编译链接通过，独立产物位于 `.test/android-config-prepare-abi`，旧产物保留。回执 `validation/2026-10-07-three-platform/core-config-prepare-validation.json` 保存代码、日志及产物摘要。未安装该产物或验证成功ApplyConfig/真实JVM，不代表完整owner、设备和发行验收。解析器完整副作用回滚没有证明。

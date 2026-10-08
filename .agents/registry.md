@@ -82,3 +82,5 @@
 - docs/validation/2026-10-07-three-platform/macos-development-signing-validation.json — 20项工具回归及真实开发签名候选；应用与发行验收另验
 
 - docs/validation/2026-10-07-three-platform/core-listener-stop-action-validation.json — 生产handler/action检查式关闭的八场景红绿及core包回归
+
+- docs/validation/2026-10-07-three-platform/core-config-prepare-validation.json — setup失败发布边界十三场景及实际Android Go/JNI编译证据

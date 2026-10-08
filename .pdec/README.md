@@ -126,3 +126,6 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 
 
 `test-core-listener-stop-action` 在本机CGO0/with_gvisor、离线依赖下运行生产Go handler/action回归。公开InboundListener替身经正式登记入口注入，覆盖失败、panic、去重、其它资源继续关闭和显式重试；不建立系统TUN或访问公网。core全包回归复用 `test-macos-owned-pipe` 的相同Go命令，证据不升级为设备或完整runtime验收。
+
+
+`test-core-config-prepare`验证生产setup早失败时保留已发布指针、默认URL及调用输入，覆盖纯复制数值语义；CGO0/with_gvisor、离线依赖。`compile-android-config-prepare-core`及对应JNI操作在独立目录使用NDK28/API26编译实际Android ARM64源码，不覆盖原ABI产物，不安装或启动VPN。编译成功不能代替真实JVM/CheckJNI和设备业务验收。

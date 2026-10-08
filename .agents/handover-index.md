@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T15:49:36+08:00
+> generated_at: 2026-10-08T16:01:54+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-08T13:32:53+08:00 | in_progress | ["Bettbox", "Android", "macOS"] | Android f881880正式构建安装与跨层owner接线边界 | `.agents/handover.md` · `2026-10-08T13:32:53+08:00` · `fp:3cb6c5e3ad` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T15:49:36+08:00 | done | ["Bettbox"] | 生产监听停止回执红绿闭合及Android初始配置合同 | `.agents/handover.md` · `2026-10-08T15:49:36+08:00` · `fp:2950f9d391` |
+| three-platform-release | resume | 2026-10-08T16:01:54+08:00 | done | ["Bettbox"] | Android配置准备层发布边界与解析副作用核验 | `.agents/handover.md` · `2026-10-08T16:01:54+08:00` · `fp:a0f161c058` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T16:01:54+08:00 | iso | done | resume | ["Bettbox"] | ["android", "go", "config", "release"] | Android配置准备层发布边界与解析副作用核验 | `.agents/handover.md` · `2026-10-08T16:01:54+08:00` · `fp:a0f161c058` |
 | 2026-10-08T15:49:36+08:00 | iso | done | resume | ["Bettbox"] | ["android", "go", "lifecycle", "release"] | 生产监听停止回执红绿闭合及Android初始配置合同 | `.agents/handover.md` · `2026-10-08T15:49:36+08:00` · `fp:2950f9d391` |
 | 2026-10-08T15:43:01+08:00 | iso | done | resume | ["Bettbox"] | ["macos", "signing", "android", "release"] | macOS完整应用开发签名候选与Android配置合同边界 | `.agents/handover.md` · `2026-10-08T15:43:01+08:00` · `fp:402b4f1027` |
 | 2026-10-08T15:13:16+08:00 | iso | done | resume | ["Bettbox", "macOS"] | ["macos", "authorization", "validation"] | macOS原生授权生命周期与取消门禁 | `.agents/handover.md` · `2026-10-08T15:13:16+08:00` · `fp:6a010d147d` |

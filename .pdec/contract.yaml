@@ -1263,6 +1263,81 @@
       "timeout_seconds": 120,
       "artifacts": [],
       "verification": "CGO0及GOPROXY/GOSUMDBoff；公开InboundListener由生产handler/action检查关闭结果，无公网、TUN或系统代理；不代表Android设备或全runtime收尾"
+    },
+    "test-core-config-prepare": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=60s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^Test(SetupConfig|CloneSetupParams)",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "CGO0离线依赖；生产setup的公开早失败config，无成功ApplyConfig、公网、TUN或系统代理。不证明整个解析器纯事务/候选资源收尾"
+    },
+    "compile-android-config-prepare-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-config-prepare-abi/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-config-prepare-abi/libclash.so",
+        ".test/android-config-prepare-abi/libclash.h"
+      ],
+      "verification": "本机NDK28/API26 Android ARM64实际生产core c-shared离线编译；独立输出保留已有ABI产物，不安装/启用VPN，不证明JVM或设备行为",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "compile-android-config-prepare-jni": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "cross_compile": "Android ARM64 NDK 28 JNI shared",
+      "argv": [
+        "clang++",
+        "-std=c++17",
+        "-O3",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-DLIBCLASH",
+        "-I.test/android-config-prepare-abi",
+        "-shared",
+        "android/core/src/main/cpp/core.cpp",
+        "android/core/src/main/cpp/jni_helper.cpp",
+        "-L.test/android-config-prepare-abi",
+        "-lclash",
+        "-Wl,-z,max-page-size=16384",
+        "-o",
+        ".test/android-config-prepare-abi/libcore.so"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/android-config-prepare-abi/libcore.so"
+      ],
+      "verification": "实际生产 JNI 源与本工作树新生成 Go C ABI 链接；不替代 Android 装机及 JNI 行为验证"
     }
   },
   "deployment": {
@@ -1374,7 +1449,7 @@
     "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e",
     "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b",
     "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
-    "core/common.go": "b19ab65b8f5d0e84d611148be7f624891aed40d9dfcc86814bd7d433dd66195e",
+    "core/common.go": "811ad1fa629ade0d1a97c13771fcca618de0de039b37713a1ca35d2660472807",
     "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
     "scripts/check_macos_supervisor.py": "4ed0575901bbee77d4ca3f20e077ca39b36f74faf82306442ff00816cb44b770",
     "scripts/tests/test_check_macos_supervisor.py": "0f3f0148087b01798b54f2f65dde610ff3d61225e657afd30e9240a49cacff81",
@@ -1489,7 +1564,8 @@
     "lib/common/system.dart": "12898544d27d2a5dcc6912a5c45a42af552713bbc0db5ae39d67e608dd875da0",
     "test/common/macos_core_privilege_test.dart": "e07c3ac24193b30f98dd49f8707e64ef52e75f8e224f7b39e33407d1421e2730",
     "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
-    "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073"
+    "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
+    "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d"
   },
   "platform_extensions": {
     "android": {
@@ -1565,6 +1641,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "a34437544fd9e2615e2c95e28d8b611e7c4d0845bc333bd52f0354cca972f1f0"
+    "contract_digest": "622cc0d59ab35ff4addfb117135d527fcd99436271c716c8c249b4ab7da25401"
   }
 }
