@@ -1,5 +1,7 @@
 # 共享客户端与平台验收
 
+2026-10-08 Android 正式候选真实业务验收：独立开发账户的真实登录、账户、订阅与节点接口均 HTTP 200，订阅未过期，返回 23 个节点。客户端界面登录、冷启动安全存储及 VPN 流量尚未验收；后台创建账户不是网页邮件注册或邀请绑定证据。见 `validation/2026-10-07-three-platform/android-live-account-validation.json` 与 `.agents/plans/2026-10-08-android-live-account.md`。
+
 ## 代码与分支
 
 Bettbox 使用 Flutter。页面、Riverpod 状态、Xboard API、邀请分享及收益展示共用 `lib/`。Flutter 支持 Windows、macOS 等原生桌面构建，插件仍须具备对应平台实现，见 [Flutter 桌面支持](https://docs.flutter.dev/platform-integration/desktop)。

@@ -1404,3 +1404,34 @@ session75243终态exit0，单一正式证书6a121d74匹配锚，包内核心一�
 
 ### HLG
 标准append dry-run/apply追加，索引工具重建。模拟器session46654作为开发环境保留，未新建AVD/清除debug数据。
+
+## 2026-10-08T10:43:20+08:00 · Android独立开发账户与真实订阅接口验收
+
+type: development
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "xboard", "account", "subscription", "security"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: e16dc5dbfbc6149337c9ad42fb74a0a99a1a895094041b567ab157342e453bd5
+
+### Summary
+优先交付Android/macOS，iOS保留开发版研究。正式APK源码ebc7d3c已安装；NoSLA新增独立验收账户ID5，真实登录、账户、订阅、节点接口均HTTP200，订阅未过期且返回23节点。Goal保持active。
+
+### Changed
+新增账户24小时有效、64MiB、限速5Mbps、device_limit1，零余额/佣金且无邀请归属；既有用户、订单及佣金事务摘要不变。一次性脚本仅在.test，秘密生成与SSHstdin注入由本机非LLM程序完成。新目录/文件FD清空ACL并核验；凭据目录.test/three-platform-release/account-provision/private/禁止通过模型读取内容。创建回执created.json与credentials.json均0600，private0700。
+
+### Validation
+独立原生审阅两项P2：继承ACL与保存后限制断言；修正后静态闭合，无新P1/P2。公开fixture实际复现0600继承ACL，FD清理文件/目录通过；祖先可写ACL计数0。真实创建完整限制与旧记录不变断言通过；API时钟调用错误实际复现后修正，四项真实HTTPS接口通过。PDEC执行就绪，未改客户端代码或重建APK。公开回执docs/validation/2026-10-07-three-platform/android-live-account-validation.json。
+
+### Next
+正式包emulator-5554当前运行于登录页，需用本机工具读取受保护测试凭据并按UI树定位注入，禁止向模型输出含凭据的树、截图或日志。随后验收订阅同步、冷启动、安全存储及VPN真实流量。macOS可信native HTTP授权/SC和正常main接线继续；iOS开发版研究继续。
+
+### Risks
+创建账户不代表网页邮件注册、邀请归属或返佣验收。后台节点在线标记0不能判定CloudBridge转发节点可用。实际Android界面登录/节点流量尚未验证；Mac系统代理、Keychain完整候选和Apple发行签名未完；支付仍缺商户/store与安全注入。不得重复创建同一账户；结果不明确时先只读恢复。
+
+### DIA
+已同步平台验证、服务部署、CHANGELOG、计划与registry；架构未变化。
+
+### HLG
+通过append dry-run后apply追加，保留真实账户副作用、接口证据及秘密读取边界。

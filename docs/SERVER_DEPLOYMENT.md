@@ -4,6 +4,8 @@
 
 运行主机为 NoSLA `216.23.116.56`，SSH 别名 `NOSLA`，Debian 13 x86_64。Xboard 目录 `/opt/xboard-test`，辅助订阅代理目录 `/opt/sub-mihomo`。流量经 Cloudflare 到 NoSLA Caddy，再到回环 Xboard 7001；访问链路无需 Vercel。
 
+2026-10-08 新增独立开发验收账户 ID 5，24 小时有效、64 MiB、限速 5 Mbps、设备限制 1，零余额/佣金、无订单。既有用户、订单及佣金事务摘要不变；不调整公共注册配置。真实登录、账户、订阅、节点接口通过，返回 23 个节点；这些证据不代表邮件注册、邀请码归属、真实节点流量或支付验收。凭据通过受保护的本机工具注入，不入仓库；公开回执见 `validation/2026-10-07-three-platform/android-live-account-validation.json`。
+
 | 域名 | 职责 | Cloudflare | 端口 |
 | --- | --- | --- | --- |
 | cloud.bingcn.site | 网页、注册、邀请、下载入口 | A → NoSLA，橙云 | 443；8443 兼容 |

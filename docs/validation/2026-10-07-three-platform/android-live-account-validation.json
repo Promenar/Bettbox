@@ -1,0 +1,55 @@
+{
+  "status": "passed",
+  "source_commit": "a3757992a3bf53adad7ccfff8ed65f303b8ff961",
+  "provision_script_sha256": "6b8fa9ac65857de00bd95e9dc527ea6162900ecd6bf54fc28a70ccb12b8bdc1d",
+  "account": {
+    "status": "created",
+    "account_id": 5,
+    "existing_records_unchanged": true,
+    "available": true,
+    "quota_bytes": 67108864,
+    "validity_seconds": 86400,
+    "balance_zero": true,
+    "commission_zero": true
+  },
+  "api": {
+    "status": "passed",
+    "scope": "真实服务器登录/账户/订阅/节点接口；不代表客户端或节点流量验收",
+    "account_id": 5,
+    "login_http": 200,
+    "user_info_http": 200,
+    "subscribe_http": 200,
+    "servers_http": 200,
+    "quota_bytes": 67108864,
+    "subscription_unexpired": true,
+    "node_count": 23,
+    "balance_zero": true,
+    "commission_zero": true,
+    "credentials_reported": false,
+    "probe_clock_error_reproduced_and_fixed": true
+  },
+  "private_storage": {
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "new_acl_cleared_and_verified": true,
+    "ancestor_write_acl_entries": 0,
+    "credential_values_reported": false
+  },
+  "acl_fixture": {
+    "mode_600_inherited_acl_reproduced": true,
+    "directory_and_file_fd_clear_passed": true,
+    "secrets_used": false
+  },
+  "independent_review": {
+    "executor": "native supervisor_native_review",
+    "two_p2_closed": true,
+    "new_p1_p2": 0,
+    "scope": "指定计划与一次性脚本静态审阅；真实执行由主控核验"
+  },
+  "limits": [
+    "后台创建账户不是网页邮件注册证据",
+    "Android客户端登录、冷启动安全存储和节点流量尚未验收",
+    "无订单、付款、邀请归属或佣金结算验收",
+    "未公开发布下载"
+  ]
+}
