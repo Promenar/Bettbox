@@ -31,4 +31,7 @@ python3 server/tests/billing/test_apply.py
 候选文件经安全应用后，隔离目录中的命令为 `php artisan billing:migrate`（计划）、`php artisan billing:migrate --execute`（执行）与 `php artisan billing:migrate --execute --rollback`（受限回滚）。生产执行需先完成 PLAN 中的部署门禁；不使用普通全目录 migrate 来替代共同事务命令。
 
 
-真实 Laravel 双进程创建、取消、通知、取消/到账竞争和返佣已通过隔离验收，证据见 `docs/validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。仅验证单轮双进程与同步任务；优惠券、多级/循环返佣、免费/管理员付款和实际异步队列尚未覆盖。
+真实 Laravel 双进程创建、取消、通知、取消/到账竞争和返佣已通过隔离验收，证据见 `docs/validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。仅验证单轮双进程与同步任务；优惠券、管理员付款和实际异步队列尚未覆盖。
+
+
+真实 Laravel 双进程单轮已验证余额完全抵扣的零金额 checkout：余额扣除、开通和流量重置一次，网关未调用，重复请求不延期；三层 50/30/20 返佣日志及余额各入账一次；购买者参与循环时全部返佣撤销，订单保持已开通、佣金待处理且仅保留一份核对记录。当前 236 项隔离检查、56 个冻结输入及11项执行器回归通过。仅验证该比例及 commission_balance 目的账户，其他比例、舍入政策和普通余额模式另验。 验收不启用生产支付，生产来源、命令注册与备份门禁保持。

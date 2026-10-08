@@ -171,4 +171,74 @@ function fixtureLaravelConcurrency($db, string $temporary, callable $makeUser, $
     $inviter->refresh();$commission->refresh();
     fixtureCheck(array_column($out,0)===[0,0] && (int)$commission->commission_status===2 && (int)$commission->actual_commission_balance===1000
         && (int)$inviter->commission_balance===1000 && App\Models\CommissionLog::where('order_id',$commission->id)->count()===1,'parallel_commission_balance_log_once');
+
+    $freeUser=$makeUser('parallel-free',null,10000);
+    $freeOrder=App\Services\OrderService::createFromRequest($freeUser,$plan,'monthly');
+    fixtureCheck((int)$freeOrder->total_amount===0 && (int)$freeOrder->balance_amount===10000,'parallel_free_balance_fully_applied');
+    $gateways=$db->table('fixture_gateway')->count();
+    $out=fixtureParallelBilling($db,$temporary,'parallel_free',static function () use ($request,$freeUser,$freeOrder): array {
+        return [$request('/fixture/checkout',['trade_no'=>$freeOrder->trade_no],App\Models\User::findOrFail($freeUser->id))->getStatusCode()];
+    });
+    $freeUser->refresh();$freeOrder->refresh();
+    fixtureCheck(in_array(200,array_column($out,0),true) && !array_diff(array_column($out,0),[200,400])
+        && (int)$freeOrder->status===3 && (int)$freeUser->balance===0 && (int)$freeUser->plan_id===(int)$plan->id
+        && (int)$freeUser->reset_count===1 && App\Models\TrafficResetLog::where('user_id',$freeUser->id)->count()===1
+        && $db->table('fixture_gateway')->count()===$gateways,'parallel_free_open_reset_no_gateway');
+    $expiry=$freeUser->expired_at;
+    fixtureCheck($request('/fixture/checkout',['trade_no'=>$freeOrder->trade_no],$freeUser)->getStatusCode()===400,'parallel_free_repeat_rejected');
+    $freeUser->refresh();
+    fixtureCheck($freeUser->expired_at===$expiry && (int)$freeUser->reset_count===1 && (int)$freeUser->balance===0,'parallel_free_repeat_no_extension');
+
+    $saved=app('config')->get('v2board');
+    app('config')->set('v2board.commission_distribution_enable',1);
+    app('config')->set('v2board.commission_distribution_l1',50);
+    app('config')->set('v2board.commission_distribution_l2',30);
+    app('config')->set('v2board.commission_distribution_l3',20);
+    try {
+        $third=$makeUser('parallel-tier3');
+        $second=$makeUser('parallel-tier2',$third->id);
+        $first=$makeUser('parallel-tier1',$second->id);
+        $customer=$makeUser('parallel-tier-buyer',$first->id);
+        $tierOrder=App\Services\OrderService::createFromRequest($customer,$plan,'monthly');
+        $tierOrder->payment_id=$positive->id;$tierOrder->save();
+        fixtureCheck($request('/api/v1/guest/payment/notify/FixtureLegacy/PUBLIC_POSITIVE',['trade_no'=>$tierOrder->trade_no,'callback_no'=>'PUBLIC_TIERS_'.$tierOrder->id])->getStatusCode()===200,'parallel_tiers_order_opened');
+        $tierOrder->refresh();$tierOrder->commission_status=1;$tierOrder->save();
+        $out=fixtureParallelBilling($db,$temporary,'parallel_tiers',static function (): array {
+            return [Illuminate\Support\Facades\Artisan::call('check:commission')];
+        });
+        $tierOrder->refresh();
+        fixtureCheck(array_column($out,0)===[0,0] && (int)$tierOrder->commission_status===2
+            && (int)$tierOrder->actual_commission_balance===1000,'parallel_tiers_settlement_once');
+        $logs=App\Models\CommissionLog::where('order_id',$tierOrder->id)->get()->keyBy('level');
+        fixtureCheck($logs->count()===3,'parallel_tiers_exact_log_count');
+        foreach ([[$first,500],[$second,300],[$third,200]] as $level=>[$beneficiary,$amount]) {
+            $beneficiary->refresh();
+            fixtureCheck((int)$beneficiary->commission_balance===$amount && (int)$beneficiary->balance===0
+                && isset($logs[$level]) && (int)$logs[$level]->invite_user_id===(int)$beneficiary->id
+                && (int)$logs[$level]->get_amount===$amount,'parallel_tiers_level_'.$level.'_balance_log_once');
+        }
+
+        $loopSecond=$makeUser('parallel-cycle2');
+        $loopFirst=$makeUser('parallel-cycle1',$loopSecond->id);
+        $loopBuyer=$makeUser('parallel-cycle-buyer',$loopFirst->id);
+        $loopSecond->invite_user_id=$loopBuyer->id;$loopSecond->save();
+        $loopOrder=App\Services\OrderService::createFromRequest($loopBuyer,$plan,'monthly');
+        $loopOrder->payment_id=$positive->id;$loopOrder->save();
+        fixtureCheck($request('/api/v1/guest/payment/notify/FixtureLegacy/PUBLIC_POSITIVE',['trade_no'=>$loopOrder->trade_no,'callback_no'=>'PUBLIC_CYCLE_'.$loopOrder->id])->getStatusCode()===200,'parallel_cycle_order_opened');
+        $loopOrder->refresh();$loopOrder->commission_status=1;$loopOrder->save();
+        $out=fixtureParallelBilling($db,$temporary,'parallel_cycle',static function (): array {
+            return [Illuminate\Support\Facades\Artisan::call('check:commission')];
+        });
+        $loopOrder->refresh();
+        fixtureCheck(array_column($out,0)===[0,0] && (int)$loopOrder->status===3 && (int)$loopOrder->commission_status===1
+            && $loopOrder->actual_commission_balance===null && App\Models\CommissionLog::where('order_id',$loopOrder->id)->count()===0
+            && $db->table('v2_billing_review')->where('order_id',$loopOrder->id)->where('category','commission_failed')->count()===1,'parallel_cycle_rolls_back_logs_keeps_review');
+        foreach ([$loopFirst,$loopSecond,$loopBuyer] as $index=>$member) {
+            $member->refresh();
+            fixtureCheck((int)$member->balance===0 && (int)$member->commission_balance===0,'parallel_cycle_member_'.$index.'_unchanged');
+        }
+    } finally {
+        app('config')->set('v2board',$saved);
+    }
+
 }

@@ -3233,3 +3233,34 @@ record-fingerprint: 99bfd326bf4ea712edd0d927dda1cb1f9c66060e5d62fdb7596da5999e81
 
 ### HLG
 通过标准append dry-run/apply追加，生成索引保留历史。
+
+## 2026-10-09T05:54:06+08:00 · 三层返佣循环回滚与零金额付款真实验收
+
+type: maintenance
+scope: ["Bettbox", "server/billing"]
+status: partial
+tags: ["billing", "invite", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 7ec523c9068ea5e1efea81f53de836152af356366226f7395d74d6b1420ced12
+
+### Summary
+真实 Laravel 双进程新增三层50/30/20返佣、购买者参与循环和全余额抵扣零金额付款验收通过；生产业务未修改，整体发行目标未完成。
+
+### Changed
+扩展既有并发helper与强制执行器完成标签，精确固定56输入不扩大执行位置或生产权限。三层每级受益人/金额/日志和结算总额核对，循环全余额/日志撤销保留一次核对，零金额开通/流量一次且零网关调用与重复不延期。
+
+### Validation
+真实任务86b5fdb3a4494817b6c83e691b7c5920通过236 checks，source_unchanged/cleanup_verified均true；主控核对23个候选摘要一致。11项执行器回归通过，缺少免费/三层/循环结果标签被拒绝。独立只读审阅无可确认P1/P2。PDEC execution_ready=true，禁网只读128MiB与64PID范围保持。
+
+### Next
+优惠券单次使用、管理员付款、实际异步队列与插件生命周期；未知下单恢复、生产命令注册、停写及备份恢复；Android整体owner采用及有效节点，macOS解锁后的黑屏与系统代理验收。
+
+### Risks
+仅三层50/30/20、commission_balance模式和购买者参与循环；不证明全部比例、舍入、余额目的账户或循环形状。零金额来自全余额抵扣，不包含管理员付款。认证/插件发现/支付网关和同步队列边界保持，真实商户及生产支付未验收。macOS本轮界面工具仍报告锁屏，无法定位黑屏；不据此修改渲染配置。
+
+### DIA
+已同步README、PLAN、CHANGELOG、PLATFORM_VALIDATION、PDEC、registry及公开回执；架构和生产接口无变化。
+
+### HLG
+使用标准append dry-run后apply追加并生成索引。

@@ -145,7 +145,8 @@ def result_summary(raw, hashes):
     required.update({'parallel_reaped_deadline_no_cleanup_responsibility','parallel_create_one_order_balance_once','parallel_cancel_refund_once',
                      'parallel_notify_open_reset_event_once','parallel_cancel_paid_consistent_winner',
                      'parallel_commission_order_opened','parallel_commission_balance_log_once'})
-    required.update(name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission'])
+    required.update({'parallel_tiers_level_2_balance_log_once', 'parallel_cycle_order_opened', 'parallel_free_repeat_no_extension', 'parallel_free_repeat_rejected', 'parallel_tiers_exact_log_count', 'parallel_cycle_member_0_unchanged', 'parallel_tiers_settlement_once', 'parallel_tiers_level_0_balance_log_once', 'parallel_tiers_level_1_balance_log_once', 'parallel_cycle_member_1_unchanged', 'parallel_free_open_reset_no_gateway', 'parallel_tiers_order_opened', 'parallel_cycle_rolls_back_logs_keeps_review', 'parallel_free_balance_fully_applied', 'parallel_cycle_member_2_unchanged'})
+    required.update(name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission','parallel_free','parallel_tiers','parallel_cycle'])
     required.update('migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'])
     if not required.issubset(checks) or value.get('environment_loaded') is not False or value.get('production_database_loaded') is not False:
         raise RunnerFailure('fixture_contract_incomplete')

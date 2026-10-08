@@ -36,7 +36,9 @@ CHECKS += ['migration_repository_insert_failure_atomic','migration_repository_de
 CHECKS += ['parallel_reaped_deadline_no_cleanup_responsibility','parallel_create_one_order_balance_once','parallel_cancel_refund_once',
            'parallel_notify_open_reset_event_once','parallel_cancel_paid_consistent_winner',
            'parallel_commission_order_opened','parallel_commission_balance_log_once']
-CHECKS += [name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission']]
+CHECKS += [name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission','parallel_free','parallel_tiers','parallel_cycle']]
+
+CHECKS += ['parallel_free_balance_fully_applied', 'parallel_free_open_reset_no_gateway', 'parallel_free_repeat_rejected', 'parallel_free_repeat_no_extension', 'parallel_tiers_order_opened', 'parallel_tiers_settlement_once', 'parallel_tiers_exact_log_count', 'parallel_cycle_order_opened', 'parallel_cycle_rolls_back_logs_keeps_review', 'parallel_tiers_level_0_balance_log_once', 'parallel_tiers_level_1_balance_log_once', 'parallel_tiers_level_2_balance_log_once', 'parallel_cycle_member_0_unchanged', 'parallel_cycle_member_1_unchanged', 'parallel_cycle_member_2_unchanged']
 
 
 class LaravelIsolatedTest(unittest.TestCase):
@@ -56,6 +58,16 @@ class LaravelIsolatedTest(unittest.TestCase):
                 self.assertEqual(receipt['status'], 'failed')
                 self.assertEqual(receipt['failure_category'], 'fixture_contract_incomplete')
                 self.assertTrue(receipt['cleanup_verified'])
+
+    def test_free_tiers_and_cycle_checks_are_required(self):
+        hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
+        for label in ['parallel_free_open_reset_no_gateway', 'parallel_tiers_settlement_once',
+                      'parallel_cycle_rolls_back_logs_keeps_review']:
+            with self.subTest(label=label):
+                payload = {'ok': True, 'checks': [x for x in CHECKS if x != label], 'source_hashes': {},
+                           'environment_loaded': False, 'production_database_loaded': False}
+                with self.assertRaises(runner.RunnerFailure):
+                    runner.result_summary(json.dumps(payload).encode(), hashes)
 
     def exercise(self, failure=None):
         with tempfile.TemporaryDirectory() as temporary:
