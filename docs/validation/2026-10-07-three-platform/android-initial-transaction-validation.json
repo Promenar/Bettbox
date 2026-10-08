@@ -1,0 +1,94 @@
+{
+  "recorded_at": "2026-10-08T20:54:08.829102+00:00",
+  "sources_sha256": {
+    "core/android_config.go": "ca6f5d93d1d6ca38299e1c2cdb277ceac4806fcce8151402ded387213b18fb7b",
+    "core/android_config_test.go": "e3db6e48a30e45a513a42dd01c7a7c56b271d2ca9478bc3116533111024771f7",
+    "core/android_initial_transaction_test.go": "993149fdd80119e2423334fa6c177023d2163dafe423a9fb9e503840bcf93596",
+    "core/hub.go": "a2dd53922896ccad853aaf345e0ad7467a10b1486776966d461b66e6cb96ac53",
+    "core/Clash.Meta/listener/responsibility.go": "4df5ab20995c3b0b27260b1d9a5d6fed6633ac73c0ea225f5b67ba6809996c9d",
+    "core/Clash.Meta/listener/responsibility_test.go": "efa9a9ccd71b5143e3b6629c5a7f71f6e6965da5af5acfd7b9f24d94fb75820e",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "379625132adad5f61172e06a32ed85da3478795b6160831ec0dc38e6acce1586",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "c6a90dbeb7acf2f7998dc14dc4e5b16cf4c221016f7d8726503e7159bb398b41"
+  },
+  "contract": {
+    "kind": 5,
+    "payload": [
+      "init",
+      "setup",
+      "state"
+    ],
+    "receipt_fields": 10,
+    "initialization_reuse": "目录及版本精确一致，初始化无操作复用",
+    "completion": "仅配置与 options；不是 listener 或 VPN START"
+  },
+  "production_red": {
+    "base_sha": "6561f6475c20a1b1f6d8900a93c3ffcb1e0671c5",
+    "exit_code": 1,
+    "test": "TestProductionAndroidInitialTransactionRetainsInitializationResponsibility",
+    "failure": "首次事务没有执行实际初始化"
+  },
+  "main_green": {
+    "exit_code": 0,
+    "cwd": "core",
+    "command": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go test -mod=readonly -count=1 -timeout=120s -tags with_gvisor .",
+    "actual_production_failure_path": true,
+    "success_and_concurrency": "driver 夹具，不是生产成功配置"
+  },
+  "listener_race": {
+    "exit_code": 0,
+    "command": "CGO_ENABLED=1 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go test -p=2 -mod=readonly -race -count=1 -timeout=90s -run ^TestChecked|^TestListenerResponsibility github.com/metacubex/mihomo/listener",
+    "scope": "登记查询不清理，Close 失败仍保留责任，确认 Close 后释放；逐组锁不是全局原子快照"
+  },
+  "Kotlin_protocol": {
+    "passed": true,
+    "actual_Android": false,
+    "sources_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt": "0490c1d81e3f7fe4b0808cc0de49db8f5baffd150785729525b02a0b605a536b",
+      "android/app/src/main/kotlin/com/appshub/bettbox/NativeRuntimeIdentity.kt": "a540d58bf22ef24b0f397d17d2c261c758a2b66a60726cbd835632f884418c90",
+      "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "379625132adad5f61172e06a32ed85da3478795b6160831ec0dc38e6acce1586",
+      "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "c6a90dbeb7acf2f7998dc14dc4e5b16cf4c221016f7d8726503e7159bb398b41"
+    },
+    "compiler": "Kotlin2.0.21",
+    "json_library": "Gson2.10.1",
+    "fixture_stdout_sha256": "d1a3d65362476ee8170e1957759ee739d4dd725e49b7a26a2490fa340b18e864",
+    "boundary": "生产解析器及公开 JSON 夹具；没有 JNI、Service 或设备验收"
+  },
+  "actual_arm64_core": {
+    "exit_code": 0,
+    "actual_android_arm64": true,
+    "ndk": "28.2.13676358",
+    "source_sha256": {
+      "core/android_config.go": "ca6f5d93d1d6ca38299e1c2cdb277ceac4806fcce8151402ded387213b18fb7b",
+      "core/hub.go": "a2dd53922896ccad853aaf345e0ad7467a10b1486776966d461b66e6cb96ac53",
+      "core/Clash.Meta/listener/responsibility.go": "4df5ab20995c3b0b27260b1d9a5d6fed6633ac73c0ea225f5b67ba6809996c9d"
+    },
+    "source_unchanged": true,
+    "artifacts": {
+      "libclash.so": "5975e0f1329c85b34ad66ba5d5127210376185c38ec2de0a0275e60689948119",
+      "libclash.h": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5"
+    }
+  },
+  "actual_release_Kotlin": {
+    "exit_code": 0,
+    "actual_release_Kotlin": true,
+    "source_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "379625132adad5f61172e06a32ed85da3478795b6160831ec0dc38e6acce1586"
+    },
+    "source_unchanged": true,
+    "boundary": "实际 Release Kotlin 工程编译，不证明 JNI/设备采用"
+  },
+  "independent_review": {
+    "read_only": true,
+    "confirmed_defects": 0
+  },
+  "not_verified": [
+    "真实生产成功配置",
+    "JNI/设备 kind5 采用",
+    "绕开 core 锁的 controller/listener 写入治理",
+    "确认 listener 启停与 owned suspend",
+    "Kotlin/Dart 唯一 owner 与 completion/ACK 联合采用",
+    "有效代理节点 HTTPS",
+    "macOS 可见画面"
+  ],
+  "release_verified": false
+}

@@ -123,6 +123,11 @@ func assertStagedStateResult(t *testing.T, result androidOwnedConfigResult) {
 }
 
 type fixtureAndroidConfigDriver struct {
+	initHome    string
+	initVersion int
+	initErr     error
+	initCall    int
+	listeners   bool
 	initialized bool
 	present     bool
 	state       state.State
@@ -138,7 +143,26 @@ type fixtureAndroidConfigDriver struct {
 	stateCall   int
 }
 
-func (d *fixtureAndroidConfigDriver) initializedLocked() bool          { return d.initialized }
+func (d *fixtureAndroidConfigDriver) initializedLocked() bool { return d.initialized }
+func (d *fixtureAndroidConfigDriver) initializationCompatibleLocked(p *InitParams) bool {
+	return !d.initialized || d.initHome == p.HomeDir && d.initVersion == p.Version
+}
+func (d *fixtureAndroidConfigDriver) listenersPresentLocked() bool { return d.listeners }
+func (d *fixtureAndroidConfigDriver) initializeLocked(p *InitParams) error {
+	if d.initialized {
+		return nil
+	}
+	d.initCall++
+	if d.panicAt == "initialize" {
+		panic("公开初始化故障")
+	}
+	if d.initErr != nil {
+		return d.initErr
+	}
+	d.initialized = true
+	d.initHome, d.initVersion = p.HomeDir, p.Version
+	return nil
+}
 func (d *fixtureAndroidConfigDriver) configPresentLocked() bool        { return d.present }
 func (d *fixtureAndroidConfigDriver) stateSnapshotLocked() state.State { return state.Copy(d.state) }
 func (d *fixtureAndroidConfigDriver) prepareSetupLocked(*SetupParams) (*preparedSetupConfig, error) {

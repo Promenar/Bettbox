@@ -386,3 +386,9 @@ Go 运行时配置 epoch 已使用库载入期公开随机身份；完整主包�
 公开证据见 `validation/2026-10-07-three-platform/android-suspend-admission-validation.json`。真实核心在 STAGED 后的旧挂起污染完成失败复现，修复后主包通过；生成头文件与实际 Android ARM64 核心编译通过。JNI 生产薄桥的 15 项公开函数表夹具通过，但未使用真实 JVM。真实 SuspendModule 与公开平台桩的 8 项回归通过；重新安装清空责任的场景修复前为 7/8、修复后为 8/8。实际 Release Kotlin 工程编译与独立只读复审通过。
 
 本节不证明新 APK 的 JNI 往返、真实设备熄屏广播、owned suspend、完整原生所有者、不可变完成回执或 engine ACK。正式候选仍保持 release_verified=false。
+
+### Android 首次初始化配置后端合同
+
+kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initial-transaction-validation.json`。真实生产入口从未初始化状态执行实际 init 后，在无效节点准备阶段失败；旧版本没有初始化，修复后保留阻断责任并拒绝旧 init。成功提交、并发首次、重放、参数冲突和初始化故障的证据为 driver 夹具，不能升级为生产成功配置证明。监听登记查询/检查式关闭 race 与严格 Kotlin 错误码解析通过，实际 Android ARM64 核心编译通过。
+
+逐组监听责任查询不是全局原子快照，不能证明 controller 或 listener 包内绕过 core 锁的写入已收敛。Kotlin/Dart 的首次真实 owner 调用、listener/suspend/停止、不可变完成回执与 engine ACK 仍待联合采用；无新 APK 或发行可用声明。

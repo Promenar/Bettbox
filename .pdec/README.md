@@ -169,3 +169,5 @@ Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例�
 `launch-macos-local-development-trace` 直接运行已严格验签的本机开发候选并捕获启动输出，旧候选宿主及两个内核进程必须先确认退出。原始日志只保存在任务目录的0600文件中，模型仅读取固定阶段和状态；启动与帧回调不代表窗口、钥匙串账户、系统代理或发行验收。该入口不启用额外系统权限或付款。
 
 Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule 与公开平台桩，8 个行为场景不访问真实 Android 广播或 JNI。checked suspend 的 Android ARM64 核心使用只读离线 Go 依赖与既有 NDK28；JNI 夹具使用该实际生成头文件，15 个场景仍不是设备验收。Release Kotlin 安全注入现有签名环境，仅编译、不安装。
+
+首次初始化配置 kind5 的本机验证使用既有离线 Go/NDK 工具链；真实核心主包、监听登记与关闭 race、生产 Kotlin 协议夹具及 Release Kotlin 编译分别验收。实际 ARM64 输出在 `.test/android-initial-core/`，不覆盖已安装候选，也不安装、启动或发行。

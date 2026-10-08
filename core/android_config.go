@@ -7,17 +7,22 @@ import (
 	"io"
 	"math"
 	"net/netip"
+	"path/filepath"
+	"strings"
 
 	"core/state"
 	"github.com/metacubex/mihomo/config"
+	"github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/listener"
 )
 
 const (
-	androidConfigPayloadLimit         = 16 * 1024 * 1024
-	androidConfigKindSetup            = 1
-	androidConfigKindUpdate           = 2
-	androidConfigKindState            = 3
-	androidConfigKindInitialComposite = 4
+	androidConfigPayloadLimit            = 16 * 1024 * 1024
+	androidConfigKindSetup               = 1
+	androidConfigKindUpdate              = 2
+	androidConfigKindState               = 3
+	androidConfigKindInitialComposite    = 4
+	androidConfigKindInitializeComposite = 5
 )
 
 const (
@@ -32,26 +37,29 @@ const (
 )
 
 const (
-	androidConfigErrorNone                = ""
-	androidConfigErrorBlocked             = "coordinatorBlocked"
-	androidConfigErrorConfigApplyFailed   = "configApplyFailed"
-	androidConfigErrorConfigPrepareFailed = "configPrepareFailed"
-	androidConfigErrorCoreNotInitialized  = "coreNotInitialized"
-	androidConfigErrorInitialStateMissing = "initialStateMissing"
-	androidConfigErrorInitialOnly         = "initialCompositeAfterConfig"
-	androidConfigErrorInvalidKind         = "invalidKind"
-	androidConfigErrorInvalidPayload      = "invalidPayload"
-	androidConfigErrorLegacyConfigPresent = "legacyConfigPresent"
-	androidConfigErrorOptionsFailed       = "optionsSnapshotFailed"
-	androidConfigErrorPayloadTooLarge     = "payloadTooLarge"
-	androidConfigErrorReceiptEncoding     = "receiptEncodingFailed"
-	androidConfigErrorRevisionOverflow    = "revisionOverflow"
-	androidConfigErrorStaleEpoch          = "staleEpoch"
-	androidConfigErrorStaleRevision       = "staleRevision"
-	androidConfigErrorStateApplyFailed    = "stateApplyFailed"
-	androidConfigErrorUpdateApplyFailed   = "updateApplyFailed"
-	androidConfigErrorUpdateBeforeConfig  = "updateBeforeConfig"
-	androidConfigErrorUnconfigured        = "unconfigured"
+	androidConfigErrorNone                   = ""
+	androidConfigErrorBlocked                = "coordinatorBlocked"
+	androidConfigErrorConfigApplyFailed      = "configApplyFailed"
+	androidConfigErrorConfigPrepareFailed    = "configPrepareFailed"
+	androidConfigErrorCoreNotInitialized     = "coreNotInitialized"
+	androidConfigErrorInitialStateMissing    = "initialStateMissing"
+	androidConfigErrorInitialOnly            = "initialCompositeAfterConfig"
+	androidConfigErrorInvalidKind            = "invalidKind"
+	androidConfigErrorInvalidPayload         = "invalidPayload"
+	androidConfigErrorLegacyConfigPresent    = "legacyConfigPresent"
+	androidConfigErrorOptionsFailed          = "optionsSnapshotFailed"
+	androidConfigErrorPayloadTooLarge        = "payloadTooLarge"
+	androidConfigErrorReceiptEncoding        = "receiptEncodingFailed"
+	androidConfigErrorRevisionOverflow       = "revisionOverflow"
+	androidConfigErrorStaleEpoch             = "staleEpoch"
+	androidConfigErrorStaleRevision          = "staleRevision"
+	androidConfigErrorStateApplyFailed       = "stateApplyFailed"
+	androidConfigErrorUpdateApplyFailed      = "updateApplyFailed"
+	androidConfigErrorUpdateBeforeConfig     = "updateBeforeConfig"
+	androidConfigErrorUnconfigured           = "unconfigured"
+	androidConfigErrorInitializeFailed       = "coreInitializeFailed"
+	androidConfigErrorInitializationConflict = "initializationConflict"
+	androidConfigErrorLegacyListenerPresent  = "legacyListenerPresent"
 )
 
 // 调用方持有runLock；已接受的状态、提交责任或资源均禁止旧写入旁路。
@@ -79,6 +87,9 @@ type androidOwnedConfigResult struct {
 
 type androidConfigDriver interface {
 	initializedLocked() bool
+	initializationCompatibleLocked(*InitParams) bool
+	initializeLocked(*InitParams) error
+	listenersPresentLocked() bool
 	configPresentLocked() bool
 	stateSnapshotLocked() state.State
 	prepareSetupLocked(*SetupParams) (*preparedSetupConfig, error)
@@ -90,7 +101,19 @@ type androidConfigDriver interface {
 
 type productionAndroidConfigDriver struct{}
 
-func (productionAndroidConfigDriver) initializedLocked() bool          { return isInit }
+func (productionAndroidConfigDriver) initializedLocked() bool { return isInit }
+func (productionAndroidConfigDriver) initializationCompatibleLocked(params *InitParams) bool {
+	return !isInit || constant.Path.HomeDir() == params.HomeDir && version == params.Version
+}
+func (productionAndroidConfigDriver) initializeLocked(params *InitParams) error {
+	if !isInit {
+		initializeClashLocked(params)
+	}
+	return nil
+}
+func (productionAndroidConfigDriver) listenersPresentLocked() bool {
+	return isRunning || listener.HasListenerResponsibility()
+}
 func (productionAndroidConfigDriver) configPresentLocked() bool        { return currentConfig != nil }
 func (productionAndroidConfigDriver) stateSnapshotLocked() state.State { return state.Snapshot() }
 func (productionAndroidConfigDriver) prepareSetupLocked(params *SetupParams) (*preparedSetupConfig, error) {
@@ -143,12 +166,14 @@ func newAndroidConfigCoordinatorForTest(driver androidConfigDriver) *androidConf
 
 type decodedAndroidConfigMutation struct {
 	kind       int
+	init       *InitParams
 	setup      *SetupParams
 	update     *UpdateParams
 	stateBytes []byte
 }
 
 type initialCompositePayload struct {
+	Init  json.RawMessage `json:"init"`
 	Setup json.RawMessage `json:"setup"`
 	State json.RawMessage `json:"state"`
 }
@@ -191,10 +216,22 @@ func decodeAndroidConfigMutation(kind int, payload string) (*decodedAndroidConfi
 			return nil, androidConfigErrorInvalidPayload
 		}
 		return &decodedAndroidConfigMutation{kind: kind, stateBytes: append([]byte(nil), data...)}, androidConfigErrorNone
-	case androidConfigKindInitialComposite:
+	case androidConfigKindInitialComposite, androidConfigKindInitializeComposite:
 		var composite initialCompositePayload
 		if err := decodeSingleJSON(data, &composite); err != nil || len(composite.Setup) == 0 || len(composite.State) == 0 {
 			return nil, androidConfigErrorInvalidPayload
+		}
+		var init *InitParams
+		if kind == androidConfigKindInitializeComposite {
+			var fields struct {
+				HomeDir *string `json:"home-dir"`
+				Version *int    `json:"version"`
+			}
+			if decodeSingleJSON(composite.Init, &fields) != nil || fields.HomeDir == nil || fields.Version == nil ||
+				*fields.HomeDir == "" || !filepath.IsAbs(*fields.HomeDir) || strings.ContainsRune(*fields.HomeDir, '\x00') || *fields.Version < 0 {
+				return nil, androidConfigErrorInvalidPayload
+			}
+			init = &InitParams{HomeDir: *fields.HomeDir, Version: *fields.Version}
 		}
 		var params SetupParams
 		if err := decodeSingleJSON(composite.Setup, &params); err != nil {
@@ -210,6 +247,7 @@ func decodeAndroidConfigMutation(kind int, payload string) (*decodedAndroidConfi
 		}
 		return &decodedAndroidConfigMutation{
 			kind:       kind,
+			init:       init,
 			setup:      copied,
 			stateBytes: append([]byte(nil), composite.State...),
 		}, androidConfigErrorNone
@@ -298,7 +336,8 @@ func runAndroidConfigEntered(operation func() error) (err error, panicked bool) 
 }
 
 func (c *androidConfigCoordinator) commitLocked(expectedEpoch, expectedRevision int64, mutation *decodedAndroidConfigMutation) androidOwnedConfigResult {
-	if !c.driver.initializedLocked() {
+	initializing := mutation.kind == androidConfigKindInitializeComposite
+	if !initializing && !c.driver.initializedLocked() {
 		return c.rejectedLocked(androidConfigErrorCoreNotInitialized)
 	}
 	if c.blocked {
@@ -338,8 +377,16 @@ func (c *androidConfigCoordinator) commitLocked(expectedEpoch, expectedRevision 
 	if mutation.kind == androidConfigKindUpdate && !c.configured {
 		return c.rejectedLocked(androidConfigErrorUpdateBeforeConfig)
 	}
-	if mutation.kind == androidConfigKindInitialComposite && c.configured {
+	if (mutation.kind == androidConfigKindInitialComposite || initializing) && c.configured {
 		return c.rejectedLocked(androidConfigErrorInitialOnly)
+	}
+	if initializing {
+		if !c.driver.initializationCompatibleLocked(mutation.init) {
+			return c.rejectedLocked(androidConfigErrorInitializationConflict)
+		}
+		if c.driver.listenersPresentLocked() {
+			return c.rejectedLocked(androidConfigErrorLegacyListenerPresent)
+		}
 	}
 	if mutation.kind == androidConfigKindSetup && !c.hasDesiredState {
 		return c.rejectedLocked(androidConfigErrorInitialStateMissing)
@@ -347,7 +394,7 @@ func (c *androidConfigCoordinator) commitLocked(expectedEpoch, expectedRevision 
 
 	desired := state.Copy(baseState)
 	nextStateGeneration := c.stateGeneration
-	if mutation.kind == androidConfigKindInitialComposite || mutation.kind == androidConfigKindState {
+	if mutation.kind == androidConfigKindInitialComposite || initializing || mutation.kind == androidConfigKindState {
 		next, err := state.MergeJSON(baseState, mutation.stateBytes)
 		if err != nil {
 			return c.rejectedLocked(androidConfigErrorInvalidPayload)
@@ -363,11 +410,16 @@ func (c *androidConfigCoordinator) commitLocked(expectedEpoch, expectedRevision 
 	}
 	attempt := c.lastAttempted + 1
 	c.lastAttempted = attempt // ENTERED：从此尝试号不可复用，也不响应调用方取消。
+	if initializing {
+		if err, panicked := runAndroidConfigEntered(func() error { return c.driver.initializeLocked(mutation.init) }); err != nil || panicked || !c.driver.initializedLocked() {
+			return c.enteredFailureLocked(attempt, androidConfigErrorInitializeFailed)
+		}
+	}
 
 	var enteredErrorCode string
 	var operation func() error
 	switch mutation.kind {
-	case androidConfigKindSetup, androidConfigKindInitialComposite:
+	case androidConfigKindSetup, androidConfigKindInitialComposite, androidConfigKindInitializeComposite:
 		prepared, err, panicked := prepareAndroidSetupEntered(c.driver, mutation.setup)
 		if err != nil || panicked {
 			return c.enteredFailureLocked(attempt, androidConfigErrorConfigPrepareFailed)

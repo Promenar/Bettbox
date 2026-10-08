@@ -35,7 +35,8 @@ object NativeConfigProtocol {
         "coreNotInitialized", "initialStateMissing", "initialCompositeAfterConfig", "invalidKind",
         "invalidPayload", "legacyConfigPresent", "optionsSnapshotFailed", "payloadTooLarge",
         "receiptEncodingFailed", "revisionOverflow", "staleEpoch", "staleRevision", "stateApplyFailed",
-        "updateApplyFailed", "updateBeforeConfig", "unconfigured", "tunConfigurationReserved", "tunCleanupUnknown")
+        "updateApplyFailed", "updateBeforeConfig", "unconfigured", "tunConfigurationReserved", "tunCleanupUnknown",
+        "coreInitializeFailed", "initializationConflict", "legacyListenerPresent")
     private val integer = Regex("(?:0|[1-9][0-9]*)")
     private val number = Regex("-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")
     private val gson = GsonBuilder().disableHtmlEscaping().create()

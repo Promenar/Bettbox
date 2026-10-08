@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 — Android 首次初始化配置事务
+
+- 配置提交 kind5 在同一核心锁内执行 init/setup/state/options；已有目录和版本必须一致，旧运行标记或登记监听责任存在时拒绝接管。副作用前校验身份、状态和计数，初始化及后续失败保留 ENTERED 尝试和阻断责任。
+- 真实初始化后准备失败完成红绿复现；并发首次、重放、冲突、初始化故障及溢出由 driver 回归验证，监听查询与关闭 race、严格 Kotlin 协议和实际 ARM64 核心编译通过。Kotlin/Dart 实际 owner 调用、listener/suspend、完成回执和 ACK 仍待联合采用。
+
 ## 2026-10-09 — Android 挂起拒绝与恢复责任
 
 - 旧挂起入口在同一核心锁内核验 owned 准入后执行，拒绝结果通过 checked C、JNI 与 Kotlin Boolean 真实传播。旧 void 导出保持兼容。

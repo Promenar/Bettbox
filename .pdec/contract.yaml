@@ -2937,6 +2937,68 @@
       "cwd": ".",
       "timeout_seconds": 120,
       "artifacts": []
+    },
+    "test-android-initial-config-protocol": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-initial-config-protocol"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [
+        ".test/android-initial-config-protocol/receipt.json"
+      ],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "test-listener-initial-responsibility": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-run",
+        "^TestChecked|^TestListenerResponsibility",
+        "github.com/metacubex/mihomo/listener"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实监听登记查询及检查式关闭回归，不访问公网或证明全部线程 drain"
+    },
+    "compile-android-initial-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-initial-core/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-initial-core/libclash.so",
+        ".test/android-initial-core/libclash.h"
+      ],
+      "verification": "首次初始化配置事务实际 Android ARM64 c-shared 编译，离线只读依赖，不安装或运行",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
     }
   },
   "deployment": {
@@ -3024,7 +3086,7 @@
     "core/state/state.go": "38ab490b6738db46c3f7f6b9d5110ccaf72fa66c0561496d86f6c6d44211b554",
     "core/state/snapshot.go": "b283decb2a81c398e7a33be75eb7cca5aa9d269ea016cfd7891642b99bc9bfb3",
     "core/state/snapshot_test.go": "cf4b18579a8c0fcf2aa9fec293b948731ad057baf83cd041289d0ced78d0845c",
-    "core/hub.go": "4d177011e6e867ac5130d27d05ee34090838b9d304deaa190c1315bb5f7293ea",
+    "core/hub.go": "a2dd53922896ccad853aaf345e0ad7467a10b1486776966d461b66e6cb96ac53",
     "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
     "core/lib_android.go": "8e038a4de68b3f02d07a82260b3c45c21c1f648323dcef7238fd347ff8c1e1b0",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
@@ -3165,12 +3227,12 @@
     "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
     "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
     "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d",
-    "core/android_config.go": "c327ec7047ce0f9973b2931348d65a931b2dea1954381bcb3c7fdeba1c699715",
-    "core/android_config_test.go": "669b874ad05abd0b1891f8fb9f2500e12021ad53872136f235b0f25ffcf7a3d7",
+    "core/android_config.go": "ca6f5d93d1d6ca38299e1c2cdb277ceac4806fcce8151402ded387213b18fb7b",
+    "core/android_config_test.go": "e3db6e48a30e45a513a42dd01c7a7c56b271d2ca9478bc3116533111024771f7",
     "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
     "scripts/check_android_config_protocol.py": "e3b34b21e83dd6dafd2493f3059bba120c9a03176f08eac195a2207f4b701313",
-    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "51b38eeba4eaa7a3d443bbf9ac92bdb2d284ce7f927d46500bd181b657489f76",
-    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "0b38f2e54abec3041768a12851e084f4644d47680aab0b4638d6e7b06cd0a08b",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "379625132adad5f61172e06a32ed85da3478795b6160831ec0dc38e6acce1586",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "c6a90dbeb7acf2f7998dc14dc4e5b16cf4c221016f7d8726503e7159bb398b41",
     "android/core/src/main/cpp/config_jni.cpp": "ad00a3b446c7c4782c8c95823734b97b79614da67aba13f43f06ace29dafaa22",
     "android/core/src/test/cpp/config_jni_fixture.cpp": "84ff2b8d7eab7f1a49be81f23e69ec57b2b459d860aa4ac70513d923c48bb1c8",
     "core/androidstartup/start_report_test.go": "230ecf1116c11fddc8087458f0731c53a1cb1b2c885406cea5a8be53c9713c69",
@@ -3258,7 +3320,10 @@
     "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidSuspendModuleFixture.kt": "4cc98d1bfe7412bee1226853d001c6416733849390bf63f04faccc0d939c220a",
     "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/CoreStub.kt": "db19a3cbca3dd71c8853b50ee13c87244ab638a253a747a81242440258fc546c",
     "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidOsStub.kt": "41ef5387b996cbd33178e1224dc3f0fc989d254f9b09a26a6d04640bd5f742e2",
-    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/VpnPluginStub.kt": "b4c08c72f121a60bb14a5d215bb3e81e30f7065513f0d8b7ff0a4d202ec1f217"
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/VpnPluginStub.kt": "b4c08c72f121a60bb14a5d215bb3e81e30f7065513f0d8b7ff0a4d202ec1f217",
+    "core/android_initial_transaction_test.go": "993149fdd80119e2423334fa6c177023d2163dafe423a9fb9e503840bcf93596",
+    "core/Clash.Meta/listener/responsibility.go": "4df5ab20995c3b0b27260b1d9a5d6fed6633ac73c0ea225f5b67ba6809996c9d",
+    "core/Clash.Meta/listener/responsibility_test.go": "efa9a9ccd71b5143e3b6629c5a7f71f6e6965da5af5acfd7b9f24d94fb75820e"
   },
   "platform_extensions": {
     "android": {
@@ -3334,6 +3399,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "63193763be8d89918f140307376b026944503ecfecfcc1cbc243102d7993e19c"
+    "contract_digest": "bcb8675e0a1ec8273cff7556d3fc4c95b203be8a344e88c0dea559806e2773d5"
   }
 }

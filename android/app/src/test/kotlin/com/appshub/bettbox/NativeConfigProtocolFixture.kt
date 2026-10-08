@@ -16,6 +16,7 @@ object NativeConfigProtocolFixture {
         tunReservationReceipts()
         runtimeIdentity()
         serviceRuntimeAdmission()
+        initialTransactionErrors()
         println("cases=$cases, failed=$failed")
         check(failed == 0) { "配置回执fixture失败" }
     }
@@ -23,6 +24,19 @@ object NativeConfigProtocolFixture {
     private fun case(run: () -> Unit) {
         cases++
         try { run() } catch (_: Exception) { failed++ }
+    }
+
+    private fun initialTransactionErrors() {
+        for (error in listOf("initializationConflict", "legacyListenerPresent")) case {
+            val r = NativeConfigProtocol.parse(receipt(outcome = "rejected", phase = "notEntered",
+                revision = "0", attempted = "0", generation = "0", configured = "false", options = "null", error = error))
+            check(r.errorCode == error)
+        }
+        case {
+            val r = NativeConfigProtocol.parse(receipt(outcome = "unknown", phase = "entered",
+                revision = "0", attempted = "1", generation = "0", configured = "false", blocked = "true", options = "null", error = "coreInitializeFailed"))
+            check(r.blocked && r.errorCode == "coreInitializeFailed")
+        }
     }
 
     private fun receipt(

@@ -54,12 +54,17 @@ func handleInitClash(paramsString string) bool {
 	if err != nil {
 		return false
 	}
+	initializeClashLocked(&params)
+	return isInit
+}
+
+// 调用方持有 runLock；首次 owner 事务与旧入口共用实际初始化原语。
+func initializeClashLocked(params *InitParams) {
 	version = params.Version
 	if !isInit {
 		constant.SetHomeDir(params.HomeDir)
 		isInit = true
 	}
-	return isInit
 }
 
 func handleStartListener() bool {

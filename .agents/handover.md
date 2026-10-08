@@ -3047,3 +3047,34 @@ JNI 是公开函数表夹具、模块是平台桩，未证明真实设备熄屏�
 
 ### HLG
 标准 append dry-run 后 apply，保留完整目标与验收边界。
+
+## 2026-10-09T04:54:24+08:00 · Android 首次初始化配置原子入口及验收边界
+
+type: maintenance
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "owner", "three-platform"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: f2e8ec565b3bf6fd327a939955b1f0e85aa12bcf50dcb6ffb9d58a776b25b312
+
+### Summary
+kind5 后端首次配置事务已实现并验证，完整三端发行目标保持进行中。
+
+### Changed
+复用配置 JNI kind5 输入 init/setup/state；同锁预检初始化参数与旧登记责任，副作用前 ENTERED，初始化及后续异常 blocked；同步严格错误码解析。
+
+### Validation
+真实未初始化入口红例失败；修复后主包通过。并发首次、重放、冲突、错误/panic和溢出由 driver 夹具通过；监听登记及关闭 race、Kotlin 严格协议、实际 Android ARM64 核心和 Release Kotlin 编译通过；独立只读复核无确定新增缺陷。
+
+### Next
+Kotlin/Dart 唯一 owner 采用 kind5；明确可确认 listener/suspend/stop 后端及 controller 旁路治理，联合接入不可变 completion/ACK 后固定 APK 设备验收；账户、邀请、支付、有效节点及 iOS 发行研究继续。
+
+### Risks
+生产成功配置仅有 driver 证据；逐组查询不能证明 listener 全局原子状态，controller 包内写入未收敛。没有新 APK/设备采用或可用发行声明。Mac 当前仍锁屏，黑屏未确认。
+
+### DIA
+已同步计划、CHANGELOG、ARCHITECTURE、PLATFORM_VALIDATION、registry、PDEC 说明及公开验证 JSON。
+
+### HLG
+标准 append dry-run 后 apply，记录完整目标和剩余边界。

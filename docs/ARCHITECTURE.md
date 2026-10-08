@@ -290,3 +290,7 @@ Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2
 ### Android 挂起完成边界
 
 旧挂起入口与 owned 配置准入共用核心 runLock；owned 已接管时拒绝旧入口。checked C 导出提供固定 0/1，JNI 仅将 1 映射为成功，Kotlin 使用真实返回值。SuspendModule 仅在挂起或恢复成功后提交本地状态；注销和恢复的未确认责任独立保留，重新安装不会清除待恢复状态。VpnPlugin 遇到旧模块清理失败时保留引用并阻断运行发布。该机制不提供带身份的 owned suspend，也不证明线程 drain 或全部资源为空。
+
+### Android 首次初始化配置事务
+
+原生配置提交 kind5 接收 init、setup、state，在一个 runLock 事务内执行初始化及首次配置；kind1—4 保持既有已初始化合同。已有初始化的目录/版本一致时无操作复用，否则拒绝。旧 isRunning 标记或登记监听槽位存在时拒绝，查询不执行未知资源清理。副作用前核验身份、状态和计数；lastAttempted 在初始化前进入 ENTERED，任何初始化、准备、提交或快照失败均保持 blocked。APPLIED 只表示配置和 options，不表示 listener/VPN 运行完成。逐组登记查询依赖既有 core 锁串行入口，不能封闭绕开该锁的 controller/listener 包内写入；全部真实调用须在唯一 owner 联合采用时处理。

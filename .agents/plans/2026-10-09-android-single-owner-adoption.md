@@ -39,3 +39,11 @@ Go 配置 epoch 已在库载入期生成一次公开随机身份（2…2^53−1�
 5. 设备覆盖主后台首次启动、普通/智能停止恢复、权限撤销、配置重启、两个 channel 并发、Binder/前台异常、迟到回执、ACK 丢失/重复、engine detach/退出及 SDK36 更新；同时核对 UI、通知、JNI/FD责任和活动组合 VPN transport。有效节点 HTTPS 流量必须另外证明。
 
 出现旧写仍可进入、来源 runtime 不同、无原意图请求、未知 FD/资源、未消费回执被销毁或未确认完成发布时停止发行验收。回滚只撤除未采用的源码；已采用资源须按确认收尾合同恢复，不通过卸载、清数据、legacy stop 或扩大权限清洗。
+
+## 首次初始化配置原子入口
+
+commitOwnedConfig 的 kind5 输入为 {init,setup,state}；init 沿用 home-dir 与 version。kind1—4 的已初始化要求保持不变。首次 kind5 在同一 runLock 内校验身份、版本、阻断、旧配置、TUN 预留、旧运行标记和登记监听资源；已有初始化仅允许目录及版本精确一致，并无操作复用。输入解码、状态合并和计数溢出检查在初始化副作用之前完成。
+
+主控独占 core/android_config.go、hub.go、Clash.Meta listener 责任查询、原生错误码解析器及关联测试。lastAttempted 在初始化前进入 ENTERED；初始化、准备、提交和快照的异常均保持 blocked。setup 使用初始化后的目录。成功仅发行配置 revision 与不可变 options，不表示 listener 或 VPN START。后续 Kotlin/Dart 首次 owner 必须调用该入口，不能在它前面单独 legacy init。并发首次请求只能一个进入，回执丢失后读取状态，不重发副作用。
+
+验收使用实际核心入口的初始化后准备失败与旧资源拒绝、driver 的成功/并发/重放/身份冲突/初始化故障/溢出，以及严格 Kotlin 错误码解析。主包回归与实际平台编译分别执行；真实设备 listener、完整 completion/ACK 和有效流量仍按总体计划验收。
