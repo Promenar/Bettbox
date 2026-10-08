@@ -5,6 +5,10 @@ from pathlib import Path
 import sys
 import tempfile
 import plistlib
+import contextlib
+import io
+import runpy
+import subprocess
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -124,6 +128,7 @@ class AdmissionTests(unittest.TestCase):
             marker = json.loads(((root / seal.DESTINATION).parent / "seal.json").read_text())
             self.assertEqual(marker, report)
             self.assertTrue(marker["passed"])
+            self.assertEqual(marker["signingmode"], "adhoc")
             self.assertEqual((source / "Contents/MacOS/Bettbox").read_bytes(), original)
 
     def test_probe_only_omits_restricted_entitlement(self):
@@ -143,6 +148,177 @@ class AdmissionTests(unittest.TestCase):
             with patch.object(seal, "tool") as tool:
                 with self.assertRaises(RuntimeError): seal.seal(root, Path("build/arbitrary.app"))
                 tool.assert_not_called()
+
+    def development_signer(self, identities=1, host_mode="apple-development",
+                           team="PUBLIC1234", host_id="com.appshub.bettbox",
+                           certificate_subject="CN=Apple Development: Public Fixture (PUBLICCN01),OU=PUBLIC1234",
+                           certificate_hash="1" * 40, duplicate_cdhash=False,
+                           authority="Apple Development: Public Fixture 0 (PUBLICCN01)"):
+        # 仅公开虚拟证书与摘要；替身输出只供生产入口解析，不代表系统身份。
+        calls = []
+        def run(argv, input_data=None):
+            calls.append(argv)
+            if argv[0] == "/usr/bin/security" and "find-identity" in argv:
+                lines = [f'  {index + 1}) {str(index + 1) * 40} "Apple Development: Public Fixture {index} (PUBLICCN01)"'
+                         for index in range(identities)]
+                output = "\n".join(lines + [f"     {identities} valid identities found\n"])
+                return SimpleNamespace(stdout=output.encode(), stderr=b"", returncode=0)
+            if argv[0] == "/usr/bin/security" and "find-certificate" in argv:
+                return SimpleNamespace(stdout=b"-----BEGIN CERTIFICATE-----\nUFVCTElD\n-----END CERTIFICATE-----\n",
+                                       stderr=b"", returncode=0)
+            if argv[0] == "/usr/bin/openssl":
+                self.assertIsInstance(input_data, bytes)
+                digest = ":".join(certificate_hash[index:index + 2] for index in range(0, 40, 2))
+                output = f"SHA1 Fingerprint={digest}\nsubject={certificate_subject}\n"
+                return SimpleNamespace(stdout=output.encode(), stderr=b"", returncode=0)
+            if "-d" in argv and argv[-1].endswith("Bettbox.app"):
+                mode = ("Signature=adhoc\n" if host_mode == "adhoc" else
+                        f"Authority={authority}\n"
+                        "Authority=Apple Worldwide Developer Relations Certification Authority\n"
+                        "Authority=Apple Root CA\n")
+                output = f"Identifier={host_id}\nCDHash={'b' * 40}\n{mode}TeamIdentifier={team}\n"
+                if duplicate_cdhash:
+                    output += f"CDHash={'b' * 40}\n"
+                return SimpleNamespace(stdout=b"", stderr=output.encode(), returncode=0)
+            return self.fake_signer(argv)
+        return run, calls
+
+    def development_bundle(self, root):
+        source = self.source_bundle(root)
+        framework = source / "Contents/Frameworks/Public.framework"
+        framework.mkdir(parents=True)
+        (framework / "Public").write_bytes(b"\xcf\xfa\xed\xfe-public-framework")
+        return source
+
+    def test_development_missing_or_multiple_identity_rejected_before_copy_and_sign(self):
+        for count in (0, 2):
+            with self.subTest(count=count), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); self.development_bundle(root)
+                signer, calls = self.development_signer(identities=count)
+                with patch.object(seal, "tool", side_effect=signer), patch.object(seal.shutil, "copytree") as copy:
+                    with self.assertRaisesRegex(RuntimeError, "开发签名身份数量不符"):
+                        seal.seal(root, signing_mode="apple-development")
+                    copy.assert_not_called()
+                self.assertTrue(any(call[0] == "/usr/bin/security" for call in calls))
+                self.assertFalse(any("--force" in call for call in calls))
+                self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_development_malformed_identity_output_rejected_before_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.development_bundle(root)
+            result = SimpleNamespace(stdout=b'  1) BAD "Apple Development: Public Fixture (PUBLIC1234)"\n'
+                                            b'     1 valid identities found\n', stderr=b"", returncode=0)
+            with patch.object(seal, "tool", return_value=result), patch.object(seal.shutil, "copytree") as copy:
+                with self.assertRaisesRegex(RuntimeError, "开发签名身份格式不符"):
+                    seal.seal(root, signing_mode="apple-development")
+                copy.assert_not_called()
+            self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_development_host_mode_team_and_identifier_are_independently_verified(self):
+        for fields in ({"host_mode": "adhoc"}, {"team": "not set"},
+                       {"team": "OTHER12345"}, {"team": "PUBLICCN01"},
+                       {"host_id": "com.public.wrong"}, {"duplicate_cdhash": True},
+                       {"authority": "Developer ID Application: Public Fixture (PUBLIC1234)"}):
+            with self.subTest(fields=fields), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); self.development_bundle(root)
+                signer, calls = self.development_signer(**fields)
+                with patch.object(seal, "tool", side_effect=signer):
+                    with self.assertRaisesRegex(RuntimeError, "宿主开发签名身份不符"):
+                        seal.seal(root, signing_mode="apple-development")
+                self.assertTrue(any("--force" in call for call in calls))
+                self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_development_certificate_sha1_and_unique_ou_required_before_copy(self):
+        cases = ({"certificate_hash": "2" * 40},
+                 {"certificate_subject": "CN=Public Fixture"},
+                 {"certificate_subject": "OU=PUBLIC1234,OU=PUBLIC1234,CN=Public Fixture"},
+                 {"certificate_subject": "OU=bad,CN=Public Fixture"})
+        for fields in cases:
+            with self.subTest(fields=fields), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); self.development_bundle(root)
+                signer, calls = self.development_signer(**fields)
+                with patch.object(seal, "tool", side_effect=signer), patch.object(seal.shutil, "copytree") as copy:
+                    with self.assertRaisesRegex(RuntimeError, "开发签名证书Team不符"):
+                        seal.seal(root, signing_mode="apple-development")
+                    copy.assert_not_called()
+                self.assertFalse(any("--force" in call for call in calls))
+                self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_development_selects_unique_identity_for_framework_and_host_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); source = self.development_bundle(root)
+            before = {name: (source / "Contents/MacOS" / name).read_bytes()
+                      for name in ("BettboxCore", "BettboxCoreSupervisor")}
+            signer, calls = self.development_signer()
+            with patch.object(seal, "tool", side_effect=signer):
+                report = seal.seal(root, signing_mode="apple-development")
+            signing = [call for call in calls if "--force" in call]
+            self.assertEqual(len(signing), 3)
+            self.assertTrue(all(call[call.index("--sign") + 1] == "1" * 40 for call in signing))
+            self.assertTrue(any(call[-1].endswith("Public.framework/Public") for call in signing))
+            self.assertTrue(any(call[-1].endswith("Public.framework") for call in signing))
+            self.assertTrue(any(call[-1].endswith("Bettbox.app") for call in signing))
+            self.assertFalse(any(call[-1].endswith(tuple(before)) for call in signing))
+            self.assertTrue(any("--deep" in call and "--strict" in call and "--verify" in call for call in calls))
+            for name, data in before.items():
+                self.assertEqual((root / seal.DESTINATION / "Contents/MacOS" / name).read_bytes(), data)
+                self.assertEqual((source / "Contents/MacOS" / name).read_bytes(), data)
+            self.assertEqual(report["signingmode"], "apple-development")
+            self.assertFalse(report["notarized"])
+            self.assertNotIn("Public Fixture", json.dumps(report))
+            self.assertEqual(json.loads(((root / seal.DESTINATION).parent / "seal.json").read_text()), report)
+
+    def test_development_tool_stderr_never_reaches_exception_or_success_marker(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.development_bundle(root)
+            result = SimpleNamespace(returncode=1, stdout=b"", stderr=b"PUBLIC_RESTRICTED_TOOL_DETAIL")
+            with patch.object(seal.subprocess, "run", return_value=result) as run:
+                with self.assertRaisesRegex(RuntimeError, "候选签名工具失败") as failure:
+                    seal.seal(root, signing_mode="apple-development")
+                self.assertNotIn("PUBLIC_RESTRICTED_TOOL_DETAIL", str(failure.exception))
+                run.assert_called_once()
+            self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_development_cli_failure_prints_only_fixed_failure_marker(self):
+        output = io.StringIO()
+        result = SimpleNamespace(returncode=1, stdout=b"", stderr=b"PUBLIC_RESTRICTED_TOOL_DETAIL")
+        with patch.object(sys, "argv", ["seal_macos_candidate.py", "--signing-mode", "apple-development"]), \
+             patch.object(seal.subprocess, "run", return_value=result), contextlib.redirect_stdout(output):
+            with self.assertRaises(SystemExit) as failure:
+                runpy.run_path(str(Path(seal.__file__)), run_name="__main__")
+        self.assertEqual(failure.exception.code, 1)
+        self.assertEqual(output.getvalue(), "MACOS_CANDIDATE_SEAL_FAIL\n")
+
+    def test_development_tool_start_and_timeout_errors_are_fixed_before_copy(self):
+        failures = (OSError("PUBLIC_RESTRICTED_TOOL_DETAIL"),
+                    subprocess.TimeoutExpired(["PUBLIC_RESTRICTED_ARGUMENT"], 60,
+                                              output=b"PUBLIC_RESTRICTED_OUTPUT",
+                                              stderr=b"PUBLIC_RESTRICTED_STDERR"))
+        for error in failures:
+            with self.subTest(kind=type(error).__name__), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); self.development_bundle(root)
+                with patch.object(seal.subprocess, "run", side_effect=error), \
+                     patch.object(seal.shutil, "copytree") as copy:
+                    with self.assertRaises(RuntimeError) as failure:
+                        seal.seal(root, signing_mode="apple-development")
+                    self.assertEqual(str(failure.exception), "候选签名工具失败")
+                    self.assertTrue(failure.exception.__suppress_context__)
+                    copy.assert_not_called()
+                self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_development_cli_start_and_timeout_errors_do_not_emit_traceback(self):
+        for error in (OSError("PUBLIC_RESTRICTED_TOOL_DETAIL"),
+                      subprocess.TimeoutExpired(["PUBLIC_ARGUMENT"], 60, stderr=b"PUBLIC_STDERR")):
+            with self.subTest(kind=type(error).__name__):
+                output = io.StringIO(); errors = io.StringIO()
+                with patch.object(sys, "argv", ["seal_macos_candidate.py", "--signing-mode", "apple-development"]), \
+                     patch.object(seal.subprocess, "run", side_effect=error), \
+                     contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+                    with self.assertRaises(SystemExit) as failure:
+                        runpy.run_path(str(Path(seal.__file__)), run_name="__main__")
+                self.assertEqual(failure.exception.code, 1)
+                self.assertEqual(output.getvalue(), "MACOS_CANDIDATE_SEAL_FAIL\n")
+                self.assertEqual(errors.getvalue(), "")
 
 
 if __name__ == "__main__": unittest.main()

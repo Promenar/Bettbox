@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scope": "macOS Apple Development完整bundle本机开发候选；不是公开发行验收",
+  "source_head": "c9b0355a062e2248e8cfc52d73ce5fd726bc6d3a",
+  "source_sha256": {
+    "scripts/seal_macos_candidate.py": "7de82c66a793fd02ef121982ddfddda1eff03576ef03c1eff776e4bd58290a1b",
+    "scripts/tests/test_seal_macos_candidate.py": "cc180ea48b44f55f68115333134879d77da9582429ecfc76632355dea53eab75"
+  },
+  "seal": {
+    "artifacts": {
+      "BettboxCore": {
+        "cdhash": "5945601ae066f12cca39df96e2100ad7b8122921",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "1afbb1375c9994c4d861aca8311e39a4ac7075616d775b496e3a920242d96587",
+        "signingmode": "adhoc"
+      },
+      "BettboxCoreSupervisor": {
+        "cdhash": "46d6b8a6d01a518e033c0c0997c680deaba61069",
+        "identifier": "com.appshub.bettbox.core.supervisor",
+        "schema": 1,
+        "sha256": "231240bbced86e196391971463507bdca6d00ccfd2af41fdb99891fdf27fdd33",
+        "signingmode": "adhoc"
+      }
+    },
+    "destination": "build/macos-local-candidate/Bettbox.app",
+    "entitlement_profile": "release",
+    "host_cdhash": "613c685e583ea3e6c4c055e36e66b9061ad05af4",
+    "host_sha256": "9f733f9a3ff2d7d7acfaf9bd0ee9662ccb660ccfc7fb99c97b1d8d7411f91b86",
+    "nested_frameworks": 10,
+    "notarized": false,
+    "passed": true,
+    "schema": 1,
+    "scope": "完整bundle开发签名；不证明应用会话、系统代理或发行资格",
+    "signingmode": "apple-development",
+    "source": "build/macos/Build/Products/Release/Bettbox.app"
+  },
+  "validation": {
+    "green_tests": 20,
+    "green_failures": 0,
+    "actual_seal_exit_code": 0,
+    "strict_nested_signature_verified": true,
+    "core_helper_bytes_preserved": true,
+    "independent_review": "独立只读审阅未发现新增P1/P2",
+    "certificate_team_source": "按所选证书指纹匹配叶证书OU；不以CN括号后缀代替Team"
+  },
+  "evidence_sha256": {
+    "macos-development-signing-red.log": "5863713290dce3f7cf539f0d84ece00827cd89c71547c0243eb7a9055e08e8f6",
+    "macos-development-signing-green.log": "c02f0dffc002a22d5d4ab4bfa5270a9f3767a2b37cbff6ffec1eca55279eaa6c",
+    "macos-development-signing-execution.log": "de05de05738484839ccaa25960c220fbe73d023f3a03035b71477f96a1f8283c"
+  },
+  "build_provenance": "复用macos-native-authorization-validation.json记录的完整构建；构建时HEAD为04365a3且包含随后提交为c9b0355的原生授权源变更。签名阶段没有修改应用编译输入。",
+  "backup": "build/macos-local-candidate-before-c9b0355",
+  "release_verified": false,
+  "unverified": [
+    "正常应用启动与Keychain冷启动",
+    "系统授权同意/取消及代理写入恢复",
+    "有效上游节点流量",
+    "Developer ID签名和公证"
+  ]
+}

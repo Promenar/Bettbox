@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — macOS 开发签名候选
+
+- 完整应用候选使用现有唯一Apple Development身份签名，10个嵌套框架及宿主严格验签通过，Core/helper签后字节保持不变；20项封装工具回归通过。证书Team按指纹匹配叶证书OU，不从CN后缀推断。
+- 默认ad hoc模式保持兼容，旧候选目录保留备份；候选未公证，正常应用、Keychain、系统代理和有效节点流量另验。回执：`validation/2026-10-07-three-platform/macos-development-signing-validation.json`。
+
 ## 2026-10-08 — Android、macOS 交付验证
 
 - macOS空受保护journal恢复免SC锁，读取/所有权未知保持失败；真实非阻塞SC权限探测与64项核心回归通过。Host迟到SC完成独立门禁经实际红绿及独立复核，未知不允许释放owner。

@@ -120,3 +120,6 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 原生FD合同验收为 `GOTOOLCHAIN=local GOWORK=off GOPROXY=off go test -mod=readonly -v github.com/metacubex/mihomo/listener/sing_tun`，cwd为core，使用项目当前替换依赖。测试不创建系统TUN；真实JNI/FD/三栈及设备流量另验。构造源与测试摘要登记在契约中。
 
 `probe-macos-sc-lock` 只执行当前SDK编译及普通宿主非阻塞配置锁/释放、偏好签名比较，不暂存、提交、应用、提权或请求系统授权。`generate-localizations` 使用既有锁定intl_utils，由七种ARB生成当前国际化文件。
+
+
+`test-macos-seal-tools` 验证封装工具的两种签名模式与固定失败边界。`seal-macos-development-candidate` 显式使用现有唯一Apple Development身份；证书和签名工具输出在本机捕获，不向模型输出身份姓名、Team值或私钥。已有候选先保留任务内备份，拒绝覆盖；Core/helper不重签，Release entitlements保持项目配置。该操作不公证、不发布、不启用系统代理；完整应用运行另验。

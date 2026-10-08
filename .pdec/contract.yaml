@@ -1204,6 +1204,43 @@
       "timeout_seconds": 180,
       "artifacts": [],
       "verification": "使用已锁定本机依赖由七种ARB生成现有国际化代码，不安装新依赖。"
+    },
+    "test-macos-seal-tools": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-p",
+        "test_seal_macos_candidate.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "仅候选签名工具单元测试，公开fixture/mock身份，不读取真实私钥、不签名或启动App"
+    },
+    "seal-macos-development-candidate": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/seal_macos_candidate.py",
+        "--signing-mode",
+        "apple-development"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 600,
+      "artifacts": [
+        "build/macos-local-candidate/Bettbox.app",
+        "build/macos-local-candidate/seal.json"
+      ],
+      "verification": "使用现有唯一AppleDevelopment身份在本机签框架/宿主；签名前保留任务旧候选，Core/helper签后字节不变，不读取私钥、不发布/公证、不启动系统代理。OS认证仅由用户在系统界面处理。"
     }
   },
   "deployment": {
@@ -1363,9 +1400,9 @@
     "macos/CoreSupervisor/Tests/SignedProduction/real_go_runner.py": "c93f39325fb30cd4b38bf24b22535a5f694f4a7f7f7525bf6e46e821e3c7f06c",
     "macos/CoreSupervisor/Tests/SignedProduction/test_real_go_runner.py": "be911540ce0b9e1b28bd0d1661ff230474697c1aaff8395b3f10bfe8ef975df1",
     "scripts/macos_supervisor_artifact.py": "0b4fdba385f187a36f79ccade6b8031ce070250da2e52308de6641f41e5ee3f4",
-    "scripts/seal_macos_candidate.py": "769631ad70e0816cf3592ffd9bf4aed6f5700ae63809a09960e2da356e11b53d",
+    "scripts/seal_macos_candidate.py": "7de82c66a793fd02ef121982ddfddda1eff03576ef03c1eff776e4bd58290a1b",
     "scripts/tests/test_macos_supervisor_artifact.py": "4f7bdbc758a924008ea9b0ae3771963dbb315bf1cf9e9e078efa70740edc05cc",
-    "scripts/tests/test_seal_macos_candidate.py": "88ce12c96f7df792a4f166c4111c652e086854d8b2535382497e81f95387488d",
+    "scripts/tests/test_seal_macos_candidate.py": "cc180ea48b44f55f68115333134879d77da9582429ecfc76632355dea53eab75",
     "scripts/check_macos_flutter_supervisor.py": "2273e582a54a4bab5b4f485628c83f441c05e0590037397debf812de1432bb28",
     "scripts/tests/test_macos_flutter_supervisor.py": "0c716db1caf247daeaff971a4c517ffa87f7026a8e3270a357b10600d1f46062",
     "integration_test/macos_supervisor_probe.dart": "9ec1c50053eeb0fe3ffd9d18f59e372e5dd1a43ad575998bf69061f004102457",
@@ -1505,6 +1542,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "c9625847750b58eb481249fe125230de20adb866d799f6da651254596917c758"
+    "contract_digest": "911f6a44e80fb3a5481360005a817a72539629c5d4b3250e80a87436c64aae67"
   }
 }

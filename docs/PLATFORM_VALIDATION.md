@@ -213,3 +213,10 @@ Android正式arm64 APK实际构建尝试：官方Java TLS、Gradle help、Go核�
 Android 原生启停接线：Go State/CallbackGate/FDLease、Kotlin 显式领取租约及 JNI Boolean 已接入；输入关闭失败阻断新启动，protect 失败传回 socket 创建方。实际 ARM64 Go 核心及生产 JNI 编译链接通过，纯 Go race 与 Kotlin 租约6例通过，独立静态审阅未发现新增 P1/P2。完整 Service 代际保护、有效 NativeTun 构造和设备启动/停止行为尚待验收，不能将该编译产物作为可用发行版。回执为 `docs/validation/2026-10-07-three-platform/android-tun-abi-validation.json`。
 
 Android 生命周期候选接入完整工作门禁、独立绑定/启动意图及主进程停止锁恢复；旧通知无法修改新代共享状态。两个生产gate/controller协程夹具入口通过，原4项独立审阅发现静态闭合；JNI helper/OnLoad九项故障夹具通过。完整工程及设备行为待验，回执分别为 `android-vpn-lifecycle-validation.json`、`android-jni-failure-validation.json`（位于 `docs/validation/2026-10-07-three-platform/`）。
+
+
+### 2026-10-08 macOS Apple Development候选
+
+`build/macos-local-candidate/Bettbox.app` 已用现有唯一Apple Development身份完成完整bundle签名；10个框架及最终宿主严格验签通过，Core/helper的既有ad hoc身份与字节保持不变。封装工具20项测试通过，证书Team来自所选指纹对应叶证书OU，未读取私钥或输出原始身份。旧候选保留于 `build/macos-local-candidate-before-c9b0355`。回执 `validation/2026-10-07-three-platform/macos-development-signing-validation.json` 记录源摘要和构建来源。
+
+该产物是本机开发候选，未公证；尚未验证正常应用启动、Keychain冷启动、系统授权同意/取消、代理写入恢复及有效上游节点流量，不能声明可用公开发行版。Android、macOS优先交付；iOS按用户选择保留开发版并研究发行方案。

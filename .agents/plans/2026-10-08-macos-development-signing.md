@@ -1,0 +1,21 @@
+# macOS 完整应用开发签名验收
+
+目标是使用现有唯一 Apple Development 身份封装本机调试候选，验证系统授权和Keychain等真实应用能力。Apple Developer ID Application身份当前缺失，因此不声明公证或公开分发资格。
+
+## 当前事实与边界
+
+c9b0355的84项Core、219项Flutter、静态分析与完整unsigned Runner构建通过。seal脚本支持默认ad hoc及显式apple-development；携带钥匙串受限权利的ad hoc宿主已有真实拒绝证据，不能用重复启动绕过。Security身份查询仅输出身份种类计数；现有证书和私钥由系统签名工具使用，不读取或序列化私钥、钥匙串值或认证信息。签名主体只用于本机开发，不新增证书、权限、公开发布或公证。
+
+## 实施合同
+
+scripts/seal_macos_candidate.py及对应test由同一施工者独占；主控管理计划、PDEC、回执和治理。默认ad hoc行为及固定Core/helper签后字节保持不变。增加显式apple-development模式，仅选择security find-identity返回的恰一个有效Apple Development身份；缺失、多个或格式异常在copy/sign之前固定拒绝。身份原始输出及工具stderr不对外暴露。框架与宿主使用该身份；固定Core/helper继续严格验证原有ad hoc manifest。
+
+宿主验证独立区分ad hoc与Apple Development，不复用仅支持ad hoc的Core解析器伪造模式。Developer模式必须有正确bundle identifier、唯一CDHash、有效TeamIdentifier和Apple Development链证据，并以codesign strict/deep实际验签；不会把Apple Development升级为Developer ID。报告只输出类型、摘要及必要非秘密证明，不输出证书姓名或原始工具文本。entitlements保持项目已有内容，不猜新增权利。既有候选通过任务内备份保留，不覆盖、不删除。
+
+## 验收与回滚
+
+先用真实生产入口的测试覆盖没有身份、多身份、错误签名类型/Team及工具失败，不制造成功清单；主控集中确认红例后采用实现。独立审阅后运行登记的Python测试与seal操作。真实启动、Keychain写读冷启动、系统认证及代理流量须解锁后独立验证。签名失败保留未发布候选及原产物，回滚仅撤除未采用工具分支，不删除journal。
+
+## 实际结果
+
+20项封装回归通过，真实apple-development操作exit0；10个框架与宿主严格验签通过，Core/helper字节保持不变。Team由选定指纹匹配叶证书OU核验，CN括号后缀与真实Team不同，不可替代。旧候选保留于build/macos-local-candidate-before-c9b0355；候选没有公证或公开发布。正常应用与系统代理运行验收待会话解锁后执行。

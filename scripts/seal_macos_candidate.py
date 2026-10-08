@@ -6,6 +6,7 @@ import os
 import json
 from pathlib import Path
 import plistlib
+import re
 import shutil
 import subprocess
 
@@ -19,12 +20,125 @@ ENV = {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}
 MAGIC = {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca", b"\xca\xfe\xba\xbf", b"\xbf\xba\xfe\xca"}
 
 
-def tool(argv):
-    result = subprocess.run(argv, env=ENV, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                            timeout=60, check=False)
+def tool(argv, input_data=None):
+    try:
+        options = {"env": ENV, "stdout": subprocess.PIPE, "stderr": subprocess.PIPE,
+                   "timeout": 60, "check": False}
+        if input_data is not None:
+            options["input"] = input_data
+        result = subprocess.run(argv, **options)
+    except (OSError, subprocess.SubprocessError):
+        raise RuntimeError("候选签名工具失败") from None
     if result.returncode:
         raise RuntimeError("候选签名工具失败")
     return result
+
+
+def captured_text(raw, failure):
+    if not isinstance(raw, bytes) or len(raw) > 65536:
+        raise RuntimeError(failure)
+    try:
+        return raw.decode("utf-8", errors="strict")
+    except UnicodeError:
+        raise RuntimeError(failure) from None
+
+
+def development_identity():
+    # 身份名称与工具原文仅在本地解析，不进入清单或错误信息。
+    result = tool(["/usr/bin/security", "find-identity", "-v", "-p", "codesigning"])
+    text = captured_text(result.stdout, "开发签名身份格式不符")
+    entries = []
+    total = None
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        summary = re.fullmatch(r"\s*(\d+) valid identities found\s*", line)
+        if summary:
+            if total is not None:
+                raise RuntimeError("开发签名身份格式不符")
+            total = int(summary.group(1))
+            continue
+        entry = re.fullmatch(r'\s*(\d+)\) ([0-9A-Fa-f]{40}) "([^"\r\n]+)"\s*', line)
+        if entry is None or total is not None or int(entry.group(1)) != len(entries) + 1:
+            raise RuntimeError("开发签名身份格式不符")
+        entries.append((entry.group(2).upper(), entry.group(3)))
+    if total is None or total != len(entries) or len({item[0] for item in entries}) != len(entries):
+        raise RuntimeError("开发签名身份格式不符")
+    candidates = []
+    for fingerprint, name in entries:
+        if not name.startswith("Apple Development:"):
+            continue
+        match = re.fullmatch(r"Apple Development: [^\r\n]+ \(([A-Z0-9]{10})\)", name)
+        if match is None:
+            raise RuntimeError("开发签名身份格式不符")
+        candidates.append((fingerprint, name))
+    if len(candidates) != 1:
+        raise RuntimeError("开发签名身份数量不符")
+    fingerprint, name = candidates[0]
+    return fingerprint, development_team(fingerprint), name
+
+
+def development_team(fingerprint):
+    # 证书CN后缀不是Team；以选中SHA1匹配公开证书，再读取唯一Subject OU。
+    raw = tool(["/usr/bin/security", "find-certificate", "-a", "-p", "-c", "Apple Development"]).stdout
+    failure = "开发签名证书Team不符"
+    if not isinstance(raw, bytes) or len(raw) > 1048576:
+        raise RuntimeError(failure)
+    pattern = rb"-----BEGIN CERTIFICATE-----\r?\n[A-Za-z0-9+/=\r\n]+-----END CERTIFICATE-----"
+    certificates = re.findall(pattern, raw)
+    if not certificates or len(certificates) > 32 or re.sub(pattern, b"", raw).strip():
+        raise RuntimeError(failure)
+    teams = []
+    for certificate in certificates:
+        result = tool(["/usr/bin/openssl", "x509", "-noout", "-fingerprint", "-sha1",
+                       "-subject", "-nameopt", "RFC2253"], input_data=certificate + b"\n")
+        lines = captured_text(result.stdout, failure).splitlines()
+        hashes = [line for line in lines if re.fullmatch(r"SHA1 Fingerprint=(?:[0-9A-Fa-f]{2}:){19}[0-9A-Fa-f]{2}", line, re.IGNORECASE)]
+        subjects = [line for line in lines if line.startswith("subject=")]
+        if len(lines) != 2 or len(hashes) != 1 or len(subjects) != 1:
+            raise RuntimeError(failure)
+        actual = hashes[0].split("=", 1)[1].replace(":", "").upper()
+        if actual != fingerprint:
+            continue
+        subject = subjects[0][len("subject="):].strip()
+        fields = []
+        current = ""
+        escaped = False
+        for character in subject:
+            if not escaped and character in ",+":
+                fields.append(current)
+                current = ""
+            else:
+                current += character
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+        fields.append(current)
+        units = [field[3:] for field in fields if field.startswith("OU=")]
+        if len(units) != 1 or re.fullmatch(r"[A-Z0-9]{10}", units[0]) is None:
+            raise RuntimeError(failure)
+        teams.append(units[0])
+    if len(teams) != 1:
+        raise RuntimeError(failure)
+    return teams[0]
+
+
+def development_host(signature, selected):
+    # 开发宿主独立核验，不借用仅允许ad hoc的固定Core解析器。
+    text = captured_text(signature, "宿主开发签名身份不符")
+    lines = text.splitlines()
+    def values(prefix):
+        return [line[len(prefix):] for line in lines if line.startswith(prefix)]
+    fingerprints = values("CDHash=")
+    authorities = values("Authority=")
+    if (values("Identifier=") != ["com.appshub.bettbox"] or
+            len(fingerprints) != 1 or re.fullmatch(r"[0-9A-Fa-f]{40}", fingerprints[0]) is None or
+            values("TeamIdentifier=") != [selected[1]] or
+            values("Signature=") or
+            authorities != [selected[2], "Apple Worldwide Developer Relations Certification Authority", "Apple Root CA"]):
+        raise RuntimeError("宿主开发签名身份不符")
+    return {"cdhash": fingerprints[0].lower(), "team": selected[1]}
 
 
 def checked_tree(app):
@@ -100,9 +214,13 @@ def artifact(app, name, identifier):
     return fields
 
 
-def seal(root=ROOT, destination_relative=DESTINATION):
+def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
+    if signing_mode not in ("adhoc", "apple-development"):
+        raise RuntimeError("候选签名模式不符")
     if destination_relative not in (DESTINATION, PROBE_DESTINATION):
         raise RuntimeError("候选目标目录不符")
+    selected = development_identity() if signing_mode == "apple-development" else None
+    signing_identity = selected[0] if selected is not None else "-"
     source = root / SOURCE; destination = root / destination_relative
     checked_tree(source)
     # build父目录必须是项目内实际目录；不覆盖既有候选。
@@ -127,25 +245,29 @@ def seal(root=ROOT, destination_relative=DESTINATION):
         if path.is_symlink() or not path.is_file(): continue
         with path.open("rb") as file: magic = file.read(4)
         if magic in MAGIC:
-            tool(["/usr/bin/codesign", "--force", "--sign", "-", str(path)])
+            tool(["/usr/bin/codesign", "--force", "--sign", signing_identity, str(path)])
     for framework in frameworks:
         if framework.is_symlink(): raise RuntimeError("framework bundle不允许链接")
-        tool(["/usr/bin/codesign", "--force", "--sign", "-", str(framework)])
+        tool(["/usr/bin/codesign", "--force", "--sign", signing_identity, str(framework)])
         tool(["/usr/bin/codesign", "--verify", "--strict", str(framework)])
     info = plistlib.loads((destination / "Contents/Info.plist").read_bytes())
     if info.get("CFBundleIdentifier") != "com.appshub.bettbox" or info.get("CFBundleExecutable") != "Bettbox":
         raise RuntimeError("宿主固定bundle身份不符")
-    host_argv = ["/usr/bin/codesign", "--force", "--sign", "-", "--identifier", "com.appshub.bettbox"]
+    host_argv = ["/usr/bin/codesign", "--force", "--sign", signing_identity, "--identifier", "com.appshub.bettbox"]
     # 探针不使用账户或钥匙串；ad hoc宿主不能携带受限钥匙串权利。
     if destination_relative != PROBE_DESTINATION:
         host_argv += ["--entitlements", str(root / "macos/Runner/Release.entitlements")]
     tool(host_argv + [str(destination)])
     tool(["/usr/bin/codesign", "--verify", "--deep", "--strict", str(destination)])
-    host_signature = tool(["/usr/bin/codesign", "-d", "--verbose=4", str(destination)]).stderr.decode("utf-8", errors="strict")
-    if [line for line in host_signature.splitlines() if line.startswith("Identifier=")] != ["Identifier=com.appshub.bettbox"]:
-        raise RuntimeError("宿主实际签名ID不符")
-    host_identity = identity.parse_core_signature(host_signature.replace(
-        "Identifier=com.appshub.bettbox\n", "Identifier=" + identity.CORE_IDENTIFIER + "\n"))
+    host_raw = tool(["/usr/bin/codesign", "-d", "--verbose=4", str(destination)]).stderr
+    if selected is not None:
+        host_identity = development_host(host_raw, selected)
+    else:
+        host_signature = host_raw.decode("utf-8", errors="strict")
+        if [line for line in host_signature.splitlines() if line.startswith("Identifier=")] != ["Identifier=com.appshub.bettbox"]:
+            raise RuntimeError("宿主实际签名ID不符")
+        host_identity = identity.parse_core_signature(host_signature.replace(
+            "Identifier=com.appshub.bettbox\n", "Identifier=" + identity.CORE_IDENTIFIER + "\n"))
     after = {name: artifact(destination, name, identifier) for name, identifier in (
         ("BettboxCore", "com.appshub.bettbox.core"),
         ("BettboxCoreSupervisor", "com.appshub.bettbox.core.supervisor"))}
@@ -154,7 +276,7 @@ def seal(root=ROOT, destination_relative=DESTINATION):
         ("BettboxCoreSupervisor", "com.appshub.bettbox.core.supervisor"))}
     if after != baseline or source_after != baseline or digest(source / "Contents/MacOS/Bettbox") != source_host:
         raise RuntimeError("签名期间固定产物或原宿主漂移")
-    report = {"schema": 1, "passed": True, "signingmode": "adhoc", "notarized": False,
+    report = {"schema": 1, "passed": True, "signingmode": signing_mode, "notarized": False,
               "source": SOURCE.as_posix(), "destination": destination_relative.as_posix(),
               "nested_frameworks": len(frameworks), "artifacts": after,
               "host_sha256": digest(destination / "Contents/MacOS/Bettbox"),
@@ -168,9 +290,11 @@ def seal(root=ROOT, destination_relative=DESTINATION):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="固定本机macOS候选开发签名")
     parser.add_argument("--probe", action="store_true")
+    parser.add_argument("--signing-mode", choices=("adhoc", "apple-development"), default="adhoc")
     arguments = parser.parse_args()
     try:
-        seal(destination_relative=PROBE_DESTINATION if arguments.probe else DESTINATION)
+        seal(destination_relative=PROBE_DESTINATION if arguments.probe else DESTINATION,
+             signing_mode=arguments.signing_mode)
         print("MACOS_CANDIDATE_SEAL_PASS")
     except (RuntimeError, OSError, ValueError, subprocess.SubprocessError):
         print("MACOS_CANDIDATE_SEAL_FAIL"); raise SystemExit(1)

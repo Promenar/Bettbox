@@ -1807,3 +1807,34 @@ record-fingerprint: 6a010d147d695ebf17d45677c4b7aa8720fdde43313c521d92cc175a76a9
 
 ### HLG
 标准append dry-run后apply，保留实际失败和未验证边界。
+
+## 2026-10-08T15:43:01+08:00 · macOS完整应用开发签名候选与Android配置合同边界
+
+type: development
+scope: ["Bettbox"]
+status: done
+tags: ["macos", "signing", "android", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 402b4f1027771e9d177048b44746edffbcc1a8758be94a8d71b9ec16a22d4619
+
+### Summary
+用户选择Android、macOS优先交付，iOS保留开发版及发行研究。完整macOS Apple Development候选封装成功；不声明发行完成。
+
+### Changed
+封装器新增显式开发签名模式，默认ad hoc兼容；按证书指纹匹配叶证书OU验证Team。既有候选保留备份。PDEC登记签名与工具测试。
+
+### Validation
+20项Python回归通过，实际签名操作exit0；10个框架及宿主严格验签，Core/helper签后字节保持。独立只读审阅未发现新增P1/P2。公开回执macos-development-signing-validation.json。
+
+### Next
+会话解锁后正常退出旧App再验证新候选Keychain、SC授权与恢复。Android配置owner/Go/JNI合同需涵盖冷启动setState早于setupConfig、HTTP配置同owner重建及真实CheckJNI。
+
+### Risks
+尚未验证正常App启动、系统授权、有效上游流量；缺Developer ID及公证。Android合同尚未生产实施。订阅实时HTTP失败、支付商户非秘密标识待补齐。
+
+### DIA
+已同步平台验证、CHANGELOG、PDEC说明、签名计划、registry和公开回执。
+
+### HLG
+通过标准append先dry-run再apply追加，保留事实链。
