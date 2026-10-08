@@ -2055,3 +2055,34 @@ record-fingerprint: 60e82946d2737e28b34432d0a1cfed873848a810139a7cbddc3ea350b68e
 
 ### HLG
 标准append dry-run后apply记录。
+
+## 2026-10-08T18:02:39+08:00 · Android拒绝输入独立收尾与旧连接保留
+
+type: development
+scope: ["Bettbox", "Android"]
+status: in_progress
+tags: ["android", "tun", "ownership", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 1abee142d85cdfb8e9fbb8ff173be6b89c748916d184b3e263d61ef479a97aff
+
+### Summary
+新增拒绝新输入的独立State收尾入口，避免版本拒绝时误停已有连接。
+
+### Changed
+不调用stop/open、不改既有runtime；本次FD与callback各一次收尾，失败固定首因，release失败pendingLease保留，全局unknown粘滞。
+
+### Validation
+委托原StartWithInputCleanupReport的RED exit1；新入口GREEN exit0；最终完整androidstartup race exit0，含并发及空输入。独立只读审阅无确认P1/P2。
+
+### Next
+将配置reservation与新拒绝收尾接入真实lib_android/JNI；封闭preclaim与claimed FD/ref责任，再收敛Native owner和旧配置旁路。
+
+### Risks
+入口尚无真实生产调用点；未操作真实FD/JVM/VPN，未生成新APK。回调禁止重入State。macOS profile及支付/上游外部条件待确认。
+
+### DIA
+已同步架构、CHANGELOG、平台验收、registry、联合计划及PDEC说明。
+
+### HLG
+标准append dry-run后apply追加。

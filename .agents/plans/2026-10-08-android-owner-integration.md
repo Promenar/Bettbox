@@ -99,3 +99,7 @@ Checked JNI释放桥已闭合：release_object_func为int，非空对象0表示�
 协调器已实现锁内 reserve/finishStart/finishStop：epoch/revision/pointer 身份匹配，同次 options 复制，预留期间 commit 在 ENTERED 前拒绝；正常启动必须同时证明 resource、lease 与 running，清理未知永久保留责任，干净失败和确认停止解除。旧回执不得释放新预留。六项回归、全 core CGO0 和 Android ARM64 核心编译通过；独立审阅发现的缺 lease 条件已用单独红绿关闭。core race 因离线 CGO 依赖缺失未启动。lib_android/JNI、配置旁路、Native codec 错误码和 owner 接线仍为下一关键路径；模块没有对设备发布运行状态。
 
 NativeConfigProtocol 已支持配置预留和 TUN 清理未知的固定错误码，并保持严格 phase/blocked/configured/version 组合。真实生产 parser 公开 JSON 红绿通过。TUN入口、旧配置接口收敛和唯一 owner 接线仍需完成。
+
+## 未入构造输入的拒绝收尾
+
+State 提供独立 RejectInputWithCleanup：拒绝新输入不调用 stop/open，不改变既有resource/lease/runtime。先收尾未采纳FD，再执行本次OnceLease释放；错误与panic固定首因，释放失败pendingLease可达并阻断新启动。报告区分本次InputCleanupConfirmed和既有Blocked；后续输入成功不清洗旧责任。真实启动在配置预留拒绝后应锁外调用该入口，然后锁内核对并报告；禁止用ready=false的StartReport处理拒绝，以免误停旧连接。公开资源红绿、并发输入及全状态模块race通过，JNI前置领取与Native最终回执仍须接线。

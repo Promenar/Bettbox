@@ -201,3 +201,5 @@ macOS宿主签名与启动准入分别验收。当前封装器未实现provision
 Android注册JNI回调释放ABI为int，非空对象仅状态1代表合法DeleteGlobalRef调用无异常及任务线程finish确认；0未Delete，2后置或已有线程责任未知。Go通过ConfirmJNIRelease与现有OnceLease受捕获错误边界保持失败，不重试删除。JNI helper仅EDETACHED附着，nullable env短路；Detach失败保存本库生命周期atomic未知责任，后续成功不能清洗。Protect/Resolve以同次finish判定结果，返回解析字符串始终malloc所有权或nullptr。依据[JNI函数规范](https://docs.oracle.com/en/java/javase/26/docs/specs/jni/functions.html#deleteglobalref)与[线程规范](https://docs.oracle.com/en/java/javase/24/docs/specs/jni/invocation.html#getenv)，不能将void API伪造为VM内部删除回执。TUN版本准入采用配置reservation/锁外构造合同，禁止runLock跨Java回调或drain等待；该接线尚未完成。
 
 Android 配置协调器提供同一配置锁内的 TUN 预留：绑定 epoch/configRevision、复制 options，预留期间 commit 在 ENTERED 前拒绝。启动回执未知及停止未确认保留预留并粘滞阻断；干净失败和确认停止才解除。构造与回调等待必须在配置锁外。该模块尚未接入实际 TUN/JNI 与唯一 Native owner，旧配置旁路和客户端错误码契约仍待收敛。
+
+Android State 的 `RejectInputWithCleanup` 独立清理未进入构造的新输入，不停止旧资源或修改旧 runtime。关闭错误或 panic、回调释放 panic 转换为固定首因并粘滞阻断；释放失败保留 pending lease。输入完成与 State 已有 blocked 责任分别报告。回调不得重入 State；真实启动接线和设备验收独立完成。

@@ -1530,7 +1530,7 @@
         "-count=1",
         "-timeout=120s",
         "-run",
-        "^TestStartReport",
+        "^TestRejectedInput",
         "-v",
         "./androidstartup"
       ],
@@ -2036,6 +2036,27 @@
       "timeout_seconds": 180,
       "artifacts": [],
       "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "test-android-rejected-input": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=120s",
+        "-run",
+        "^TestRejectedInput",
+        "-v",
+        "./androidstartup"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实生产报告接口red/green，公开内存Resource，不调用系统FD、VPN或网络"
     }
   },
   "deployment": {
@@ -2278,7 +2299,9 @@
     "scripts/check_android_jni_release.py": "417346c52b9a2588ae5624a933641b65ac5163e3f6c4e0f6dd8675ca0409978d",
     "android/core/src/test/cpp/jni_release_fixture.cpp": "d7cfe7feea2039254b00b5dbbca98d6e4f20b600aa458d9383fd608a434edd9c",
     "core/android_tun_reservation.go": "69485d1f3fc1887b89db9820fb3e412a3867e85e69dc4b58bf1d926eb02092d8",
-    "core/android_tun_reservation_test.go": "016285b17e3b204a8f966092ec1de1da541acd5a6ff5bf56eb8c35ad3ec33179"
+    "core/android_tun_reservation_test.go": "016285b17e3b204a8f966092ec1de1da541acd5a6ff5bf56eb8c35ad3ec33179",
+    "core/androidstartup/rejected_input.go": "9b0ddc91719323ff4a728febc91f2dfc37789fcc6b38c69bcbba0c5f59ce2911",
+    "core/androidstartup/rejected_input_test.go": "25a8688125f49bf9b66722485e9f4a35cc9bf504340c1e267762f6b48a933cd6"
   },
   "platform_extensions": {
     "android": {
@@ -2354,6 +2377,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "231220bf52aa126c16216bb7091954f8ef24dec1d9f448c50a9b7d26686aeb2f"
+    "contract_digest": "322b1fb31e19286a2beb585bc4a30a340d19ee1c1dd08d9bda1c1c8e793e1c0d"
   }
 }

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "baseline": "aa4b71df5ec1a4c5892dd1c510623df1932fce27",
+  "source_sha256": {
+    "core/androidstartup/rejected_input.go": "9b0ddc91719323ff4a728febc91f2dfc37789fcc6b38c69bcbba0c5f59ce2911",
+    "core/androidstartup/rejected_input_test.go": "25a8688125f49bf9b66722485e9f4a35cc9bf504340c1e267762f6b48a933cd6"
+  },
+  "validation": {
+    "red_exit": 1,
+    "initial_green_exit": 0,
+    "final_startup_full_race_exit": 0,
+    "new_top_level_tests": 4,
+    "failure_subcases": 4
+  },
+  "review": "独立只读审阅无确认P1/P2",
+  "boundary": [
+    "拒绝输入入口尚未接入真实TUN/JNI启动",
+    "公开Resource/关闭计数，没有真实FD、JVM或VPN",
+    "本轮未重新编译Android或生成新APK",
+    "回调禁止同步重入State，真实CheckJNI与owner接线另验"
+  ]
+}

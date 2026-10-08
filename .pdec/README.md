@@ -139,3 +139,5 @@ JNI检查式释放验收使用任务独立产物：`compile-jni-release-red-expa
 TUN 配置预留验证入口：`test-android-tun-reservation`、`test-android-config-reservation-regression`、`test-android-tun-reservation-race` 和 `compile-android-tun-reservation-core`。race 需要完整离线 CGO 依赖；模块测试不代表 JVM 或真实 VPN 验收。
 
 `test-android-config-reservation-red/green` 使用缓存 Kotlin/Gson 验证预留错误码的原生 parser 合同，输出为独立 `.test/android-config-reservation-*`。
+
+`test-android-rejected-input` 验证独立拒绝输入清理；完整状态模块 race 使用 `test-android-startup-full`。公开替身不操作真实 FD/VPN。

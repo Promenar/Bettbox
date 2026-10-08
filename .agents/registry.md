@@ -95,3 +95,5 @@
 - docs/validation/2026-10-07-three-platform/android-tun-reservation-validation.json — 配置预留六项回归、核心编译与尚未接线边界
 
 - docs/validation/2026-10-07-three-platform/android-config-reservation-codec-validation.json — 配置预留错误码跨层兼容红绿与JVM边界
+
+- docs/validation/2026-10-07-three-platform/android-rejected-input-validation.json — 拒绝新输入保留旧连接、粘滞责任及状态模块race证据
