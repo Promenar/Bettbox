@@ -1,0 +1,174 @@
+{
+  "source_commit": "a35d73fd77c846bd1c153ace1b6a3db6428812c7",
+  "build_status": "passed",
+  "build_contract_digest": "ab06176efd6e8ba2893ef24931ae99f7e8fae2dcc24984b3b4c569d2edd77e7f",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "signature_verified": true,
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "apk": {
+    "path": "build/app/outputs/flutter-apk/app-release.apk",
+    "sha256": "dc002d4801c6d3d9808eefc6ce8d440b7dcbc2d3a551e8591a08190bc2f87d92"
+  },
+  "native_library_count": 12,
+  "native_library_hashes": {
+    "lib/arm64-v8a/libapp.so": "537d99211a878e82ab3f8dca938e2b9b45faecd12cea0d07b0bd6823401c42a2",
+    "lib/arm64-v8a/libbarhopper_v3.so": "ec09597e9eb3aee0eb55ae3366da0d4ba416f5aa35a1af0b3811f50ff46743a1",
+    "lib/arm64-v8a/libclash.so": "f9d094925a7841a9640a9b94d768e10831690167702131010fed5a25767375fa",
+    "lib/arm64-v8a/libcode_forge.so": "ca2cb4e860bf68eb3d202f13383fd6d3d04e102f6003110f6116d28aeedde4d5",
+    "lib/arm64-v8a/libcore.so": "9682d692d804f3cbb74cbbc55e3fda46e354cb29f8d193219d652d41976fc1ee",
+    "lib/arm64-v8a/libdartjni.so": "5fbc116569c4721d05e32fb572e6d4ef52a54902a2acff34eebcf1869687a79d",
+    "lib/arm64-v8a/libdatastore_shared_counter.so": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+    "lib/arm64-v8a/libflutter.so": "151099d0b73b3025d7545c8431af4d7f23bf3e7fe5767d9fec6323fa372ef743",
+    "lib/arm64-v8a/libimage_processing_util_jni.so": "0292b063fafccf734472cbb59588e756c2dbca907c72021ba6fbf126385508a2",
+    "lib/arm64-v8a/libqjs.so": "d1b50013b8ff69afc6452b8780023401e854f8999255b0187a13ef9d04e1fd95",
+    "lib/arm64-v8a/libsqlite3.so": "081df67ee9ab852daea6a0679427e90fc89a0245d06f93dafe2309875c609c5c",
+    "lib/arm64-v8a/libsurface_util_jni.so": "a5c9d1928ea92ec7a94dff8cf666e7739cd734198b9f0ae1d4e28ea3c86516ba"
+  },
+  "gradle_cleanup_verified": true,
+  "first_attempt_failed_network": true,
+  "retry_success": true,
+  "installed_hash": {
+    "installed_apk_hash_matches": true,
+    "sha256": "dc002d4801c6d3d9808eefc6ce8d440b7dcbc2d3a551e8591a08190bc2f87d92"
+  },
+  "observations": {
+    "running-before-update": {
+      "observed_at": "2026-10-08T19:12:30.731802+00:00",
+      "runtime_visible": true,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ],
+        [
+          "WIFI",
+          "VPN"
+        ]
+      ],
+      "active_vpn": true
+    },
+    "running-update-background": {
+      "observed_at": "2026-10-08T19:12:59.218171+00:00",
+      "runtime_visible": false,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ],
+        [
+          "WIFI",
+          "VPN"
+        ]
+      ],
+      "active_vpn": true
+    },
+    "running-update-launched": {
+      "observed_at": "2026-10-08T19:13:16.349044+00:00",
+      "runtime_visible": true,
+      "foreground_service": true,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ],
+        [
+          "WIFI",
+          "VPN"
+        ]
+      ],
+      "active_vpn": true
+    },
+    "stopped-before-update": {
+      "observed_at": "2026-10-08T19:13:46.465753+00:00",
+      "runtime_visible": false,
+      "foreground_service": false,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    },
+    "stopped-update-background": {
+      "observed_at": "2026-10-08T19:14:05.817244+00:00",
+      "runtime_visible": false,
+      "foreground_service": false,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    },
+    "stopped-update-launched": {
+      "observed_at": "2026-10-08T19:14:34.220120+00:00",
+      "runtime_visible": false,
+      "foreground_service": false,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    },
+    "final-cold-stopped": {
+      "observed_at": "2026-10-08T19:15:51.818255+00:00",
+      "runtime_visible": false,
+      "foreground_service": false,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false
+    },
+    "initial-update-background": {
+      "observed_at": "2026-10-08T19:11:49.336412+00:00",
+      "runtime_visible": false,
+      "foreground_service": false,
+      "current_network_transports": [
+        [
+          "CELLULAR"
+        ],
+        [
+          "WIFI"
+        ]
+      ],
+      "active_vpn": false,
+      "evidence_source": "主控实时observe工具输出；未手动打开应用"
+    }
+  },
+  "settings_changed": false,
+  "effective_proxy_https_verified": false,
+  "release_verified": false,
+  "remaining": [
+    "智能暂停更新后条件重评估",
+    "首次PENDING与用户停止/迟到Dart启动交错",
+    "权限撤销后更新",
+    "熄屏速度通知路径",
+    "双存储故障跨进程unknown",
+    "完整唯一owner/配置/typed completion/ACK退出接线",
+    "有效节点流量和三端服务端业务"
+  ]
+}

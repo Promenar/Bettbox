@@ -268,3 +268,7 @@ Service/Vpn 的 Dart 包装器仅接受 true。SmartAutoStopManager 使用 compl
 SDK36 的包更新广播通过 `GlobalState.handlePackageReplacement` 在 runLock 内检查恢复资格与停止屏障，明确允许才请求启动。资格文件位于应用 noBackupFilesDir，仅当前票据的 Core、前台发布和 START 完成后授予；普通停止、IDLE 停止和权限撤销同步撤销，智能暂停保留既有资格。严格标记读取，临时文件不参与决策，内容 fsync 后原子替换；不支持原子移动不降级。写入停止标记失败可确认删除兜底；双重失败继续资源清理但停止响应为 false，生命周期保持阻断。存储初始化也在异常保护内。
 
 BootReceiver 的开机自启合同独立。文件方案不承诺目录的断电持久性；两个持久化渠道都失败后的冷进程事实无法由内存阻断证明。资格存储夹具和 Kotlin 编译不替代设备覆盖安装、暂停条件重评估或迟到 Dart 启动交错验证。
+
+### Android 唯一所有者采用边界
+
+owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapter，主后台配置和退出尚未共用唯一 owner。公共 hub setState/setup/update、直接 FFI quickStart 以及 legacy 生命周期没有 Android owned 采用后的完整拒绝门禁；darwin 的 ownedListenerMode 不承担这个职责。完整采用须原子收敛实际配置写、用户停止意图、同次 options/资源身份、双 channel 不可变完成消费与 ACK 退出准入，执行合同见 `.agents/plans/2026-10-09-android-single-owner-adoption.md`。

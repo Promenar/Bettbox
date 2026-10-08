@@ -2830,3 +2830,34 @@ record-fingerprint: 82c482bf37b0245d4cbbd869b933870bea6b06071b4a5b0be027d9e0deed
 
 ### HLG
 标准append保存红绿、初始化异常修复及独立复验事实，整体Goal保持active。
+
+## 2026-10-09T03:19:06+08:00 · Android a35d73f签名候选更新基础设备验收与完整owner采用计划
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["apk", "device", "package-restart", "owner", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 6056af5196e0975154c8548e206f0cfe0b02e5f9f5cfb6ddc8befe863581b30f
+
+### Summary
+a35d73f正式签名APK重试成功并同源安装。设备确认运行更新可恢复、普通停止更新保持停止，冷启动保持停止。整体发行未完成。
+
+### Changed
+只更新安装目标摘要、APK公开回执、验收/变更文档与registry；新增自足完整owner联合采用计划。没有修改客户端/Go源码或设备配置，用户.video_agent未触碰。
+
+### Validation
+首轮网络上游限时失败终态1，源码/锁无漂移且清理确认；重试终态0，正式证书、12个ARM64库、源码/锁和清理通过。APK SHA dc002d4801c6d3d9808eefc6ce8d440b7dcbc2d3a551e8591a08190bc2f87d92，设备回读相同。确认运行更新前和手动打开后runtime/fore/VPN为true，更新打开前fore/VPN为true；普通停止更新打开前后及最后冷启动均fore/VPN为false、打开后runtime=false。PDEC安装摘要更新并validate通过。
+
+### Next
+验证智能暂停重评估、首次PENDING/停止与迟到请求、权限撤销、熄屏；完整采用唯一owner、旧写门禁、原意图、双channel typed完成与ACK退出。macOS窗口工具仍锁屏；付呗商户/门店/通道/网关状态已异步询问，答案待到。
+
+### Risks
+有效节点HTTPS、唯一owner及服务端邀请支付全路径未验收。独立android_package_restart_review调查确认hub配置/quickStart/legacy生命周期无Android owned采用后门禁，主控核对实际源码；不能局部换Boolean宣称采用。实际旧APK证明JNI按libclash.so basename依赖且唯一打包核心，设备共享runtime实例另验。双存储故障与目录断电持久性未知不因基础更新回归消除。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、registry、完整采用计划、公开APK设备回执及PDEC安装摘要。
+
+### HLG
+标准append归档成功/失败、只读联合调查及设备边界。Goal保持active；候选release_verified=false。

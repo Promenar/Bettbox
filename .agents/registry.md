@@ -147,3 +147,6 @@
 - docs/validation/2026-10-07-three-platform/android-foreground-publication-validation.json — 首次前台确认生产夹具红绿、Kotlin编译与独立复核及未覆盖设备边界
 
 - docs/validation/2026-10-07-three-platform/android-package-restart-validation.json — 更新资格红绿、真实文件、Kotlin编译与初始化异常独立复验；覆盖安装另验
+
+- .agents/plans/2026-10-09-android-single-owner-adoption.md — Android完整owner/配置/双channel/Dart/退出联合采用合同
+- docs/validation/2026-10-07-three-platform/android-a35d73f-apk-validation.json — 正式签名构建/回读与运行/停止更新基础设备验证，发行另验

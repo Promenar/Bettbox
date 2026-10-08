@@ -364,3 +364,9 @@ SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageR
 2026-10-09：旧无条件恢复决策在“没有已确认运行资格不得更新启动”断言失败；生产 JVM 三个入口通过，包含真正文件原子替换、严格内容、缺失/损坏/临时文件、删除兜底、双重失败与存储初始化异常。实际 release Kotlin 编译终态 0 且 BUILD SUCCESSFUL。独立只读复审发现存储 lazy 初始化可中断资源清理，修复后的 provider 异常夹具和编译通过，复验确认源码 P1 关闭。公开来源见 `validation/2026-10-07-three-platform/android-package-restart-validation.json`。
 
 设备尚安装 a21276f，候选尚未产出新 APK。必须验证 Android 私有目录原子移动、用户停止/已运行/首次 PENDING/撤销权限/智能暂停的覆盖安装与条件重评估，以及 Receiver 接受后 Dart 迟到启动交错。双存储故障跨进程状态未知及断电目录持久性没有通过验收；有效代理 HTTPS、唯一 owner 和 typed engine ACK 仍需独立完成。
+
+## Android a35d73f 正式签名候选与更新基础设备验收
+
+正式 APK 已完成受控重试，源码/锁不变、单一正式证书、12个 ARM64库和任务清理检查通过；设备安装回读摘要与构建一致。首轮上游连接限时失败没有改变域名/TLS授权，重试成功。从a21276f停止态首次安装资格候选时更新没有启动；确认运行后更新在手动打开前恢复前台服务与活动 WIFI|VPN；普通停止后更新、手动打开以及最后冷启动均保持无运行计时/前台服务/活动VPN。配置未调整。公开回执为 `android-a35d73f-apk-validation.json`。
+
+智能暂停条件重评估、首次PENDING交错、权限撤销与熄屏速度路径尚未覆盖。唯一owner联合采用及有效节点HTTPS尚未完成，APK是正式签名候选，release_verified=false。独立调查确认Android owned采用后的legacy配置写门禁缺失；完整接线以 `.agents/plans/2026-10-09-android-single-owner-adoption.md` 为执行计划，不能将现有 helper 或更新资格基础验证等同完整发行验收。
