@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "scope": "macOS系统授权引用与SC session生命周期；实际系统认证未执行",
+  "source_sha256": {
+    "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "e97c0fd55d566520323cf91d3a3566ed59131e501525ff13090bfc3afcbb383f",
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "722302b286a1601867cb6bdf0524dba80d947a135465830d4c507bc6eac8dc4e",
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "ed0a529e44409976b418f5119dd00ac82ea7b806b55d56cf84993a204fdc4cbc",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "154c073274c384a6abbd979271bdeb9ec60a46527f8eff621b67b3c7fb3488b5",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "8139ca04f012bfbbe92176888b817b9d5c38e160208af16b488da8dd1c3a5cf3",
+    "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947"
+  },
+  "validation": {
+    "red_tests": 76,
+    "red_failures": 3,
+    "green_tests": 84,
+    "green_failures": 0,
+    "host_sdk_and_fixture_exit_code": 0,
+    "independent_review": "只读源码独立审阅未发现新增P1/P2",
+    "build": {
+      "commands_succeeded": true,
+      "source_unchanged": true,
+      "locks_unchanged": true,
+      "requested_signing_mode": "unsigned",
+      "core_identity": {
+        "cdhash": "5945601ae066f12cca39df96e2100ad7b8122921",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "1afbb1375c9994c4d861aca8311e39a4ac7075616d775b496e3a920242d96587",
+        "signingmode": "adhoc"
+      }
+    }
+  },
+  "evidence_sha256": {
+    "macos-authorization-red.log": "edec7beaf02c9564d72ee500444e42a6e77b414db38800763aa902f0cfaf301e",
+    "macos-authorization-compile-failure.log": "c9e9ecbcc155159ef177c55dc97225575f1572403b1158da277b32c694e8ea40",
+    "macos-authorization-green.log": "4f518e2dc60ec8674ebb92020ae3be0d5b61ea25a2591d11a781f44eb6ad1108",
+    "macos-authorization-host.log": "fd2ac72102bfe3e9fdcb8fcc3d03d3dd043547dde6673fc05935e50e21238a34",
+    "macos-authorization-full-build.log": "8345884fb744f9cc6e9ade007ea08c48bc79cf84a285e8871428ef2aa8093fe1"
+  },
+  "authorization_parameters": {
+    "rights": "nil",
+    "environment": "nil",
+    "flags": 0,
+    "preferences_id": "nil",
+    "free_flags": 0
+  },
+  "release_verified": false,
+  "unverified": [
+    "实际OS认证弹窗及用户取消/同意",
+    "系统代理实际写入和双读",
+    "非空journal真实恢复",
+    "正常界面启停退出",
+    "有效上游协议流量",
+    "发行签名及公证"
+  ]
+}

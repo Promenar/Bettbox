@@ -1,5 +1,130 @@
 import Foundation
 import SystemConfiguration
+import Security
+
+// 工厂只在原生事务内部使用，引用与固定SDK参数不进入通道或日志。
+protocol SCSessionFactory {
+    func createSession() throws -> SCSessionResource
+}
+protocol SCSessionResource: AnyObject {
+    var preferences: SCPreferences? { get }
+    func lockWithoutWaiting() throws
+    func synchronize()
+    func unlock() throws
+    func releaseSession()
+    func releaseAuthorization() throws
+}
+
+// 关闭责任由实际生产入口消费；测试资源不需要伪造原生引用。
+final class SCSessionLifecycle {
+    private let resource: SCSessionResource
+    private var locked = false
+    private var closed = false
+    init(_ resource: SCSessionResource) { self.resource = resource }
+    var preferences: SCPreferences? { resource.preferences }
+    func lock() throws {
+        guard !closed, !locked else { throw BackendFailure.busy }
+        try resource.lockWithoutWaiting()
+        locked = true
+    }
+    func close() throws {
+        guard !closed else { return }
+        closed = true
+        var failure: Error?
+        if locked {
+            resource.synchronize()
+            do { try resource.unlock() } catch { failure = error }
+            locked = false
+        }
+        resource.releaseSession()
+        do { try resource.releaseAuthorization() } catch { if failure == nil { failure = error } }
+        if let failure { throw failure }
+    }
+    deinit { try? close() }
+}
+
+protocol SCSessionConstruction: AnyObject {
+    func createAuthorization() throws
+    func createSession() throws -> SCSessionResource
+    func releaseAuthorization() throws
+}
+struct AuthorizedSCSessionFactory: SCSessionFactory {
+    private let constructionFactory: () -> SCSessionConstruction
+    init(constructionFactory: (() -> SCSessionConstruction)? = nil) {
+        self.constructionFactory = constructionFactory ?? { NativeSCSessionConstruction() }
+    }
+    func createSession() throws -> SCSessionResource {
+        let construction = constructionFactory()
+        do {
+            try construction.createAuthorization()
+            return try construction.createSession()
+        } catch {
+            do { try construction.releaseAuthorization() }
+            catch { throw BackendFailure.sessionCleanupFailed }
+            throw error
+        }
+    }
+}
+private func authorizationFailure(_ status: OSStatus) -> BackendFailure {
+    if status == errAuthorizationCanceled { return .authorizationCancelled }
+    if status == errAuthorizationDenied || status == errAuthorizationInteractionNotAllowed { return .permissionDenied }
+    return .readFailed
+}
+private final class NativeSCSessionConstruction: SCSessionConstruction {
+    private var authorization: AuthorizationRef?
+    func createAuthorization() throws {
+        // SDK将Defaults定义为零；Swift使用导入的选项类型表达同一值。
+        let status = AuthorizationCreate(nil, nil, AuthorizationFlags(rawValue: 0), &authorization)
+        guard status == errAuthorizationSuccess, authorization != nil else { throw authorizationFailure(status) }
+    }
+    func createSession() throws -> SCSessionResource {
+        guard let authorization else { throw BackendFailure.readFailed }
+        guard let preferences = SCPreferencesCreateWithAuthorization(nil,
+            "Bettbox proxy transaction" as CFString, nil, authorization) else {
+            if SCError() == kSCStatusAccessError { throw BackendFailure.permissionDenied }
+            throw BackendFailure.readFailed
+        }
+        let resource = AuthorizedSCSessionResource(preferences, authorization)
+        self.authorization = nil
+        return resource
+    }
+    func releaseAuthorization() throws {
+        guard let authorization else { return }
+        self.authorization = nil
+        guard AuthorizationFree(authorization, AuthorizationFlags(rawValue: 0)) == errAuthorizationSuccess else {
+            throw BackendFailure.sessionCleanupFailed
+        }
+    }
+    deinit { try? releaseAuthorization() }
+}
+private final class AuthorizedSCSessionResource: SCSessionResource {
+    private(set) var preferences: SCPreferences?
+    private var authorization: AuthorizationRef?
+    init(_ preferences: SCPreferences, _ authorization: AuthorizationRef) {
+        self.preferences = preferences; self.authorization = authorization
+    }
+    func lockWithoutWaiting() throws {
+        guard let preferences else { throw BackendFailure.readFailed }
+        guard SCPreferencesLock(preferences, false) else {
+            if SCError() == kSCStatusAccessError { throw BackendFailure.permissionDenied }
+            if SCError() == kSCStatusLocked { throw BackendFailure.busy }
+            throw BackendFailure.readFailed
+        }
+    }
+    func synchronize() { if let preferences { SCPreferencesSynchronize(preferences) } }
+    func unlock() throws {
+        guard let preferences, SCPreferencesUnlock(preferences) else { throw BackendFailure.readFailed }
+    }
+    func releaseSession() { preferences = nil }
+    func releaseAuthorization() throws {
+        guard let authorization else { return }
+        self.authorization = nil
+        guard AuthorizationFree(authorization, AuthorizationFlags(rawValue: 0)) == errAuthorizationSuccess else {
+            throw BackendFailure.sessionCleanupFailed
+        }
+    }
+    deinit { releaseSession(); try? releaseAuthorization() }
+}
 
 struct SCReadOnlyInspection {
     let services: Int
@@ -9,33 +134,40 @@ struct SCReadOnlyInspection {
     let preferencesUnchanged: Bool
 }
 
-// 由串行ProxyTransaction独占；不创建提权授权，不将系统字典输出到channel。
+// 由串行ProxyTransaction独占，系统认证由OS处理，不将系统字典输出到通道。
 final class SystemConfigurationBackend: ConfigurationBackend {
-    private var preferences: SCPreferences?
+    private var sessionLifecycle: SCSessionLifecycle?
+    private var preferences: SCPreferences? { sessionLifecycle?.preferences }
+    private let sessionFactory: SCSessionFactory
     private var staged = false
     private var poison = false
     private let store: SCDynamicStore?
-    init() { store = SCDynamicStoreCreate(nil, "Bettbox proxy verification" as CFString, nil, nil) }
+    init(sessionFactory: SCSessionFactory? = nil) {
+        self.sessionFactory = sessionFactory ?? AuthorizedSCSessionFactory()
+        store = SCDynamicStoreCreate(nil, "Bettbox proxy verification" as CFString, nil, nil)
+    }
 
     func lock() throws {
         guard !poison else { throw BackendFailure.readFailed }
-        guard preferences == nil else { throw BackendFailure.busy }
-        guard let session = SCPreferencesCreate(nil, "Bettbox proxy transaction" as CFString, nil) else {
-            throw BackendFailure.readFailed
+        guard sessionLifecycle == nil else { throw BackendFailure.busy }
+        let lifecycle: SCSessionLifecycle
+        do { lifecycle = SCSessionLifecycle(try sessionFactory.createSession()) }
+        catch {
+            if error as? BackendFailure == .sessionCleanupFailed { poison = true }
+            throw error
         }
-        guard SCPreferencesLock(session, false) else {
-            if SCError() == kSCStatusAccessError { throw BackendFailure.permissionDenied }
-            if SCError() == kSCStatusLocked { throw BackendFailure.busy }
-            throw BackendFailure.readFailed
+        do { try lifecycle.lock() }
+        catch {
+            do { try lifecycle.close() } catch { poison = true; throw BackendFailure.sessionCleanupFailed }
+            throw error
         }
-        preferences = session; staged = false
+        sessionLifecycle = lifecycle; staged = false
     }
-    func unlockDiscardingStagedChanges() {
-        guard let session = preferences else { poison = true; return }
-        SCPreferencesSynchronize(session)
-        if !SCPreferencesUnlock(session) { poison = true }
+    func unlockDiscardingStagedChanges() throws {
+        guard let lifecycle = sessionLifecycle else { poison = true; throw BackendFailure.sessionCleanupFailed }
         // 丢弃整个session，未commit的暂存不能进入下一事务。
-        preferences = nil; staged = false
+        defer { sessionLifecycle = nil; staged = false }
+        do { try lifecycle.close() } catch { poison = true; throw BackendFailure.sessionCleanupFailed }
     }
     private func session() throws -> SCPreferences {
         guard let session = preferences, !poison else { throw BackendFailure.readFailed }

@@ -60,7 +60,7 @@ struct SafeResult: Equatable {
     var unresolvedGroups: Int = 0
 }
 enum BackendFailure: Error, Equatable {
-    case permissionDenied, busy, readFailed, stageFailed
+    case permissionDenied, authorizationCancelled, sessionCleanupFailed, busy, readFailed, stageFailed
     // rejected 必须由后端证明没有持久化写入，不能把未知失败映射为此项。
     case commitRejected, commitUncertain, applyFailed, verificationFailed
 }
@@ -153,7 +153,7 @@ enum LoadedOwnershipJournal {
 protocol ConfigurationBackend: AnyObject {
     // wait=false，后端必须刷新 session；解锁时丢弃所有未提交暂存。
     func lock() throws
-    func unlockDiscardingStagedChanges()
+    func unlockDiscardingStagedChanges() throws
     func persistentServices() throws -> [ServiceSnapshot]
     func activeServices(serviceIDs: [String]) throws -> [String: ActiveServiceSnapshot]
     // 新鲜读取后同时核对目标组CAS与未拥有摘要，再只合并指定白名单组。

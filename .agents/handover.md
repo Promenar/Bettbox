@@ -1776,3 +1776,34 @@ Core64项通过；Host SDK定向编译和迟到SC夹具通过；当前Flutter全
 
 ### HLG
 使用标准append先dry-run再apply记录；索引由工具重建。
+
+## 2026-10-08T15:13:16+08:00 · macOS原生授权生命周期与取消门禁
+
+type: development
+scope: ["Bettbox", "macOS"]
+status: done
+tags: ["macos", "authorization", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 6a010d147d695ebf17d45677c4b7aa8720fdde43313c521d92cc175a76a9c813
+
+### Summary
+系统代理原生授权生产实现完成，84项Core、宿主SDK及完整unsigned Runner构建通过；实际OS认证与代理流量仍待验。Android/macOS优先，iOS保留开发研究。
+
+### Changed
+内部SCSessionFactory/Resource/Lifecycle拥有原生引用，固定nil rights/environment、默认flags与prefsID=nil。取消、授权前撤销及baseline后撤销门禁修复；同步关闭先于completion。关闭throws及partial清理失败粘性阻断空journal洗白。
+
+### Validation
+基线76项3失败实际确认取消错误映射、过期factory进入、baseline撤销仍commit；生产修复84项0失败。Swift C flag名称首次编译失败已保留，SDK确认Defaults=0后改AuthorizationFlags(rawValue:0)。Host检查 .test/three-platform-release/supervisor-check-f2v_f7fs/execution.json通过，完整Runner构建退出0且source_unchanged/locks_unchanged=true。独立只读源码审阅未发现新P1/P2。Flutter/Dart与04365a3验证219项及analyze版本一致，未重复运行。
+
+### Next
+保留既有候选，封装开发签名候选；核对现有Bettbox旧进程、journal与ClashBar运行冲突后，通过应用正常路径验证系统认证拒绝/同意、代理生效恢复、正常退出和有效上游流量。不得自动停止无关ClashBar。Android配置owner、邀请网页绑定及支付外部条件独立处理。
+
+### Risks
+未执行真实OS认证/SC写入，未宣称可用发行。unsigned构建不代表DeveloperID、公证或安全存储冷启动通过。既有Bettbox/Core进程96765/96769仍在运行，PID仅当时快照；须实时核对并走安全退出，不能无依据kill或删除journal。
+
+### DIA
+已同步架构、变更、平台验收、registry、实施计划和公开脱敏授权回执；PDEC当前c9625847750b58eb481249fe125230de20adb866d799f6da651254596917c758已验证ready。
+
+### HLG
+标准append dry-run后apply，保留实际失败和未验证边界。

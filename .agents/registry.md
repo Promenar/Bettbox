@@ -74,3 +74,6 @@
 - docs/validation/2026-10-07-three-platform/macos-host-late-sc-validation.json — 已投递SC完成乱序、保守恢复与独立复核
 
 - docs/validation/2026-10-07-three-platform/macos-application-lifecycle-validation.json — Application配置与偏好状态回归、219项Flutter、静态分析及完整unsigned Runner构建边界
+
+- .agents/plans/2026-10-08-macos-native-authorization.md — 系统认证参数、资源归属、取消和恢复验收合同
+- docs/validation/2026-10-07-three-platform/macos-native-authorization-validation.json — 原生授权84项回归、宿主/完整构建和实际系统认证待验边界

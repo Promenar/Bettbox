@@ -1252,11 +1252,11 @@
     "scripts/check_android_regressions.py": "9192077d0b1dc7abb38cc394e645577266dfe109e87dabecef087633316819ae",
     "plugins/proxy/macos/Package.swift": "e98972e639c1b7b02e8534be5aaa3e455a5c1baf763765935108e909ede83d15",
     "plugins/proxy/macos/Tests/Core/LifecycleTests.swift": "7a673f212b31d2ff4bcff903bee6ed1ce030938d54fa11c3685e29d5745b3507",
-    "plugins/proxy/macos/Tests/Core/Fakes.swift": "77a9334fee9c55499e28aff346f04b649102ea09ca307e3d3c7eb4588bd891a2",
-    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "d0a928b22f639e710844dfc8327673359aff7be693e98115f7e6172d2a783cb5",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "154c073274c384a6abbd979271bdeb9ec60a46527f8eff621b67b3c7fb3488b5",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "8139ca04f012bfbbe92176888b817b9d5c38e160208af16b488da8dd1c3a5cf3",
     "plugins/proxy/macos/Classes/Core/Lifecycle.swift": "c941484fe0b9a6ea806012f9bb6fd22677a87ec5b303683cca4e47985187def7",
-    "plugins/proxy/macos/Classes/Core/Contract.swift": "11fbdeb71a3baeb4f2aa2a44054a42c3a73adf4c818765b20f6dc566777f32b4",
-    "plugins/proxy/macos/Classes/Core/Transaction.swift": "2d08061c5f483ff5fbcd53d11483a8d1011698a9169bade6d7851f8eb2a6dcb8",
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "722302b286a1601867cb6bdf0524dba80d947a135465830d4c507bc6eac8dc4e",
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "ed0a529e44409976b418f5119dd00ac82ea7b806b55d56cf84993a204fdc4cbc",
     "scripts/verify_android_java_identity.py": "27d8c4fb134674091e1049ef15802993dbeb40562c77e3ec9c48189bfb26ea5a",
     "plugins/flutter_qjs/android/build.gradle": "c3787a343227aaa3ba86959b3f519a9e1ed64fd79a9575ae6febe3811ec5a440",
     "android/.gitignore": "e3f9181e8884389faa5ea0660611cba14e0e3920896c4aa461776c8358c5b448",
@@ -1383,7 +1383,7 @@
     "lib/manager/clash_manager.dart": "b826849ff3f446c7eb140afdfcb8680cfeec7705a999c25b3dfbe253cb20e534",
     "test/clash/supervisor/supervisor_event_dispatch_test.dart": "29f2ab362977cbc653b8f530b92541168cdcf88430ae20b5d9efc7e20bbf471a",
     "lib/clash/supervisor/supervisor_events.dart": "a0b1a4d8dcead830f1120cfbccc4027a01addb3abcde213c0435c41f19dae8c6",
-    "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "73c8fa6621aeb1607b6611495d8ffb806389011453958be7921dfd115e930f41",
+    "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "e97c0fd55d566520323cf91d3a3566ed59131e501525ff13090bfc3afcbb383f",
     "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "9c68c1f60f4df4f706251e2613f4fff0dc09b19d6bbea00ada305f71f201146a",
     "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "513ceca70d6f1be2f8de2f1af1ed576abb53c3aff0c36bde9c388c68d5166ebf",
     "plugins/proxy/macos/Classes/Core/JournalCoding.swift": "3cf5b326fd46f2e082cc9ec0874482d661acda15dcf8fc13bf39f4626f5d9f73",
@@ -1428,7 +1428,8 @@
     "macos/CoreSupervisor/Host/HostSystemProxyCoordinator.swift": "628f9fc03fbc20be0d4197a5a73d7ccb3b538cddb8c7fcf410b0693d06f32c9a",
     "scripts/probe_macos_sc_lock.py": "91d40596591029274a22439f99b75890b378fdecfa965e6233667db9918f93d2",
     "lib/common/system.dart": "12898544d27d2a5dcc6912a5c45a42af552713bbc0db5ae39d67e608dd875da0",
-    "test/common/macos_core_privilege_test.dart": "e07c3ac24193b30f98dd49f8707e64ef52e75f8e224f7b39e33407d1421e2730"
+    "test/common/macos_core_privilege_test.dart": "e07c3ac24193b30f98dd49f8707e64ef52e75f8e224f7b39e33407d1421e2730",
+    "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947"
   },
   "platform_extensions": {
     "android": {
@@ -1504,6 +1505,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "3190ef9f330cc42aa7fd5d729b99a5cc547c67c0a26df6db5086a8670396275f"
+    "contract_digest": "c9625847750b58eb481249fe125230de20adb866d799f6da651254596917c758"
   }
 }

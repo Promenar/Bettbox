@@ -205,3 +205,5 @@ Android 原生启停接线：Go State/CallbackGate/FDLease、Kotlin 显式领取
 Android 生命周期候选接入完整工作门禁、独立绑定/启动意图及主进程停止锁恢复；旧通知无法修改新代共享状态。两个生产gate/controller协程夹具入口通过，原4项独立审阅发现静态闭合；JNI helper/OnLoad九项故障夹具通过。完整工程及设备行为待验，回执分别为 `android-vpn-lifecycle-validation.json`、`android-jni-failure-validation.json`（位于 `docs/validation/2026-10-07-three-platform/`）。
 
 - macOS Application按代次分别确认内核初始化与配置就绪，代理偏好兑现失败后同值会真实重试；停止和退出先确认代理恢复及所属入口撤销。219项Flutter测试、静态分析和完整unsigned Release构建通过；TUN旧提权入口已删除，真实系统授权和流量仍待验证。
+
+- macOS系统代理采用原生Authorization Services默认权限参数及同步资源生命周期，明确取消保持cancelled，已撤销请求在授权前拒绝，运行双读后撤销禁止提交；关闭不确定结果阻断虚假恢复。76项基线测试先确认3处失败，修复后84项通过，SDK宿主和完整unsigned Runner构建通过；真实OS认证和代理流量未验收。

@@ -118,6 +118,121 @@ final class TransactionTests: XCTestCase {
         XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0); XCTAssertEqual(backend.applies, 0)
     }
 
+    func testEmptyJournalNeverCallsSessionFactory() {
+        let factory = FakeSCSessionFactory()
+        factory.failure = .permissionDenied
+        let backend = SystemConfigurationBackend(sessionFactory: factory)
+        let transaction = ProxyTransaction(configuration: backend, journal: FakeJournal())
+        XCTAssertEqual(transaction.recover(generation: 1).status, .idle)
+        XCTAssertEqual(transaction.stop(generation: 2).status, .idle)
+        XCTAssertEqual(factory.creates, 0)
+    }
+
+    func testExplicitAuthorizationCancellationMustRemainCancelled() {
+        let factory = FakeSCSessionFactory(); factory.failure = .authorizationCancelled
+        let backend = FakeConfiguration(); backend.sessionFactory = factory
+        let transaction = ProxyTransaction(configuration: backend, journal: FakeJournal())
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .cancelled)
+        XCTAssertEqual(factory.creates, 1)
+        XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0)
+    }
+
+    func testRevokedStartMustNotEnterAuthorizationFactory() {
+        let factory = FakeSCSessionFactory()
+        let backend = FakeConfiguration(); backend.sessionFactory = factory
+        let transaction = ProxyTransaction(configuration: backend, journal: FakeJournal())
+        XCTAssertEqual(transaction.start(capability(current: { false }), generation: 1, isCurrent: { true }).status, .cancelled)
+        XCTAssertEqual(factory.creates, 0)
+        XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0)
+    }
+
+    func testRevocationWhileAuthorizationLockWaitsPreventsWrites() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let factory = FakeSCSessionFactory(); backend.sessionFactory = factory
+        let flag = SessionTestCurrentFlag()
+        let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
+        factory.resource.beforeLock = { entered.signal(); _ = release.wait(timeout: .now() + 2) }
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        let endpoint = capability(current: { flag.get() })
+        let done = expectation(description: "授权等待终结")
+        DispatchQueue.global().async {
+            let result = transaction.start(endpoint, generation: 1, isCurrent: { true })
+            XCTAssertEqual(result.status, .cancelled)
+            done.fulfill()
+        }
+        XCTAssertEqual(entered.wait(timeout: .now() + 1), .success)
+        XCTAssertEqual(factory.resource.events, ["lock"])
+        flag.revoke(); release.signal()
+        wait(for: [done], timeout: 2)
+        XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0)
+        XCTAssertNil(store.record)
+        XCTAssertEqual(factory.resource.events, ["lock", "synchronize", "unlock", "releaseSession", "freeAuthorization"])
+    }
+
+    func testRevocationDuringBaselineReadMustPreventCommit() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        var current = true
+        backend.afterStage = { backend.beforeActiveRead = { current = false } }
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(current: { current }), generation: 1, isCurrent: { true }).status, .cancelled)
+        XCTAssertEqual(backend.commits, 0)
+        XCTAssertNil(store.record)
+    }
+
+    func testNonemptyJournalFactoryDenialPreservesEvidence() throws {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let encoder = JSONEncoder(); encoder.outputFormatting = .sortedKeys
+        let original = try encoder.encode(store.record)
+        let factory = FakeSCSessionFactory(); factory.failure = .permissionDenied
+        backend.sessionFactory = factory
+        XCTAssertEqual(transaction.recover(generation: 2).status, .permissionDenied)
+        XCTAssertEqual(factory.creates, 1)
+        XCTAssertEqual(try encoder.encode(store.record), original)
+    }
+
+    func testCloseFailureCannotReturnAppliedAndRetainsJournal() {
+        let factory = FakeSCSessionFactory(); factory.resource.unlockFailure = true
+        let backend = FakeConfiguration(); backend.sessionFactory = factory
+        let store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertNotNil(store.record)
+        XCTAssertEqual(factory.resource.events.filter { $0 == "freeAuthorization" }.count, 1)
+    }
+
+    func testPartialFactoryCleanupFailureCannotBeWashedByEmptyJournal() {
+        let construction = FakeSCSessionConstruction()
+        construction.sessionFailure = .permissionDenied; construction.cleanupFailure = true
+        let factory = AuthorizedSCSessionFactory(constructionFactory: { construction })
+        let backend = SystemConfigurationBackend(sessionFactory: factory)
+        let store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertNil(store.record)
+        XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
+        XCTAssertEqual(transaction.stop(generation: 3).status, .recoveryRequired)
+        XCTAssertEqual(transaction.start(capability(), generation: 4, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertEqual(construction.events, ["createAuthorization", "createSession", "freeAuthorization"])
+    }
+
+    func testCloseFailureCannotReturnRestored() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let factory = FakeSCSessionFactory(); factory.resource.freeFailure = true
+        backend.sessionFactory = factory
+        XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
+        XCTAssertEqual(factory.resource.events.filter { $0 == "freeAuthorization" }.count, 1)
+        // journal已确认恢复并清空，也不能洗掉本进程SDK清理未知。
+        XCTAssertNil(store.record)
+        XCTAssertEqual(transaction.recover(generation: 3).status, .recoveryRequired)
+        XCTAssertEqual(transaction.stop(generation: 4).status, .recoveryRequired)
+        XCTAssertEqual(transaction.start(capability(), generation: 5, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertEqual(factory.creates, 1)
+    }
+
     func testCredentialBlindCapabilityAllowsUnknownButPresentStillRejectsBeforeSetter() {
         var unknown = publicService()
         unknown.authentication = .unknown

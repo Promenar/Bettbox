@@ -7,6 +7,7 @@ final class ProxyTransaction {
     private let journal: JournalBackend
     private let serial = NSLock()
     private var ownsJournal = false
+    private var cleanupUncertain = false
 
     init(configuration: ConfigurationBackend, journal: JournalBackend) {
         self.configuration = configuration
@@ -23,7 +24,7 @@ final class ProxyTransaction {
 
     func start(_ capability: CredentialBlindEndpointCapability, generation: UInt64,
                isCurrent: @escaping () -> Bool) -> SafeResult {
-        operation(generation) {
+        operation(generation, admission: { isCurrent() && capability.isCurrent() }) {
             let intent = capability.intent
             let current = { isCurrent() && capability.isCurrent() }
             guard intent.validate(), capability.endpoint.port == intent.port else {
@@ -107,6 +108,10 @@ final class ProxyTransaction {
                     try self.journal.clear()
                     return SafeResult(status: .failedRolledBack, generation: generation)
                 }
+                guard current() else {
+                    try self.journal.clear()
+                    return SafeResult(status: .cancelled, generation: generation)
+                }
             } catch {
                 try self.journal.clear()
                 return SafeResult(status: .failedRolledBack, generation: generation)
@@ -147,27 +152,48 @@ final class ProxyTransaction {
     }
 
     private func operation(_ generation: UInt64, emptyJournalIsIdle: Bool = false,
+                           admission: (() -> Bool)? = nil,
                            body: () throws -> SafeResult) -> SafeResult {
         serial.lock()
         defer { serial.unlock() }
         do {
+            guard !cleanupUncertain else { return SafeResult(status: .recoveryRequired, generation: generation) }
+            if admission?() == false { return SafeResult(status: .cancelled, generation: generation) }
             if !ownsJournal { try journal.acquireOwnership(); ownsJournal = true }
             // 仅已独占且严格读取的空记录可免系统锁；无权读取不是空记录。
             if emptyJournalIsIdle, try journal.load() == nil {
                 return SafeResult(status: .idle, generation: generation)
             }
+            if admission?() == false { return SafeResult(status: .cancelled, generation: generation) }
             try configuration.lock()
-            defer { configuration.unlockDiscardingStagedChanges() }
-            return try body()
-        } catch let failure as FixedFailure {
-            return SafeResult(status: failure.status, generation: generation)
-        } catch BackendFailure.permissionDenied {
-            return SafeResult(status: .permissionDenied, generation: generation)
-        } catch BackendFailure.busy {
-            return SafeResult(status: .busy, generation: generation)
-        } catch JournalFailure.busy {
-            return SafeResult(status: .busy, generation: generation)
+            let result: SafeResult
+            do { result = try body() }
+            catch { result = failureResult(error, generation: generation) }
+            // 清理必须在回包前同步终结；清理未知优先于业务成功或取消。
+            do { try configuration.unlockDiscardingStagedChanges() }
+            catch {
+                cleanupUncertain = true
+                return SafeResult(status: .recoveryRequired, generation: generation)
+            }
+            return result
         } catch {
+            return failureResult(error, generation: generation)
+        }
+    }
+    private func failureResult(_ error: Error, generation: UInt64) -> SafeResult {
+        switch error {
+        case let failure as FixedFailure:
+            return SafeResult(status: failure.status, generation: generation)
+        case BackendFailure.authorizationCancelled:
+            return SafeResult(status: .cancelled, generation: generation)
+        case BackendFailure.permissionDenied:
+            return SafeResult(status: .permissionDenied, generation: generation)
+        case BackendFailure.sessionCleanupFailed:
+            cleanupUncertain = true
+            return SafeResult(status: .recoveryRequired, generation: generation)
+        case BackendFailure.busy, JournalFailure.busy:
+            return SafeResult(status: .busy, generation: generation)
+        default:
             return SafeResult(status: .recoveryRequired, generation: generation)
         }
     }

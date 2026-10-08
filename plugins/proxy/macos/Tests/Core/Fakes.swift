@@ -1,4 +1,5 @@
 import Foundation
+import SystemConfiguration
 @testable import MacosProxyTransactionCore
 
 // 这些 fixture 明确声明认证为 absent；不证明真实 SC 能观测认证。
@@ -42,6 +43,9 @@ final class FakeConfiguration: ConfigurationBackend {
     var applies = 0
     var lockCount = 0
     var lockAttempts = 0
+    var beforeActiveRead: (() -> Void)?
+    var sessionFactory: SCSessionFactory?
+    private var sessionLifecycle: SCSessionLifecycle?
     private var pending: [String: [ProxyGroup: GroupValue]] = [:]
 
     init(_ services: [ServiceSnapshot] = [publicService()]) {
@@ -55,11 +59,22 @@ final class FakeConfiguration: ConfigurationBackend {
         lockAttempts += 1
         if let failure = lockFailure { throw failure }
         guard !locked else { throw BackendFailure.busy }
+        if let sessionFactory {
+            let lifecycle = SCSessionLifecycle(try sessionFactory.createSession())
+            do { try lifecycle.lock() }
+            catch {
+                do { try lifecycle.close() } catch { throw BackendFailure.sessionCleanupFailed }
+                throw error
+            }
+            sessionLifecycle = lifecycle
+        }
         locked = true; lockCount += 1
     }
-    func unlockDiscardingStagedChanges() {
+    func unlockDiscardingStagedChanges() throws {
         precondition(locked)
         pending = [:]; locked = false
+        let lifecycle = sessionLifecycle; sessionLifecycle = nil
+        try lifecycle?.close()
     }
     func persistentServices() throws -> [ServiceSnapshot] {
         precondition(locked)
@@ -69,6 +84,7 @@ final class FakeConfiguration: ConfigurationBackend {
     }
     func activeServices(serviceIDs: [String]) throws -> [String: ActiveServiceSnapshot] {
         precondition(locked)
+        let callback = beforeActiveRead; beforeActiveRead = nil; callback?()
         return active.filter { serviceIDs.contains($0.key) }
     }
     func stage(serviceID: String, replacements: [ProxyGroup: GroupValue],
@@ -113,6 +129,66 @@ final class FakeConfiguration: ConfigurationBackend {
             if verificationMismatch { active[services[0].id]?[.http] = publicService().groups[.http] }
         }
         if applyFailure { throw BackendFailure.applyFailed }
+    }
+}
+
+final class FakeSCSessionResource: SCSessionResource {
+    var preferences: SCPreferences? { nil }
+    var events: [String] = []
+    var lockFailure: BackendFailure?
+    var beforeLock: (() -> Void)?
+    var unlockFailure = false
+    var freeFailure = false
+    func lockWithoutWaiting() throws {
+        events.append("lock")
+        let callback = beforeLock; beforeLock = nil; callback?()
+        if let lockFailure { throw lockFailure }
+    }
+    func synchronize() { events.append("synchronize") }
+    func unlock() throws {
+        events.append("unlock")
+        if unlockFailure { throw BackendFailure.readFailed }
+    }
+    func releaseSession() { events.append("releaseSession") }
+    func releaseAuthorization() throws {
+        events.append("freeAuthorization")
+        if freeFailure { throw BackendFailure.readFailed }
+    }
+}
+final class FakeSCSessionFactory: SCSessionFactory {
+    let resource = FakeSCSessionResource()
+    var creates = 0
+    var failure: BackendFailure?
+    func createSession() throws -> SCSessionResource {
+        creates += 1
+        if let failure { throw failure }
+        return resource
+    }
+}
+
+final class FakeSCSessionConstruction: SCSessionConstruction {
+    let resource = FakeSCSessionResource()
+    var events: [String] = []
+    var authorizationFailure: BackendFailure?
+    var sessionFailure: BackendFailure?
+    var cleanupFailure = false
+    private var ownsAuthorization = false
+    func createAuthorization() throws {
+        events.append("createAuthorization")
+        // 模拟SDK失败却已返回部分引用的分支。
+        ownsAuthorization = true
+        if let authorizationFailure { throw authorizationFailure }
+    }
+    func createSession() throws -> SCSessionResource {
+        events.append("createSession")
+        if let sessionFailure { throw sessionFailure }
+        ownsAuthorization = false
+        return resource
+    }
+    func releaseAuthorization() throws {
+        guard ownsAuthorization else { return }
+        ownsAuthorization = false; events.append("freeAuthorization")
+        if cleanupFailure { throw BackendFailure.sessionCleanupFailed }
     }
 }
 
