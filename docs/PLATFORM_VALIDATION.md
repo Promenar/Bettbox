@@ -293,6 +293,6 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 
 现有Pixel_7 ARM64模拟器SDK36保留数据安装成功，设备回读APK摘要匹配。实际首页显示，未出现该应用的crash buffer记录；无前台服务且connectivity中的VPN transport仅为请求后，执行冷启动，返回首页且没有密码输入表单。该证据不单独证明账户接口、订阅刷新或安全存储内容正确。
 
-点击启动后未观察到启动时间，界面保留服务已就绪；后台Service存在不作为隧道成功证据。应用日志包含握手异常，但尚未定位到此次启动的根因。VPN真实流量、统一Native owner、配置/TUN接线及engine退出合同、邀请注册/佣金、支付全路径仍待验证，release_verified保持false。macOS完整客户端启动与正式发行签名另验，空白监督探针不作为正常界面验收。
+实际普通启动/停止两轮通过：启动时间、前台VPN Service与VPN网络对象同时出现，普通停止后就绪界面恢复，前台服务及VPN网络对象撤销。首次点击未进入运行态尚未定位根因；冷启动后的启动操作成功，不将早期握手日志视为已确认根因。规则模式下Chrome HTTPS请求返回ERR_CONNECTION_CLOSED；直连模式与无VPN对照显示当前网页正文。测试网页当前不含旧Example Domain标题，验收按实际正文和错误页面进行。尚未证明Chrome包路由范围、Mihomo数据计数及代理节点流量，直连结果不能替代规则转发验收。测试结束恢复规则模式并确认无前台服务或VPN网络对象。统一Native owner、配置/TUN接线及engine退出合同、邀请注册/佣金、支付全路径仍待验证，release_verified保持false。macOS完整客户端启动与正式发行签名另验，空白监督探针不作为正常界面验收。
 
 公开回执：validation/2026-10-07-three-platform/android-2011be5-apk-validation.json。

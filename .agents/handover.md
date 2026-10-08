@@ -2458,3 +2458,34 @@ PDEC退出0 execution_ready=true；release receipt passed，签名锚通过，12
 
 ### HLG
 通过标准append dry-run后apply追加，目标保持active。
+
+## 2026-10-08T23:56:48+08:00 · Android实际启停两轮及规则直连HTTPS对照
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["android", "vpn", "device"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 144518436f2ebe9c386972a29244082ea383ae7fa288f607021056febb4cb8b1
+
+### Summary
+2011be5正式候选实际普通启停两轮通过；规则模式HTTPS失败，直连及无VPN正文显示通过，未确认代理流量。
+
+### Changed
+更新同一源版本公开回执、PLATFORM_VALIDATION与CHANGELOG，无产品源改动。测试结束恢复规则模式，前台服务与VPN网络对象均无残留。
+
+### Validation
+实际启动出现启动时间、前台Service及VPN网络对象；普通停止撤销三者，两轮证据在.test/three-platform-release/android-device-2011be5。规则模式Chrome ERR_CONNECTION_CLOSED，直连及无VPN当前正文可见。旧网页标题验收条件无效，截图确认真实正文后按当前正文重新对照。
+
+### Next
+定位规则转发失败及首次未启动现象；验证Chrome包路由和Mihomo流量、可用代理节点；完成Native owner及三端发行和业务全路径。
+
+### Risks
+此前口头自动模式不准确，实际选中规则模式。首次未进入运行态根因未确定。直连显示不证明代理节点或包路由覆盖，release_verified=false；Apple和支付商条件未齐。
+
+### DIA
+已同步平台验证、CHANGELOG和公开候选回执。
+
+### HLG
+标准append dry-run再apply，完整目标保持active。

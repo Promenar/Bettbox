@@ -46,9 +46,10 @@
   "vpn_connected_verified": false,
   "release_verified": false,
   "remaining": [
-    "点击启动后未观察到启动时间，原因待定位",
-    "后台Service存在不等于隧道建立",
-    "实际代理流量和完整业务闭环待验"
+    "首次点击未进入运行态未确定根因；冷启动后的实际启动停止正常",
+    "规则模式HTTPS请求ERR_CONNECTION_CLOSED；直连及无VPN当前正文显示成功，尚未定位规则转发失败根因",
+    "未证明代理节点、Chrome包路由范围与Mihomo数据计数",
+    "统一Native owner、配置/TUN/engine退出合同及完整业务闭环待验"
   ],
   "cold_ui": {
     "home_visible": true,
@@ -56,5 +57,53 @@
     "service_ready_visible": true,
     "start_time_visible": false,
     "ui_node_count": 31
+  },
+  "vpn_lifecycle_two_cycles_verified": true,
+  "native_start": {
+    "foreground_service": true,
+    "vpn_network_transport_count": 1,
+    "vpn_request_count": 2,
+    "runtime_button_count": 1
+  },
+  "ordinary_stop": {
+    "runtime_visible": false,
+    "ready_visible": true,
+    "foreground_service": false,
+    "vpn_network_transport_count": 0,
+    "vpn_service_present": false
+  },
+  "second_stop": {
+    "runtime_visible": false,
+    "ready_visible": true,
+    "foreground_service": false,
+    "vpn_network_transport_count": 0,
+    "vpn_service_present": false
+  },
+  "rule_browser": {
+    "example_domain_title": false,
+    "browser_errors": [
+      "ERR_CONNECTION_CLOSED"
+    ],
+    "known_failure_text": [
+      "无法访问此网站",
+      "重新加载"
+    ],
+    "node_count": 48,
+    "mode": "rule"
+  },
+  "direct_browser": {
+    "current_example_body_visible": true,
+    "browser_errors": [],
+    "foreground_service": true,
+    "vpn_network_count": 1
+  },
+  "no_vpn_browser": {
+    "current_example_body_visible": true,
+    "browser_errors": []
+  },
+  "final_idle": {
+    "rule_mode_restored": true,
+    "foreground_service": false,
+    "vpn_network_count": 0
   }
 }
