@@ -3109,3 +3109,34 @@ HTTP、SOCKS、Mixed 工厂将 TLS/Reality 配置校验移至 TCP 绑定之前�
 
 ### HLG
 标准 append dry-run 后 apply，保留未完成目标与下步边界。
+
+## 2026-10-09T05:17:20+08:00 · 支付候选当前来源核验与发行门禁收敛
+
+type: maintenance
+scope: ["Bettbox", "Xboard", "NoSLA"]
+status: partial
+tags: ["release", "billing", "validation"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: bdc8f3f149bbd9f5fa0675da19f420c266c8a6a9aa105bd42aa2c4bc81231efa
+
+### Summary
+当前付呗纯契约 117 项禁网隔离回归通过；真实 Laravel 与 SQLite 并发原通过回执已核对当前源字节。生产支付未部署、未启用，完整三端 Goal 未完成。
+
+### Changed
+修正支付 README 和计费计划中过时的未执行/未实现声明，新增公开 payment-readiness-validation.json；真实框架迁移、并发、插件生命周期和未知支付结果恢复的可执行顺序已明确。
+
+### Validation
+Laravel 回执对应18个候选输入、SQLite并发17个输入均与当前一致；旧付呗回执两个文件漂移，重新执行后11个输入一致，117项通过，输出摘要 f17393ea82e0978b59858c647ef3f2c3bca157c184b3e62c36beff7ade36a607。PDEC validate execution_ready=true。独立原生只读审阅未发现足以确认常规路径必然失败的P1，列明未覆盖工程分支；主控核对真实夹具SQL和服务任务事务边界。 当前 NoSLA 业务容器只读回查：付呗插件、Atomic 核心和候选迁移三个固定文件均不存在，确认候选未部署；不读取业务配置或凭据。
+
+### Next
+按计划增加真实Laravel migration up/down、框架并发和实际插件发现验收，完善未知下单结果恢复；Android完整owner联合接线和macOS可见窗口验收继续。
+
+### Risks
+框架认证/插件发现/支付传输为显式夹具，框架并发未验；117执行器清理命令成功不等同另验目录消失。生产商户配置、密钥引用、迁移及真实付款未验。Mac界面工具仍报告锁屏，黑屏原因未定位。
+
+### DIA
+已同步支付README、计费PLAN、PLATFORM_VALIDATION、CHANGELOG、registry与公开证据。
+
+### HLG
+标准append dry-run后apply，保留完整目标和下步。

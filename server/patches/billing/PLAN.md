@@ -29,7 +29,7 @@
 
 付呗插件在下单前创建快照，把32位 external_no 传给平台；回调映射原订单并在 settleAttempt 中事务内核对 signed amount/uid/store/provider scope。checkout 支付配置保存采用相同 SQLite 写事务，已有未完成尝试禁止变更支付方式或应收金额。PaymentService 原接口保持兼容，订单原36位号传入插件后由插件映射，旧插件不改外部编号。候选目录 plugins/Fubei 与 billing overlay 包含同一版插件。
 
-真实 Laravel checkout/回调/开通/队列/钩子、生产 SQLite schema 和人工小额支付均未运行验收。独立进程测试仅证明候选核心及使用真实 SQLite 的插件适配接口，不证明完整框架环境。未实现平台自动查单/关单与人工核对后台，钩子 outbox 已提供但实际消费者的事件ID幂等尚待验收；异常需只读人工对账，生产保持禁用。
+真实 Laravel 隔离测试已覆盖 checkout、回调、开通、同步队列、钩子和返佣命令；认证、插件发现与网关传输为显式夹具，框架测试为串行。生产 SQLite schema、真实插件生命周期、完整框架并发和人工小额付款尚未验收。独立 SQLite 进程测试提供事务并发证据，不能替代完整框架并发。未实现平台自动查单/关单与人工核对后台，钩子 outbox 已提供但实际消费者的事件ID幂等尚待验收；异常需只读人工对账，生产保持禁用。
 
 新佣金金额沿用现有计算，但拒绝非整数分结果并进入人工核对；向下取整等新舍入政策需另行确认，不猜测。真实服务器 schema 必须在部署前只读核验，源码迁移不是生产数据库证据。
 
@@ -39,24 +39,24 @@
 
 apply.py 在准备阶段冻结所有已校验 overlay bytes 和原始备份 bytes；应用不重新读取候选源。文件提交点先登记已知 inode 与内容，之后 fsync/stat 或清理失败也纳入当前文件回滚。来源文件的 inode、模式、内容及新增目标不存在性在写入前复核，漂移拒绝。逐级目录句柄使用 O_NOFOLLOW，每次写入和回滚重新核对父路径，拒绝链接替换；新目标排他创建。安全回滚遇到路径漂移会停止并保留备份，要求人工核对，不跟随未知路径覆盖。应用必须排除其它源码写入者；该流程不声称在有权限恶意并发改写普通目标文件的对抗环境中提供原子文件级 CAS。
 
-## 真实框架验收计划（未执行）
+## 真实框架验收与开放门禁
 
 线上创建流程的用户重读、未完成订单复核、余额抵扣后 setInvite 计算次序完整保留，创建及开通直接入口使用 SQLite mutex 先写后读；checkout 保留负数拒绝，免费入口仅接受当前数据库金额等于0。开通保留 processing 状态复核、套餐缺失拒绝、订单模型刷新及 TYPE_NEW_PURCHASE 事件类型。CloudBridgeRelay 源码与通知协议没有改动。
 
-隔离 Laravel 完整环境需使用真实 Eloquent、迁移、队列和 HookManager 建立以下 fixture，当前纯 PDO 入口不假称覆盖：
+隔离 Laravel 验收使用真实 Eloquent、测试 schema、同步队列和 HookManager；以下项目区分已覆盖路径与开放条件：
 
 1. 开始金额1000分、余额300分、邀请比例10%，创建后余额0、balance_amount=300、total_amount=700、commission_balance=70；全余额抵扣后应付0，佣金基数按线上次序为0。对同一用户并发创建必须只有一个未完成订单，并验证余额和优惠券副作用不重复。
 2. checkout 对负数订单返回拒绝，零金额仅可信 free 来源到账；初读后负数变更也不得通过 Atomic::paid 免费开通。
 3. processing 订单缺失套餐时开通事务回滚，保持 processing/outbox 待处理；恢复套餐后真实套餐与流量更新只发生一次，成功事件可补偿交付。
 4. CloudBridgeRelay、Epay 和其它已安装旧插件真实 notify 协议、免费入口、管理员付款、取消后迟到通知、重试开通与消费者事件ID幂等回归。
 
-纯 PDO 用例新增负数免费拒绝与101个事件的公平交付：前100永久失败，后续成功事件可在下一批交付；即使前100已经到期重试，新事件也先于退避事件领取。源码应用测试在 replace/link 提交后注入 fsync/stat 故障，验证当前文件亦回滚。以上测试代码尚待主控在隔离执行器运行，完整框架 fixture 尚未实现。
+纯 PDO 用例新增负数免费拒绝与101个事件的公平交付：前100永久失败，后续成功事件可在下一批交付；即使前100已经到期重试，新事件也先于退避事件领取。源码应用测试在 replace/link 提交后注入 fsync/stat 故障，验证当前文件亦回滚。独立 SQLite 进程及真实 Laravel 隔离 fixture 已执行通过，当前输入摘要与通过回执一致；生产消费者、完整框架并发和真实支付仍属开放门禁。框架认证、插件发现和网络支付为显式夹具，不能据此声明生产认证或插件生命周期通过。
 
 ## 负金额人工核对
 
 到账的 legacy/manual/free 来源在同一写事务内重新核对 total_amount 和 handling_amount，不允许任何负值进入 processing。历史 processing 开通在状态重读后、套餐/钩子/余额/流量处理前应用相同防护。负值保持原金额、回调号、付款时间与状态，不猜修正；negative_order_amount 核对证据随正常事务返回提交，重复重试仅保留一条记录，不以异常回滚该证据。付呗下单也拒绝负值；已验签的付呗流水遇到原订单变负，保存流水并把尝试置为人工核对，不开通。
 
-新增真实 PDO fixture 覆盖负总额与负手续费的 pending/processing、三个受信来源拒绝、开通动作不调用、用户余额/开通次数/佣金日志不变、历史回调与付款时间不变、核对记录持久化和幂等，以及付呗快照后金额变负的流水保留。OrderService.open 的完整 Eloquent/套餐/HookManager 路径仍须真实 Laravel 验收，当前 fixture 不代替它。
+新增真实 PDO fixture 覆盖负总额与负手续费的 pending/processing、三个受信来源拒绝、开通动作不调用、用户余额/开通次数/佣金日志不变、历史回调与付款时间不变、核对记录持久化和幂等，以及付呗快照后金额变负的流水保留。OrderService.open 的 Eloquent、套餐与 HookManager 路径已在真实 Laravel 隔离环境验收；生产数据库和实际外部消费者仍须另外验证。
 
 源码应用要求明确的物理规范路径；路径任何组件为符号链接均拒绝。macOS 临时测试根的 /var 别名仅在测试 fixture 中 resolve 为 /private/var；业务应用脚本不自动解析链接或放宽 O_NOFOLLOW。
 
@@ -64,4 +64,14 @@ apply.py 在准备阶段冻结所有已校验 overlay bytes 和原始备份 byte
 
 checkout 在同一 SQLite 写事务里计算 handling_amount 并赋值后调用 guardAmountsInside；失败返回 null 而非抛异常，使 negative_order_amount 核对记录提交。外层发现空结果直接返回失败，不调用 PaymentService.pay，不保存负手续费和支付方式变更。已有平台尝试的冲突检查与原手续费计算公式保持。
 
-checkout_worker.php 执行实际候选 OrderController.checkout，模型/请求/支付网关仅为接口外壳，所有持久化与并发使用独立真实 SQLite PDO。六个进程验证旧 Epay 类型、total_amount=1000、fixed_fee=-100、合计900仍全部拒绝，网关 pay 调用为0、核对记录1、订单原字段不变；正手续费100的对照验证调用一次且金额1100。此适配用例不等于完整 Laravel 插件生命周期已覆盖，真实框架仍须用 Epay/CloudBridgeRelay 安全网关 spy 核验同一路径。测试未在施工侧运行。
+checkout_worker.php 执行实际候选 OrderController.checkout，模型/请求/支付网关仅为接口外壳，所有持久化与并发使用独立真实 SQLite PDO。六个进程验证旧 Epay 类型、total_amount=1000、fixed_fee=-100、合计900仍全部拒绝，网关 pay 调用为0、核对记录1、订单原字段不变；正手续费100的对照验证调用一次且金额1100。真实 Laravel 隔离 fixture 已用安全网关 spy 验证 checkout 拒绝负金额、网关未调用及核对记录持久化；该证据不等于生产 Epay/CloudBridgeRelay 插件发现与完整生命周期已覆盖。
+
+## 可执行发行验收顺序
+
+1. 主控独占真实 Laravel 隔离 fixture、其精确白名单执行器及当前迁移文件的验收。现有框架 fixture 直接加载 SQL schema，不能证明 Laravel migration up/down；新增空库与公开历史行的真实迁移验收，检查重名拒绝、NULL 历史佣金保留、空证据回滚和存在新账务证据时拒绝 down。
+2. 在同一隔离环境以独立进程和同一 SQLite 文件验证并发创建、优惠券单次消费、免费/管理员付款、取消与到账竞争、多级返佣、循环邀请及异步任务补偿；断言余额、订单、佣金日志和套餐/流量状态。不得以已有 PDO 并发回执替代这些真实框架分支。
+3. 真实插件管理器执行安装、禁用和启用；仅网关传输边界使用 spy，验证实际旧插件协议、鉴权、订单归属与全部事件消费者幂等。
+4. 未知下单结果的恢复需明确尝试发送状态、持久二维码结果及人工核对工作流。自动查单/关单依当前官方契约实施；不能假定同一外部号重复创建必然幂等。
+5. 上述工程验收与独立审阅通过后，核对生产 schema、停写和一致备份、候选来源与安全密钥引用。真实商户配置及人工付款是独立外部条件，未满足前不启用收款。
+
+公开 OrderService::open 的直接入口在完成提交后执行 openEvent/order.open.after；正常 OrderHandleJob 路径有外层 Atomic 事务，不能据此宣称正常路径必然丢事件。需核对实际直接调用者并以故障注入确定恢复合同，未取证前不按猜测改写事件语义。

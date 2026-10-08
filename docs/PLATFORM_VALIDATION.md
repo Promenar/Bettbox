@@ -398,3 +398,7 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 公开证据见 `validation/2026-10-07-three-platform/listener-factory-preflight-validation.json`。HTTP、SOCKS、Mixed 使用真实工厂与 loopback 绑定；旧版 3 个无效证书场景均在返回错误前创建实际监听，测试负责收回捕获资源。修复后 9 个场景的 race 验证通过，分别检查错误证书不调用 Listen、正常关闭后端口重绑、合成证书的真实 TLS 握手。TLS 客户端使用合成信任根并保留证书校验，不输出或持久化合成私钥。核心主包回归通过。
 
 该证据不覆盖 Reality/ECH/客户端证书全部失败组合、有效文件证书 watcher、accept/handler/活动 UDP drain、TProxy、SS/TUIC 部分构造或完整 owner 采用。没有新 APK、三端发行或 macOS 黑屏修复声明。
+
+## 服务端支付候选当前来源核验
+
+2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 18 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
