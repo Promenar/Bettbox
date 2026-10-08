@@ -62,6 +62,36 @@ final class SCProxyDictionaryTests: XCTestCase {
         XCTAssertThrowsError(try SCProxyDictionary.merging(changed, replacements: [.pac: before[.pac]!]))
         XCTAssertThrowsError(try SCProxyDictionary.decode(["Unknown": String(repeating: "x", count: 262145)]))
     }
+    func testUnownedDigestIncludesSOCKSAuthenticationPACURLAndUnknownFields() throws {
+        let first: [String: Any] = [
+            "SOCKSEnable": 0, "SOCKSProxy": "first.public.example", "SOCKSPort": 1080,
+            "HTTPUser": "public-user", "ProxyAutoConfigURLString": "https://public.example/a",
+            "PublicUnknown": ["value": 1]
+        ]
+        let changes: [(String, Any)] = [
+            ("SOCKSProxy", "second.public.example"), ("HTTPUser", "other-public-user"),
+            ("ProxyAutoConfigURLString", "https://public.example/b"),
+            ("PublicUnknown", ["value": 2])
+        ]
+        for (key, value) in changes {
+            var changed = first; changed[key] = value
+            XCTAssertNotEqual(try SCProxyDictionary.unownedDigest(first),
+                              try SCProxyDictionary.unownedDigest(changed),
+                              "未拥有字段变化必须使服务级摘要失效：\(key)")
+        }
+        var owned = first
+        owned["HTTPEnable"] = 1; owned["HTTPProxy"] = "127.0.0.1"; owned["HTTPPort"] = 7890
+        owned["HTTPSEnable"] = 1; owned["HTTPSProxy"] = "127.0.0.1"; owned["HTTPSPort"] = 7890
+        owned["ExceptionsList"] = ["localhost"]; owned["ProxyAutoConfigEnable"] = 0
+        owned["ProxyAutoDiscoveryEnable"] = 0
+        XCTAssertEqual(try SCProxyDictionary.unownedDigest(first), try SCProxyDictionary.unownedDigest(owned))
+    }
+    func testRecognizedAuthenticationIsPresentAndAbsenceRemainsUnknown() {
+        XCTAssertEqual(SCProxyDictionary.authenticationState([:]), .unknown)
+        for key in ["HTTPUser", "HTTPPassword", "HTTPSUser", "HTTPSPassword", "SOCKSUser", "SOCKSPassword"] {
+            XCTAssertEqual(SCProxyDictionary.authenticationState([key: "public-fixture"]), .present)
+        }
+    }
     func testActualSDKReadOnlyInspection() throws {
         var disabledZero = 0, enabledZero = 0
         var bypassType = 0, bypassEmpty = 0, bypassTokens = 0, bypassControls = 0, bypassOverLimit = 0

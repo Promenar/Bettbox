@@ -15,6 +15,19 @@ enum SCProxyDictionary {
         .pac: kSCPropNetProxiesProxyAutoConfigEnable as String,
         .wpad: kSCPropNetProxiesProxyAutoDiscoveryEnable as String
     ]
+    private static let recognizedAuthenticationKeys = Set([
+        "HTTPUser", "HTTPPassword", "HTTPSUser", "HTTPSPassword", "SOCKSUser", "SOCKSPassword"
+    ])
+    private static var ownedKeys: Set<String> {
+        Set((manual[.http] ?? []) + (manual[.https] ?? []) + [bypass] + Array(automatic.values))
+    }
+    static func authenticationState(_ raw: [String: Any]) -> AuthenticationState {
+        raw.keys.contains(where: recognizedAuthenticationKeys.contains) ? .present : .unknown
+    }
+    // schema4服务级守卫：只排除本事务实际拥有的字段，SOCKS、认证、PAC URL及未知字段全部纳入。
+    static func unownedDigest(_ raw: [String: Any]) throws -> String {
+        try fingerprint(raw.filter { !ownedKeys.contains($0.key) })
+    }
     private static func number(_ raw: Any?) throws -> Int? {
         guard let raw else { return nil }
         guard let n = raw as? NSNumber,

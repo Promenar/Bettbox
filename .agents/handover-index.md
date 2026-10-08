@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T13:02:11+08:00
+> generated_at: 2026-10-08T13:49:02+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -9,13 +9,16 @@
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
+| bettbox-three-platform-release | resume | 2026-10-08T13:32:53+08:00 | in_progress | ["Bettbox", "Android", "macOS"] | Android f881880正式构建安装与跨层owner接线边界 | `.agents/handover.md` · `2026-10-08T13:32:53+08:00` · `fp:3cb6c5e3ad` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T13:02:11+08:00 | in_progress | ["android", "jni", "macos", "release"] | Android完整启动工作门禁与JNI异常路径候选闭合 | `.agents/handover.md` · `2026-10-08T13:02:11+08:00` · `fp:1deaa2610c` |
+| three-platform-release | resume | 2026-10-08T13:49:02+08:00 | done | ["Bettbox", "macOS", "Android"] | macOS schema4事务核心与Android直连设备通路验收 | `.agents/handover.md` · `2026-10-08T13:49:02+08:00` · `fp:eaa504c48d` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T13:49:02+08:00 | iso | done | resume | ["Bettbox", "macOS", "Android"] | ["release", "system-proxy", "vpn", "validation"] | macOS schema4事务核心与Android直连设备通路验收 | `.agents/handover.md` · `2026-10-08T13:49:02+08:00` · `fp:eaa504c48d` |
+| 2026-10-08T13:32:53+08:00 | iso | in_progress | resume | ["Bettbox", "Android", "macOS"] | ["release", "android", "macos", "validation"] | Android f881880正式构建安装与跨层owner接线边界 | `.agents/handover.md` · `2026-10-08T13:32:53+08:00` · `fp:3cb6c5e3ad` |
 | 2026-10-08T13:02:11+08:00 | iso | in_progress | resume | ["android", "jni", "macos", "release"] | ["vpn", "lifecycle", "jni", "release"] | Android完整启动工作门禁与JNI异常路径候选闭合 | `.agents/handover.md` · `2026-10-08T13:02:11+08:00` · `fp:1deaa2610c` |
 | 2026-10-08T12:39:08+08:00 | iso | in_progress | resume | ["android", "core", "release"] | ["android", "vpn", "jni", "fd", "release"] | Android FD领取与Go JNI真实ABI接线验收 | `.agents/handover.md` · `2026-10-08T12:39:08+08:00` · `fp:02ae0ff773` |
 | 2026-10-08T12:19:43+08:00 | iso | in_progress | resume | ["android", "core", "nosla"] | ["vpn", "ownership", "upstream", "validation"] | 上游订阅只读失效证据与原生FD构造合同 | `.agents/handover.md` · `2026-10-08T12:19:43+08:00` · `fp:404d55d961` |

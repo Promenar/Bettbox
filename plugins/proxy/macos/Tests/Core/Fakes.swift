@@ -9,12 +9,21 @@ func publicService(_ id: String = "public-service") -> ServiceSnapshot {
                  .socks: .manual(ManualProxy(enabled: false, host: "socks.example", port: 1080)),
                  .bypass: .bypass(["*.example", "localhost"]),
                  .pac: .automatic(AutomaticProxy(enabled: true, unchangedConfigurationDigest: String(repeating: "a", count: 64))),
-                 .wpad: .automatic(AutomaticProxy(enabled: nil, unchangedConfigurationDigest: String(repeating: "b", count: 64)))])
+                 .wpad: .automatic(AutomaticProxy(enabled: nil, unchangedConfigurationDigest: String(repeating: "b", count: 64)))],
+        unownedDigest: String(repeating: "c", count: 64))
+}
+
+func publicCapability(port: Int = 7890, bypass: [String] = ["localhost", "*.public.example"],
+                      generation: UInt64 = 7, epoch: UInt64 = 1,
+                      current: @escaping () -> Bool = { true }) -> CredentialBlindEndpointCapability {
+    CredentialBlindEndpointCapability(supervisorGeneration: generation, listenerEpoch: epoch,
+                                      host: "127.0.0.1", port: port, state: "active",
+                                      bypass: bypass, current: current)!
 }
 
 final class FakeConfiguration: ConfigurationBackend {
     var services: [ServiceSnapshot]
-    var active: [String: [ProxyGroup: GroupValue]]
+    var active: [String: ActiveServiceSnapshot]
     var unownedFields = ["public-service": ["public-unknown-key": "preserve-public-value"]]
     var locked = false
     var lockFailure: BackendFailure?
@@ -24,6 +33,8 @@ final class FakeConfiguration: ConfigurationBackend {
     var applyBeforeFailure = false
     var verificationMismatch = false
     var nextRead: (() -> Void)?
+    var beforeStage: (() -> Void)?
+    var afterStage: (() -> Void)?
     var afterCommit: (() -> Void)?
     var arbitraryReadError: Error?
     var stages = 0
@@ -34,7 +45,10 @@ final class FakeConfiguration: ConfigurationBackend {
 
     init(_ services: [ServiceSnapshot] = [publicService()]) {
         self.services = services
-        active = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0.groups) })
+        active = Dictionary(uniqueKeysWithValues: services.map {
+            ($0.id, ActiveServiceSnapshot(authentication: $0.authentication, groups: $0.groups,
+                                           unownedDigest: String(repeating: "d", count: 64)))
+        })
     }
     func lock() throws {
         if let failure = lockFailure { throw failure }
@@ -51,15 +65,24 @@ final class FakeConfiguration: ConfigurationBackend {
         if let error = arbitraryReadError { throw error }
         return services
     }
-    func activeGroups(serviceIDs: [String]) throws -> [String: [ProxyGroup: GroupValue]] {
+    func activeServices(serviceIDs: [String]) throws -> [String: ActiveServiceSnapshot] {
         precondition(locked)
         return active.filter { serviceIDs.contains($0.key) }
     }
-    func stage(serviceID: String, replacements: [ProxyGroup: GroupValue]) throws {
+    func stage(serviceID: String, replacements: [ProxyGroup: GroupValue],
+               expected: [ProxyGroup: GroupValue], expectedUnownedDigest: String) throws {
         precondition(locked)
         stages += 1
+        let beforeCallback = beforeStage; beforeStage = nil; beforeCallback?()
         if stages == stageFailureAt { throw BackendFailure.stageFailed }
+        guard let service = services.first(where: { $0.id == serviceID }),
+              Set(replacements.keys) == Set(expected.keys),
+              expected.allSatisfy({ service.groups[$0.key] == $0.value }),
+              service.unownedDigest == expectedUnownedDigest else {
+            throw BackendFailure.stageFailed
+        }
         pending[serviceID, default: [:]].merge(replacements) { _, new in new }
+        let afterCallback = afterStage; afterStage = nil; afterCallback?()
     }
     func commit() throws {
         precondition(locked)
@@ -78,7 +101,13 @@ final class FakeConfiguration: ConfigurationBackend {
         precondition(locked)
         applies += 1
         if !applyFailure || applyBeforeFailure {
-            active = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0.groups) })
+            active = Dictionary(uniqueKeysWithValues: services.map { service in
+                let previous = active[service.id]
+                return (service.id, ActiveServiceSnapshot(
+                    authentication: previous?.authentication ?? service.authentication,
+                    groups: service.groups,
+                    unownedDigest: previous?.unownedDigest ?? service.unownedDigest))
+            })
             if verificationMismatch { active[services[0].id]?[.http] = publicService().groups[.http] }
         }
         if applyFailure { throw BackendFailure.applyFailed }
@@ -88,6 +117,7 @@ final class FakeConfiguration: ConfigurationBackend {
 final class FakeJournal: JournalBackend {
     let installOwnerID = UUID()
     var record: OwnershipJournal?
+    var legacyRecord: LegacyOwnershipJournalV3?
     var acquired = false
     var persistFailure: JournalPhase?
     var clearFailure = false
@@ -99,18 +129,23 @@ final class FakeJournal: JournalBackend {
         acquired = true
     }
     func releaseOwnership() { acquired = false }
-    func load() throws -> OwnershipJournal? { precondition(acquired); return record }
+    func load() throws -> LoadedOwnershipJournal? {
+        precondition(acquired)
+        if let legacyRecord { return .legacyV3(legacyRecord) }
+        return record.map(LoadedOwnershipJournal.current)
+    }
     func persist(_ journal: OwnershipJournal) throws {
         precondition(acquired)
         if persistFailure == journal.phase { throw JournalFailure.unavailable }
         if completedProgressSaveFailure && !journal.restoration.verifiedRestored.isEmpty {
             throw JournalFailure.unavailable
         }
+        legacyRecord = nil
         record = journal; persistedPhases.append(journal.phase); persistedRecords.append(journal)
     }
     func clear() throws {
         precondition(acquired)
         if clearFailure { throw JournalFailure.unavailable }
-        record = nil
+        record = nil; legacyRecord = nil
     }
 }

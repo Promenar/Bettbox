@@ -70,8 +70,10 @@ final class SystemConfigurationBackend: ConfigurationBackend {
                 dictionary = raw
             } else { dictionary = [:] }
             return ServiceSnapshot(id: id, enabled: SCNetworkServiceGetEnabled(service),
-                hasProxyProtocol: proxy != nil, authentication: .unknown,
-                groups: try SCProxyDictionary.decode(dictionary), active: try activeDictionary(id) != nil)
+                hasProxyProtocol: proxy != nil, authentication: SCProxyDictionary.authenticationState(dictionary),
+                groups: try SCProxyDictionary.decode(dictionary),
+                unownedDigest: try SCProxyDictionary.unownedDigest(dictionary),
+                active: try activeDictionary(id) != nil)
         }
     }
     func persistentServices() throws -> [ServiceSnapshot] {
@@ -80,23 +82,35 @@ final class SystemConfigurationBackend: ConfigurationBackend {
         SCPreferencesSynchronize(session)
         return try snapshots(session)
     }
-    func activeGroups(serviceIDs: [String]) throws -> [String: [ProxyGroup: GroupValue]] {
+    func activeServices(serviceIDs: [String]) throws -> [String: ActiveServiceSnapshot] {
         let session = try session()
         guard serviceIDs.count <= 256, Set(serviceIDs).count == serviceIDs.count else { throw BackendFailure.readFailed }
         let known = Set(try services(session).compactMap { SCNetworkServiceGetServiceID($0) as String? })
-        var result: [String: [ProxyGroup: GroupValue]] = [:]
+        var result: [String: ActiveServiceSnapshot] = [:]
         for id in serviceIDs {
             guard known.contains(id) else { continue }
-            if let dictionary = try activeDictionary(id) { result[id] = try SCProxyDictionary.decode(dictionary) }
+            if let dictionary = try activeDictionary(id) {
+                result[id] = ActiveServiceSnapshot(
+                    authentication: SCProxyDictionary.authenticationState(dictionary),
+                    groups: try SCProxyDictionary.decode(dictionary),
+                    unownedDigest: try SCProxyDictionary.unownedDigest(dictionary))
+            }
         }
         return result
     }
-    func stage(serviceID: String, replacements: [ProxyGroup: GroupValue]) throws {
+    func stage(serviceID: String, replacements: [ProxyGroup: GroupValue],
+               expected: [ProxyGroup: GroupValue], expectedUnownedDigest: String) throws {
         let session = try session()
         guard let service = try services(session).first(where: { (SCNetworkServiceGetServiceID($0) as String?) == serviceID }),
               SCNetworkServiceGetEnabled(service),
               let proxy = SCNetworkServiceCopyProtocol(service, kSCNetworkProtocolTypeProxies),
               let raw = SCNetworkProtocolGetConfiguration(proxy) as? [String: Any] else {
+            throw BackendFailure.stageFailed
+        }
+        let current = try SCProxyDictionary.decode(raw)
+        guard Set(replacements.keys) == Set(expected.keys),
+              expected.allSatisfy({ current[$0.key] == $0.value }),
+              try SCProxyDictionary.unownedDigest(raw) == expectedUnownedDigest else {
             throw BackendFailure.stageFailed
         }
         let merged = try SCProxyDictionary.merging(raw, replacements: replacements)

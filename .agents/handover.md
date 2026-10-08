@@ -1652,3 +1652,65 @@ VM函数表不是真实JVM；purecontroller/gate不覆盖Binder、SharedPreferen
 
 ### HLG
 标准append先dry-run后apply，保存代码候选和真实红绿范围；尚未将任何候选标为可用发行。
+
+## 2026-10-08T13:32:53+08:00 · Android f881880正式构建安装与跨层owner接线边界
+
+type: development
+scope: ["Bettbox", "Android", "macOS"]
+status: in_progress
+tags: ["release", "android", "macos", "validation"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 3cb6c5e3adf63b5f6d99d57d3fa5fcd01ae3cafff40a96409893816017089afd
+
+### Summary
+用户选择先交付Android、macOS，iOS保留开发版与发行研究。f881880a43a4ac15d9605de31c66f1abd3343142正式Android构建通过，候选保留；真实VPN尚未通过。macOS schema4核心实施包正在独立施工。
+
+### Changed
+新增Android唯一配置/生命周期owner与typed completion联合计划、f881880公开构建回执；扩展macOS schema4核心实施计划；同步registry、ARCHITECTURE、CHANGELOG和PDEC安装哈希。Mac施工独占proxy Core及Tests，不写Host/Dart/聚合文档；原生只读审查发现权限与回执终结边界。
+
+### Validation
+正式driver session59025 exit0：同源源码/锁不变、验签成功、16KiB对齐及owned Gradle清理通过；APK72632f7f6c3bacb755b3e8b518adb0901aa32c43f30a635827ca3b054ecb12dd，证书6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82。模拟器5554安装Success、回读哈希相等、COLD launch ok；已恢复dev账户身份，getSubscribe200且套餐有效21h/64MiB0消耗。按钮未建立tun0/CONNECTED，未触发确认JNI/VPN验收。Swift全47项只有新SOCKS摘要回归失败，真实XCTAssertNotEqual相同摘要，red回执已保存。
+
+### Next
+完成Mac schema4核心、更新PDEC输入摘要并执行green和独立审阅；接入Host与正常App。Android定位init/IPC未终结等待，再采用既有AndroidNativeOperations与ConfigJournal，不制造第二owner；typed completion由owner锁内捕获状态，ledger仅投递，修复前后台及tile状态接线、checked listener和配置旁路。上游后台更新问题等待用户安全处理。
+
+### Risks
+候选native borrowedFd合同与现行detach/JNI领取不兼容，不能直接overlay；现Boolean接口只能证明受理。初次冷启动订阅为空及网络异常、后来冷启动卡片恢复，原因未归因；不得称无套餐。安装先按同源验签与用户设备授权执行，精确PDEC安装APK哈希在安装后更新，不追认为满足安装前门禁。Mac核心修改未测试未审阅，未触碰真实SC配置。有效上游、真实支付、Apple发行条件尚未满足。用户.video_agent未读取修改。
+
+### DIA
+已同步registry、ARCHITECTURE、CHANGELOG、Android联合计划、macOS核心计划及公开构建回执；后续核心实现文档待实际验收同步。
+
+### HLG
+通过标准append先dry-run后apply记录；Goal保持active，不声明可用发行或已完成。
+
+## 2026-10-08T13:49:02+08:00 · macOS schema4事务核心与Android直连设备通路验收
+
+type: development
+scope: ["Bettbox", "macOS", "Android"]
+status: done
+tags: ["release", "system-proxy", "vpn", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: eaa504c48d2b019499ab1181620928257067919be03ed7fad7a96f7452108ecd
+
+### Summary
+schema4事务核心、恢复提交前竞争修复完成；Android f881880正式候选直连模式真实代理与浏览器通路、两轮停止资源清理通过。总体Goal保持active，未声明可用发行。
+
+### Changed
+macOS核心新增不可序列化专用入口能力、独立持久/运行未拥有摘要、严格schema3兼容及保守schema4恢复；更新公开验证回执、架构、CHANGELOG和registry。
+
+### Validation
+SOCKS摘要缺陷47项中1项失败；恢复stage后外部active改变在61项全量中失败；最小修复后PDEC e1461d1bec1ca8f93b97087ac63782e54452a8a4995e72d27f36e413ed73f7ae ready、61项0失败，独立Agent复核P2闭合。Android同源APK在DIRECT模式7890 HTTP请求200，Chrome trace显示HTTPS/TLSv1.3，第二启动tun0及7890存在，两次停止确认消失。ip查询的权限拒绝来自设备netlink命令，ADB正常。
+
+### Next
+主控接入macOS正常Host/Dart系统代理及停止恢复次序；Android配置owner和typed真实完成回执联合接线。有效上游协议代理仍待核验。
+
+### Risks
+核心fixture不替代真实SC权限、commit/apply、恢复及正常应用网络验收；AndroidDIRECT不证明节点代理。iOS保留开发版，Apple团队未具备，Fubei商户权限未具备，不公开发布。先前13:32记录的即时tun0未观察到已由后续真实观察补齐；不追写历史。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、registry与两平台公开回执。
+
+### HLG
+通过标准append dry-run及apply追加事实；索引由脚本重建。

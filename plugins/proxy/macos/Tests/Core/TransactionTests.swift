@@ -4,16 +4,28 @@ import XCTest
 
 final class TransactionTests: XCTestCase {
     let intent = ProxyIntent(port: 7890, bypass: ["localhost", "*.public.example"])
+    func capability(_ value: ProxyIntent? = nil, current: @escaping () -> Bool = { true }) -> CredentialBlindEndpointCapability {
+        let selected = value ?? intent
+        return publicCapability(port: selected.port, bypass: selected.bypass, current: current)
+    }
+    func legacy(_ record: OwnershipJournal, phase: JournalPhase = .verifiedApplied) -> LegacyOwnershipJournalV3 {
+        LegacyOwnershipJournalV3(schemaVersion: 3, installOwnerID: record.installOwnerID,
+            generation: record.transactionGeneration, transactionID: record.transactionID,
+            intent: record.intent, phase: phase, entries: record.entries.map {
+                LegacyJournalEntryV3(serviceID: $0.serviceID, before: $0.before,
+                                     written: $0.written, ownedGroups: $0.ownedGroups)
+            })
+    }
 
     func testStartStopPreservesMissingKeysAndUnownedFields() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let before = backend.services[0].groups
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         XCTAssertEqual(store.record?.phase, .verifiedApplied)
         XCTAssertEqual(transaction.stop(generation: 2).status, .restored)
         XCTAssertEqual(backend.services[0].groups, before)
-        XCTAssertEqual(backend.active["public-service"], before)
+        XCTAssertEqual(backend.active["public-service"]?.groups, before)
         XCTAssertEqual(backend.unownedFields["public-service"]?["public-unknown-key"], "preserve-public-value")
         XCTAssertNil(store.record)
         XCTAssertFalse(backend.locked)
@@ -25,22 +37,22 @@ final class TransactionTests: XCTestCase {
             if activeOnly { backend.active["public-service"]?[.socks] = .manual(ManualProxy(enabled: true, host: "external.example", port: 1080)) }
             else { backend.services[0].groups[.socks] = .manual(ManualProxy(enabled: true, host: "external.example", port: 1080)) }
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .unsupportedSOCKSProxy)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .unsupportedSOCKSProxy)
             XCTAssertEqual(backend.stages, 0); XCTAssertNil(store.record)
         }
         let backend = FakeConfiguration(), store = FakeJournal()
         backend.active = [:]
-        XCTAssertEqual(ProxyTransaction(configuration: backend, journal: store).start(intent, generation: 1, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertEqual(ProxyTransaction(configuration: backend, journal: store).start(capability(), generation: 1, isCurrent: { true }).status, .recoveryRequired)
         XCTAssertEqual(backend.stages, 0)
     }
     func testPriorSOCKSJournalSchemaRefusesAutomaticRecovery() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         let original = store.record!
         store.record = OwnershipJournal(schemaVersion: 2, installOwnerID: original.installOwnerID,
-            generation: original.generation, transactionID: original.transactionID,
-            intent: original.intent, phase: original.phase, entries: original.entries)
+            transactionGeneration: original.transactionGeneration, transactionID: original.transactionID,
+            endpoint: original.endpoint, intent: original.intent, phase: original.phase, entries: original.entries)
         let before = backend.stages
         XCTAssertEqual(transaction.stop(generation: 2).status, .recoveryRequired)
         XCTAssertEqual(backend.stages, before)
@@ -49,7 +61,7 @@ final class TransactionTests: XCTestCase {
         var inactive = publicService("inactive-service"); inactive.active = false
         let backend = FakeConfiguration([publicService(), inactive]), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         XCTAssertEqual(store.record?.entries.map { $0.serviceID }, ["public-service"])
         XCTAssertEqual(backend.services[1].groups, inactive.groups)
     }
@@ -57,7 +69,7 @@ final class TransactionTests: XCTestCase {
         let backend = FakeConfiguration(), store = FakeJournal()
         let original = backend.services[0].groups[.socks]
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         XCTAssertEqual(backend.services[0].groups[.socks], original)
         XCTAssertFalse(store.record!.entries[0].ownedGroups.contains(.socks))
     }
@@ -69,13 +81,20 @@ final class TransactionTests: XCTestCase {
         XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0); XCTAssertEqual(backend.applies, 0)
     }
 
-    func testAuthenticationPresentAndUnknownRejectAllServicesBeforeSetter() {
-        for authentication in [AuthenticationState.present, .unknown] {
-            var unsafe = publicService("second-service")
-            unsafe.authentication = authentication
-            let backend = FakeConfiguration([publicService(), unsafe]), store = FakeJournal()
+    func testCredentialBlindCapabilityAllowsUnknownButPresentStillRejectsBeforeSetter() {
+        var unknown = publicService()
+        unknown.authentication = .unknown
+        let allowedBackend = FakeConfiguration([unknown]), allowedStore = FakeJournal()
+        let allowed = ProxyTransaction(configuration: allowedBackend, journal: allowedStore)
+        XCTAssertEqual(allowed.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(allowedStore.record?.phase, .verifiedApplied)
+
+        for activeOnly in [false, true] {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            if activeOnly { backend.active["public-service"]?.authentication = .present }
+            else { backend.services[0].authentication = .present }
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .unsupportedAuthenticatedProxy)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .unsupportedAuthenticatedProxy)
             XCTAssertEqual(backend.stages, 0); XCTAssertNil(store.record)
         }
     }
@@ -83,9 +102,10 @@ final class TransactionTests: XCTestCase {
     func testInvalidInputAndUserinfoNeverPersistOrWrite() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(ProxyIntent(port: 0, bypass: []), generation: 1, isCurrent: { true }).status, .invalidInput)
+        XCTAssertNil(CredentialBlindEndpointCapability(supervisorGeneration: 7, listenerEpoch: 1,
+            host: "127.0.0.1", port: 0, state: "active", bypass: [], current: { true }))
         backend.services[0].groups[.http] = .manual(ManualProxy(enabled: false, host: "public-user:fictional-pass@proxy.example", port: 80))
-        XCTAssertEqual(transaction.start(intent, generation: 2, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertEqual(transaction.start(capability(), generation: 2, isCurrent: { true }).status, .recoveryRequired)
         XCTAssertEqual(backend.stages, 0); XCTAssertNil(store.record)
     }
 
@@ -95,7 +115,7 @@ final class TransactionTests: XCTestCase {
             let before = backend.services.map { $0.groups }
             if rejectCommit { backend.commitFailure = .commitRejected } else { backend.stageFailureAt = 2 }
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .failedRolledBack)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .failedRolledBack)
             XCTAssertEqual(backend.services.map { $0.groups }, before)
             XCTAssertEqual(backend.applies, 0)
             XCTAssertNil(store.record)
@@ -112,7 +132,7 @@ final class TransactionTests: XCTestCase {
             if mode == 2 { backend.applyFailure = true; backend.applyBeforeFailure = true }
             if mode == 3 { backend.verificationMismatch = true }
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .recoveryRequired)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .recoveryRequired)
             XCTAssertEqual(store.record?.phase, .uncertain)
             let stages = backend.stages, commits = backend.commits
             XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
@@ -124,7 +144,7 @@ final class TransactionTests: XCTestCase {
         for phase in [JournalPhase.prepared, .committed, .verifiedApplied] {
             let backend = FakeConfiguration(), store = FakeJournal(); store.persistFailure = phase
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .recoveryRequired)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .recoveryRequired)
             if phase == .prepared { XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0) }
             else {
                 XCTAssertNotEqual(store.record?.phase, .verifiedApplied)
@@ -139,7 +159,7 @@ final class TransactionTests: XCTestCase {
         for phase in [JournalPhase.prepared, .committed, .uncertain] {
             let backend = FakeConfiguration(), store = FakeJournal()
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
             store.record?.phase = phase
             let commits = backend.commits
             XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
@@ -150,7 +170,7 @@ final class TransactionTests: XCTestCase {
     func testExternalProxyAndPACGuardChangesArePreservedWhileOtherGroupsRestore() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         let originalEntries = store.record!.entries
         let external = GroupValue.manual(ManualProxy(enabled: true, host: "external.example", port: 8443))
         let pac = GroupValue.automatic(AutomaticProxy(enabled: false, unchangedConfigurationDigest: String(repeating: "c", count: 64)))
@@ -180,9 +200,9 @@ final class TransactionTests: XCTestCase {
         for deleteService in [false, true] {
             let backend = FakeConfiguration(), store = FakeJournal()
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
             if deleteService { backend.services = [] }
-            else { backend.active["public-service"] = publicService().groups }
+            else { backend.active["public-service"]?.groups = publicService().groups }
             let commits = backend.commits
             XCTAssertEqual(transaction.recover(generation: 2).status, .conflict)
             XCTAssertEqual(backend.commits, commits)
@@ -193,11 +213,11 @@ final class TransactionTests: XCTestCase {
         let backend = FakeConfiguration(), store = FakeJournal()
         let before = backend.services[0].groups
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         let commits = backend.commits
-        XCTAssertEqual(transaction.start(intent, generation: 2, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 2, isCurrent: { true }).status, .applied)
         XCTAssertEqual(backend.commits, commits)
-        XCTAssertEqual(transaction.start(ProxyIntent(port: 7891, bypass: []), generation: 3, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(ProxyIntent(port: 7891, bypass: [])), generation: 3, isCurrent: { true }).status, .applied)
         XCTAssertEqual(store.record?.entries[0].before, before)
         XCTAssertEqual(transaction.stop(generation: 4).status, .restored)
         XCTAssertEqual(backend.services[0].groups, before)
@@ -210,7 +230,7 @@ final class TransactionTests: XCTestCase {
         let other = ProxyTransaction(configuration: backend, journal: store)
         XCTAssertEqual(other.stop(generation: 2).status, .busy)
         backend.lockFailure = .permissionDenied
-        XCTAssertEqual(owner.start(intent, generation: 3, isCurrent: { true }).status, .permissionDenied)
+        XCTAssertEqual(owner.start(capability(), generation: 3, isCurrent: { true }).status, .permissionDenied)
         XCTAssertEqual(backend.stages, 0)
     }
 
@@ -219,7 +239,7 @@ final class TransactionTests: XCTestCase {
         backend.arbitraryReadError = NSError(domain: "PUBLIC_FAKE_SECRET_DIAGNOSTIC", code: 123,
             userInfo: [NSLocalizedDescriptionKey: "https://public-user:fictional-password@example.test/private-pac"])
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        let result = transaction.start(intent, generation: 1, isCurrent: { true })
+        let result = transaction.start(capability(), generation: 1, isCurrent: { true })
         XCTAssertEqual(result.status, .recoveryRequired)
         let text = String(reflecting: result)
         XCTAssertFalse(text.contains("FAKE_SECRET")); XCTAssertFalse(text.contains("fictional-password"))
@@ -228,7 +248,7 @@ final class TransactionTests: XCTestCase {
     func testRestoreRejectedCommitLeavesVerifiedEvidenceForSafeRetry() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         let written = backend.services[0].groups
         backend.commitFailure = .commitRejected
         XCTAssertEqual(transaction.stop(generation: 2).status, .failedRolledBack)
@@ -242,11 +262,11 @@ final class TransactionTests: XCTestCase {
     func testForeignJournalAndCleanupFailureCannotClaimSuccessfulRecovery() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         let original = store.record!
         store.record = OwnershipJournal(schemaVersion: original.schemaVersion, installOwnerID: UUID(),
-            generation: original.generation, transactionID: original.transactionID,
-            intent: original.intent, phase: .verifiedApplied, entries: original.entries)
+            transactionGeneration: original.transactionGeneration, transactionID: original.transactionID,
+            endpoint: original.endpoint, intent: original.intent, phase: .verifiedApplied, entries: original.entries)
         let commits = backend.commits
         XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
         XCTAssertEqual(backend.commits, commits)
@@ -259,7 +279,7 @@ final class TransactionTests: XCTestCase {
     func testCompletedProgressSaveFailureDoesNotInventDurableRestoration() {
         let backend = FakeConfiguration(), store = FakeJournal()
         let transaction = ProxyTransaction(configuration: backend, journal: store)
-        XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
         let originalEntries = store.record!.entries
         let external = GroupValue.manual(ManualProxy(enabled: true, host: "external.example", port: 8443))
         backend.services[0].groups[.http] = external; backend.active["public-service"]?[.http] = external
@@ -278,13 +298,13 @@ final class TransactionTests: XCTestCase {
         for mode in 0...3 {
             let backend = FakeConfiguration(), store = FakeJournal()
             let transaction = ProxyTransaction(configuration: backend, journal: store)
-            XCTAssertEqual(transaction.start(intent, generation: 1, isCurrent: { true }).status, .applied)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
             let owned = OwnedGroupID(serviceID: "public-service", group: .http)
             if mode == 0 {
                 let original = store.record!
                 store.record = OwnershipJournal(schemaVersion: 1, installOwnerID: original.installOwnerID,
-                    generation: original.generation, transactionID: original.transactionID,
-                    intent: original.intent, phase: original.phase, entries: original.entries)
+                    transactionGeneration: original.transactionGeneration, transactionID: original.transactionID,
+                    endpoint: original.endpoint, intent: original.intent, phase: original.phase, entries: original.entries)
             }
             if mode == 1 { store.record?.restoration.verifiedRestored = [owned] }
             if mode == 2 {
@@ -300,5 +320,279 @@ final class TransactionTests: XCTestCase {
             XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
             XCTAssertEqual(backend.commits, commits)
         }
+    }
+
+    func testCapabilityValidatesEndpointAndPersistsIndependentEvidence() {
+        XCTAssertNil(CredentialBlindEndpointCapability(supervisorGeneration: 0, listenerEpoch: 1,
+            host: "127.0.0.1", port: 7890, state: "active", bypass: [], current: { true }))
+        XCTAssertNil(CredentialBlindEndpointCapability(supervisorGeneration: 7, listenerEpoch: 0,
+            host: "127.0.0.1", port: 7890, state: "active", bypass: [], current: { true }))
+        XCTAssertNil(CredentialBlindEndpointCapability(supervisorGeneration: 7, listenerEpoch: 1,
+            host: "localhost", port: 7890, state: "active", bypass: [], current: { true }))
+        XCTAssertNil(CredentialBlindEndpointCapability(supervisorGeneration: 7, listenerEpoch: 1,
+            host: "127.0.0.1", port: 7890, state: "stopped", bypass: [], current: { true }))
+        XCTAssertNil(CredentialBlindEndpointCapability(supervisorGeneration: 7, listenerEpoch: 1,
+            host: "127.0.0.1", port: 7890, state: "active", bypass: ["user@public.example"], current: { true }))
+
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 42, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(store.record?.schemaVersion, 4)
+        XCTAssertEqual(store.record?.transactionGeneration, 42)
+        XCTAssertEqual(store.record?.endpoint.supervisorGeneration, 7)
+        XCTAssertEqual(store.record?.endpoint.listenerEpoch, 1)
+        XCTAssertEqual(store.record?.endpoint.host, "127.0.0.1")
+        XCTAssertEqual(store.record?.endpoint.port, intent.port)
+    }
+
+    func testCapabilityRevocationBeforeAndDuringCommitCannotPublishStaleEndpoint() {
+        do {
+            var current = false
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let result = ProxyTransaction(configuration: backend, journal: store)
+                .start(capability(current: { current }), generation: 1, isCurrent: { true })
+            XCTAssertEqual(result.status, .cancelled)
+            XCTAssertEqual(backend.stages, 0); XCTAssertEqual(backend.commits, 0); XCTAssertNil(store.record)
+            current = true
+        }
+        do {
+            var current = true
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let before = backend.services[0].groups
+            backend.afterStage = { current = false }
+            let result = ProxyTransaction(configuration: backend, journal: store)
+                .start(capability(current: { current }), generation: 1, isCurrent: { true })
+            XCTAssertEqual(result.status, .cancelled)
+            XCTAssertEqual(backend.stages, 1); XCTAssertEqual(backend.commits, 0)
+            XCTAssertEqual(backend.services[0].groups, before); XCTAssertNil(store.record)
+        }
+        do {
+            var current = true
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let before = backend.services[0].groups
+            backend.afterCommit = { current = false }
+            let result = ProxyTransaction(configuration: backend, journal: store)
+                .start(capability(current: { current }), generation: 1, isCurrent: { true })
+            XCTAssertEqual(result.status, .cancelled)
+            XCTAssertEqual(backend.commits, 2)
+            XCTAssertEqual(backend.services[0].groups, before)
+            XCTAssertEqual(backend.active["public-service"]?.groups, before)
+            XCTAssertNil(store.record)
+        }
+    }
+
+    func testPersistentAndActiveUnownedDigestsHaveIndependentBaselinesAndGuards() {
+        let initialBackend = FakeConfiguration(), initialStore = FakeJournal()
+        let initial = ProxyTransaction(configuration: initialBackend, journal: initialStore)
+        XCTAssertEqual(initial.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        XCTAssertEqual(initialStore.record?.entries[0].persistentUnownedDigest, String(repeating: "c", count: 64))
+        XCTAssertEqual(initialStore.record?.entries[0].activeUnownedDigest, String(repeating: "d", count: 64))
+        XCTAssertNotEqual(initialStore.record?.entries[0].persistentUnownedDigest,
+                          initialStore.record?.entries[0].activeUnownedDigest)
+
+        for activeOnly in [false, true] {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+            if activeOnly { backend.active["public-service"]?.unownedDigest = String(repeating: "e", count: 64) }
+            else { backend.services[0].unownedDigest = String(repeating: "e", count: 64) }
+            let commits = backend.commits
+            let result = transaction.stop(generation: 2)
+            XCTAssertEqual(result.status, .conflict)
+            XCTAssertEqual(backend.commits, commits)
+            XCTAssertNotNil(store.record)
+        }
+    }
+
+    func testStartChecksFreshOwnedCASAndActiveGuardBeforeCommit() {
+        do {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let external = GroupValue.manual(ManualProxy(enabled: true, host: "external.example", port: 8081))
+            backend.beforeStage = { backend.services[0].groups[.http] = external }
+            let result = ProxyTransaction(configuration: backend, journal: store)
+                .start(capability(), generation: 1, isCurrent: { true })
+            XCTAssertEqual(result.status, .failedRolledBack)
+            XCTAssertEqual(backend.commits, 0)
+            XCTAssertEqual(backend.services[0].groups[.http], external)
+            XCTAssertNil(store.record)
+        }
+        do {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            backend.afterStage = {
+                backend.active["public-service"]?.unownedDigest = String(repeating: "e", count: 64)
+            }
+            let result = ProxyTransaction(configuration: backend, journal: store)
+                .start(capability(), generation: 1, isCurrent: { true })
+            XCTAssertEqual(result.status, .failedRolledBack)
+            XCTAssertEqual(backend.commits, 0)
+            XCTAssertNil(store.record)
+        }
+    }
+
+    func testVerifiedRecoveryUsesFreshOwnedCASAndPreservesExternalChange() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let external = GroupValue.manual(ManualProxy(enabled: true, host: "external.example", port: 8081))
+        backend.beforeStage = { backend.services[0].groups[.http] = external }
+        let commits = backend.commits
+        let result = transaction.stop(generation: 2)
+        XCTAssertEqual(result.status, .failedRolledBack)
+        XCTAssertEqual(backend.commits, commits)
+        XCTAssertEqual(backend.services[0].groups[.http], external)
+        XCTAssertEqual(store.record?.phase, .verifiedApplied)
+    }
+
+    func testVerifiedRecoveryRechecksActiveGuardsAfterStageBeforeCommit() throws {
+        for mode in 0...2 {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+            let written = backend.services[0].groups
+            let original = store.record!
+            let originalBytes = try JournalCoding.encode(original)
+            let externalHTTP = GroupValue.manual(ManualProxy(
+                enabled: true, host: "external.example", port: 8081))
+            backend.afterStage = {
+                if mode == 0 {
+                    backend.active["public-service"]?.unownedDigest = String(repeating: "e", count: 64)
+                } else if mode == 1 {
+                    backend.active["public-service"]?.authentication = .present
+                } else {
+                    backend.active["public-service"]?[.http] = externalHTTP
+                }
+            }
+            let stages = backend.stages, commits = backend.commits, applies = backend.applies
+
+            XCTAssertEqual(transaction.stop(generation: 2).status, .failedRolledBack)
+            XCTAssertEqual(backend.stages, stages + 1)
+            XCTAssertEqual(backend.commits, commits)
+            XCTAssertEqual(backend.applies, applies)
+            XCTAssertEqual(backend.services[0].groups, written)
+            if mode == 0 {
+                XCTAssertEqual(backend.active["public-service"]?.unownedDigest,
+                               String(repeating: "e", count: 64))
+            } else if mode == 1 {
+                XCTAssertEqual(backend.active["public-service"]?.authentication, .present)
+            } else {
+                XCTAssertEqual(backend.active["public-service"]?[.http], externalHTTP)
+            }
+            XCTAssertEqual(store.record?.phase, .verifiedApplied)
+            XCTAssertEqual(try JournalCoding.encode(store.record!), originalBytes)
+        }
+    }
+
+    func testSchema4NonverifiedClearsOnlyAllBeforeWithoutConfigurationWrites() {
+        for phase in [JournalPhase.prepared, .committed, .uncertain] {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+            let entry = store.record!.entries[0]
+            backend.services[0].groups = entry.before
+            backend.active[entry.serviceID]?.groups = entry.before
+            store.record?.phase = phase
+            let stages = backend.stages, commits = backend.commits, applies = backend.applies
+            XCTAssertEqual(transaction.recover(generation: 2).status, .restored)
+            XCTAssertEqual(backend.stages, stages)
+            XCTAssertEqual(backend.commits, commits)
+            XCTAssertEqual(backend.applies, applies)
+            XCTAssertNil(store.record)
+        }
+    }
+
+    func testSchema4NonverifiedPreservesWrittenMixedDigestAndPresentEvidence() {
+        for mode in 0...3 {
+            let backend = FakeConfiguration(), store = FakeJournal()
+            let transaction = ProxyTransaction(configuration: backend, journal: store)
+            XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+            let entry = store.record!.entries[0]
+            store.record?.phase = .uncertain
+            if mode == 1 { backend.services[0].groups = entry.before }
+            if mode == 2 {
+                backend.services[0].groups = entry.before
+                backend.active[entry.serviceID]?.groups = entry.before
+                backend.active[entry.serviceID]?.unownedDigest = String(repeating: "e", count: 64)
+            }
+            if mode == 3 {
+                backend.services[0].groups = entry.before
+                backend.active[entry.serviceID]?.groups = entry.before
+                backend.services[0].authentication = .present
+            }
+            let stages = backend.stages, commits = backend.commits
+            XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
+            XCTAssertEqual(backend.stages, stages); XCTAssertEqual(backend.commits, commits)
+            XCTAssertNotNil(store.record)
+        }
+    }
+
+    func testAllBeforeCleanupFailureKeepsJournalWithoutConfigurationWrite() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let entry = store.record!.entries[0]
+        backend.services[0].groups = entry.before
+        backend.active[entry.serviceID]?.groups = entry.before
+        store.record?.phase = .prepared
+        store.clearFailure = true
+        let stages = backend.stages, commits = backend.commits
+        XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
+        XCTAssertEqual(backend.stages, stages); XCTAssertEqual(backend.commits, commits)
+        XCTAssertNotNil(store.record)
+    }
+
+    func testVerifiedJournalAlreadyAtBeforeCanFinishCrashRecoveryWithoutWrite() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let entry = store.record!.entries[0]
+        backend.services[0].groups = entry.before
+        backend.active[entry.serviceID]?.groups = entry.before
+        let stages = backend.stages, commits = backend.commits
+        XCTAssertEqual(transaction.recover(generation: 2).status, .restored)
+        XCTAssertEqual(backend.stages, stages); XCTAssertEqual(backend.commits, commits)
+        XCTAssertNil(store.record)
+    }
+
+    func testLegacyV3BlocksStartAndOnlyExplicitAbsentRecoveryCanRestore() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let old = legacy(store.record!)
+        store.record = nil; store.legacyRecord = old
+        let commits = backend.commits
+        XCTAssertEqual(transaction.start(capability(), generation: 2, isCurrent: { true }).status, .recoveryRequired)
+        XCTAssertEqual(backend.commits, commits)
+        XCTAssertNotNil(store.legacyRecord)
+        XCTAssertEqual(transaction.recover(generation: 3).status, .restored)
+        XCTAssertEqual(backend.services[0].groups, old.entries[0].before)
+        XCTAssertNil(store.legacyRecord)
+
+        let unknownBackend = FakeConfiguration(), unknownStore = FakeJournal()
+        let current = ProxyTransaction(configuration: unknownBackend, journal: unknownStore)
+        XCTAssertEqual(current.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        unknownStore.legacyRecord = legacy(unknownStore.record!); unknownStore.record = nil
+        unknownBackend.services[0].authentication = .unknown
+        unknownBackend.active["public-service"]?.authentication = .unknown
+        let stages = unknownBackend.stages
+        XCTAssertEqual(current.recover(generation: 2).status, .recoveryRequired)
+        XCTAssertEqual(unknownBackend.stages, stages)
+        XCTAssertNotNil(unknownStore.legacyRecord)
+    }
+
+    func testTamperedEndpointEvidenceCannotAuthorizeRecovery() {
+        let backend = FakeConfiguration(), store = FakeJournal()
+        let transaction = ProxyTransaction(configuration: backend, journal: store)
+        XCTAssertEqual(transaction.start(capability(), generation: 1, isCurrent: { true }).status, .applied)
+        let original = store.record!
+        store.record = OwnershipJournal(schemaVersion: 4, installOwnerID: original.installOwnerID,
+            transactionGeneration: original.transactionGeneration, transactionID: original.transactionID,
+            endpoint: EndpointEvidence(profile: .credentialBlindHTTPv1,
+                supervisorGeneration: original.endpoint.supervisorGeneration,
+                listenerEpoch: original.endpoint.listenerEpoch, host: "localhost", port: original.intent.port),
+            intent: original.intent, phase: original.phase, entries: original.entries)
+        let commits = backend.commits
+        XCTAssertEqual(transaction.recover(generation: 2).status, .recoveryRequired)
+        XCTAssertEqual(backend.commits, commits)
+        XCTAssertNotNil(store.record)
     }
 }

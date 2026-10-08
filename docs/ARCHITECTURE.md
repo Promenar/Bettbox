@@ -132,6 +132,8 @@ Go Android adapter 已接入 State、CallbackGate、Shutdown 和 FDLease；配�
 
 Android 配置与启停目标使用同一operation Mutex及独立配置journal；已开始的同步写入不能随请求取消而丢失归属。未确认副作用完成时保留恢复状态，只有实际Applied派生options可进入启动。候选helper的30项JVM验证已通过；同步JNI和所有配置写入口接线尚未实施，当前客户端不能视为已采用此合同。
 
+真实调用层尚将原生请求受理布尔值当作完成：前台、后台智能切换及磁贴缺少关联终态回执。联合计划见 `.agents/plans/2026-10-08-android-owner-integration.md`，以既有唯一owner的typed completion投影到请求回执，区分stateRevision与configRevision；Dart仅在确认终态后提交展示和持久状态。f881880正式APK已通过完整编译、验签和安装来源核验，直连模式下本机HTTP代理、浏览器HTTPS及两轮TUN/监听启动停止通过；上游代理另验，因此不表示该联合合同已经采用。
+
 TCP/UDP隧道构造器在任何端口绑定前校验目标地址，无效目标不创建socket；合法目标的绑定及错误传递保持原接口。此输入副作用边界已有生产构造器race回归，监听器整体Close、provider及运行状态确认独立验收。
 
 ## 专用入口与检查式关闭
@@ -173,3 +175,5 @@ macOS受保护journal候选：native固定路径、0700目录/0600单链接文�
 Android Service 启停由生产 VpnWorkGate 串行覆盖 establish、重试、JNI 消费及未交接FD收尾；stop先撤销票据再等待工作结束。每次绑定采用独立ServiceConnection及注册票据，权限、超时与断连回调不能借用新启动意图。持久停止标记只在主进程经真实Core.stopTun确认后解除；通知使用局部Builder，共享速度及已发布状态在固定service/generation末端门禁提交。公开协程屏障复现旧establish未完成却确认STOP的红例，修复后两个生产gate/controller夹具入口通过；独立回审原4项静态闭合。完整Android工程、Binder、SharedPreferences和设备通知性能另验。
 
 JNI 初始化逐项检查class/globalref/method与pending exception；加载失败统一回收String globalref并清除方法IDs。字符串构造成功后才进入Java callback，失败返回固定结果，不描述原始异常。生产helper与真实JNI_OnLoad的9项公开函数表故障夹具通过，实际ARM64链接通过；不等同于实际JVM、CheckJNI或线程attach验收。
+
+macOS系统代理事务核心使用schema4：启动依赖不可反序列化的credential-blind能力，保留unknown认证事实并拒绝已识别present；服务级持久与运行未拥有字段摘要分别守卫SOCKS、认证、PAC URL及未知配置。verified恢复在stage后、commit前再次检查运行侧，外部变化时保留原journal且不提交；部分组冲突不阻断其他组的受限恢复。旧schema3严格canonical读取，不能自动升级为新能力。61项实际Swift测试和独立复审通过，回执为 `validation/2026-10-07-three-platform/macos-sc-schema4-validation.json`；正常宿主/Dart接线及真实写入、恢复、流量尚未验收。

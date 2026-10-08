@@ -65,3 +65,6 @@
 - .agents/plans/2026-10-08-macos-system-proxy-integration.md — 正常应用SC/endpoint授权、恢复次序及认证unknown待裁定设计
 - docs/validation/2026-10-07-three-platform/android-jni-failure-validation.json — JNI helper与真实OnLoad九项函数表故障回归，非真实JVM
 - docs/validation/2026-10-07-three-platform/android-vpn-lifecycle-validation.json — 生产协程门禁红绿、绑定/恢复/旧通知controller夹具与设备边界
+- .agents/plans/2026-10-08-android-owner-integration.md — Android配置owner、typed完成回执、跨engine与资源收尾联合计划
+- docs/validation/2026-10-07-three-platform/android-f881880-build-validation.json — f881880正式编译/验签/安装来源、冷启动、直连通路及上游未验收边界
+- docs/validation/2026-10-07-three-platform/macos-sc-schema4-validation.json — schema4来源摘要、61项回归、独立回审与真实系统接线边界

@@ -252,7 +252,7 @@ final class ProtectedJournalBackend: JournalBackend {
               bytes == Data(owner.uuidString.lowercased().utf8), !poison else { throw JournalFailure.invalid }
         return owner
     }
-    func load() throws -> OwnershipJournal? {
+    func load() throws -> LoadedOwnershipJournal? {
         serial.lock(); defer { serial.unlock() }
         let owner = try owned()
         guard let data = try readFile("journal.json", limit: JournalCoding.limit) else { return nil }

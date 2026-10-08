@@ -31,7 +31,7 @@ final class ProxyLifecycle {
         return !exhausted && epoch == token
     }
 
-    func start(_ intent: ProxyIntent, completion: @escaping (SafeResult) -> Void) {
+    func start(_ capability: CredentialBlindEndpointCapability, completion: @escaping (SafeResult) -> Void) {
         intentLock.lock()
         guard let token = advanceLocked() else {
             intentLock.unlock()
@@ -40,7 +40,7 @@ final class ProxyLifecycle {
         beforeSubmissionForTesting?(.start, token)
         worker.async { [self] in
             intentLock.lock(); intentLock.unlock()
-            let result = transaction.start(intent, generation: token, isCurrent: { self.isCurrent(token) })
+            let result = transaction.start(capability, generation: token, isCurrent: { self.isCurrent(token) })
             if result.status == .applied && !isCurrent(token) {
                 completion(SafeResult(status: .cancelled, generation: token)); return
             }

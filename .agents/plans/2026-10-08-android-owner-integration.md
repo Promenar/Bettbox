@@ -1,0 +1,31 @@
+# Android 配置与生命周期联合接线
+
+目标是由一个原生 owner 统一前台、后台、快捷磁贴、智能切换、配置提交和资源收尾，并向客户端报告真实完成事实。正式编译、模拟器启动、夹具验证和真实 VPN 流量分别验收。
+
+## 已核对事实与边界
+
+`ServicePlugin` 的启停方法立即返回 true；Dart 的 state、smart manager 和后台 main 存在提前提交运行状态的路径。原生 STOP 事件缺少请求关联，Dart 的早期清状态还会使 controller 的 STOP 分支失效。权限回调只有成功分支，缺少拒绝、无 Activity 和旧结果归属处理。
+
+配置候选 `AndroidNativeOperations` 与 `NativePreparedConfig` 已有进程唯一实例、operation Mutex、配置 journal、ENTERED/Applied 归属和30项夹具；尚未接入实际 App。其 borrowedFd/closeOriginalFd 不能直接覆盖实际 detachFd→TunFDLease→JNI领取→Go采纳合同。现有 VpnWorkGate/VpnLifecycle 的平台失效票据可保留，但不能与唯一 owner 竞争发行权威代次。
+
+前台 setup/update/setState、后台 quickStart、IPC reconnect、listener/shutdown及 HTTP patch/update均须纳入同一 owner。Go runLock 只防局部数据竞争；options与TUN快照尚无共同配置版本。上述为源码未封闭边界，尚无设备竞态复现。
+
+## 实施与所有权
+
+先采用并扩展既有 owner，增加不可变 typed completion；在 owner 内分类、提交、捕获 snapshot 后才释放执行锁。Boolean 兼容接口从同一次 completion 派生，不能 await bool 后重读后来状态。权限、绑定及建立等待可撤销；已进入同步提交或 JNI 的工作不能因调用者取消丢失归属。输入 FD 仅由当前领取合同关闭一次。
+
+native 分配配置 revision；同步 JNI backend 在首个副作用前登记 ENTERED，并在实际完成后从同次提交派生复制 options。TUN 启动核验该版本对应快照。增加 setState 的类型化 mutation，关闭直接配置写旁路，保留实际热更新与 HTTP 功能。尚未 ENTERED、仍为当前意图的排队配置遇到版本推进时，只能由同 owner 重新准备；不修改旧 payload 的 baseRevision 冒充新准备，不让后台再次 beginStart 覆盖用户 STOP。
+
+receipt ledger 不执行 JNI、不接纳生命周期意图、不分配 generation。它仅关联 requestId 与 owner handle，保存不可变结果并在主线程 exactly once 投递。wire 字段为 requestId、generation、revision（owner stateRevision）、configRevision、ownedGeneration、outcome、phase、smartStopped、startedAtMs；配置版本与生命周期发布版本职责独立。
+
+completed 只表示目标真实完成；拒绝为 rejected，撤销为 cancelled，建立失败且收尾已确认可为 failed，原生停止/FD关闭/配置归属不确定为 unknown+blocked。超时不清 owner 或自动解除恢复锁。旧请求回执不得拼入后来请求的 snapshot。startedAtMs 只在真实 running 提交产生，确认 stopped 后清空。
+
+service/vpn 两通道共用 typed dispatcher。前台 state/controller/manager 与后台 main/tile 仅在确认后更新运行时间、持久标记及流量。普通全停先确认 TUN，再 checked listener 收尾，再服务/绑定清理；智能暂停保留恢复所需资源。后台 engine 收到回执并确认 ack 后，重新核对 owner 已停止且无新操作，才允许自动销毁。
+
+主控负责 Go/JNI 合同、Dart接线、PDEC、聚合文档及交接；原生 owner/adapter 与跨层审阅按稳定接口分包。共享聚合文件串行；实际施工前明确精确文件所有权。macOS SC核心包与 Android 不共用源码，可独立施工。
+
+## 验收与回滚
+
+红回归直接使用生产 owner/backend/ledger：旧配置提交被 STOP 替代、取消后真实 Applied 保留、A options不能配B快照、排队版本推进的同意图重准备、无 Activity/权限拒绝/旧结果、旧回执晚投递、重复 stop、未知停止不清状态、不销毁 engine、listener close未知及直接旁路拒绝。Dart测试必须覆盖真实 state/manager/main入口，不能用镜像控制器替代。
+
+主控更新 PDEC 输入摘要并确认 execution_ready 后执行登记的 JVM/Go/Flutter检查、正式 Android 编译、独立串行审阅与模拟器验收。设备同时核对请求、权威状态、真实TUN、listener、通知和界面；有效上游节点协议流量另验。出现未知 owner/journal 时保留恢复责任，不通过卸载、清数据或旧旁路清洗。回滚仅撤除未采用代码；已采用资源按确认收尾合同恢复。

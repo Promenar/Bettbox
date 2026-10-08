@@ -18,12 +18,22 @@ enum GroupValue: Equatable, Codable {
     case automatic(AutomaticProxy)
 }
 enum AuthenticationState: Equatable { case absent, present, unknown }
+struct ActiveServiceSnapshot: Equatable {
+    var authentication: AuthenticationState
+    var groups: [ProxyGroup: GroupValue]
+    var unownedDigest: String
+    subscript(_ group: ProxyGroup) -> GroupValue? {
+        get { groups[group] }
+        set { groups[group] = newValue }
+    }
+}
 struct ServiceSnapshot {
     var id: String
     var enabled: Bool
     var hasProxyProtocol: Bool
     var authentication: AuthenticationState
     var groups: [ProxyGroup: GroupValue]
+    var unownedDigest: String
     var active: Bool = true
 }
 struct ProxyIntent: Equatable, Codable {
@@ -56,6 +66,34 @@ enum BackendFailure: Error, Equatable {
 }
 enum JournalFailure: Error { case unavailable, invalid, busy }
 enum JournalPhase: String, Equatable, Codable { case prepared, committed, verifiedApplied, uncertain }
+enum EndpointProfile: String, Equatable, Codable { case credentialBlindHTTPv1 }
+struct EndpointEvidence: Equatable, Codable {
+    let profile: EndpointProfile
+    let supervisorGeneration: UInt64
+    let listenerEpoch: UInt64
+    let host: String
+    let port: Int
+}
+// 仅Host可信路径可在内存中发行；不实现Codable，也没有allowUnknown开关。
+final class CredentialBlindEndpointCapability {
+    let endpoint: EndpointEvidence
+    let bypass: [String]
+    private let current: () -> Bool
+
+    init?(supervisorGeneration: UInt64, listenerEpoch: UInt64, host: String,
+          port: Int, state: String, bypass: [String], current: @escaping () -> Bool) {
+        let intent = ProxyIntent(port: port, bypass: bypass)
+        guard supervisorGeneration > 0, listenerEpoch > 0, host == "127.0.0.1",
+              state == "active", intent.validate() else { return nil }
+        endpoint = EndpointEvidence(profile: .credentialBlindHTTPv1,
+                                    supervisorGeneration: supervisorGeneration,
+                                    listenerEpoch: listenerEpoch, host: host, port: port)
+        self.bypass = Array(bypass)
+        self.current = current
+    }
+    var intent: ProxyIntent { ProxyIntent(port: endpoint.port, bypass: bypass) }
+    func isCurrent() -> Bool { current() }
+}
 struct OwnedGroupID: Hashable, Codable {
     let serviceID: String
     let group: ProxyGroup
@@ -69,17 +107,47 @@ struct JournalEntry: Equatable {
     let before: [ProxyGroup: GroupValue]
     let written: [ProxyGroup: GroupValue]
     let ownedGroups: Set<ProxyGroup>
+    let persistentUnownedDigest: String
+    let activeUnownedDigest: String
 }
 struct OwnershipJournal: Codable {
+    let schemaVersion: Int
+    let installOwnerID: UUID
+    let transactionGeneration: UInt64
+    let transactionID: UUID
+    let endpoint: EndpointEvidence
+    let intent: ProxyIntent
+    var phase: JournalPhase
+    // 原始 entries 不可改写；完成证据仅来自恢复后的持久/运行双读。
+    var restoration = RestorationProgress()
+    let entries: [JournalEntry]
+}
+struct LegacyJournalEntryV3: Equatable {
+    let serviceID: String
+    let before: [ProxyGroup: GroupValue]
+    let written: [ProxyGroup: GroupValue]
+    let ownedGroups: Set<ProxyGroup>
+}
+struct LegacyOwnershipJournalV3: Codable {
     let schemaVersion: Int
     let installOwnerID: UUID
     let generation: UInt64
     let transactionID: UUID
     let intent: ProxyIntent
     var phase: JournalPhase
-    // 原始 entries 不可改写；完成证据仅来自恢复后的持久/运行双读。
     var restoration = RestorationProgress()
-    let entries: [JournalEntry]
+    let entries: [LegacyJournalEntryV3]
+}
+enum LoadedOwnershipJournal {
+    case current(OwnershipJournal)
+    case legacyV3(LegacyOwnershipJournalV3)
+
+    var installOwnerID: UUID {
+        switch self {
+        case .current(let value): value.installOwnerID
+        case .legacyV3(let value): value.installOwnerID
+        }
+    }
 }
 
 protocol ConfigurationBackend: AnyObject {
@@ -87,9 +155,10 @@ protocol ConfigurationBackend: AnyObject {
     func lock() throws
     func unlockDiscardingStagedChanges()
     func persistentServices() throws -> [ServiceSnapshot]
-    func activeGroups(serviceIDs: [String]) throws -> [String: [ProxyGroup: GroupValue]]
-    // 只合并指定白名单组到当前配置，保留一切未知字段。
-    func stage(serviceID: String, replacements: [ProxyGroup: GroupValue]) throws
+    func activeServices(serviceIDs: [String]) throws -> [String: ActiveServiceSnapshot]
+    // 新鲜读取后同时核对目标组CAS与未拥有摘要，再只合并指定白名单组。
+    func stage(serviceID: String, replacements: [ProxyGroup: GroupValue],
+               expected: [ProxyGroup: GroupValue], expectedUnownedDigest: String) throws
     func commit() throws
     func apply() throws
 }
@@ -98,7 +167,7 @@ protocol JournalBackend: AnyObject {
     // 应用生命周期锁，不能仅按一次读写加锁；受保护后端持有目录FD与内核文件锁。
     func acquireOwnership() throws
     func releaseOwnership()
-    func load() throws -> OwnershipJournal?
+    func load() throws -> LoadedOwnershipJournal?
     func persist(_ journal: OwnershipJournal) throws
     func clear() throws
 }

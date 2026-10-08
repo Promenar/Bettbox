@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "source_base_commit": "f881880a43a4ac15d9605de31c66f1abd3343142",
+  "contract_digest": "e1461d1bec1ca8f93b97087ac63782e54452a8a4995e72d27f36e413ed73f7ae",
+  "command": [
+    "swift",
+    "test",
+    "--package-path",
+    "plugins/proxy/macos",
+    "--scratch-path",
+    ".test/three-platform-release/macos-proxy-core-build"
+  ],
+  "tests": 61,
+  "failures": 0,
+  "red_regressions": [
+    "SOCKS未拥有字段摘要缺陷：47项中的1项失败",
+    "verified恢复stage后外部active改变：61项中的定向回归失败"
+  ],
+  "schema": 4,
+  "legacy_schema3": "严格canonical解码；不自动升级；unknown认证保留恢复责任",
+  "independent_review": "未参与核心施工的原生Agent只读回审确认P2闭合；未重跑或验证真实SC写入",
+  "source_sha256": {
+    "plugins/proxy/macos/Classes/Core/Contract.swift": "11fbdeb71a3baeb4f2aa2a44054a42c3a73adf4c818765b20f6dc566777f32b4",
+    "plugins/proxy/macos/Classes/Core/JournalCoding.swift": "3cf5b326fd46f2e082cc9ec0874482d661acda15dcf8fc13bf39f4626f5d9f73",
+    "plugins/proxy/macos/Classes/Core/Lifecycle.swift": "c941484fe0b9a6ea806012f9bb6fd22677a87ec5b303683cca4e47985187def7",
+    "plugins/proxy/macos/Classes/Core/ProtectedJournalBackend.swift": "bb921b0a1a981c007d111c47563799ebad39329ee25a6994e503870255072dc8",
+    "plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift": "9c68c1f60f4df4f706251e2613f4fff0dc09b19d6bbea00ada305f71f201146a",
+    "plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift": "73c8fa6621aeb1607b6611495d8ffb806389011453958be7921dfd115e930f41",
+    "plugins/proxy/macos/Classes/Core/Transaction.swift": "d60f90cd105be0bdde1e9f30583bc4c72acd23ab218a2a0eb7a15fcce9c6e166",
+    "plugins/proxy/macos/Tests/Core/Fakes.swift": "4cf69328555b30beb010b6fd4c36bbb2b1f3a9e32edbb514e47e8c1f90879dfc",
+    "plugins/proxy/macos/Tests/Core/LifecycleTests.swift": "7a673f212b31d2ff4bcff903bee6ed1ce030938d54fa11c3685e29d5745b3507",
+    "plugins/proxy/macos/Tests/Core/ProtectedJournalTests.swift": "9f4d20ded4ff5314673123313e73386b2da390b77870d0afab53aabe8aa57244",
+    "plugins/proxy/macos/Tests/Core/SCProxyDictionaryTests.swift": "513ceca70d6f1be2f8de2f1af1ed576abb53c3aff0c36bde9c388c68d5166ebf",
+    "plugins/proxy/macos/Tests/Core/TransactionTests.swift": "5c0b237c0ed4d88c266f4e8151b816a50b871249f72aea0dd27c43acad0f74f0"
+  },
+  "boundary": "核心真实Swift包测试；未接入正常宿主或Dart应用，未写入真实系统代理；不能替代权限、流量及发行签名验收"
+}

@@ -1,0 +1,76 @@
+{
+  "status": "passed",
+  "target": "android-arm64-release",
+  "signature_verified": true,
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "approved_contract_digest": "2f1aa1eed96c5ff2d0b2a72dc7240ec9753b50c4aae2ade98fe6f6ead848e58a",
+  "apk": {
+    "path": "build/app/outputs/flutter-apk/app-release.apk",
+    "sha256": "72632f7f6c3bacb755b3e8b518adb0901aa32c43f30a635827ca3b054ecb12dd"
+  },
+  "artifacts": {
+    "libclash/android/arm64-v8a/libclash.so": "01ef17a1a6a777c3feaf49320f986b2601d9fd8c8caecd55ca4571cc38dfc04f",
+    "libclash/android/arm64-v8a/libclash.h": "a454fc2930e788d343586c12c5da3c7264ee80f7298d98615641f7ed75f37d43"
+  },
+  "source_commit": "f881880a43a4ac15d9605de31c66f1abd3343142",
+  "candidate_copy": {
+    "path": "build/releases/android/Bettbox-arm64-f881880.apk",
+    "sha256": "72632f7f6c3bacb755b3e8b518adb0901aa32c43f30a635827ca3b054ecb12dd",
+    "bytes": 55821667
+  },
+  "release_verified": false,
+  "cleanup_verified": true,
+  "apk_libraries": {
+    "lib/arm64-v8a/libapp.so": "e2d0c5131fc0929fdce9cfbab489f2993d4309763df98ed8b7a0fcc918063a74",
+    "lib/arm64-v8a/libbarhopper_v3.so": "ec09597e9eb3aee0eb55ae3366da0d4ba416f5aa35a1af0b3811f50ff46743a1",
+    "lib/arm64-v8a/libclash.so": "01ef17a1a6a777c3feaf49320f986b2601d9fd8c8caecd55ca4571cc38dfc04f",
+    "lib/arm64-v8a/libcode_forge.so": "ca2cb4e860bf68eb3d202f13383fd6d3d04e102f6003110f6116d28aeedde4d5",
+    "lib/arm64-v8a/libcore.so": "137022424786ca7f11ec7fe7711cfa0a4aa6f8da87844faff3aa096fa8946d10",
+    "lib/arm64-v8a/libdartjni.so": "5fbc116569c4721d05e32fb572e6d4ef52a54902a2acff34eebcf1869687a79d",
+    "lib/arm64-v8a/libdatastore_shared_counter.so": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+    "lib/arm64-v8a/libflutter.so": "151099d0b73b3025d7545c8431af4d7f23bf3e7fe5767d9fec6323fa372ef743",
+    "lib/arm64-v8a/libimage_processing_util_jni.so": "0292b063fafccf734472cbb59588e756c2dbca907c72021ba6fbf126385508a2",
+    "lib/arm64-v8a/libqjs.so": "d1b50013b8ff69afc6452b8780023401e854f8999255b0187a13ef9d04e1fd95",
+    "lib/arm64-v8a/libsqlite3.so": "081df67ee9ab852daea6a0679427e90fc89a0245d06f93dafe2309875c609c5c",
+    "lib/arm64-v8a/libsurface_util_jni.so": "a5c9d1928ea92ec7a94dff8cf666e7739cd734198b9f0ae1d4e28ea3c86516ba"
+  },
+  "device": {
+    "serial": "emulator-5554",
+    "installation": "Success",
+    "installed_apk_sha256": "72632f7f6c3bacb755b3e8b518adb0901aa32c43f30a635827ca3b054ecb12dd",
+    "cold_launch_status": "ok",
+    "dev_account_identity_matches": true,
+    "initial_observation": {
+      "vpn_path_verified": false,
+      "observed_tun0": false,
+      "interpretation": "初次即时观察；不能代表后续终态"
+    },
+    "direct_mode_validation": {
+      "observed_at": "2026-10-08T13:46:00+08:00",
+      "tun0_present": true,
+      "loopback_7890_listening": true,
+      "http_proxy_trace_status": 200,
+      "browser_https_trace_loaded": true,
+      "browser_https_trace_tls": "TLSv1.3",
+      "first_stop_tun0_absent": true,
+      "first_stop_7890_absent": true,
+      "second_start_tun0_present": true,
+      "second_start_7890_present": true,
+      "second_stop_tun0_absent": true,
+      "second_stop_7890_absent": true,
+      "second_stop_running_timer_absent": true,
+      "scope": "同源已安装正式APK；直连模式；不代表上游节点协议代理流量通过"
+    }
+  },
+  "account_api": {
+    "getSubscribe_status": 200,
+    "plan_present": true,
+    "expired": false,
+    "quota_bytes": 67108864,
+    "used_bytes": 0
+  },
+  "boundary": "正式构建、签名、16KiB产物与安装来源通过；直连模式本机代理HTTP200、浏览器HTTPS和两轮启动/停止资源清理通过。生命周期回执/配置owner联合接线、上游协议代理流量与完整发行验收尚未通过。",
+  "execution_contract_note": "安装基于用户设备调试授权及同源验签执行，但安装项精确APK哈希在安装后更新；不将事后PDEC更新追认为安装前门禁。"
+}

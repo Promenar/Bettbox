@@ -16,77 +16,98 @@ final class ProxyTransaction {
     deinit { if ownsJournal { journal.releaseOwnership() } }
 
     func recover(generation: UInt64) -> SafeResult {
-        operation(generation) { try self.recoverLocked(generation) }
+        operation(generation) { try self.recoverLoaded(generation) }
     }
 
     func stop(generation: UInt64) -> SafeResult { recover(generation: generation) }
 
-    func start(_ intent: ProxyIntent, generation: UInt64,
-               isCurrent: () -> Bool) -> SafeResult {
+    func start(_ capability: CredentialBlindEndpointCapability, generation: UInt64,
+               isCurrent: @escaping () -> Bool) -> SafeResult {
         operation(generation) {
-            guard intent.validate() else { throw FixedFailure(status: .invalidInput) }
-            guard isCurrent() else { return SafeResult(status: .cancelled, generation: generation) }
+            let intent = capability.intent
+            let current = { isCurrent() && capability.isCurrent() }
+            guard intent.validate(), capability.endpoint.port == intent.port else {
+                throw FixedFailure(status: .invalidInput)
+            }
+            guard current() else { return SafeResult(status: .cancelled, generation: generation) }
             if let old = try self.journal.load() {
-                try self.validateJournal(old)
-                if old.phase == .verifiedApplied && old.intent == intent {
-                    if try self.matchesWritten(old) {
-                        if isCurrent() { return SafeResult(status: .applied, generation: generation) }
+                switch old {
+                case .current(let record):
+                    try self.validateJournal(record)
+                    if record.phase == .verifiedApplied, record.intent == intent,
+                       record.endpoint == capability.endpoint, try self.matchesWritten(record), current() {
+                        return SafeResult(status: .applied, generation: generation)
                     }
+                case .legacyV3(let record):
+                    try self.validateLegacyJournal(record)
+                    return SafeResult(status: .recoveryRequired, generation: generation)
                 }
-                let recovery = try self.recoverLocked(generation)
+                let recovery = try self.recoverLoaded(generation)
                 guard recovery.status == .restored || recovery.status == .idle else { return recovery }
             }
             let services = try self.configuration.persistentServices().filter { $0.enabled && $0.active }
             guard !services.isEmpty else { throw FixedFailure(status: .noServices) }
-            guard services.count <= 256 else { throw FixedFailure(status: .recoveryRequired) }
-            guard Set(services.map { $0.id }).count == services.count else {
+            guard services.count <= 256, Set(services.map { $0.id }).count == services.count else {
                 throw FixedFailure(status: .recoveryRequired)
             }
-            let running = try self.configuration.activeGroups(serviceIDs: services.map { $0.id })
+            let running = try self.configuration.activeServices(serviceIDs: services.map { $0.id })
             var entries: [JournalEntry] = []
-            // 全部服务预检完成后才能写 journal 或系统配置。
+            // 全部服务、双读与能力预检完成后才能写journal或系统配置。
             for service in services {
-                guard service.authentication == .absent else {
-                    throw FixedFailure(status: .unsupportedAuthenticatedProxy)
+                guard let active = running[service.id], !service.id.isEmpty,
+                      service.hasProxyProtocol, service.authentication != .present,
+                      active.authentication != .present,
+                      self.validGroups(service.groups), self.validGroups(active.groups),
+                      self.validDigest(service.unownedDigest), self.validDigest(active.unownedDigest) else {
+                    throw FixedFailure(status: service.authentication == .present || running[service.id]?.authentication == .present
+                                       ? .unsupportedAuthenticatedProxy : .recoveryRequired)
                 }
-                guard !service.id.isEmpty && service.hasProxyProtocol && self.validGroups(service.groups) else {
-                    throw FixedFailure(status: .recoveryRequired)
-                }
-                // 专用入口不提供SOCKS；必须由持久与运行双读证明其未启用。
                 guard case .manual(let storedSOCKS)? = service.groups[.socks],
-                      case .manual(let activeSOCKS)? = running[service.id]?[.socks] else {
+                      case .manual(let activeSOCKS)? = active.groups[.socks] else {
                     throw FixedFailure(status: .recoveryRequired)
                 }
                 guard storedSOCKS.enabled != true, activeSOCKS.enabled != true else {
                     throw FixedFailure(status: .unsupportedSOCKSProxy)
                 }
+                guard service.groups == active.groups else {
+                    throw FixedFailure(status: .recoveryRequired)
+                }
                 let written = self.desiredGroups(intent, before: service.groups)
                 let owned = Set(ProxyGroup.allCases.filter { service.groups[$0] != written[$0] })
                 entries.append(JournalEntry(serviceID: service.id, before: service.groups,
-                                            written: written, ownedGroups: owned))
+                                            written: written, ownedGroups: owned,
+                                            persistentUnownedDigest: service.unownedDigest,
+                                            activeUnownedDigest: active.unownedDigest))
             }
-            guard isCurrent() else { return SafeResult(status: .cancelled, generation: generation) }
-            var record = OwnershipJournal(schemaVersion: 3,
-                installOwnerID: self.journal.installOwnerID, generation: generation, transactionID: UUID(),
-                intent: intent, phase: .prepared, entries: entries)
+            guard current() else { return SafeResult(status: .cancelled, generation: generation) }
+            var record = OwnershipJournal(schemaVersion: 4,
+                installOwnerID: self.journal.installOwnerID,
+                transactionGeneration: generation, transactionID: UUID(),
+                endpoint: capability.endpoint, intent: intent, phase: .prepared, entries: entries)
+            try self.validateJournal(record)
             try self.journal.persist(record)
             do {
                 for entry in entries {
-                    guard isCurrent() else {
+                    guard current() else {
                         try self.journal.clear()
                         return SafeResult(status: .cancelled, generation: generation)
                     }
                     if !entry.ownedGroups.isEmpty {
                         try self.configuration.stage(serviceID: entry.serviceID,
-                            replacements: entry.written.filter { entry.ownedGroups.contains($0.key) })
+                            replacements: entry.written.filter { entry.ownedGroups.contains($0.key) },
+                            expected: entry.before.filter { entry.ownedGroups.contains($0.key) },
+                            expectedUnownedDigest: entry.persistentUnownedDigest)
                     }
                 }
-                guard isCurrent() else {
+                guard current() else {
                     try self.journal.clear()
                     return SafeResult(status: .cancelled, generation: generation)
                 }
+                guard try self.activeBaselineStillMatches(record) else {
+                    try self.journal.clear()
+                    return SafeResult(status: .failedRolledBack, generation: generation)
+                }
             } catch {
-                // 暂存失败，未调用 commit；解锁时后端必须丢弃 session。
                 try self.journal.clear()
                 return SafeResult(status: .failedRolledBack, generation: generation)
             }
@@ -100,14 +121,11 @@ final class ProxyTransaction {
                 try? self.journal.persist(record)
                 return SafeResult(status: .recoveryRequired, generation: generation)
             }
-            // 一旦 commit，取消不能丢下未核验的配置，必须继续核验或保留未决证据。
             record.phase = .committed
             do {
                 try self.journal.persist(record)
                 try self.configuration.apply()
-                guard try self.matchesWritten(record) else {
-                    throw BackendFailure.verificationFailed
-                }
+                guard try self.matchesWritten(record) else { throw BackendFailure.verificationFailed }
                 record.phase = .verifiedApplied
                 try self.journal.persist(record)
             } catch {
@@ -115,8 +133,8 @@ final class ProxyTransaction {
                 try? self.journal.persist(record)
                 return SafeResult(status: .recoveryRequired, generation: generation)
             }
-            if !isCurrent() {
-                let compensation = try self.recoverLocked(generation)
+            if !current() {
+                let compensation = try self.recoverCurrent(record, generation: generation)
                 if compensation.status == .restored {
                     return SafeResult(status: .cancelled, generation: generation,
                                       changedGroups: compensation.changedGroups)
@@ -145,107 +163,282 @@ final class ProxyTransaction {
         } catch JournalFailure.busy {
             return SafeResult(status: .busy, generation: generation)
         } catch {
-            // 任意底层异常均不能跨出原始正文。
             return SafeResult(status: .recoveryRequired, generation: generation)
         }
     }
 
-    private func recoverLocked(_ generation: UInt64) throws -> SafeResult {
-        guard var record = try journal.load() else {
+    private func recoverLoaded(_ generation: UInt64) throws -> SafeResult {
+        guard let loaded = try journal.load() else {
             return SafeResult(status: .idle, generation: generation)
         }
-        try validateJournal(record)
+        switch loaded {
+        case .current(let record):
+            try validateJournal(record)
+            return try recoverCurrent(record, generation: generation)
+        case .legacyV3(let record):
+            try validateLegacyJournal(record)
+            return try recoverLegacy(record, generation: generation)
+        }
+    }
+
+    private func recoverCurrent(_ input: OwnershipJournal, generation: UInt64) throws -> SafeResult {
+        var record = input
         guard record.phase == .verifiedApplied else {
+            if try allOwnedGroupsAreBefore(record) {
+                try journal.clear()
+                return SafeResult(status: .restored, generation: generation)
+            }
             return SafeResult(status: .recoveryRequired, generation: generation)
         }
-        let verifiedRecord = record
         let services = try configuration.persistentServices()
-        let active = try configuration.activeGroups(serviceIDs: record.entries.map { $0.serviceID })
+        let active = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
         guard Set(services.map { $0.id }).count == services.count else { throw JournalFailure.invalid }
         let current = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0) })
         var changes: [String: [ProxyGroup: GroupValue]] = [:]
-        var conflictGroups: Set<OwnedGroupID> = []
+        var conflicts: Set<OwnedGroupID> = []
+        var alreadyRestored: Set<OwnedGroupID> = []
         for entry in record.entries {
+            guard let service = current[entry.serviceID], let running = active[entry.serviceID],
+                  stable(service, running, entry) else {
+                conflicts.formUnion(entry.ownedGroups.map { OwnedGroupID(serviceID: entry.serviceID, group: $0) })
+                continue
+            }
             for group in entry.ownedGroups {
-                // 新认证配置也是外部变更，不能恢复原 host 或 enable。
-                guard let service = current[entry.serviceID], service.enabled,
-                      service.hasProxyProtocol, service.authentication == .absent,
-                      service.groups[group] == entry.written[group],
-                      active[entry.serviceID]?[group] == entry.written[group] else {
-                    conflictGroups.insert(OwnedGroupID(serviceID: entry.serviceID, group: group))
-                    continue
+                let id = OwnedGroupID(serviceID: entry.serviceID, group: group)
+                if service.groups[group] == entry.written[group],
+                   running.groups[group] == entry.written[group] {
+                    changes[entry.serviceID, default: [:]][group] = entry.before[group]
+                } else if service.groups[group] == entry.before[group],
+                          running.groups[group] == entry.before[group] {
+                    alreadyRestored.insert(id)
+                } else {
+                    conflicts.insert(id)
                 }
-                changes[entry.serviceID, default: [:]][group] = entry.before[group]
             }
         }
-        let conflicts = conflictGroups.count
+        let conflictCount = conflicts.count
         let count = changes.values.reduce(0) { $0 + $1.count }
         if count == 0 {
-            if conflicts == 0 { try journal.clear(); return SafeResult(status: .restored, generation: generation) }
+            if conflictCount == 0 {
+                guard try allOwnedGroupsAreBefore(record) else {
+                    return SafeResult(status: .recoveryRequired, generation: generation)
+                }
+                try journal.clear()
+                return SafeResult(status: .restored, generation: generation)
+            }
             record.phase = .uncertain
-            record.restoration.remainingConflicts = conflictGroups
+            record.restoration.verifiedRestored = alreadyRestored
+            record.restoration.remainingConflicts = conflicts
             try journal.persist(record)
-            return SafeResult(status: .conflict, generation: generation, unresolvedGroups: conflicts)
+            return SafeResult(status: .conflict, generation: generation, unresolvedGroups: conflictCount)
         }
-        // 补偿提交前撤销自动恢复资格，崩溃不能重放旧 verified 标记。
+        let verifiedRecord = record
         record.phase = .uncertain
-        record.restoration.remainingConflicts = conflictGroups
+        record.restoration.remainingConflicts = conflicts
         try journal.persist(record)
         do {
-            for id in changes.keys.sorted() { try configuration.stage(serviceID: id, replacements: changes[id]!) }
+            for id in changes.keys.sorted() {
+                guard let entry = record.entries.first(where: { $0.serviceID == id }) else { throw JournalFailure.invalid }
+                try configuration.stage(serviceID: id, replacements: changes[id]!,
+                                        expected: record.entries.first(where: { $0.serviceID == id })!.written
+                                            .filter { changes[id]!.keys.contains($0.key) },
+                                        expectedUnownedDigest: entry.persistentUnownedDigest)
+            }
+            let active = try configuration.activeServices(serviceIDs: Array(changes.keys))
+            guard changes.allSatisfy({ id, groups in
+                guard let entry = record.entries.first(where: { $0.serviceID == id }),
+                      let running = active[id], running.authentication != .present,
+                      running.unownedDigest == entry.activeUnownedDigest,
+                      validGroups(running.groups) else { return false }
+                return groups.keys.allSatisfy { running.groups[$0] == entry.written[$0] }
+            }) else { throw BackendFailure.stageFailed }
         } catch {
-            // 尚未 commit，可恢复原 verified 证据，重试仍须双读匹配。
             try journal.persist(verifiedRecord)
-            return SafeResult(status: .failedRolledBack, generation: generation, unresolvedGroups: count + conflicts)
+            return SafeResult(status: .failedRolledBack, generation: generation,
+                              unresolvedGroups: count + conflictCount)
         }
         do {
             try configuration.commit()
         } catch BackendFailure.commitRejected {
             try journal.persist(verifiedRecord)
-            return SafeResult(status: .failedRolledBack, generation: generation, unresolvedGroups: count + conflicts)
+            return SafeResult(status: .failedRolledBack, generation: generation,
+                              unresolvedGroups: count + conflictCount)
         } catch {
-            return SafeResult(status: .recoveryRequired, generation: generation, unresolvedGroups: count + conflicts)
+            return SafeResult(status: .recoveryRequired, generation: generation,
+                              unresolvedGroups: count + conflictCount)
         }
         do {
             try configuration.apply()
             let after = try configuration.persistentServices()
+            let running = try configuration.activeServices(serviceIDs: Array(changes.keys))
             guard Set(after.map { $0.id }).count == after.count else { throw BackendFailure.verificationFailed }
-            let byID = Dictionary(uniqueKeysWithValues: after.map { ($0.id, $0.groups) })
-            let running = try configuration.activeGroups(serviceIDs: Array(changes.keys))
+            let byID = Dictionary(uniqueKeysWithValues: after.map { ($0.id, $0) })
             for (id, groups) in changes {
+                guard let entry = record.entries.first(where: { $0.serviceID == id }),
+                      let service = byID[id], let activeService = running[id],
+                      stable(service, activeService, entry) else { throw BackendFailure.verificationFailed }
                 for (group, value) in groups {
-                    guard byID[id]?[group] == value && running[id]?[group] == value else {
+                    guard service.groups[group] == value && activeService.groups[group] == value else {
                         throw BackendFailure.verificationFailed
                     }
                 }
             }
         } catch {
-            return SafeResult(status: .recoveryRequired, generation: generation, unresolvedGroups: count + conflicts)
+            return SafeResult(status: .recoveryRequired, generation: generation,
+                              unresolvedGroups: count + conflictCount)
         }
-        // 最终双读通过才登记完成集合，并在返回或 clear 之前持久化。
-        record.restoration.verifiedRestored = Set(changes.flatMap { id, groups in
+        record.restoration.verifiedRestored = alreadyRestored.union(Set(changes.flatMap { id, groups in
             groups.keys.map { OwnedGroupID(serviceID: id, group: $0) }
-        })
+        }))
         try validateJournal(record)
         try journal.persist(record)
-        if conflicts > 0 {
-            // 已恢复组不再认领；冲突证据保持 uncertain，只能人工处理。
-            return SafeResult(status: .conflict, generation: generation, changedGroups: count, unresolvedGroups: conflicts)
+        if conflictCount > 0 {
+            return SafeResult(status: .conflict, generation: generation,
+                              changedGroups: count, unresolvedGroups: conflictCount)
+        }
+        guard try allOwnedGroupsAreBefore(record) else {
+            return SafeResult(status: .recoveryRequired, generation: generation,
+                              unresolvedGroups: count)
         }
         try journal.clear()
         return SafeResult(status: .restored, generation: generation, changedGroups: count)
+    }
+
+    // schema4非verified只允许“已经全量回到before”的零配置写入清理。
+    private func allOwnedGroupsAreBefore(_ record: OwnershipJournal) throws -> Bool {
+        let services = try configuration.persistentServices()
+        guard Set(services.map { $0.id }).count == services.count else { return false }
+        let current = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0) })
+        let active = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
+        return record.entries.allSatisfy { entry in
+            guard let service = current[entry.serviceID], let running = active[entry.serviceID],
+                  stable(service, running, entry) else { return false }
+            return entry.ownedGroups.allSatisfy {
+                service.groups[$0] == entry.before[$0] && running.groups[$0] == entry.before[$0]
+            }
+        }
+    }
+
+    private func stable(_ service: ServiceSnapshot, _ active: ActiveServiceSnapshot,
+                        _ entry: JournalEntry) -> Bool {
+        service.enabled && service.active && service.hasProxyProtocol &&
+        service.authentication != .present && active.authentication != .present &&
+        service.unownedDigest == entry.persistentUnownedDigest &&
+        active.unownedDigest == entry.activeUnownedDigest &&
+        validGroups(service.groups) && validGroups(active.groups)
     }
 
     private func matchesWritten(_ record: OwnershipJournal) throws -> Bool {
         let services = try configuration.persistentServices()
         guard Set(services.map { $0.id }).count == services.count else { return false }
         let current = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0) })
-        let active = try configuration.activeGroups(serviceIDs: record.entries.map { $0.serviceID })
+        let active = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
         return record.entries.allSatisfy { entry in
-            guard let service = current[entry.serviceID], service.enabled, service.hasProxyProtocol,
-                  service.authentication == .absent else { return false }
-            return service.groups == entry.written && active[entry.serviceID] == entry.written
+            guard let service = current[entry.serviceID], let running = active[entry.serviceID],
+                  stable(service, running, entry) else { return false }
+            return service.groups == entry.written && running.groups == entry.written
         }
+    }
+
+    private func activeBaselineStillMatches(_ record: OwnershipJournal) throws -> Bool {
+        let active = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
+        return record.entries.allSatisfy { entry in
+            guard let service = active[entry.serviceID] else { return false }
+            return service.authentication != .present && service.groups == entry.before &&
+                service.unownedDigest == entry.activeUnownedDigest && validGroups(service.groups)
+        }
+    }
+
+    // legacy v3绝不升级或持久化新来源；只在历史absent合同下恢复written或确认已回到before。
+    private func recoverLegacy(_ record: LegacyOwnershipJournalV3, generation: UInt64) throws -> SafeResult {
+        guard record.phase == .verifiedApplied else {
+            return SafeResult(status: .recoveryRequired, generation: generation)
+        }
+        let services = try configuration.persistentServices()
+        guard Set(services.map { $0.id }).count == services.count else { throw JournalFailure.invalid }
+        let current = Dictionary(uniqueKeysWithValues: services.map { ($0.id, $0) })
+        let active = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
+        var changes: [String: [ProxyGroup: GroupValue]] = [:]
+        for entry in record.entries {
+            guard let service = current[entry.serviceID], let running = active[entry.serviceID],
+                  service.enabled, service.active, service.hasProxyProtocol,
+                  service.authentication == .absent, running.authentication == .absent,
+                  validGroups(service.groups), validGroups(running.groups) else {
+                return SafeResult(status: .recoveryRequired, generation: generation)
+            }
+            for group in entry.ownedGroups {
+                if service.groups[group] == entry.written[group],
+                   running.groups[group] == entry.written[group] {
+                    changes[entry.serviceID, default: [:]][group] = entry.before[group]
+                } else if service.groups[group] != entry.before[group] ||
+                            running.groups[group] != entry.before[group] {
+                    return SafeResult(status: .recoveryRequired, generation: generation)
+                }
+            }
+        }
+        if changes.isEmpty {
+            try journal.clear()
+            return SafeResult(status: .restored, generation: generation)
+        }
+        do {
+            for id in changes.keys.sorted() {
+                guard let service = current[id],
+                      let entry = record.entries.first(where: { $0.serviceID == id }) else {
+                    throw JournalFailure.invalid
+                }
+                try configuration.stage(serviceID: id, replacements: changes[id]!,
+                                        expected: entry.written
+                                            .filter { changes[id]!.keys.contains($0.key) },
+                                        expectedUnownedDigest: service.unownedDigest)
+            }
+            let beforeCommit = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
+            guard record.entries.allSatisfy({ entry in
+                guard let service = beforeCommit[entry.serviceID], service.authentication == .absent,
+                      validGroups(service.groups) else { return false }
+                return entry.ownedGroups.allSatisfy { group in
+                    let expected = changes[entry.serviceID]?[group] == nil ? entry.before[group] : entry.written[group]
+                    return service.groups[group] == expected
+                }
+            }) else {
+                return SafeResult(status: .failedRolledBack, generation: generation,
+                                  unresolvedGroups: changes.values.reduce(0) { $0 + $1.count })
+            }
+        } catch {
+            return SafeResult(status: .failedRolledBack, generation: generation,
+                              unresolvedGroups: changes.values.reduce(0) { $0 + $1.count })
+        }
+        do {
+            try configuration.commit()
+        } catch BackendFailure.commitRejected {
+            return SafeResult(status: .failedRolledBack, generation: generation,
+                              unresolvedGroups: changes.values.reduce(0) { $0 + $1.count })
+        } catch {
+            return SafeResult(status: .recoveryRequired, generation: generation)
+        }
+        do {
+            try configuration.apply()
+            let after = Dictionary(uniqueKeysWithValues: try configuration.persistentServices().map { ($0.id, $0) })
+            let running = try configuration.activeServices(serviceIDs: record.entries.map { $0.serviceID })
+            for entry in record.entries {
+                guard let service = after[entry.serviceID], let activeService = running[entry.serviceID],
+                      service.enabled, service.active, service.hasProxyProtocol,
+                      service.authentication == .absent, activeService.authentication == .absent,
+                      validGroups(service.groups), validGroups(activeService.groups) else {
+                    throw BackendFailure.verificationFailed
+                }
+                for group in entry.ownedGroups {
+                    guard service.groups[group] == entry.before[group],
+                          activeService.groups[group] == entry.before[group] else {
+                        throw BackendFailure.verificationFailed
+                    }
+                }
+            }
+        } catch {
+            return SafeResult(status: .recoveryRequired, generation: generation)
+        }
+        try journal.clear()
+        return SafeResult(status: .restored, generation: generation,
+                          changedGroups: changes.values.reduce(0) { $0 + $1.count })
     }
 
     private func validGroups(_ groups: [ProxyGroup: GroupValue]) -> Bool {
@@ -260,14 +453,17 @@ final class ProxyTransaction {
                     }) else { return false }
                 }
             case (.bypass, .bypass(let domains)?):
-                if let domains = domains, !ProxyIntent(port: 1, bypass: domains).validate(allowEmptyStoredBypass: true) { return false }
+                if let domains, !ProxyIntent(port: 1, bypass: domains).validate(allowEmptyStoredBypass: true) { return false }
             case (.pac, .automatic(let fields)?), (.wpad, .automatic(let fields)?):
-                guard fields.unchangedConfigurationDigest.count == 64,
-                      fields.unchangedConfigurationDigest.allSatisfy({ "0123456789abcdef".contains($0) }) else { return false }
+                guard validDigest(fields.unchangedConfigurationDigest) else { return false }
             default: return false
             }
         }
         return true
+    }
+
+    private func validDigest(_ value: String) -> Bool {
+        value.count == 64 && value.allSatisfy { "0123456789abcdef".contains($0) }
     }
 
     private func desiredGroups(_ intent: ProxyIntent, before: [ProxyGroup: GroupValue]) -> [ProxyGroup: GroupValue] {
@@ -286,27 +482,56 @@ final class ProxyTransaction {
     }
 
     private func validateJournal(_ record: OwnershipJournal) throws {
+        guard record.schemaVersion == 4, record.installOwnerID == journal.installOwnerID,
+              record.transactionGeneration > 0, record.endpoint.profile == .credentialBlindHTTPv1,
+              record.endpoint.supervisorGeneration > 0, record.endpoint.listenerEpoch > 0,
+              record.endpoint.host == "127.0.0.1", record.endpoint.port == record.intent.port,
+              record.intent.validate(), !record.entries.isEmpty, record.entries.count <= 256,
+              Set(record.entries.map { $0.serviceID }).count == record.entries.count else { throw JournalFailure.invalid }
+        try validateEntries(record.entries.map {
+            ($0.serviceID, $0.before, $0.written, $0.ownedGroups)
+        }, intent: record.intent)
+        guard record.entries.allSatisfy({ validDigest($0.persistentUnownedDigest) && validDigest($0.activeUnownedDigest) }) else {
+            throw JournalFailure.invalid
+        }
+        try validateProgress(record.restoration, entries: record.entries.map { ($0.serviceID, $0.ownedGroups) },
+                             phase: record.phase)
+    }
+
+    private func validateLegacyJournal(_ record: LegacyOwnershipJournalV3) throws {
         guard record.schemaVersion == 3, record.installOwnerID == journal.installOwnerID,
-              record.intent.validate(), !record.entries.isEmpty,
+              record.generation > 0, record.intent.validate(), !record.entries.isEmpty,
               record.entries.count <= 256,
               Set(record.entries.map { $0.serviceID }).count == record.entries.count else { throw JournalFailure.invalid }
-        for entry in record.entries {
-            guard !entry.serviceID.isEmpty, validGroups(entry.before), validGroups(entry.written),
-                  entry.written == desiredGroups(record.intent, before: entry.before),
-                  entry.ownedGroups == Set(ProxyGroup.allCases.filter { entry.before[$0] != entry.written[$0] }) else {
+        try validateEntries(record.entries.map {
+            ($0.serviceID, $0.before, $0.written, $0.ownedGroups)
+        }, intent: record.intent)
+        try validateProgress(record.restoration, entries: record.entries.map { ($0.serviceID, $0.ownedGroups) },
+                             phase: record.phase)
+    }
+
+    private func validateEntries(_ entries: [(String, [ProxyGroup: GroupValue], [ProxyGroup: GroupValue], Set<ProxyGroup>)],
+                                 intent: ProxyIntent) throws {
+        for (serviceID, before, written, owned) in entries {
+            guard !serviceID.isEmpty, validGroups(before), validGroups(written),
+                  written == desiredGroups(intent, before: before),
+                  owned == Set(ProxyGroup.allCases.filter { before[$0] != written[$0] }) else {
                 throw JournalFailure.invalid
             }
         }
-        let owned = Set(record.entries.flatMap { entry in
-            entry.ownedGroups.map { OwnedGroupID(serviceID: entry.serviceID, group: $0) }
+    }
+
+    private func validateProgress(_ progress: RestorationProgress,
+                                  entries: [(String, Set<ProxyGroup>)], phase: JournalPhase) throws {
+        let owned = Set(entries.flatMap { serviceID, groups in
+            groups.map { OwnedGroupID(serviceID: serviceID, group: $0) }
         })
-        guard record.restoration.verifiedRestored.isSubset(of: owned),
-              record.restoration.remainingConflicts.isSubset(of: owned),
-              record.restoration.verifiedRestored.isDisjoint(with: record.restoration.remainingConflicts) else {
+        guard progress.verifiedRestored.isSubset(of: owned),
+              progress.remainingConflicts.isSubset(of: owned),
+              progress.verifiedRestored.isDisjoint(with: progress.remainingConflicts) else {
             throw JournalFailure.invalid
         }
-        if record.phase != .uncertain &&
-            (!record.restoration.verifiedRestored.isEmpty || !record.restoration.remainingConflicts.isEmpty) {
+        if phase != .uncertain && (!progress.verifiedRestored.isEmpty || !progress.remainingConflicts.isEmpty) {
             throw JournalFailure.invalid
         }
     }
