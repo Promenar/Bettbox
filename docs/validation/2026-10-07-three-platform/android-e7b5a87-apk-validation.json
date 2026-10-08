@@ -1,0 +1,56 @@
+{
+  "source_commit": "e7b5a878df042319f737cc8176106e71f8f3c1e0",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "build_status": "passed",
+  "signature_verified": true,
+  "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+  "candidate_path": "build/releases/android/Bettbox-arm64-e7b5a87.apk",
+  "apk_sha256": "9b6807f7bcb3d26208312a59c366aab2898d334ee5913476129fbbaa7af68b34",
+  "installed_apk_sha256": "9b6807f7bcb3d26208312a59c366aab2898d334ee5913476129fbbaa7af68b34",
+  "installed_apk_exact_match": true,
+  "core_sha256": "44a4bbb2c6ca412cf241544e8dcf03df1594b9ef01760a93b0187f5711df1577",
+  "native_ELF_and_zip_16KiB_alignment": true,
+  "gradle_cleanup_verified": true,
+  "dependency_network_transport": "task-loopback-https-connect",
+  "dependency_network_renewal_stopped": true,
+  "dependency_network_connection_count": 478,
+  "release_verified": false,
+  "boundary": "正式签名本地候选；尚未完成VPN真实流量、邀请注册闭环与支付验收，未公开发布。",
+  "native_email_input_type": "0x800b1",
+  "native_autocorrect_disabled": true,
+  "native_suggestions_disabled": true,
+  "ui_login": {
+    "source_commit": "e7b5a878df042319f737cc8176106e71f8f3c1e0",
+    "apk_sha256": "9b6807f7bcb3d26208312a59c366aab2898d334ee5913476129fbbaa7af68b34",
+    "email_exact_match": true,
+    "public_ASCII_fixture_exact": true,
+    "login_form_closed": true,
+    "known_labels": {
+      "退出登录": false,
+      "邀请返利": false,
+      "登录同步订阅信息": false,
+      "订阅尚未生效，请先开通套餐": false,
+      "网络错误": false,
+      "我的订阅": false,
+      "登录": false,
+      "订阅": true
+    },
+    "credentials_reported": false
+  },
+  "ui_account": {
+    "account_identity_exact_visible": true,
+    "logout_visible": true,
+    "invite_entry_visible": true,
+    "quota_64MB_visible": false,
+    "login_visible": false
+  },
+  "ui_cold_start": {
+    "cold_start_account_identity_exact": true,
+    "cold_start_logout_visible": true,
+    "cold_start_quota_64MB_visible": true,
+    "emulator_IME_settings_restored": true,
+    "secrets_reported": false
+  },
+  "IME_boundary": "中文拼音模式会转换ADB按键；Alphabet模式下公开ASCII与凭据完整匹配，验证后恢复原模式和软键盘设置。"
+}

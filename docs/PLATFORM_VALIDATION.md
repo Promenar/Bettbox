@@ -1,6 +1,6 @@
 # 共享客户端与平台验收
 
-2026-10-08 正式 APK 账户输入：实际邮箱完整比对失败，EditorInfo 包含自动纠错标志。三页邮箱/密码及邀请码候选已显式关闭纠错、建议和智能字符替换；8 项通道回归与完整 Flutter 192 项通过，静态分析无问题。正式包需重建、安装并复核原生输入后才能确认设备修复，不能把通道测试当成登录成功。见 `validation/2026-10-07-three-platform/android-account-input-validation.json`。
+2026-10-08 正式 Android 候选 `e7b5a87` 已构建、验签并覆盖安装，回读 APK SHA256 一致；账户字段原生输入类型 `0x800b1` 已关闭纠错和建议。模拟器中文输入法改写 ADB 按键，切换已有 Alphabet 后公开 ASCII 与真实邮箱完整匹配；真实登录、账号身份、邀请入口及冷启动恢复通过，首页显示 64 MB 配额，输入法设置已恢复。8 项通道回归和完整 Flutter 192 项通过。VPN 真实流量、节点实际呈现、邀请注册闭环和支付尚未验收，未公开发布。见 `validation/2026-10-07-three-platform/android-e7b5a87-apk-validation.json`。
 
 2026-10-08 Android 正式候选真实业务验收：独立开发账户的真实登录、账户、订阅与节点接口均 HTTP 200，订阅未过期，返回 23 个节点。客户端界面登录、冷启动安全存储及 VPN 流量尚未验收；后台创建账户不是网页邮件注册或邀请绑定证据。见 `validation/2026-10-07-three-platform/android-live-account-validation.json` 与 `.agents/plans/2026-10-08-android-live-account.md`。
 

@@ -1466,3 +1466,34 @@ EditorInfo固定解析0x8021；当前android-36 SDK javap确认AUTO_CORRECT=3276
 
 ### HLG
 使用append dry-run后apply追加实际设备观察、修复及后续冻结边界。
+
+## 2026-10-08T11:23:13+08:00 · Android正式候选真实登录与冷启动恢复验收
+
+type: implementation
+scope: ["Bettbox", "Android", "macOS"]
+status: done
+tags: ["android", "release-candidate", "account", "macos-design"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 789fc40319931fdd434ef5da185c808f2fd8fc68efe8f2a6af31b6546b1658c4
+
+### Summary
+Android e7b5a87 正式签名候选构建、安装、真实账户登录及冷启动恢复通过。完整发行目标保持进行中；iOS遵循用户选择保留开发版与发行研究，优先Android/macOS。
+
+### Changed
+更新Android安装契约APK摘要和批准摘要，保存脱敏构建/安装/登录/冷启动证据，同步平台验收说明、CHANGELOG及账户计划。稳定候选 build/releases/android/Bettbox-arm64-e7b5a87.apk。
+
+### Validation
+构建驱动会话79797终止exit0，源e7b5a878df042319f737cc8176106e71f8f3c1e0及锁未漂移，唯一正式证书、native ELF和16KiB zipalign、网络退出/Gradle清理通过；安装回读SHA256 9b6807f7bcb3d26208312a59c366aab2898d334ee5913476129fbbaa7af68b34。原生inputType 0x800b1；中文拼音改写ADB键事件，Alphabet模式公开ASCII与真实邮箱完整匹配，提交登录后正确账户身份/退出登录/邀请入口可见；force-stop再启动仍保持账户身份且首页64MB配额。原模拟器IME subtype617035939和show_ime_with_hard_keyboard=0已恢复。复用冻结输入8项红绿/192项Flutter/静态分析证据。独立审阅公开回执/PDEC/脚本语义无P1/P2，主控实际检查安装与UI证据。
+
+### Next
+验证Android节点呈现、VPN真实流量及异常恢复，再完成邀请注册闭环和支付。macOS只读设计需主控进一步核验：保留SC authentication unknown；原生直接接收经身份认证的Core监听资源，考虑持有监听FD防端口复用；SC恢复先于端点释放；启用中的旧代理完整恢复不能被只接受关闭基线的限制替代。设计报告未实施、未形成实机通过结论。
+
+### Risks
+APK为本地正式签名候选，release_verified=false；未公开发布、未付款/生成邀请/公开注册，Android实际页大小4096未验16KiB设备。macOS正常main/Keychain/真实SC代理与流量尚未验收；iOS组织Team/NE/AppGroup及发行政策、DeveloperID公证、Fubei商户/门店与安全注入仍需外部条件。秘密未进入输出，用户.video_agent未触碰。
+
+### DIA
+已同步docs/PLATFORM_VALIDATION.md、docs/CHANGELOG.md、账户计划、Android公开验证回执及PDEC安装摘要。
+
+### HLG
+使用结构化append先dry-run再apply，记录事实与后续边界。

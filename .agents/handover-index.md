@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T10:59:05+08:00
+> generated_at: 2026-10-08T11:23:13+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T10:59:05+08:00 | partial | ["Bettbox"] | Android账户输入法边界修复与完整Flutter回归 | `.agents/handover.md` · `2026-10-08T10:59:05+08:00` · `fp:406841ad0e` |
+| three-platform-release | resume | 2026-10-08T11:23:13+08:00 | done | ["Bettbox", "Android", "macOS"] | Android正式候选真实登录与冷启动恢复验收 | `.agents/handover.md` · `2026-10-08T11:23:13+08:00` · `fp:789fc40319` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T11:23:13+08:00 | iso | done | resume | ["Bettbox", "Android", "macOS"] | ["android", "release-candidate", "account", "macos-design"] | Android正式候选真实登录与冷启动恢复验收 | `.agents/handover.md` · `2026-10-08T11:23:13+08:00` · `fp:789fc40319` |
 | 2026-10-08T10:59:05+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "input", "credentials", "flutter"] | Android账户输入法边界修复与完整Flutter回归 | `.agents/handover.md` · `2026-10-08T10:59:05+08:00` · `fp:406841ad0e` |
 | 2026-10-08T10:43:20+08:00 | iso | partial | resume | ["Bettbox"] | ["android", "xboard", "account", "subscription", "security"] | Android独立开发账户与真实订阅接口验收 | `.agents/handover.md` · `2026-10-08T10:43:20+08:00` · `fp:e16dc5dbfb` |
 | 2026-10-08T10:25:13+08:00 | iso | done | resume | ["Bettbox", "Android"] | ["android", "release", "emulator"] | Android正式签名APK及模拟器安装启动验收 | `.agents/handover.md` · `2026-10-08T10:25:13+08:00` · `fp:6af4ec326e` |
