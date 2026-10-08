@@ -1,0 +1,58 @@
+{
+  "source_commit": "5fabe2f03a59859bcf1dd63483479854ceb380b7",
+  "status": "failed",
+  "phase": "android-release-build",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "events": {
+    "overload": 0,
+    "queue-expired": 43,
+    "upstream-unavailable": 0,
+    "header-timeout": 0,
+    "header-too-large": 0,
+    "header-malformed": 0,
+    "target-outside-allowlist": 1,
+    "relay-failed": 0,
+    "resolution-slot-expired": 0,
+    "nonofficial-jcenter": 0,
+    "nonofficial-jitpack": 0,
+    "outside-other": 0,
+    "non-connect-request": 0,
+    "unsupported-connect-authority": 0,
+    "unapproved-connect-host": 0,
+    "rejected-public-maven-google": 1,
+    "rejected-public-gradle-downloads": 0,
+    "rejected-public-gvt-redirector": 0,
+    "rejected-public-google-dl-ssl": 0,
+    "rejected-public-jetbrains-download": 0,
+    "rejected-public-adoptium-api": 0,
+    "rejected-public-java-download": 0
+  },
+  "cleanup_verified": true,
+  "remaining_owned_processes": 0,
+  "formal_apk_verified": false,
+  "official_source": "https://developer.android.com/build/remote-repositories",
+  "reason": "真实请求maven.google.com被白名单拒绝；官方Google Maven HTTPS别名",
+  "fix": {
+    "host": "maven.google.com",
+    "port": 443,
+    "scheme": "https",
+    "authority": "既有用户仅限本项目官方依赖授权",
+    "source_hashes": {
+      "scripts/android_dependency_network.py": "025b56819537f984011196aa9e6dfa8fc3400369267dc131406800b9b8e4ad14",
+      "scripts/tests/test_android_dependency_network.py": "b25af8eeb09dad2cd2e3724bb110ccc7ddcee9d3cb0e6dcab979710bebbaeca0"
+    },
+    "tests": 94,
+    "test_exit_code": 0,
+    "red": {
+      "sources": {
+        "scripts/android_dependency_network.py": "9af4cee7146e382adc1f38348ecef9e91eac558ba1ccf9beb867c110fae9e413",
+        "scripts/tests/test_android_dependency_network.py": "b25af8eeb09dad2cd2e3724bb110ccc7ddcee9d3cb0e6dcab979710bebbaeca0"
+      },
+      "log_sha256": "af9c8c93af907d97328743104406cf0fcc6ba462c497361d08fdeae67c0360dd"
+    },
+    "green_log_sha256": "60570f2b765b6d182f2d02473d0d6074b5e4aab0107914ddfc79424278eee3c9",
+    "apk_verified": false
+  },
+  "independent_review": "静态复核无P1/P2；主控执行94项测试并核验Google官方文档"
+}

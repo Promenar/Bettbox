@@ -44,7 +44,7 @@
 
 ## Android 官方依赖连接验收
 
-任务仅使用用户授权的九个官方依赖主机与 Cloudflare DoH。连接代理监听127.0.0.1随机端口，只接受白名单host:443的CONNECT，透明转发TLS字节；Java保留原站SNI和默认证书校验。每次上游连接使用原始CNAME/地址最短TTL，TTL0仅用于当前查询对应的一次连接且不缓存，过期回答有界重新解析；已建立的TCP不因DNS缓存到期中断。
+任务仅使用用户授权范围内的十个已核验官方依赖主机与 Cloudflare DoH。连接代理监听127.0.0.1随机端口，只接受白名单host:443的CONNECT，透明转发TLS字节；Java保留原站SNI和默认证书校验。每次上游连接使用原始CNAME/地址最短TTL，TTL0仅用于当前查询对应的一次连接且不缓存，过期回答有界重新解析；已建立的TCP不因DNS缓存到期中断。
 
 只向wrapper与实际Gradle JVM注入任务代理参数，hosts限制为localhost闭包，禁止系统解析回退。禁止系统DNS、Tailscale、全局hosts、全局代理和非官方依赖变化；pub/Go不使用该代理。实现由Android网络工作包独占四个脚本/测试文件，独立审阅后主控登记PDEC、冻结来源，先Java TLS与Gradle help，再APK。清理须验证owned socket/thread/child与Gradle进程退出，回执不保留签名URL或响应正文。
 
@@ -102,3 +102,5 @@ Go专用入口与Checked关闭API已集成并通过当前工作树回归：Mac m
 ## Android正式构建网络拒绝定位
 
 主控独占任务代理及相关测试；仅新增固定拒绝类别，区分非CONNECT、非法authority、未批准CONNECT域名及固定公开候选，不记录任意主机、头、URL或凭据。所有拒绝继续阻断任务，不改HOSTS、TLS、DNS、并发或预算。先运行失败回归，再执行登记test-android-network；独立只读复核后冻结源码执行正式release构建。依据真实事件决定后续方案，未知请求不得凭猜测扩权。验证源码/锁未漂移与归属退出，再同步DIA/HLG、一次提交推送。
+
+Google Maven HTTPS别名接入：当前真实正式构建在maven.google.com被拒绝，已由Google官方remote-repositories文档确认。按用户“仅限本项目官方依赖”授权，仅加入准确host:443，不加子域、明文HTTP或系统DNS回退。失败测试先复现，完整网络/构建回归后独立复核；冻结源码再实际构建，最终APK及业务另验。

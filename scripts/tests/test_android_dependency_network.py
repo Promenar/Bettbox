@@ -69,7 +69,7 @@ class DependencyNetworkTest(unittest.TestCase):
             (b'GET http://fictional-private.example/ HTTP/1.1\r\n\r\n', 'non-connect-request'),
             (b'CONNECT fictional-private.example:443 HTTP/1.1\r\n\r\n', 'unapproved-connect-host'),
             (b'CONNECT plugins.gradle.org:80 HTTP/1.1\r\n\r\n', 'unsupported-connect-authority'),
-            (b'CONNECT maven.google.com:443 HTTP/1.1\r\n\r\n', 'rejected-public-maven-google'),
+            (b'CONNECT downloads.gradle.org:443 HTTP/1.1\r\n\r\n', 'rejected-public-gradle-downloads'),
         ]
         for request, source in cases:
             with self.subTest(source=source), self.assertRaises(network.HeaderError) as caught:
@@ -90,6 +90,16 @@ class DependencyNetworkTest(unittest.TestCase):
         self.assertEqual(set(plan['hosts']), set(network.HOSTS))
         self.assertNotIn('jitpack.io', plan['hosts'])
         self.assertNotIn('jcenter.bintray.com', plan['hosts'])
+
+    def test_documented_google_maven_alias_is_https_only(self):
+        host, tail = network.connect_host(b'CONNECT maven.google.com:443 HTTP/1.1\r\n\r\nTLS')
+        self.assertEqual((host, tail), ('maven.google.com', b'TLS'))
+        self.assertIn('maven.google.com', network.SOURCES)
+        self.assertEqual(network.checked_url('https://maven.google.com/').hostname, host)
+        for request in [b'CONNECT maven.google.com:80 HTTP/1.1\r\n\r\n',
+                        b'GET http://maven.google.com/ HTTP/1.1\r\n\r\n',
+                        b'CONNECT private.maven.google.com:443 HTTP/1.1\r\n\r\n']:
+            with self.assertRaises(network.HeaderError): network.connect_host(request)
 
     def test_doh_no_proxy_default_tls_no_redirect_and_query_identity(self):
         answer = {'Status': 0, 'Question': [{'name': 'plugins.gradle.org', 'type': 1}],

@@ -25,7 +25,7 @@ from pathlib import Path
 DOH_ENDPOINT = "https://cloudflare-dns.com/dns-query"
 HOSTS = (
     "plugins.gradle.org", "plugins-artifacts.gradle.org", "repo.maven.apache.org",
-    "repo1.maven.org", "dl.google.com", "storage.googleapis.com", "services.gradle.org",
+    "repo1.maven.org", "dl.google.com", "maven.google.com", "storage.googleapis.com", "services.gradle.org",
     "github.com", "release-assets.githubusercontent.com",
 )
 SOURCES = {
@@ -34,6 +34,7 @@ SOURCES = {
     "repo.maven.apache.org": "android/settings.gradle.kts:mavenCentral",
     "repo1.maven.org": "plugins/flutter_qjs/android/build.gradle:既有官方 Maven Central 兼容入口",
     "dl.google.com": "android/settings.gradle.kts:google",
+    "maven.google.com": "https://developer.android.com/build/remote-repositories:Google Maven官方HTTPS别名",
     "storage.googleapis.com": "Flutter 官方 download.flutter.io 仓库",
     "services.gradle.org": "android/gradle/wrapper/gradle-wrapper.properties",
     "github.com": "Gradle 官方分发重定向",
@@ -42,7 +43,6 @@ SOURCES = {
 DOMAIN = re.compile(r"(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}")
 # 仅投影固定公开名称供排错；这些目标依然拒绝，不能作为联网授权。
 REJECTED_PUBLIC_TARGETS = {
-    "maven.google.com": "rejected-public-maven-google",
     "downloads.gradle.org": "rejected-public-gradle-downloads",
     "redirector.gvt1.com": "rejected-public-gvt-redirector",
     "dl-ssl.google.com": "rejected-public-google-dl-ssl",

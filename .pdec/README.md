@@ -107,4 +107,6 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 
 `test-macos-proxy-core`同时覆盖受保护journal真实私有文件与跨进程flock；46项测试仅在任务私有fixture目录发布记录，真实SystemConfiguration仍只读，不代表正常App系统代理写入验收。
 
-Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法authority、未批准CONNECT域名及固定公开候选；候选标签不赋予联网权限。九域名HOSTS与HTTPS/TLS门禁保持，任意目标、请求头和URL不进入回执。诊断回归及构建工具93项测试通过；真实正式APK重跑与验签结果单独记录。
+Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法authority、未批准CONNECT域名及固定公开候选；候选标签不赋予联网权限。固定HOSTS与HTTPS/TLS门禁保持，任意目标、请求头和URL不进入回执。诊断回归及构建工具93项测试通过；真实正式APK重跑与验签结果单独记录。
+
+正式构建真实拒绝maven.google.com后，按既有本项目官方依赖授权加入该精确HTTPS别名；[Google官方仓库说明](https://developer.android.com/build/remote-repositories)确认其与已批准dl.google.com仓库对应。任务代理共十个官方主机，其他未知目标继续拒绝，未改变系统配置。

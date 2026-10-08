@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-08T09:49:50+08:00
+> generated_at: 2026-10-08T10:03:50+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -10,12 +10,13 @@
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-08T09:49:50+08:00 | done | ["Bettbox", "Android"] | Android固定拒绝诊断及正式构建候选 | `.agents/handover.md` · `2026-10-08T09:49:50+08:00` · `fp:b120eb4fe7` |
+| three-platform-release | resume | 2026-10-08T10:03:50+08:00 | done | ["Bettbox", "Android"] | Android正式构建Google Maven拒绝根因及修复 | `.agents/handover.md` · `2026-10-08T10:03:50+08:00` · `fp:9e416e9197` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-08T10:03:50+08:00 | iso | done | resume | ["Bettbox", "Android"] | ["android", "network", "release"] | Android正式构建Google Maven拒绝根因及修复 | `.agents/handover.md` · `2026-10-08T10:03:50+08:00` · `fp:9e416e9197` |
 | 2026-10-08T09:49:50+08:00 | iso | done | resume | ["Bettbox", "Android"] | ["android", "network", "release"] | Android固定拒绝诊断及正式构建候选 | `.agents/handover.md` · `2026-10-08T09:49:50+08:00` · `fp:b120eb4fe7` |
 | 2026-10-08T09:47:16+08:00 | iso | partial | resume | ["Bettbox", "Android"] | ["android", "release", "dependency-network"] | Android正式APK构建实际失败与网络边界定位 | `.agents/handover.md` · `2026-10-08T09:47:16+08:00` · `fp:ca03d4048b` |
 | 2026-10-08T09:32:49+08:00 | iso | done | resume | ["Bettbox", "macOS"] | ["journal", "proxy", "three-platform-release"] | macOS受保护journal及跨实例目录同步验收 | `.agents/handover.md` · `2026-10-08T09:32:49+08:00` · `fp:a936cfd7ee` |

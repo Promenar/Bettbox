@@ -1342,3 +1342,34 @@ record-fingerprint: b120eb4fe79ab37a52c7f485bf1522536184a02771717120682fb243ebc9
 
 ### HLG
 标准append dry-run/apply记录，索引由工具重建。
+
+## 2026-10-08T10:03:50+08:00 · Android正式构建Google Maven拒绝根因及修复
+
+type: implementation
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "network", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 9e416e91978f3d5c213a080052f3440ed4dee74e54a5acd0de8542bf8b574eed
+
+### Summary
+真实重跑定位maven.google.com被拒绝，按既有项目官方依赖授权接入精确HTTPS别名；完整Goal保持active。
+
+### Changed
+HOSTS/SOURCES增加maven.google.com，移出拒绝候选；CONNECT443、原站TLS、任务DNS及其他未知目标拒绝保持。
+
+### Validation
+session69912实际exit1，APK阶段拒绝maven-google1，其他越界类别0；源码/锁稳定、清理确认且无剩余owned进程。Google官方remote-repositories确认别名。新增回归旧实现失败，当前94项测试exit0，独立只读审阅无P1/P2。NoSLA公开注册/后台/guest配置HTTPS均200，仅入口可达证明。
+
+### Next
+提交推送后冻结来源执行正式release重跑，保留live handle并观察终态；正式APK验签、安装、有效业务流量，以及Mac native授权接线继续。
+
+### Risks
+未生成或验签正式APK；单元通过不证明真实网络/安装/业务。iOS仍开发版研究，Apple5.4组织资格与NE用途须落实，未改变既定优先范围。
+
+### DIA
+已同步CHANGELOG、PlatformValidation、PDEC说明、计划和公开脱敏回执。
+
+### HLG
+标准append dry-run/apply追加，索引工具重建。
