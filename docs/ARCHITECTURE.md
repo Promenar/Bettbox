@@ -262,3 +262,9 @@ Service/Vpn 的 Dart 包装器仅接受 true。SmartAutoStopManager 使用 compl
 ### Android 首次前台发布确认
 
 `BaseServiceInterface.startForeground` 返回同代前台发布布尔结果。VPN 服务首次速度通知返回 false 时使用基础通知，实际平台调用完成后才更新通知缓存；构造异常由启动失败路径处理。`VpnPlugin` 仅在当前 ticket 仍为 RUNNING 且前台确认成功后发布 START。该确认属于 Android 平台前台步骤，不代表唯一 Native owner 或 typed Go engine ACK；更新恢复资格与持久停止意图按 `.agents/plans/2026-10-09-android-package-restart.md` 接线和验收。
+
+### Android 更新恢复资格
+
+SDK36 的包更新广播通过 `GlobalState.handlePackageReplacement` 在 runLock 内检查恢复资格与停止屏障，明确允许才请求启动。资格文件位于应用 noBackupFilesDir，仅当前票据的 Core、前台发布和 START 完成后授予；普通停止、IDLE 停止和权限撤销同步撤销，智能暂停保留既有资格。严格标记读取，临时文件不参与决策，内容 fsync 后原子替换；不支持原子移动不降级。写入停止标记失败可确认删除兜底；双重失败继续资源清理但停止响应为 false，生命周期保持阻断。存储初始化也在异常保护内。
+
+BootReceiver 的开机自启合同独立。文件方案不承诺目录的断电持久性；两个持久化渠道都失败后的冷进程事实无法由内存阻断证明。资格存储夹具和 Kotlin 编译不替代设备覆盖安装、暂停条件重评估或迟到 Dart 启动交错验证。

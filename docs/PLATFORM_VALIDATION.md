@@ -358,3 +358,9 @@ SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageR
 服务接口 `startForeground` 返回同代实际发布结果。首次速度通知返回 false（包括熄屏抑制、智能暂停和旧代拒绝）时尝试基础通知；实际平台调用完成后才更新缓存与前台标记。`performStartCore` 收到 false 不发布 START，当前代执行失败清理。速度构造异常传播到失败清理，不把所有异常描述为基础兜底。
 
 生产 helper 的旧决策忽略速度结果，在基础前台调用次数断言失败；修复后的 JVM 两入口、RUNNING 后同代失败与旧 ticket 拒绝用例通过。完整 Android release Kotlin 编译成功，编译后仅补夹具，生产来源摘要不变；独立只读复审无确认 P1。公开回执为 `android-foreground-publication-validation.json`。源码候选尚未打入新 APK，不能用它宣布熄屏设备、持久更新资格或覆盖安装停止意图通过。
+
+## Android 更新恢复资格源码候选
+
+2026-10-09：旧无条件恢复决策在“没有已确认运行资格不得更新启动”断言失败；生产 JVM 三个入口通过，包含真正文件原子替换、严格内容、缺失/损坏/临时文件、删除兜底、双重失败与存储初始化异常。实际 release Kotlin 编译终态 0 且 BUILD SUCCESSFUL。独立只读复审发现存储 lazy 初始化可中断资源清理，修复后的 provider 异常夹具和编译通过，复验确认源码 P1 关闭。公开来源见 `validation/2026-10-07-three-platform/android-package-restart-validation.json`。
+
+设备尚安装 a21276f，候选尚未产出新 APK。必须验证 Android 私有目录原子移动、用户停止/已运行/首次 PENDING/撤销权限/智能暂停的覆盖安装与条件重评估，以及 Receiver 接受后 Dart 迟到启动交错。双存储故障跨进程状态未知及断电目录持久性没有通过验收；有效代理 HTTPS、唯一 owner 和 typed engine ACK 仍需独立完成。

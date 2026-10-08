@@ -9,6 +9,8 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = [
+    ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/PackageRestartEligibility.kt',
+    ROOT / 'android/app/src/test/kotlin/com/appshub/bettbox/PackageRestartFixture.kt',
     ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt',
     ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt',
     ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt',
@@ -49,6 +51,8 @@ def main():
          'com.appshub.bettbox.plugins.VpnWorkGateFixture'],
         [str(java), '-cp', os.pathsep.join(map(str, [output, *classpath])),
          'com.appshub.bettbox.plugins.VpnLifecycleFixture'],
+        [str(java), '-cp', os.pathsep.join(map(str, [output, *classpath])),
+         'com.appshub.bettbox.PackageRestartFixture', str(output.parent / 'store-fixture')],
     ]
     for index, command in enumerate(commands):
         result = subprocess.run(command, env=env, capture_output=True, text=True, timeout=60)
@@ -59,7 +63,7 @@ def main():
             return 1
     if any(hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != digest for name, digest in hashes.items()):
         raise ValueError('source_drift')
-    receipt = {'fixture_exit': 0, 'fixture_entrypoints': 2, 'actual_Android': False,
+    receipt = {'fixture_exit': 0, 'fixture_entrypoints': len(commands) - 1, 'actual_Android': False,
                'compiler': 'Gradle8.14 Kotlin2.0.21', 'coroutine': '1.9.0',
                'production_sources': {str(p.relative_to(ROOT)): hashes[str(p.relative_to(ROOT))] for p in SOURCES},
                'boundary': '实际生产协程门禁，公开异步屏障；不替代Service/Binder/JNI或真实FD设备验证。'}

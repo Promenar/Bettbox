@@ -657,6 +657,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                     GlobalState.runLock.withLock {
                         if (lifecycle.current(ticket) && lifecycle.phase == VpnLifecycle.Phase.RUNNING) {
                             GlobalState.updateRunState(RunState.START)
+                            GlobalState.confirmPackageRestartRun()
                         }
                     }
                 }
@@ -732,10 +733,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         val connectionRef: ServiceConnection?
         val shouldForceStop: Boolean
         val stopGeneration: Long
+        val eligibilityRevoked: Boolean
         GlobalState.runLock.withLock {
+            eligibilityRevoked = preserveSmartStopped || GlobalState.revokePackageRestartRun()
             if (!force && lifecycle.phase == VpnLifecycle.Phase.IDLE && !startRequested &&
                 !localCleanupFailed && !GlobalState.isCurrentlyStopping()) {
-                completion?.invoke(true)
+                if (!eligibilityRevoked) markBlocked()
+                completion?.invoke(eligibilityRevoked)
                 return
             }
             startRequested = false
@@ -782,7 +786,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                         }
                     }, commit = { stopped ->
                         GlobalState.runLock.withLock {
-                            if (lifecycle.stopped(stopGeneration, stopped, preserveSmartStopped)) {
+                            if (lifecycle.stopped(stopGeneration, stopped && eligibilityRevoked, preserveSmartStopped)) {
                                 isBind = false
                                 isBinding.set(false)
                                 bettBoxService = null

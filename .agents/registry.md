@@ -145,3 +145,5 @@
 
 - .agents/plans/2026-10-09-android-package-restart.md — 更新恢复资格、停止意图、首次前台确认与错误/设备验收计划
 - docs/validation/2026-10-07-three-platform/android-foreground-publication-validation.json — 首次前台确认生产夹具红绿、Kotlin编译与独立复核及未覆盖设备边界
+
+- docs/validation/2026-10-07-three-platform/android-package-restart-validation.json — 更新资格红绿、真实文件、Kotlin编译与初始化异常独立复验；覆盖安装另验

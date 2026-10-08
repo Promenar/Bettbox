@@ -1163,7 +1163,7 @@
       "artifacts": [
         ".test/android-vpn-work-gate/receipt.json"
       ],
-      "verification": "实际生产Kotlin门禁/生命周期/首次前台确认夹具；缓存编译器；Android工程和设备另验"
+      "verification": "实际生产Kotlin门禁/生命周期/首次前台确认/更新资格及真实文件夹具；缓存编译器；Android工程和设备另验"
     },
     "test-supervisor-system-proxy": {
       "executor": "local-mac",
@@ -2982,12 +2982,12 @@
     "scripts/check_android_tun_lease.py": "af34e306b45260817a1a480fd93b94f509dc7647ac3dd91ec2ad2d74a116b088",
     "android/core/src/test/cpp/jni_failure_fixture.cpp": "1548b452ae5b4540251ceccfb871405ce234379f2490b1a3721543a53dcd36a0",
     "android/core/src/main/cpp/jni_helper.h": "94c8ea35845d2e0b57bdca798bb85dc4fa926e3748403f4d56a179d92816b747",
-    "scripts/check_android_vpn_work_gate.py": "c24ab40fbfb6bc6aa9382c3e3631ba3d8f987ba98e88d41ad2162486dfa3a73e",
+    "scripts/check_android_vpn_work_gate.py": "e4d91b5db5fb531a71d358100a53ffc7d3d75c25a92fc4aad9d810b6c25d1413",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
     "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "5e0c5c4349662155139da87805837823bafd9642ae8899747130099940fa5110",
-    "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "4a54de20794463effa8ffd5035e5158b19d187496d8ae8171617a89b24c001f4",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "755df2479e540cb774fa7a82b38acdf6013e90404626c68d0b61ca34680c406c",
+    "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "b7a40c42aef5185091d40fd5d2efd352e2b683c4d3688765f8729f0dcf386e48",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "3dc27c17ad4cb9b64665323f99341edb182e0088e7a112901a89b1a3d41ad634",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "dfebdc74a3a70eb30c980619a91883341763e7529c77a36690483a8579c74069",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BaseServiceInterface.kt": "b83e4d22525cd4bbafb60b7f2ecfd822c4d32d2c05cfdd3debbda8d7e3687cc5",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxService.kt": "a6a714c8eb3c60f469310d5d4b51b6ce49190b0216f01911c00809436b1ec23c",
@@ -3070,7 +3070,10 @@
     "test/plugins/android_smart_resume_test.dart": "900bfe852d29d1d934b8736eb7de8bb50f0e2e2572eefc2b71fa39a9a609f02c",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/SmartResumeAwaiter.kt": "333878cdb01d921c6b512a90efd578f900239dcca10020377ec76cbf96ffd084",
     "test/plugins/smart_resume_completion_test.dart": "0a602d72a5ab979ef038b4faa96cb6a37541dbd5fa56424c0331c7d06365505c",
-    "android/app/src/main/kotlin/com/appshub/bettbox/services/ForegroundPublication.kt": "90388d223a2ef2a5dda0c547453b1974f3cf81bf3d84eba4ad9fffae96e7a4b8"
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/ForegroundPublication.kt": "90388d223a2ef2a5dda0c547453b1974f3cf81bf3d84eba4ad9fffae96e7a4b8",
+    "android/app/src/main/kotlin/com/appshub/bettbox/receivers/PackageReplacedReceiver.kt": "b2a4494f9bb084d6ef7dc2f613c5b17cfff1bcae863c6ccae68eaa28003c47ea",
+    "android/app/src/main/kotlin/com/appshub/bettbox/PackageRestartEligibility.kt": "0a5344f78a6b097df651554b382895bc33401942a05de1260e7c76d88c392b08",
+    "android/app/src/test/kotlin/com/appshub/bettbox/PackageRestartFixture.kt": "66528906ce198afc149567342d5cb6701ca42f8a68e2f69a6e434fbe152a23d0"
   },
   "platform_extensions": {
     "android": {
@@ -3146,6 +3149,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "70d07fdaccb45f2df23271fd909abb04d6075163a54284f3afb6640ef6f99901"
+    "contract_digest": "ab06176efd6e8ba2893ef24931ae99f7e8fae2dcc24984b3b4c569d2edd77e7f"
   }
 }

@@ -2799,3 +2799,34 @@ record-fingerprint: b44b2b2bd0a0cd27c9631b9a253b77ab4d5efb7e66db61412088297a47f7
 
 ### HLG
 标准append记录独立设计发现、前提源码红绿与下一步，整体Goal保持active。
+
+## 2026-10-09T02:43:34+08:00 · Android更新恢复资格候选与存储初始化失败闭环
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["package-restart", "storage", "regression", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 82c482bf37b0245d4cbbd869b933870bea6b06071b4a5b0be027d9e0deedcf00
+
+### Summary
+已接入SDK36更新资格门禁、普通停止同步撤销和智能暂停保留，完成源码候选验收。整体发行目标未完成。
+
+### Changed
+专属noBackup严格文件、同步内容原子替换及确认删除兜底；Global锁内门禁，当前运行确认授予；IDLE/撤销完整停止入口失败回执。新增真实文件及初始化异常生产夹具，同步PDEC和文档。
+
+### Validation
+旧无条件恢复决策red1；最终生产JVM三个入口green。release Kotlin实际终态0/BUILD SUCCESSFUL；独立android_package_restart_review发现lazy初始化P1，provider内异常保护修复后夹具/编译通过、独立只读复验确认源码关闭。BootReceiver无diff。
+
+### Next
+冻结源码候选统一正式APK构建；同源设备验证停止/运行/PENDING/权限撤销/智能暂停覆盖安装、条件重评估与迟到Dart启动交错。macOS窗口工具当前报告锁屏，黑屏原因未确认。
+
+### Risks
+目前安装a21276f，不含源码资格修复；JVM不替代Android私有目录原子移动。文件内容fsync不承诺目录断电持久性，双存储故障跨进程unknown。owner/typed ACK、有效代理HTTPS、macOS界面与账户、iOS发行、邀请支付业务尚未完整验收。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、registry、计划、公开回执及PDEC。
+
+### HLG
+标准append保存红绿、初始化异常修复及独立复验事实，整体Goal保持active。

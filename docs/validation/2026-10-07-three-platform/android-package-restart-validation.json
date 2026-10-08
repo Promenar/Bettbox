@@ -1,0 +1,66 @@
+{
+  "base_commit": "56ed968c416ba948c676b2e674f713d72b403a22",
+  "source_hashes": {
+    "scripts/check_android_vpn_work_gate.py": "e4d91b5db5fb531a71d358100a53ffc7d3d75c25a92fc4aad9d810b6c25d1413",
+    "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "b7a40c42aef5185091d40fd5d2efd352e2b683c4d3688765f8729f0dcf386e48",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "3dc27c17ad4cb9b64665323f99341edb182e0088e7a112901a89b1a3d41ad634",
+    "android/app/src/main/kotlin/com/appshub/bettbox/receivers/PackageReplacedReceiver.kt": "b2a4494f9bb084d6ef7dc2f613c5b17cfff1bcae863c6ccae68eaa28003c47ea",
+    "android/app/src/main/kotlin/com/appshub/bettbox/PackageRestartEligibility.kt": "0a5344f78a6b097df651554b382895bc33401942a05de1260e7c76d88c392b08",
+    "android/app/src/test/kotlin/com/appshub/bettbox/PackageRestartFixture.kt": "66528906ce198afc149567342d5cb6701ca42f8a68e2f69a6e434fbe152a23d0"
+  },
+  "red": {
+    "exit_code": 1,
+    "failed_invariant": "没有已确认运行资格时，更新不得启动",
+    "baseline_decision": "mayRestore无条件true，与旧SDK36广播决策一致",
+    "actual_android": false
+  },
+  "green": {
+    "fixture_exit": 0,
+    "fixture_entrypoints": 3,
+    "actual_Android": false,
+    "compiler": "Gradle8.14 Kotlin2.0.21",
+    "coroutine": "1.9.0",
+    "production_sources": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/PackageRestartEligibility.kt": "0a5344f78a6b097df651554b382895bc33401942a05de1260e7c76d88c392b08",
+      "android/app/src/test/kotlin/com/appshub/bettbox/PackageRestartFixture.kt": "66528906ce198afc149567342d5cb6701ca42f8a68e2f69a6e434fbe152a23d0",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "dfebdc74a3a70eb30c980619a91883341763e7529c77a36690483a8579c74069",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/SmartResumeAwaiter.kt": "333878cdb01d921c6b512a90efd578f900239dcca10020377ec76cbf96ffd084",
+      "android/app/src/main/kotlin/com/appshub/bettbox/services/ForegroundPublication.kt": "90388d223a2ef2a5dda0c547453b1974f3cf81bf3d84eba4ad9fffae96e7a4b8",
+      "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "5e0c5c4349662155139da87805837823bafd9642ae8899747130099940fa5110",
+      "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt": "0d030e42bdff19c5f0c9e5425bfb5307780d403dbdfd95fa5611e36fe37e1893"
+    },
+    "boundary": "实际生产协程门禁，公开异步屏障；不替代Service/Binder/JNI或真实FD设备验证。"
+  },
+  "compile": {
+    "exit_code": 0,
+    "build_successful": true,
+    "actual_release_kotlin": true,
+    "contract_digest": "ab06176efd6e8ba2893ef24931ae99f7e8fae2dcc24984b3b4c569d2edd77e7f",
+    "source_hashes": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "b7a40c42aef5185091d40fd5d2efd352e2b683c4d3688765f8729f0dcf386e48",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "3dc27c17ad4cb9b64665323f99341edb182e0088e7a112901a89b1a3d41ad634",
+      "android/app/src/main/kotlin/com/appshub/bettbox/receivers/PackageReplacedReceiver.kt": "b2a4494f9bb084d6ef7dc2f613c5b17cfff1bcae863c6ccae68eaa28003c47ea",
+      "android/app/src/main/kotlin/com/appshub/bettbox/PackageRestartEligibility.kt": "0a5344f78a6b097df651554b382895bc33401942a05de1260e7c76d88c392b08"
+    }
+  },
+  "independent_review": {
+    "agent": "android_package_restart_review",
+    "confirmed_p1": "存储初始化异常中断停止清理",
+    "p1_closed_source": true,
+    "boundary": "审阅只读；主控执行实际测试和编译"
+  },
+  "boot_receiver_unchanged": true,
+  "device_verified": false,
+  "new_apk_built": false,
+  "release_ready": false,
+  "remaining": [
+    "真实Android私有目录原子替换和覆盖安装",
+    "普通停止、已运行、首次PENDING、权限撤销和智能暂停重评估",
+    "Receiver接受后Dart迟到启动与用户停止交错",
+    "断电目录持久性不承诺",
+    "资格及停止屏障均无法持久化时跨进程状态未知",
+    "唯一owner/typed ACK及有效代理HTTPS未完成"
+  ]
+}

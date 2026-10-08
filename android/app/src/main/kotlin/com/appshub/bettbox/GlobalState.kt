@@ -30,6 +30,33 @@ enum class RunState {
 
 object GlobalState {
     val runLock = ReentrantLock()
+    private val packageRestartEligibility by lazy {
+        PackageRestartEligibility {
+            val context = BettboxApplication.getAppContext()
+            FilePackageRestartStore(
+            java.io.File(context.noBackupFilesDir, "package-restart-eligibility"),
+            stopClear = {
+                !isStopping && context.getSharedPreferences("vpn_state", android.content.Context.MODE_PRIVATE)
+                    .getLong("stop_lock_ts", 0L) == 0L
+            }
+            )
+        }
+    }
+
+    internal fun confirmPackageRestartRun() {
+        if (!packageRestartEligibility.grantConfirmedRun()) {
+            android.util.Log.e("GlobalState", "更新恢复资格写入未确认")
+        }
+    }
+
+    internal fun revokePackageRestartRun(): Boolean = packageRestartEligibility.revoke().also {
+        if (!it) android.util.Log.e("GlobalState", "更新恢复资格撤销未确认")
+    }
+
+    fun handlePackageReplacement(): Boolean = runLock.withLock {
+        if (!packageRestartEligibility.mayRestore()) false else handleStart(skipDebounce = true)
+    }
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     const val NOTIFICATION_CHANNEL = "Bettbox"
@@ -149,12 +176,17 @@ object GlobalState {
 
     fun handleStop(skipDebounce: Boolean = false) {
         if (!skipDebounce && !acquireToggleSlot()) return
-        if (currentRunState == RunState.STOP) return
-
-        updateRunState(RunState.PENDING)
-        startPendingTimeout()
-        VpnPlugin.handleStop()
-        getCurrentTilePlugin()?.handleStop()
+        runLock.withLock {
+            if (currentRunState == RunState.STOP) {
+                // 已挂起或已停止也须撤销更新恢复资格。
+                VpnPlugin.handleStop()
+                return
+            }
+            updateRunState(RunState.PENDING)
+            startPendingTimeout()
+            VpnPlugin.handleStop()
+            getCurrentTilePlugin()?.handleStop()
+        }
     }
 
     private fun acquireToggleSlot(): Boolean {
