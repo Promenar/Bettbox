@@ -1,0 +1,53 @@
+{
+  "sources_sha256": {
+    "core/android_config.go": "cb2c3ce45effbe80d1422a8afe9c38acb3ca82f406a62ea7f14882e607ac46e6",
+    "core/android_config_test.go": "ef16be14f655b7c3fcd28c72dd1590356a42bcb45613bd329124801f3e10b31a",
+    "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
+    "core/common.go": "509139f98aa95541907b5df5b12c6667027e778df6720f3a7527d448ae695b75",
+    "core/lib_android.go": "b07813170ee8339cf0c7fa6e078b2f6f85e3f13dbae58ba75aaa4d1b43e830e7",
+    "core/state/snapshot.go": "b283decb2a81c398e7a33be75eb7cca5aa9d269ea016cfd7891642b99bc9bfb3",
+    "core/state/snapshot_test.go": "cf4b18579a8c0fcf2aa9fec293b948731ad057baf83cd041289d0ced78d0845c",
+    "android/core/src/main/cpp/config_jni.cpp": "ad00a3b446c7c4782c8c95823734b97b79614da67aba13f43f06ace29dafaa22",
+    "android/core/src/test/cpp/config_jni_fixture.cpp": "84ff2b8d7eab7f1a49be81f23e69ec57b2b459d860aa4ac70513d923c48bb1c8",
+    "android/core/src/main/cpp/CMakeLists.txt": "754893a47a1a86c2def0b2c0b8e0b724dd4145ddb97b8125d7877683f8b99b88",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "88168afb0d1c0546d5a9e80de05e8ed3fd676e3e6beb9142ed6b39252d548a58",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "370d8765dafcae16feaf1b73f9684375fec0877032984c5783d35454400b95cb",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "fa9c82d5556e04ddfdebcf37752fc2153efe1c440852d643d5625551cc4aa727",
+    "scripts/check_android_config_protocol.py": "4afd0904c291eb16cfbd5a1be79e3be58373ab085a92d282997cedd5da4a87dc"
+  },
+  "checks": {
+    "production_config_red_exit": 1,
+    "production_config_green_exit": 0,
+    "config_top_level_tests": 12,
+    "route_wire_legacy_red_exit": 1,
+    "route_wire_red_failed_case": "explicit_empty",
+    "core_full_cgo0_with_gvisor_exit": 0,
+    "state_race_exit": 0,
+    "native_codec_jvm_passed": true,
+    "native_codec_sources_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "370d8765dafcae16feaf1b73f9684375fec0877032984c5783d35454400b95cb",
+      "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "fa9c82d5556e04ddfdebcf37752fc2153efe1c440852d643d5625551cc4aa727"
+    },
+    "android_go_c_shared_exit": 0,
+    "android_production_jni_link_exit": 0,
+    "jni_function_table_asan_cases": 17,
+    "jni_function_table_asan_failed": 0,
+    "actual_Android_JVM_JNI": false,
+    "options_two_top_level_tests_exit": 0,
+    "route_wire_three_shapes_passed": true
+  },
+  "artifacts_sha256": {
+    ".test/android-owned-config-abi/libclash.so": "6f55719f52aecaf21e2d55cacd3dd28238a329200050b689495508fbfec22dc5",
+    ".test/android-owned-config-abi/libclash.h": "41785bda08a445a57180927ebb85584fec32215ce0e45a555aa3ffb77a12beeb",
+    ".test/android-owned-config-abi/libcore.so": "b65c1f10da8f156e90f8f90cf63930f733353032eff7c8d3f8017638e8c4fac9"
+  },
+  "independent_review": "空路由兼容回归及编码兜底合同修正经两名独立只读审阅者复核；没有未关闭确认P1/P2",
+  "boundary": [
+    "只有stage与真实proxy早失败使用完整生产提交路径，成功应用及多错误场景主要用driver替身",
+    "编码失败注入仅为防御分支，固定回执类型未找到真实可达编码错误",
+    "JNI函数表为本机公开替身，ASAN通过不证明真实Android JVM/CheckJNI",
+    "Native owner、HTTP/FFI/quickStart旁路收敛、带版本TUN准入、epoch换代和Dart完成回执尚未接线",
+    "未安装新APK、未生成发行包、未验证有效上游或真实支付"
+  ],
+  "execution_audit": "首轮codec red在stale PDEC后因主控缺少短路仍运行，不能作为合规证据；随后刷新授权输入并以execution_ready门禁短路的red2复现实际失败。其余集中green/ABI操作均门禁通过。"
+}

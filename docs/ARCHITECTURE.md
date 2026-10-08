@@ -191,3 +191,5 @@ macOS系统代理事务通过内部AuthorizedSCSessionFactory取得原生Authori
 ### 配置准备与发布
 
 Go setupConfig持有runLock，通过cloneSetupParams复制调用输入、prepareSetupConfigLocked建立局部候选、commitSetupConfigLocked发布并应用。准备失败保留已发布配置指针和原默认探测URL；复制保持既有tolerance数值转换语义。Mihomo ParseRawConfig仍会临时修改General并可能触及geodata及持久fake-IP缓存，准备层不提供全资源回滚。Android统一提交需在调用解析器前标ENTERED，以epoch/revision绑定options与TUN采纳；该联合接线尚待验收。
+
+Android同步配置中间层：Go生产入口以runLock执行epoch/revision CAS、STAGED初始状态、ENTERED准备/提交及同次options深副本；回执严格区分staged/applied/rejected/unknown，未知保留责任并粘滞阻断。JNI同步桥及Kotlin严格十字段codec已实现，但未接入唯一Native owner。Core全包、state race、实际Kotlin JVM、NDK28/API26 ARM64 Go/JNI编译及17项JNI函数表ASAN验证通过；真实Android JVM/CheckJNI、带版本TUN准入、HTTP/FFI旁路收敛、epoch换代、完整App及业务验收另验。回执 `docs/validation/2026-10-07-three-platform/android-owned-config-validation.json`。

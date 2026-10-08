@@ -51,5 +51,6 @@ set_target_properties(clash PROPERTIES
         IMPORTED_NO_SONAME TRUE)
 add_library(${CMAKE_PROJECT_NAME} SHARED
         jni_helper.cpp
+        config_jni.cpp
         core.cpp)
 target_link_libraries(${CMAKE_PROJECT_NAME} clash)

@@ -199,6 +199,11 @@ func readFile(path string) ([]byte, error) {
 func updateConfig(params *UpdateParams) {
 	runLock.Lock()
 	defer runLock.Unlock()
+	updateConfigLocked(params)
+}
+
+// 调用者持有runLock；保留updateConfig既有更新顺序和行为。
+func updateConfigLocked(params *UpdateParams) {
 	if currentConfig == nil {
 		log.Infoln("[APP] updateConfig called before setupConfig")
 		return

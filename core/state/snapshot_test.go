@@ -45,6 +45,45 @@ func TestValidPartialStateUpdatePreservesFields(t *testing.T) {
 	}
 }
 
+func TestMergeJSONUsesExplicitSnapshotWithoutGlobalCommit(t *testing.T) {
+	Replace(State{
+		CurrentProfileName: "PUBLIC_GLOBAL",
+		BypassDomain:       []string{"global.invalid"},
+	})
+	base := State{
+		CurrentProfileName: "PUBLIC_BASE",
+		BypassDomain:       []string{"base.invalid"},
+	}
+	merged, err := MergeJSON(base, []byte(`{"vpn-props":{"allowBypass":true}}`))
+	if err != nil {
+		t.Fatalf("显式快照合并失败: %v", err)
+	}
+	if merged.CurrentProfileName != "PUBLIC_BASE" || !merged.VpnProps.AllowBypass || merged.BypassDomain[0] != "base.invalid" {
+		t.Fatalf("显式快照合并结果错误: %+v", merged)
+	}
+	merged.BypassDomain[0] = "changed.invalid"
+	if base.BypassDomain[0] != "base.invalid" || Snapshot().CurrentProfileName != "PUBLIC_GLOBAL" {
+		t.Fatal("纯合并泄露别名或提交了全局状态")
+	}
+}
+
+func TestReplaceCopiesMutableState(t *testing.T) {
+	value := State{
+		BypassDomain: []string{"replace.invalid"},
+		VpnProps: AndroidVpnRawOptions{AccessControl: &AccessControl{
+			Enable:     true,
+			AcceptList: []string{"PUBLIC_ACCEPT"},
+		}},
+	}
+	Replace(value)
+	value.BypassDomain[0] = "changed.invalid"
+	value.VpnProps.AccessControl.AcceptList[0] = "PUBLIC_CHANGED"
+	actual := Snapshot()
+	if actual.BypassDomain[0] != "replace.invalid" || actual.VpnProps.AccessControl.AcceptList[0] != "PUBLIC_ACCEPT" {
+		t.Fatal("Replace保留了调用方可变别名")
+	}
+}
+
 func TestConcurrentStateUpdatesAndReaders(t *testing.T) {
 	var work sync.WaitGroup
 	for i := 0; i < 8; i++ {

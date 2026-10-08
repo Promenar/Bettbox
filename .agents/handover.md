@@ -1900,3 +1900,34 @@ ParseRawConfig临时全局、geodata文件和持久fake-IP副作用未完全隔�
 
 ### HLG
 标准append dry-run/apply追加事实，保留历史。
+
+## 2026-10-08T16:34:05+08:00 · Android同步配置版本回执与JNI桥集中验证
+
+type: development
+scope: ["Bettbox"]
+status: done
+tags: ["android", "config", "jni", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 8f9e5c3292ab3d73cdef632e704f008a4441071bb294709b6bab84060765b066
+
+### Summary
+完成同步Go配置中间层、JNI raw桥及严格Kotlin回执，Android/macOS优先交付，iOS保留开发版及发行研究；Goal保持active。
+
+### Changed
+STAGED与initial composite、runLock内epoch/revision CAS及同次options，ENTERED未知粘滞阻断；保留空路由wire三态，编码失败防御分支保留真实stamp。新增独立ABI与公开夹具。
+
+### Validation
+生产stage red exit1、green十二顶层测试exit0；真实proxy早失败走生产driver。空列表复制回归临时恢复原行为，explicit_empty真实失败后finally确认源码与契约恢复；options两个顶层及三形态green。全core CGO0/with_gvisor、state race、实际Kotlin JVM、NDK28/API26 ARM64 Go/JNI链接通过；JNI公开函数表ASAN十七场景零失败。两名独立审阅者关闭相关问题。公开回执android-owned-config-validation.json。
+
+### Next
+连接唯一Native owner，带epoch/revision的TUN准入，HTTP/FFI/quickStart收敛、生命周期换代、ledger及Dart完成回执；真实CheckJNI、装机与业务全路径验收。
+
+### Risks
+成功Apply/provider仍主要driver替身；ParseRawConfig非纯事务，当前epoch固定1仅Go加载生命周期。JNI函数表非真实Android JVM。有效上游与支付外部条件未关闭，未安装新APK或交付新发行版本。首codec red在PDEC stale后因主控未短路仍运行，不能作合规证据；随后门禁短路的red2重新复现，后续集中操作均execution_ready通过。
+
+### DIA
+已同步架构、平台验证、CHANGELOG、联合计划、PDEC、registry及公开回执。
+
+### HLG
+使用标准append dry-run/apply追加当前事实，保留历史。

@@ -1338,6 +1338,185 @@
         ".test/android-config-prepare-abi/libcore.so"
       ],
       "verification": "实际生产 JNI 源与本工作树新生成 Go C ABI 链接；不替代 Android 装机及 JNI 行为验证"
+    },
+    "test-android-owned-config": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^Test.*AndroidConfig",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "CGO0本机离线依赖，实际生产同步配置入口与公开driver fixture；不启用VPN，不代表Android JVM/Native owner或完整业务"
+    },
+    "test-android-config-protocol-red": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-config-protocol-red"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "test-android-config-protocol-red2": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-config-protocol-red2"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "test-android-config-protocol-green": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_config_protocol.py",
+        "--output-name",
+        "android-config-protocol-green"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "已有Kotlin/Gson缓存编译生产codec并运行公开JVM夹具，无JNI/设备/网络/秘密；唯一输出目录拒绝覆盖"
+    },
+    "compile-android-owned-config-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-owned-config-abi/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-owned-config-abi/libclash.so",
+        ".test/android-owned-config-abi/libclash.h"
+      ],
+      "verification": "本机NDK28/API26 Android ARM64实际生产core c-shared离线编译；独立输出保留已有ABI产物，不安装/启用VPN，不证明JVM或设备行为",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "compile-android-owned-config-jni": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "cross_compile": "Android ARM64 NDK 28 JNI shared",
+      "argv": [
+        "clang++",
+        "-std=c++17",
+        "-O3",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-DLIBCLASH",
+        "-I.test/android-owned-config-abi",
+        "-shared",
+        "android/core/src/main/cpp/core.cpp",
+        "android/core/src/main/cpp/jni_helper.cpp",
+        "android/core/src/main/cpp/config_jni.cpp",
+        "-L.test/android-owned-config-abi",
+        "-lclash",
+        "-Wl,-z,max-page-size=16384",
+        "-o",
+        ".test/android-owned-config-abi/libcore.so"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/android-owned-config-abi/libcore.so"
+      ],
+      "verification": "实际生产 JNI 源与本工作树新生成 Go C ABI 链接；不替代 Android 装机及 JNI 行为验证"
+    },
+    "test-android-config-jni": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "clang++",
+        "-std=c++17",
+        "-fsanitize=address",
+        "-I.test/android-owned-config-abi",
+        "-I.test/android-jni-failure/include",
+        "-Iandroid/core/src/main/cpp",
+        "android/core/src/main/cpp/jni_helper.cpp",
+        "android/core/src/main/cpp/config_jni.cpp",
+        "android/core/src/test/cpp/config_jni_fixture.cpp",
+        "-o",
+        ".test/android-owned-config-abi/config-jni-fixture"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/android-owned-config-abi/config-jni-fixture"
+      ],
+      "verification": "实际生产JNI桥与公开函数表17场景，ASAN本机运行，无真实JVM/Go runtime/设备"
+    },
+    "run-android-config-jni": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-owned-config-abi/config-jni-fixture"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [],
+      "verification": "公开函数表JNI夹具17场景，不替代CheckJNI/设备"
+    },
+    "test-android-owned-options": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestAndroidVpnOptions",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "公开options深副本与RouteAddress nil/空/非空wire回归；实际生产helper，不启动设备或公网"
     }
   },
   "deployment": {
@@ -1402,7 +1581,7 @@
     "scripts/tests/test_android_distribution_cache.py": "142649185d32b665f1c95204784c8c22a72a2a4113a1b56d6430c424e085284b",
     "android/core/build.gradle.kts": "df95a98d99607647f6518f115978a7f39f5094da488e4d4c9e3eb5d159295650",
     "android/app/build.gradle.kts": "01f59a54af90473002ab59f7c2dda0afd94a7c6c6ffe515d254d054abe3e2f51",
-    "android/core/src/main/cpp/CMakeLists.txt": "d7d22196a04b4f04eeff70a9f93f38f28614070323430e826ac9955be0be072d",
+    "android/core/src/main/cpp/CMakeLists.txt": "754893a47a1a86c2def0b2c0b8e0b724dd4145ddb97b8125d7877683f8b99b88",
     "core/Clash.Meta/listener/http/credential_blind_test.go": "082f72c95147c11a01b012801df18f2785c14f0d7a2220970e0f6d8cbbb89459",
     "core/Clash.Meta/listener/http/credential_blind_request_test.go": "6a28e2cea2abd00d96372686b347ad6cf4cd43ef9736f09715a0b6f274728c67",
     "core/Clash.Meta/listener/http/credential_blind.go": "bb5c238847a4d51d3fce392f796ad74d8e30a44b71b39173ddd6dcb498f530b4",
@@ -1423,11 +1602,11 @@
     "scripts/check_macos_owned_process.py": "2e388478c65f823fe5ba034b3c375708bb227e65d5ccd57cea11fa417442c7e3",
     "scripts/tests/test_macos_owned_process.py": "f76c58a20ff43c8ddde02c724b4753452f7209a36d2b53d461e59ca9e6baa986",
     "core/state/state.go": "38ab490b6738db46c3f7f6b9d5110ccaf72fa66c0561496d86f6c6d44211b554",
-    "core/state/snapshot.go": "c2c9fd4a5b94915a1050567f01bad595bff4efded716a95c18b219fc8a606fb9",
-    "core/state/snapshot_test.go": "0eef91b22dacc03cfeb2a4d0fa15f54f22d4778aef6d1eefb83517be3c02318c",
+    "core/state/snapshot.go": "b283decb2a81c398e7a33be75eb7cca5aa9d269ea016cfd7891642b99bc9bfb3",
+    "core/state/snapshot_test.go": "cf4b18579a8c0fcf2aa9fec293b948731ad057baf83cd041289d0ced78d0845c",
     "core/hub.go": "16076609249d4d4cd329c426f73c481bddf3fd2dcc362de0ef33dc9e4d04a02c",
     "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
-    "core/lib_android.go": "ca6cbe6e2120beb6650eabfdfa069d7d20875086ae9ec8b1e50251ed61a3b10b",
+    "core/lib_android.go": "b07813170ee8339cf0c7fa6e078b2f6f85e3f13dbae58ba75aaa4d1b43e830e7",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
     "core/androidstartup/quick_start.go": "e50ccf397186981b47abf6b7cfac25b362654944093ee45699a9bdb1e6d40453",
     "core/androidstartup/quick_start_test.go": "cfba93b2062089c004bf33fa9974f1f894b359ee94ee5ff3c58da2dd57a56f5e",
@@ -1449,7 +1628,7 @@
     "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e",
     "core/Clash.Meta/listener/stop_checked_test.go": "6f53bfb7d2f6787751c980a1d96e54202352e4c0d5a32e9e44d6acc8ba91c27b",
     "core/Clash.Meta/listener/http/owned_endpoint_test.go": "0e43ffe721f419e47eb7eedd70fea62bf27b8d371675acb94d8c1a83f15b6e73",
-    "core/common.go": "811ad1fa629ade0d1a97c13771fcca618de0de039b37713a1ca35d2660472807",
+    "core/common.go": "509139f98aa95541907b5df5b12c6667027e778df6720f3a7527d448ae695b75",
     "core/constant.go": "b069cc0e4cfb70e1bd4f48aa1236e089da1f6fc5a0df3fdcf4357cff6342edec",
     "scripts/check_macos_supervisor.py": "4ed0575901bbee77d4ca3f20e077ca39b36f74faf82306442ff00816cb44b770",
     "scripts/tests/test_check_macos_supervisor.py": "0f3f0148087b01798b54f2f65dde610ff3d61225e657afd30e9240a49cacff81",
@@ -1537,7 +1716,7 @@
     "core/android_bride.go": "74a7023de5dec456f61404ee4f9fe523664ea7bb8c2debb3fcd3b625dd6e2aa5",
     "core/tun/tun.go": "f10d11aa419543c7d6cb7d57c6036cbad4e2a739523a07889091dfd16404590c",
     "core/androidstartup/socket_protect_test.go": "290e41d493c0e21ab97356b902d7564fe46e5fd4bd30fbacdc33460e30f89f98",
-    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "76d8e8aaf1358459e45c35b9a857a55768a82fd5453e71a1d3092f486b2434dc",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "88168afb0d1c0546d5a9e80de05e8ed3fd676e3e6beb9142ed6b39252d548a58",
     "android/core/src/main/java/com/appshub/bettbox/core/TunInterface.kt": "c0a1e9c1cc1c4e255d030f2843405a79fabdaf45cdb0d7eae2a7a9ed6781a3d3",
     "android/core/src/main/java/com/appshub/bettbox/core/TunFDLease.kt": "f6b4d292f4bccf90f2d6847b922c4fd7e8158db798a1191ebe731beb8a25de40",
     "android/core/src/test/kotlin/com/appshub/bettbox/core/TunFDLeaseFixture.kt": "d8e57f3a5336ad295728ecc1c703af9bcfc1517e22537c88426d563742ee2304",
@@ -1565,7 +1744,15 @@
     "test/common/macos_core_privilege_test.dart": "e07c3ac24193b30f98dd49f8707e64ef52e75f8e224f7b39e33407d1421e2730",
     "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
     "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
-    "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d"
+    "core/config_setup_prepare_test.go": "aa7660b025c7e95b73101cd3b53ec7ce6c6c1cd568f94a624d69ced1c53a4f7d",
+    "core/android_config.go": "cb2c3ce45effbe80d1422a8afe9c38acb3ca82f406a62ea7f14882e607ac46e6",
+    "core/android_config_test.go": "ef16be14f655b7c3fcd28c72dd1590356a42bcb45613bd329124801f3e10b31a",
+    "core/android_config_export_android.go": "4ddef572f79c28e3f43e254be0f2297d8f4dff9cdea60f172c7604d9e28af9bb",
+    "scripts/check_android_config_protocol.py": "4afd0904c291eb16cfbd5a1be79e3be58373ab085a92d282997cedd5da4a87dc",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "370d8765dafcae16feaf1b73f9684375fec0877032984c5783d35454400b95cb",
+    "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "fa9c82d5556e04ddfdebcf37752fc2153efe1c440852d643d5625551cc4aa727",
+    "android/core/src/main/cpp/config_jni.cpp": "ad00a3b446c7c4782c8c95823734b97b79614da67aba13f43f06ace29dafaa22",
+    "android/core/src/test/cpp/config_jni_fixture.cpp": "84ff2b8d7eab7f1a49be81f23e69ec57b2b459d860aa4ac70513d923c48bb1c8"
   },
   "platform_extensions": {
     "android": {
@@ -1641,6 +1828,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "622cc0d59ab35ff4addfb117135d527fcd99436271c716c8c249b4ab7da25401"
+    "contract_digest": "453be2d725cc822778c666e2cc4adfb57ffc0b4d6a9de43ee6808481cb728127"
   }
 }

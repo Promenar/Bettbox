@@ -4,8 +4,21 @@ import android.util.Log
 import android.os.ParcelFileDescriptor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.net.InetSocketAddress
+import androidx.annotation.Keep
 
+@Keep
 object Core {
+
+    private external fun getOwnedConfigStatusNative(): String?
+    private external fun commitOwnedConfigNative(epoch: Long, revision: Long, kind: Int, payload: String): String?
+
+    // 原始回执仅交给统一owner的严格解析器，不据此自行发布VPN状态。
+    fun ownedConfigStatusRaw(): String = getOwnedConfigStatusNative()
+        ?: throw IllegalStateException("配置状态读取未确认")
+
+    fun commitOwnedConfigRaw(epoch: Long, revision: Long, kind: Int, payload: String): String =
+        commitOwnedConfigNative(epoch, revision, kind, payload)
+            ?: throw IllegalStateException("配置提交结果未知")
 
     private external fun startNativeTun(lease: TunFDLease, cb: TunInterface?): Boolean
     private external fun suspend(suspended: Int)

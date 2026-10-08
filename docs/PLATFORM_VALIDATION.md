@@ -230,3 +230,5 @@ Go handleStopListener及stopListener action使用既有StopListenerChecked，在
 ### 2026-10-08 配置准备层
 
 生产setup的7个早失败场景真实red后修复；13个场景（包含数值及深复制）与core包回归通过。NDK28/API26实际Android ARM64 Go c-shared及生产JNI编译链接通过，独立产物位于 `.test/android-config-prepare-abi`，旧产物保留。回执 `validation/2026-10-07-three-platform/core-config-prepare-validation.json` 保存代码、日志及产物摘要。未安装该产物或验证成功ApplyConfig/真实JVM，不代表完整owner、设备和发行验收。解析器完整副作用回滚没有证明。
+
+Android同步配置中间层：Go生产入口以runLock执行epoch/revision CAS、STAGED初始状态、ENTERED准备/提交及同次options深副本；回执严格区分staged/applied/rejected/unknown，未知保留责任并粘滞阻断。JNI同步桥及Kotlin严格十字段codec已实现，但未接入唯一Native owner。Core全包、state race、实际Kotlin JVM、NDK28/API26 ARM64 Go/JNI编译及17项JNI函数表ASAN验证通过；真实Android JVM/CheckJNI、带版本TUN准入、HTTP/FFI旁路收敛、epoch换代、完整App及业务验收另验。回执 `docs/validation/2026-10-07-three-platform/android-owned-config-validation.json`。
