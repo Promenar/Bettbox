@@ -401,7 +401,7 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 
 ## 服务端支付候选当前来源核验
 
-2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 23 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
+2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 24 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
 
 ## SQLite 账务真实迁移与故障原子性
 
@@ -414,7 +414,7 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 
 真实 Laravel 两进程、共同起跑、独立重连和操作区间重叠已验证同用户只创建一单、重复取消退款一次、重复通知开通/流量/消费一次、取消与到账合法赢家状态和返佣余额/日志一次。197 项检查、56 个冻结输入在 NoSLA 禁网只读 128 MiB 临时容器通过；实际进程收尾 deadline 责任缺陷已通过红绿回归修复。仅单轮两进程、旧网关夹具和同步队列，不代表同时等待同一 mutex 的测量、压力测试或真实付呗并发。
 
-公开证据见 `validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。10 项执行器回归包含缺失并发/重叠标签时必须拒绝通过回执。优惠券、管理员付款、实际异步队列、生产插件发现/认证及商户支付另验。生产业务源码未因测试扩大范围而改写。
+公开证据见 `validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。10 项执行器回归包含缺失并发/重叠标签时必须拒绝通过回执。优惠券、管理员付款、生产 Redis/常驻队列、生产插件发现/认证及商户支付另验。生产业务源码未因测试扩大范围而改写。
 
 
 ## Laravel 三层邀请及零金额付款
@@ -422,3 +422,10 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 真实 Laravel 双进程单轮已验证余额完全抵扣的零金额 checkout：余额扣除、开通和流量重置一次，网关未调用，重复请求不延期；三层 50/30/20 返佣日志及余额各入账一次；购买者参与循环时全部返佣撤销，订单保持已开通、佣金待处理且仅保留一份核对记录。当前 236 项隔离检查、56 个冻结输入及11项执行器回归通过。仅验证该比例及 commission_balance 目的账户，其他比例、舍入政策和普通余额模式另验。
 
 证据见 `validation/2026-10-07-three-platform/laravel-invite-free-payment-validation.json`。这是公开临时数据库、认证/插件发现/网关夹具和同步队列下的真实业务验证；网页注册邀请归属、真实商户付款、生产配置与三端完整链路仍待验收。
+
+
+## Laravel 真实数据库异步队列
+
+真实 Laravel DatabaseQueue/Worker 已在专用 SQLite 队列表验证：CheckOrder 将任务序列化入队且不立即开通；首次开通异常释放任务重试、attempts 增长且业务事务无半次开通；真实 JobProcessed 事件核对两个独立 PID 各消费一个目标任务后队列清空，开通、流量重置和幂等消费者各一次。258 项真实隔离检查、57 个冻结输入与12项执行器回归通过，临时配置恢复。只覆盖有界数据库队列消费，不证明生产 Redis、daemon 信号/超时、failed_jobs终态、强杀或长期压力。
+
+证据见 `validation/2026-10-07-three-platform/laravel-database-queue-validation.json`。认证/插件发现/支付网关夹具边界保持，不等于生产真实商户或三端完整业务验收。

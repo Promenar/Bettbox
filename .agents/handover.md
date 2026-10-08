@@ -3264,3 +3264,34 @@ record-fingerprint: 7ec523c9068ea5e1efea81f53de836152af356366226f7395d74d6b1420c
 
 ### HLG
 使用标准append dry-run后apply追加并生成索引。
+
+## 2026-10-09T06:01:17+08:00 · 数据库异步队列重试及逐PID目标消费验收
+
+type: maintenance
+scope: ["Bettbox", "server/billing"]
+status: partial
+tags: ["billing", "queue", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 604061865ad11bc1db28fe53faeb2f1ef22aa95341c0d41161ce7171ea319a14
+
+### Summary
+真实Laravel DatabaseQueue/Worker补偿任务持久化、异常释放重试与重复任务逐PID消费通过；整体发行目标未完成，生产业务未修改或启用。
+
+### Changed
+新增 laravel_queue_check.php，使用专用fixture_jobs和临时queue配置；CheckOrder实际入队，开通故障后Worker释放重试。两个PID分别通过JobProcessed证据消费一个目标任务，开通/流量/幂等事件一次。执行器冻结57输入，强制异步与逐PID结果，配置finally恢复。
+
+### Validation
+初验4e099c8b899d4fd192745b3612acfe74通过257 checks；独立审阅发现固定成功回执不能证明每PID实际消费。增强准入red be07ec3fbc864edeb08ce02cd649b2f8在queue_two_pids_processed_target_once失败；真实JobProcessed计数修复green99cb947e4ace47a3a446138fe175b0c4通过258 checks、57输入、source_unchanged/cleanup_verified true。主控核对24候选摘要，12项mock回归通过；独立复审P2封闭。PDEC execution_ready=true，禁网只读128MiB/64PID不扩展。
+
+### Next
+真实框架优惠券单次使用、管理员付款、插件生命周期；未知下单恢复、生产命令注册、停写与备份恢复。Android整体owner采用及有效节点流量；macOS解锁后的黑屏与系统代理验收。
+
+### Risks
+仅数据库队列有界消费、公开故障及幂等夹具消费者；不证明生产Redis、daemon信号/超时、failed_jobs耗尽、强杀或压力测试。认证/发现/网关为显式夹具，真实商户付款和三端完整链路未验收。缓存fixture队列连接随一次性脚本结束，生产配置未修改。
+
+### DIA
+已同步README、PLAN、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC、registry和当前公开回执。
+
+### HLG
+使用标准append dry-run后apply追加并生成索引。

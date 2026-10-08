@@ -181,3 +181,6 @@
 
 - .agents/plans/2026-10-09-laravel-invite-free-payment.md — 三层返佣、循环邀请及零金额付款真实框架验收范围
 - docs/validation/2026-10-07-three-platform/laravel-invite-free-payment-validation.json — 具体返佣比例、循环回滚与余额抵扣真实双进程证据
+
+- .agents/plans/2026-10-09-laravel-database-queue.md — 真实数据库异步队列/Worker补偿、异常重试与执行边界
+- docs/validation/2026-10-07-three-platform/laravel-database-queue-validation.json — 持久任务、实际Worker双进程和重复开通不变量证据

@@ -305,3 +305,6 @@ HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避�
 
 
 真实账务并发验收使用已断开的父连接和 fork 后各自重连的 SQLite 连接，共同起跑门禁与 PID/退出/单调时间交集验证独立进程行为；最终断言订单、余额、重置与幂等消费日志。成功 waitpid 立即撤销清理责任，超时仅适用于未回收子进程。隔离旧网关夹具、同步队列与生产认证/插件发现边界见 `docs/PLATFORM_VALIDATION.md`。
+
+
+数据库异步队列隔离验收使用真实 Laravel DatabaseQueue 和 Worker，CheckOrder 的序列化补偿与 OrderHandleJob 消费分离，异常先释放重试，重复持久任务由独立进程消费；不以同步调用替代。临时 queue 配置恢复，生产 Redis/daemon 生命周期另验。

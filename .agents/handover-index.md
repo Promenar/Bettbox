@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T05:54:06+08:00
+> generated_at: 2026-10-09T06:01:17+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -9,7 +9,7 @@
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
-| bettbox-three-platform-release | resume | 2026-10-09T05:54:06+08:00 | partial | ["Bettbox", "server/billing"] | 三层返佣循环回滚与零金额付款真实验收 | `.agents/handover.md` · `2026-10-09T05:54:06+08:00` · `fp:7ec523c906` |
+| bettbox-three-platform-release | resume | 2026-10-09T06:01:17+08:00 | partial | ["Bettbox", "server/billing"] | 数据库异步队列重试及逐PID目标消费验收 | `.agents/handover.md` · `2026-10-09T06:01:17+08:00` · `fp:604061865a` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
 | three-platform-release | resume | 2026-10-09T03:19:06+08:00 | partial | ["Bettbox", "Android"] | Android a35d73f签名候选更新基础设备验收与完整owner采用计划 | `.agents/handover.md` · `2026-10-09T03:19:06+08:00` · `fp:6056af5196` |
 
@@ -17,6 +17,7 @@
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T06:01:17+08:00 | iso | partial | resume | ["Bettbox", "server/billing"] | ["billing", "queue", "three-platform-release"] | 数据库异步队列重试及逐PID目标消费验收 | `.agents/handover.md` · `2026-10-09T06:01:17+08:00` · `fp:604061865a` |
 | 2026-10-09T05:54:06+08:00 | iso | partial | resume | ["Bettbox", "server/billing"] | ["billing", "invite", "three-platform-release"] | 三层返佣循环回滚与零金额付款真实验收 | `.agents/handover.md` · `2026-10-09T05:54:06+08:00` · `fp:7ec523c906` |
 | 2026-10-09T05:50:15+08:00 | iso | partial | resume | ["Bettbox", "server/billing"] | ["billing", "concurrency", "three-platform-release"] | Laravel 双进程账务验收与子进程收尾红绿 | `.agents/handover.md` · `2026-10-09T05:50:15+08:00` · `fp:99bfd326bf` |
 | 2026-10-09T05:42:40+08:00 | iso | partial | resume | ["Bettbox", "server/billing"] | ["billing", "migration", "three-platform-release"] | 账务迁移与仓库记录共同事务候选验收 | `.agents/handover.md` · `2026-10-09T05:42:40+08:00` · `fp:5d4a502be0` |

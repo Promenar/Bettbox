@@ -40,6 +40,10 @@ CHECKS += [name+'_overlap' for name in ['parallel_create','parallel_cancel','par
 
 CHECKS += ['parallel_free_balance_fully_applied', 'parallel_free_open_reset_no_gateway', 'parallel_free_repeat_rejected', 'parallel_free_repeat_no_extension', 'parallel_tiers_order_opened', 'parallel_tiers_settlement_once', 'parallel_tiers_exact_log_count', 'parallel_cycle_order_opened', 'parallel_cycle_rolls_back_logs_keeps_review', 'parallel_tiers_level_0_balance_log_once', 'parallel_tiers_level_1_balance_log_once', 'parallel_tiers_level_2_balance_log_once', 'parallel_cycle_member_0_unchanged', 'parallel_cycle_member_1_unchanged', 'parallel_cycle_member_2_unchanged']
 
+CHECKS += ['queue_dedicated_database', 'queue_empty_owned_table', 'queue_paid_without_inline_open', 'queue_processing_not_opened', 'queue_real_compensation_command', 'queue_serialized_job_not_sync', 'queue_failed_job_released_for_retry', 'queue_failure_business_transaction_rolled_back', 'queue_duplicate_serialized_jobs', 'queue_workers_consumed_persistent_jobs', 'queue_duplicate_retry_open_reset_event_once', 'queue_configuration_restored', 'parallel_queue_overlap']
+
+CHECKS += ['queue_two_pids_processed_target_once']
+
 
 class LaravelIsolatedTest(unittest.TestCase):
     def test_real_migration_input_and_completion_are_required(self):
@@ -63,6 +67,17 @@ class LaravelIsolatedTest(unittest.TestCase):
         hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
         for label in ['parallel_free_open_reset_no_gateway', 'parallel_tiers_settlement_once',
                       'parallel_cycle_rolls_back_logs_keeps_review']:
+            with self.subTest(label=label):
+                payload = {'ok': True, 'checks': [x for x in CHECKS if x != label], 'source_hashes': {},
+                           'environment_loaded': False, 'production_database_loaded': False}
+                with self.assertRaises(runner.RunnerFailure):
+                    runner.result_summary(json.dumps(payload).encode(), hashes)
+
+    def test_async_queue_results_are_required(self):
+        self.assertIn('server/tests/billing/laravel_queue_check.php', runner.CANDIDATE_INPUTS)
+        hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
+        for label in ['queue_serialized_job_not_sync', 'queue_failed_job_released_for_retry',
+                      'queue_duplicate_retry_open_reset_event_once', 'parallel_queue_overlap', 'queue_two_pids_processed_target_once']:
             with self.subTest(label=label):
                 payload = {'ok': True, 'checks': [x for x in CHECKS if x != label], 'source_hashes': {},
                            'environment_loaded': False, 'production_database_loaded': False}
@@ -157,7 +172,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 56)
+        self.assertEqual(len(receipt['source_hashes']), 57)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)

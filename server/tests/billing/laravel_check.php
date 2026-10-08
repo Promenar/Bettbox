@@ -249,6 +249,8 @@ SQL);
     // fork 前释放旧 PDO 引用，各子进程重新建立连接。
     $pdo=null;
     fixtureLaravelConcurrency($db,$temporary,$makeUser,$plan,$positive,$request);
+    require fixtureFile($candidate,'server/tests/billing/laravel_queue_check.php');
+    fixtureLaravelDatabaseQueue($db,$temporary,$makeUser,$plan);
     $pdo=$db->getPdo();
     fixtureCheck($pdo===$db->getPdo() && $db->getDatabaseName()===$temporary.'/fixture.sqlite','same_isolated_connection');
     foreach ($hashes as $path=>$digest) fixtureCheck(!is_link($path) && hash_file('sha256',$path)===$digest,'source_unchanged_'.basename($path));

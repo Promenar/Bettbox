@@ -50,6 +50,7 @@ CANDIDATE_INPUTS = (
     'server/tests/billing/laravel_support.php',
     'server/tests/billing/laravel_migration_check.php',
     'server/tests/billing/laravel_concurrency_check.php',
+    'server/tests/billing/laravel_queue_check.php',
 )
 IMAGE_SOURCE_CONTAINER = 'xboard-test-xboard-1'
 DIGEST = re.compile(r'sha256:[a-f0-9]{64}\Z')
@@ -147,6 +148,8 @@ def result_summary(raw, hashes):
                      'parallel_commission_order_opened','parallel_commission_balance_log_once'})
     required.update({'parallel_tiers_level_2_balance_log_once', 'parallel_cycle_order_opened', 'parallel_free_repeat_no_extension', 'parallel_free_repeat_rejected', 'parallel_tiers_exact_log_count', 'parallel_cycle_member_0_unchanged', 'parallel_tiers_settlement_once', 'parallel_tiers_level_0_balance_log_once', 'parallel_tiers_level_1_balance_log_once', 'parallel_cycle_member_1_unchanged', 'parallel_free_open_reset_no_gateway', 'parallel_tiers_order_opened', 'parallel_cycle_rolls_back_logs_keeps_review', 'parallel_free_balance_fully_applied', 'parallel_cycle_member_2_unchanged'})
     required.update(name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission','parallel_free','parallel_tiers','parallel_cycle'])
+    required.update({'queue_dedicated_database', 'queue_serialized_job_not_sync', 'parallel_queue_overlap', 'queue_paid_without_inline_open', 'queue_failure_business_transaction_rolled_back', 'queue_duplicate_retry_open_reset_event_once', 'queue_configuration_restored', 'queue_failed_job_released_for_retry', 'queue_empty_owned_table', 'queue_real_compensation_command', 'queue_workers_consumed_persistent_jobs', 'queue_duplicate_serialized_jobs', 'queue_processing_not_opened'})
+    required.add('queue_two_pids_processed_target_once')
     required.update('migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'])
     if not required.issubset(checks) or value.get('environment_loaded') is not False or value.get('production_database_loaded') is not False:
         raise RunnerFailure('fixture_contract_incomplete')
