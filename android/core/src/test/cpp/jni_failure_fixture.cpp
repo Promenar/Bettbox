@@ -57,6 +57,10 @@ extern "C" void registerCallbacks(protect_func, resolve_process_func, release_ob
 extern "C" GoUint8 startTUN(int, void *) { return 0; }
 extern "C" GoUint8 stopTun() { return 0; }
 extern "C" void suspend(int) {}
+static int suspend_result;
+static int suspend_argument;
+extern "C" int suspendChecked(int value) { suspend_argument = value; return suspend_result; }
+extern "C" jboolean Java_com_appshub_bettbox_core_Core_suspend(JNIEnv *, jobject, jint);
 extern "C" jint JNI_OnLoad(JavaVM *, void *);
 
 int main() {
@@ -96,7 +100,15 @@ int main() {
         if (status != JNI_ERR || invalid_calls != 0 || registered_callbacks != 0 ||
             deleted_globals != 1 || pending) ++failed;
     }
-    std::printf("{\"JNI_failure_cases\":9,\"failed\":%d,\"actual_JVM\":false}\n", failed);
+    // 实际JNI薄桥传递拒绝/成功；异常整数不能被当作成功。
+    for (int result : {0, 1, -1}) {
+        suspend_result = result;
+        for (int value : {0, 1}) {
+            if (Java_com_appshub_bettbox_core_Core_suspend(nullptr, nullptr, value) !=
+                (result == 1 ? JNI_TRUE : JNI_FALSE) || suspend_argument != value) ++failed;
+        }
+    }
+    std::printf("{\"JNI_failure_cases\":15,\"failed\":%d,\"actual_JVM\":false}\n", failed);
     return failed ? 1 : 0;
 }
 

@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 — Android 挂起拒绝与恢复责任
+
+- 旧挂起入口在同一核心锁内核验 owned 准入后执行，拒绝结果通过 checked C、JNI 与 Kotlin Boolean 真实传播。旧 void 导出保持兼容。
+- 挂起及恢复失败不提交本地成功；重新安装保留待恢复责任，注销失败不覆盖模块引用或发布运行成功。真实核心红绿、8 项生产模块夹具、15 项 JNI 夹具、Android ARM64 核心和实际 Release Kotlin 编译通过，独立复核完成。新 APK、熄屏设备、owned suspend 与完整 owner/ACK 另验。
+
 ## 2026-10-09 — Android 实际运行时身份准入
 
 - 后台经实际 FFI 动作取得实例身份，两个原生 channel 通过后台 JNI 严格比较；正常 IPC、配置及快捷启动在比对之后执行。失败 engine 提供关联拒绝 IPC 并按真实 messenger 归属禁止后续启动，保留未知资源。

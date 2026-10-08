@@ -27,13 +27,13 @@ class SuspendModule(private val context: Context) {
 
         when {
             shouldSuspendNow && !isSuspended -> {
-                Core.suspended(true)
-                isSuspended = true
+                if (Core.suspended(true)) isSuspended = true
             }
             !shouldSuspendNow && isSuspended -> {
-                Core.suspended(false)
-                isSuspended = false
-                com.appshub.bettbox.plugins.VpnPlugin.onUpdateNetwork()
+                if (Core.suspended(false)) {
+                    isSuspended = false
+                    com.appshub.bettbox.plugins.VpnPlugin.onUpdateNetwork()
+                }
             }
         }
     }
@@ -42,8 +42,7 @@ class SuspendModule(private val context: Context) {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.action?.let { action ->
                 if (action == Intent.ACTION_SCREEN_ON && isSuspended) {
-                    Core.suspended(false)
-                    isSuspended = false
+                    if (Core.suspended(false)) isSuspended = false
                 } else {
                     updateSuspendState()
                 }
@@ -53,8 +52,6 @@ class SuspendModule(private val context: Context) {
 
     fun install() {
         if (isInstalled) return
-        isInstalled = true
-        isSuspended = false
 
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
@@ -64,16 +61,19 @@ class SuspendModule(private val context: Context) {
             }
         }
         context.registerReceiver(receiver, filter)
+        isInstalled = true
         updateSuspendState()
     }
 
     fun uninstall(): Boolean {
-        if (!isInstalled) return true
+        if (!isInstalled && !isSuspended) return true
         return try {
-            context.unregisterReceiver(receiver)
-            isInstalled = false
+            if (isInstalled) {
+                context.unregisterReceiver(receiver)
+                isInstalled = false
+            }
             if (isSuspended) {
-                Core.suspended(false)
+                if (!Core.suspended(false)) return false
                 isSuspended = false
             }
             true

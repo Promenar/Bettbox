@@ -652,7 +652,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
                 if (committed && isCurrent(ticket)) {
                     if (currentOptions.dozeSuspend) {
-                        suspendModule?.uninstall()
+                        if (suspendModule?.uninstall() == false) {
+                            Core.stopTun()
+                            failStart(ticket, cleanupSucceeded = false, notify = notifyOnFailure)
+                            return@start
+                        }
                         suspendModule = SuspendModule(BettboxApplication.getAppContext())
                         suspendModule?.install()
                     }

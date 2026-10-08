@@ -380,3 +380,9 @@ Go 运行时配置 epoch 已使用库载入期公开随机身份；完整主包�
 当前黑屏原因未确认。现有候选进程存活且标准输出/错误指向 `/dev/null`；统一日志缺少 Dart 启动阶段信息，采样中的事件循环及 Metal 线程不能证明正常渲染。源码接入固定启动阶段标记及10秒等待提示，供带输出捕获的开发启动定位首帧之前的等待。四项诊断行为测试及启用真实Go动态库的292项Flutter回归通过；该证据不代表候选重建、实际窗口或黑屏修复通过。锁屏时不执行窗口验收，也不把首帧回调标记当作窗口正常证据。
 
 源码 `c0bcb9c` 的完整 macOS 本机开发构建通过，源与锁摘要未变。旧宿主及两层内核进程经应用退出通道正常退出后，旧包保存在 `build/macos-local-development-before-c0bcb9c/`；新包位于 `build/macos-local-development/Bettbox.app`。Apple Development 嵌套签名及严格验签通过，35项封装器回归通过。实际启动日志出现全部初始化阶段返回、`runApp` 和首帧回调，内核预加载等待约1.7秒，没有固定阶段的失败或10秒等待标记。该结果排除这份候选停在首帧之前的初始化步骤；锁屏阻止实际窗口确认，不能认定黑屏根因或修复完成。公开证据见 macos-startup-candidate-validation.json。
+
+### Android 挂起准入与恢复失败回归
+
+公开证据见 `validation/2026-10-07-three-platform/android-suspend-admission-validation.json`。真实核心在 STAGED 后的旧挂起污染完成失败复现，修复后主包通过；生成头文件与实际 Android ARM64 核心编译通过。JNI 生产薄桥的 15 项公开函数表夹具通过，但未使用真实 JVM。真实 SuspendModule 与公开平台桩的 8 项回归通过；重新安装清空责任的场景修复前为 7/8、修复后为 8/8。实际 Release Kotlin 工程编译与独立只读复审通过。
+
+本节不证明新 APK 的 JNI 往返、真实设备熄屏广播、owned suspend、完整原生所有者、不可变完成回执或 engine ACK。正式候选仍保持 release_verified=false。

@@ -41,6 +41,7 @@ extern "C" void registerCallbacks(protect_func, resolve_process_func, release_ob
 extern "C" GoUint8 startTUN(int, void *) { ++starts; return 1; }
 extern "C" GoUint8 stopTun() { ++stops; return 1; }
 extern "C" void suspend(int) {}
+extern "C" int suspendChecked(int) { return 0; }
 extern "C" jint JNI_OnLoad(JavaVM *, void *);
 extern "C" jboolean Java_com_appshub_bettbox_core_Core_startNativeTun(JNIEnv *, jobject, jobject, jobject);
 extern "C" jboolean Java_com_appshub_bettbox_core_Core_stopNativeTun(JNIEnv *);

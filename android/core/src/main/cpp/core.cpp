@@ -102,9 +102,9 @@ Java_com_appshub_bettbox_core_Core_stopOwnedTunNative(JNIEnv *env, jobject,
 }
 
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_appshub_bettbox_core_Core_suspend(JNIEnv *, jobject, jint suspended) {
-    suspend(suspended);
+    return suspendChecked(suspended) == 1 ? JNI_TRUE : JNI_FALSE;
 }
 
 

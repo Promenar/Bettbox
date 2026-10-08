@@ -6,8 +6,38 @@ import (
 	"encoding/json"
 	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/listener"
+	"github.com/metacubex/mihomo/tunnel"
 	"testing"
 )
+
+// 已采用配置后，旧无身份挂起不能改变真实隧道状态。
+func TestProductionAndroidOwnedRejectsLegacySuspend(t *testing.T) {
+	withProductionAndroidConfigFixture(t)
+	var staged androidOwnedConfigResult
+	if err := json.Unmarshal([]byte(commitAndroidOwnedConfigJSON(androidConfigEpoch, 0, androidConfigKindState, `{}`)), &staged); err != nil {
+		t.Fatal(err)
+	}
+	assertStagedStateResult(t, staged)
+	previous := tunnel.Status()
+	t.Cleanup(func() {
+		switch previous {
+		case tunnel.Running:
+			tunnel.OnRunning()
+		case tunnel.Inner:
+			tunnel.OnInnerLoading()
+		default:
+			tunnel.OnSuspend()
+		}
+	})
+	tunnel.OnRunning()
+	if handleSuspend(true) || tunnel.Status() != tunnel.Running {
+		t.Fatal("已采用配置后旧挂起改变真实隧道状态")
+	}
+	tunnel.OnSuspend()
+	if handleSuspend(false) || tunnel.Status() != tunnel.Suspend {
+		t.Fatal("已采用配置后旧恢复改变真实隧道状态")
+	}
+}
 
 // 实际登记监听资源，确认无身份旧请求不能关闭资源或清除运行时状态。
 func TestProductionAndroidOwnedRejectsLegacyListenerAndShutdown(t *testing.T) {

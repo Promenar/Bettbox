@@ -97,6 +97,7 @@ extern "C" void registerCallbacks(protect_func protect_callback,
 extern "C" GoUint8 startTUN(int, void *) { return 0; }
 extern "C" GoUint8 stopTun() { return 0; }
 extern "C" void suspend(int) {}
+extern "C" int suspendChecked(int) { return 0; }
 extern "C" jint JNI_OnLoad(JavaVM *, void *);
 
 // 旧版 void 回调仍可编译，但固定映射为 -1，避免把 ABI 编译失败误当成语义 RED。

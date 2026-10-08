@@ -110,3 +110,11 @@ func stopListener() {
 func suspend(suspended C.int) {
 	handleSuspend(suspended != 0)
 }
+
+//export suspendChecked
+func suspendChecked(suspended C.int) C.int {
+	if handleSuspend(suspended != 0) {
+		return 1
+	}
+	return 0
+}

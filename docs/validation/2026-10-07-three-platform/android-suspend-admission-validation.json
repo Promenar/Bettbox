@@ -1,0 +1,109 @@
+{
+  "recorded_at": "2026-10-08T20:42:35.309559+00:00",
+  "source_sha256": {
+    "core/hub.go": "4d177011e6e867ac5130d27d05ee34090838b9d304deaa190c1315bb5f7293ea",
+    "core/lib.go": "e37704b1fc1b710552d96a61c2540cc4b1eeb4b43e3a20af75669de5f590e06c",
+    "core/android_legacy_lifecycle_test.go": "72e0d4f73b161621e11974d563ca2fd072e380858a7a1879bb80b039c1af25e2",
+    "android/core/src/main/cpp/core.cpp": "2ca9303762e13763b24c87769a6e9a93e01e2d2451c3ea645e908606beaedb32",
+    "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "e9fc6d17c7034c931930eb3406b332e761bfdc464188303bc4a49c7a9bda0e66",
+    "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "64c9c6cbbec58c2faf4d2bdf3fb90b22acefd5a6b2bd05725671dd88fb1705c1",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "4f2cf6bbe65081ba52d29000dff673c173a2c8498a1f9b6c59f368f56cb52dde",
+    "scripts/check_android_suspend_module.py": "d6ae6260ca0ea75f13b63f74308de8d7fa4b2b1080c1d2ce3aaca30fec448584",
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidContentStub.kt": "b54f1bba60dfc94e701dc126173a8373338237af67b78ea6a061f37b2ac42beb",
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidXStub.kt": "6ba5d728aa7dacb81b1c08387e3f31188f0edb3601e8fb57dcafce501f5b29a0",
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidSuspendModuleFixture.kt": "4cc98d1bfe7412bee1226853d001c6416733849390bf63f04faccc0d939c220a",
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/CoreStub.kt": "db19a3cbca3dd71c8853b50ee13c87244ab638a253a747a81242440258fc546c",
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidOsStub.kt": "41ef5387b996cbd33178e1224dc3f0fc989d254f9b09a26a6d04640bd5f742e2",
+    "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/VpnPluginStub.kt": "b4c08c72f121a60bb14a5d215bb3e81e30f7065513f0d8b7ff0a4d202ec1f217"
+  },
+  "Go_main": {
+    "actual_production": true,
+    "red": {
+      "exit_code": 1,
+      "test": "TestProductionAndroidOwnedRejectsLegacySuspend",
+      "failure": "STAGED 后旧挂起入口改变真实 tunnel 状态"
+    },
+    "green": {
+      "exit_code": 0,
+      "command": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go test -mod=readonly -count=1 -timeout=120s -tags with_gvisor .",
+      "cwd": "core"
+    }
+  },
+  "Go_android_arm64": {
+    "exit_code": 0,
+    "target": "android-arm64-api26",
+    "ndk": "28.2.13676358",
+    "source_sha256": {
+      "core/hub.go": "4d177011e6e867ac5130d27d05ee34090838b9d304deaa190c1315bb5f7293ea",
+      "core/lib.go": "e37704b1fc1b710552d96a61c2540cc4b1eeb4b43e3a20af75669de5f590e06c"
+    },
+    "source_unchanged": true,
+    "actual_android_library": true,
+    "artifacts": {
+      "libclash.so": "d0733b0881ca5404feb66f53cbf5a885fd77d17a96916806298decb50c208f74",
+      "libclash.h": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5"
+    },
+    "checked_header_export": true
+  },
+  "JNI_fixture": {
+    "actual_production_bridge": true,
+    "generated_android_header": true,
+    "cases": 15,
+    "failed": 0,
+    "actual_JVM": false
+  },
+  "module_reinstall_red": {
+    "passed": 7,
+    "cases": 8,
+    "exit_code": 1,
+    "scope": "更改 install 前的候选，新增卸载恢复失败后的重新安装场景"
+  },
+  "module_green": {
+    "passed": true,
+    "actual_Android": false,
+    "fixture": {
+      "passed": 8,
+      "cases": 8
+    },
+    "sources_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "64c9c6cbbec58c2faf4d2bdf3fb90b22acefd5a6b2bd05725671dd88fb1705c1",
+      "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidContentStub.kt": "b54f1bba60dfc94e701dc126173a8373338237af67b78ea6a061f37b2ac42beb",
+      "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidOsStub.kt": "41ef5387b996cbd33178e1224dc3f0fc989d254f9b09a26a6d04640bd5f742e2",
+      "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidSuspendModuleFixture.kt": "4cc98d1bfe7412bee1226853d001c6416733849390bf63f04faccc0d939c220a",
+      "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/AndroidXStub.kt": "6ba5d728aa7dacb81b1c08387e3f31188f0edb3601e8fb57dcafce501f5b29a0",
+      "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/CoreStub.kt": "db19a3cbca3dd71c8853b50ee13c87244ab638a253a747a81242440258fc546c",
+      "android/app/src/test/kotlin/com/appshub/bettbox/suspendfixture/VpnPluginStub.kt": "b4c08c72f121a60bb14a5d215bb3e81e30f7065513f0d8b7ff0a4d202ec1f217"
+    },
+    "compiler": "Kotlin2.0.21",
+    "fixture_stdout_sha256": "732ad0f762efc4224b784d00d8e2a97ebeb3db6741da58db6d44a2a4c723d237",
+    "boundary": "真实生产挂起模块与公开平台桩；没有真实 Android 广播、JNI 或设备验收"
+  },
+  "release_Kotlin": {
+    "exit_code": 0,
+    "actual_release_Kotlin": true,
+    "source_sha256": {
+      "android/core/src/main/java/com/appshub/bettbox/core/Core.kt": "e9fc6d17c7034c931930eb3406b332e761bfdc464188303bc4a49c7a9bda0e66",
+      "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "64c9c6cbbec58c2faf4d2bdf3fb90b22acefd5a6b2bd05725671dd88fb1705c1",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "4f2cf6bbe65081ba52d29000dff673c173a2c8498a1f9b6c59f368f56cb52dde"
+    },
+    "source_unchanged": true,
+    "boundary": "实际 Kotlin 编译，不代表 APK/JNI 或设备验收"
+  },
+  "independent_review": {
+    "read_only": true,
+    "confirmed_new_defects": 0,
+    "initial_findings_fixed": [
+      "重新安装清空恢复责任",
+      "旧模块注销失败仍覆盖引用"
+    ]
+  },
+  "release_verified": false,
+  "not_verified": [
+    "新 APK 的实际 JNI Boolean 往返",
+    "真实 Android 熄屏广播与恢复失败",
+    "完整唯一 owner 与配置/TUN/listener 联合采用",
+    "typed completion 与 engine ACK",
+    "有效代理节点 HTTPS",
+    "macOS 可见界面"
+  ]
+}

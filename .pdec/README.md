@@ -167,3 +167,5 @@ Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例�
 智能停止沿用 test-android-stop-dart、test-android-vpn-work-gate、compile-android-stop-response-adapter 与完整 test-flutter/analyze 操作。测试使用公开 channel/会话对象与协程屏障，实际 Android release Kotlin 编译使用既有安全签名注入，不回显凭据。该阶段不安装新 APK，不把 JNI void 挂起无异常作为 engine ACK。
 
 `launch-macos-local-development-trace` 直接运行已严格验签的本机开发候选并捕获启动输出，旧候选宿主及两个内核进程必须先确认退出。原始日志只保存在任务目录的0600文件中，模型仅读取固定阶段和状态；启动与帧回调不代表窗口、钥匙串账户、系统代理或发行验收。该入口不启用额外系统权限或付款。
+
+Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule 与公开平台桩，8 个行为场景不访问真实 Android 广播或 JNI。checked suspend 的 Android ARM64 核心使用只读离线 Go 依赖与既有 NDK28；JNI 夹具使用该实际生成头文件，15 个场景仍不是设备验收。Release Kotlin 安全注入现有签名环境，仅编译、不安装。

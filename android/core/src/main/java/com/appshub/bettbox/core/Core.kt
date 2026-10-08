@@ -21,7 +21,7 @@ object Core {
             ?: throw IllegalStateException("配置提交结果未知")
 
     private external fun startNativeTun(lease: TunFDLease, cb: TunInterface?): Boolean
-    private external fun suspend(suspended: Int)
+    private external fun suspend(suspended: Int): Boolean
     private external fun stopNativeTun(): Boolean
     private external fun startOwnedTunNative(epoch: Long, revision: Long, generation: Long, lease: TunFDLease, cb: TunInterface?): String?
     private external fun stopOwnedTunNative(epoch: Long, revision: Long, generation: Long): String?
@@ -110,11 +110,10 @@ object Core {
 
     fun suspended(value: Boolean): Boolean {
         return runCatching {
-            Log.d("Core", "suspended called with value: $value")
             suspend(if (value) 1 else 0)
-            Log.d("Core", "suspend JNI call completed")
-        }.onFailure {
+        }.getOrElse {
             Log.e("Core", "TUN 挂起调用失败")
-        }.isSuccess
+            false
+        }
     }
 }

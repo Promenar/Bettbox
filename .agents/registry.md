@@ -162,3 +162,5 @@
 - docs/validation/2026-10-07-three-platform/macos-startup-trace-validation.json — 固定阶段诊断源摘要、回归与未覆盖窗口边界
 
 - docs/validation/2026-10-07-three-platform/macos-startup-candidate-validation.json — 同源完整开发构建、严格签名、旧会话退出及实际首帧边界
+
+- docs/validation/2026-10-07-three-platform/android-suspend-admission-validation.json — 挂起准入真实核心红绿、JNI/模块夹具和 ARM64/Kotlin 编译边界

@@ -3016,3 +3016,34 @@ record-fingerprint: 8604d35014507d4fd26587418e1295c657ef48afc4365f6bf3fc43738a84
 
 ### HLG
 标准append预演后追加，索引由工具重建。
+
+## 2026-10-09T04:42:48+08:00 · Android 挂起准入、拒绝传播与恢复责任回归
+
+type: maintenance
+scope: ["Bettbox"]
+status: partial
+tags: ["android", "suspend", "three-platform"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 75252d0839c2f46ff50dab461b20c10876cb277d1bafbb8c011f8d65d107937d
+
+### Summary
+已修复旧挂起旁路和恢复失败责任丢失，总体三端交付目标未完成。
+
+### Changed
+Go 同锁准入，checked C/JNI/Kotlin Boolean；模块仅成功提交状态，重新安装保留责任；旧模块清理失败保留引用并阻断启动。
+
+### Validation
+真实核心污染失败复现与修复后主包通过；模块重新安装 red 7/8、green 8/8；JNI15项通过；实际 Android ARM64 核心和 Release Kotlin 编译通过；独立复审无新增确定缺陷。
+
+### Next
+完成带身份的初始化、listener/suspend/stop后端合同与 Kotlin/Dart 唯一 owner、双通道完成和 ACK；固定同源 APK 设备验证；macOS 解锁后检查黑屏；账户、邀请、支付与有效节点全路径另验。
+
+### Risks
+JNI 是公开函数表夹具、模块是平台桩，未证明真实设备熄屏或新 APK；owned suspend 尚未实现。Mac 当前锁屏，首帧日志不能证明可见画面。
+
+### DIA
+已同步 CHANGELOG、ARCHITECTURE、PLATFORM_VALIDATION、registry、PDEC 说明与公开证据。
+
+### HLG
+标准 append dry-run 后 apply，保留完整目标与验收边界。

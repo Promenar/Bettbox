@@ -651,7 +651,9 @@ func handleSetupConfig(bytes []byte) string {
 }
 
 func handleSuspend(suspended bool) bool {
-	if !isInit {
+	runLock.Lock()
+	defer runLock.Unlock()
+	if !isInit || androidLegacyConfigWriteErrorLocked() != nil {
 		return false
 	}
 	if suspended {
@@ -670,9 +672,7 @@ func handleSuspend(suspended bool) bool {
 		log.Infoln("[APP] Resume from suspend")
 		tunnel.OnRunning()
 
-		runLock.Lock()
 		cfg := currentConfig
-		runLock.Unlock()
 		if cfg != nil && cfg.NTP != nil && cfg.NTP.Enable {
 			c := cfg.NTP
 			mihomoNtp.ReCreateNTPService(
