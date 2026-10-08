@@ -219,7 +219,7 @@ Android 生命周期候选接入完整工作门禁、独立绑定/启动意图�
 
 `build/macos-local-candidate/Bettbox.app` 已用现有唯一Apple Development身份完成完整bundle签名；10个框架及最终宿主严格验签通过，Core/helper的既有ad hoc身份与字节保持不变。封装工具20项测试通过，证书Team来自所选指纹对应叶证书OU，未读取私钥或输出原始身份。旧候选保留于 `build/macos-local-candidate-before-c9b0355`。回执 `validation/2026-10-07-three-platform/macos-development-signing-validation.json` 记录源摘要和构建来源。
 
-该产物是本机开发候选，未公证；尚未验证正常应用启动、Keychain冷启动、系统授权同意/取消、代理写入恢复及有效上游节点流量，不能声明可用公开发行版。Android、macOS优先交付；iOS按用户选择保留开发版并研究发行方案。
+该产物是本机开发候选，未公证。实际CUA启动被系统拒绝，本地错误分类为缺少matching profile/invalid profile；候选未嵌入profile，两个标准安装目录计数均为0。严格验签成功不能证明系统启动准入。真实App保留DP Keychain与Release权利，未降低安全存储要求；需要Xcode团队/profile及其授权链适配，再验Keychain冷启动、系统代理写入恢复和有效上游流量。封装器对完整候选任何非空权利配置在复制/签名前拒绝，签后实际权利必须匹配预检快照；24项公开回归通过。回执 `validation/2026-10-07-three-platform/macos-profile-admission-validation.json`。Android、macOS优先交付；iOS保留开发版并研究发行方案。
 
 
 ### 2026-10-08 生产监听停止回执
@@ -232,3 +232,7 @@ Go handleStopListener及stopListener action使用既有StopListenerChecked，在
 生产setup的7个早失败场景真实red后修复；13个场景（包含数值及深复制）与core包回归通过。NDK28/API26实际Android ARM64 Go c-shared及生产JNI编译链接通过，独立产物位于 `.test/android-config-prepare-abi`，旧产物保留。回执 `validation/2026-10-07-three-platform/core-config-prepare-validation.json` 保存代码、日志及产物摘要。未安装该产物或验证成功ApplyConfig/真实JVM，不代表完整owner、设备和发行验收。解析器完整副作用回滚没有证明。
 
 Android同步配置中间层：Go生产入口以runLock执行epoch/revision CAS、STAGED初始状态、ENTERED准备/提交及同次options深副本；回执严格区分staged/applied/rejected/unknown，未知保留责任并粘滞阻断。JNI同步桥及Kotlin严格十字段codec已实现，但未接入唯一Native owner。Core全包、state race、实际Kotlin JVM、NDK28/API26 ARM64 Go/JNI编译及17项JNI函数表ASAN验证通过；真实Android JVM/CheckJNI、带版本TUN准入、HTTP/FFI旁路收敛、epoch换代、完整App及业务验收另验。回执 `docs/validation/2026-10-07-three-platform/android-owned-config-validation.json`。
+
+Android生产启动报告：`State.StartWithInputCleanupReport` 在同一状态锁内执行旧资源收口、新资源构造、输入清理和最终状态捕获。输入失败先固化首码，资源Close失败保留resource/lease及已启动runtime；release panic只保留其指针责任，不伪造JNI释放确认。Shutdown先关闭回调准入并等待所有pin，再仅尝试一次释放；listener/release panic转为稳定错误，重复Close保持失败。8项初始报告及6项混合故障在修复前失败；最终定向7项、完整startup race、core回归和Android ARM64 Go/JNI编译链接通过。尚未接带版本TUN入口或重建APK；回执 `validation/2026-10-07-three-platform/android-start-report-validation.json`。
+
+用户所见黑色窗口经当前进程路径与CUA截图确认来自 `build/macos-flutter-supervisor/Bettbox.app`。探针入口 `integration_test/macos_supervisor_probe.dart` 使用 `SizedBox.shrink`，没有客户端业务页面；空窗口不计入完整应用UI或发行验收。

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "release_verified": false,
+  "sources_sha256": {
+    "core/androidstartup/state.go": "b31e3c57aa86d76d6693cc5327af32637a230b35e6339df24e456414e2be5de0",
+    "core/androidstartup/callback_gate.go": "1b3157a0f5b5c9a1c61a7a22ee7388d3e0accaab3f5f130592fa01acfd77e8aa",
+    "core/androidstartup/start_report_test.go": "230ecf1116c11fddc8087458f0731c53a1cb1b2c885406cea5a8be53c9713c69",
+    "core/androidstartup/callback_gate_test.go": "0b2f0578c79f57fd7b8341078d5dd69fa4b588a6c79277bb94a07092d19bed49"
+  },
+  "checks": {
+    "initial_report_red_exit": 1,
+    "initial_report_red_failed_tests": 8,
+    "initial_report_green_exit": 0,
+    "initial_report_green_tests": 12,
+    "mixed_failure_red_exit": 1,
+    "mixed_failure_red_failed_tests": 6,
+    "mixed_failure_final_green_exit": 0,
+    "mixed_failure_final_green_passed_tests": 7,
+    "full_androidstartup_race_exit": 0,
+    "full_core_cgo0_with_gvisor_exit": 0,
+    "android_arm64_go_c_shared_exit": 0,
+    "android_arm64_jni_link_exit": 0
+  },
+  "log_sha256": {
+    ".test/three-platform-release/android-start-report-red.log": "26b9ba2cd427533561489180a28f92bf8ebc76b2a258458f430a3c2fb4dc2243",
+    ".test/three-platform-release/android-start-report-green.log": "79d4a1b98024ebee71cc58577930793fd1d89f7b8c0229f6741110a3f8411c91",
+    ".test/three-platform-release/android-start-report-mixed-red.log": "e9112832469fd8929470031ddcdfcbc3a8a5792d4a466d2d552318a21a4ba288",
+    ".test/three-platform-release/android-start-report-mixed-green-final.log": "bb201a64ec785c6624779952d835a5e5ef2ffd8d19c856af4f014bc0da015db1",
+    ".test/three-platform-release/android-start-report-full-race-green.log": "3f36a979d5823d2969b0550cf52f7d999f514653e6962b5bfe71742e7a4237ae",
+    ".test/three-platform-release/android-start-report-core-full-green.log": "05eb32d0f2c01a7368465c140b2d451e2404a3979aa98c2315ec905122142476",
+    ".test/three-platform-release/android-start-report-abi-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".test/three-platform-release/android-start-report-jni-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "artifacts_sha256": {
+    ".test/android-start-report-abi/libclash.so": "f91b28c5c3b1b4ff928fb0b54dd584c7b806c8ffc5be89d01dc0d51ecee4c4fb",
+    ".test/android-start-report-abi/libclash.h": "41785bda08a445a57180927ebb85584fec32215ce0e45a555aa3ffb77a12beeb",
+    ".test/android-start-report-abi/libcore.so": "b65c1f10da8f156e90f8f90cf63930f733353032eff7c8d3f8017638e8c4fac9"
+  },
+  "independent_review": "施工与独立只读审阅分离；确认的runtime误清、首错覆盖、Shutdown重复伪成功缺陷均关闭。主控补强panic不得向调用方传播断言并执行最终定向race。",
+  "boundaries": [
+    "实际生产State/Shutdown配公开内存Resource和lease；未创建系统TUN或网络连接",
+    "RetainsLease只证明State持有指针，不能证明JNI引用已释放",
+    "未知资源Close保留runtime，Running表示已启动且未确认关闭，不证明流量健康",
+    "未接带epoch/revision的TUN启动ABI、唯一Native owner、HTTP/FFI/quickStart收敛或Dart完成回执",
+    "Android编译链接不证明真实JVM/CheckJNI，未构建安装新APK"
+  ]
+}

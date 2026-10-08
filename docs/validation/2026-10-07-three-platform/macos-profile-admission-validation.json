@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "release_verified": false,
+  "launch_validated": false,
+  "sources_sha256": {
+    "scripts/seal_macos_candidate.py": "8537e4fc0a6a4c9d39628994c465b50aa600af3e81207a8b6248b534fed0b50f",
+    "scripts/tests/test_seal_macos_candidate.py": "1f0500a9d3f268a3f8b2e8349a5baf68d758a18173f9a9b81296cf4eb011091e",
+    "macos/Runner/Release.entitlements": "0672f83103b450e4e0b5b86e42238d9b9ba39af727de43d185f22ec56143cda5"
+  },
+  "runtime_observations": {
+    "old_production_app_normal_menu_quit": true,
+    "old_production_app_and_core_absent_after_quit": true,
+    "public_probe_remained_running": true,
+    "candidate_path": "build/macos-local-candidate/Bettbox.app",
+    "strict_deep_verify_exit": 0,
+    "cua_launch_failed": true,
+    "cua_error_categories": [
+      "NSCocoaErrorDomain:256",
+      "Launchd/POSIX:163"
+    ],
+    "system_log_classification": {
+      "missing_matching_profile": true,
+      "invalid_profile": true
+    },
+    "embedded_profile_exists": false,
+    "standard_installed_profile_counts": [
+      0,
+      0
+    ],
+    "candidate_process_after_launch": false,
+    "user_black_window_confirmed": {
+      "running_process": "build/macos-flutter-supervisor/Bettbox.app/Contents/MacOS/Bettbox",
+      "cua_screenshot_black": true,
+      "probe_entry": "integration_test/macos_supervisor_probe.dart",
+      "probe_root_widget": "Directionality/SizedBox.shrink",
+      "full_client_window": false
+    }
+  },
+  "checks": {
+    "production_seal_profile_gate_red_exit": 1,
+    "red_total_tests": 21,
+    "red_failed_tests": 1,
+    "green_exit": 0,
+    "green_total_tests": 24,
+    "real_app_rights_unchanged": true,
+    "independent_review_confirmed_p1_p2_remaining": 0
+  },
+  "log_sha256": {
+    ".test/three-platform-release/macos-profile-seal-red.log": "88440f8ce3056411ae29059504e65d74087954ae658005d757598402b11b1315",
+    ".test/three-platform-release/macos-profile-seal-green.log": "bed85811dba2b9f84e808e1032bb1cd611b06ffcc82693ec787fb01096374daa"
+  },
+  "boundary": [
+    "系统日志只在本地分类，未输出身份/profile/日志原文",
+    "封装器没有profile信任和授权校验；完整候选任何非空权利配置均在复制或签名前拒绝，嵌入未验证profile不能绕过",
+    "无权利公开夹具只验证签名封装；签后实际权利漂移不发布成功清单",
+    "保留真实App的DP Keychain与Release权利，未重签/覆盖既有候选",
+    "待Xcode团队/profile准备及授权链集成；真实Keychain、系统代理写入恢复、有效上游及公开发行未验收"
+  ],
+  "primary_sources": [
+    "https://developer.apple.com/documentation/technotes/tn3137-on-mac-keychains",
+    "https://developer.apple.com/documentation/technotes/tn3125-inside-code-signing-provisioning-profiles"
+  ]
+}

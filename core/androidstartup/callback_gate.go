@@ -126,13 +126,32 @@ func (s *Shutdown) Close(g *CallbackGate, lease *OnceLease, closeListener func()
 		g.CloseAdmission()
 		// newListener 已尝试关闭且失败，绝不再调用 Close 抹掉首个错误。
 		if err == nil {
-			err = closeListener()
+			listenerErr, panicked := callListenerClose(closeListener)
+			if listenerErr != nil || panicked {
+				err = errors.New("TUN listener 关闭失败")
+			}
 		}
-		g.Wait()
-		lease.Release()
+		// 在后续等待或释放前固化首个关闭错误，避免 panic 越过 sync.Once 后误报成功。
 		if err != nil {
 			s.err = errors.New("TUN listener 关闭失败")
 		}
+		g.Wait()
+		if releaseLease(lease) && s.err == nil {
+			s.err = errors.New("JNI 引用释放失败")
+		}
 	})
 	return s.err
+}
+
+func callListenerClose(closeListener func() error) (err error, panicked bool) {
+	defer func() {
+		if recover() != nil {
+			err = errors.New("TUN listener 关闭发生panic")
+			panicked = true
+		}
+	}()
+	if closeListener == nil {
+		return errors.New("TUN listener 关闭入口为空"), false
+	}
+	return closeListener(), false
 }

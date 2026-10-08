@@ -81,9 +81,15 @@ class AdmissionTests(unittest.TestCase):
         helper.with_name("Bettbox").write_bytes(b"public-host")
         (app / "Contents/Info.plist").write_bytes(plistlib.dumps({
             "CFBundleIdentifier": "com.appshub.bettbox", "CFBundleExecutable": "Bettbox"}))
+        entitlement = root / "macos/Runner/Release.entitlements"
+        entitlement.parent.mkdir(parents=True, exist_ok=True)
+        # 无受限权利的公开宿主夹具只验证嵌套签名，不能代替完整App准入。
+        entitlement.write_bytes(plistlib.dumps({}))
         return source
 
     def fake_signer(self, argv):
+        if "-d" in argv and "--entitlements" in argv:
+            return SimpleNamespace(stdout=plistlib.dumps({}), stderr=b"", returncode=0)
         path = argv[-1]
         identifier = "com.appshub.bettbox"
         if path.endswith("BettboxCoreSupervisor"): identifier += ".core.supervisor"
@@ -243,6 +249,53 @@ class AdmissionTests(unittest.TestCase):
                     copy.assert_not_called()
                 self.assertFalse(any("--force" in call for call in calls))
                 self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_restricted_keychain_without_profile_is_rejected_before_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.development_bundle(root)
+            entitlement = root / "macos/Runner/Release.entitlements"
+            entitlement.parent.mkdir(parents=True, exist_ok=True)
+            entitlement.write_bytes(plistlib.dumps({"keychain-access-groups": []}))
+            signer, calls = self.development_signer()
+            with patch.object(seal, "tool", side_effect=signer), patch.object(seal.shutil, "copytree", wraps=seal.shutil.copytree) as copy:
+                with self.assertRaisesRegex(RuntimeError, "provisioning profile准入"):
+                    seal.seal(root, signing_mode="apple-development")
+                copy.assert_not_called()
+            self.assertFalse(any("--force" in call for call in calls))
+            self.assertFalse(((root / seal.DESTINATION).parent / "seal.json").exists())
+
+    def test_signed_entitlement_drift_never_publishes_success(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.source_bundle(root)
+            def signer(argv):
+                if "-d" in argv and "--entitlements" in argv:
+                    return SimpleNamespace(stdout=plistlib.dumps({"keychain-access-groups": []}), stderr=b"", returncode=0)
+                return self.fake_signer(argv)
+            with patch.object(seal, "tool", side_effect=signer):
+                with self.assertRaisesRegex(RuntimeError, "宿主实际权利不符"):
+                    seal.seal(root)
+            self.assertFalse((root / seal.DESTINATION.parent / "seal.json").exists())
+
+    def test_unknown_right_requires_profile_admission(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.source_bundle(root)
+            (root / "macos/Runner/Release.entitlements").write_bytes(plistlib.dumps({"public-unknown-right": True}))
+            with patch.object(seal, "tool") as signer, patch.object(seal.shutil, "copytree") as copy:
+                with self.assertRaisesRegex(RuntimeError, "provisioning profile准入"):
+                    seal.seal(root)
+                copy.assert_not_called(); signer.assert_not_called()
+
+    def test_embedded_unverified_profile_cannot_bypass_keychain_gate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); source = self.development_bundle(root)
+            (source / "Contents/embedded.provisionprofile").write_bytes(b"PUBLIC_UNVERIFIED_PROFILE")
+            (root / "macos/Runner/Release.entitlements").write_bytes(plistlib.dumps({"keychain-access-groups": []}))
+            signer, calls = self.development_signer()
+            with patch.object(seal, "tool", side_effect=signer), patch.object(seal.shutil, "copytree", wraps=seal.shutil.copytree) as copy:
+                with self.assertRaisesRegex(RuntimeError, "provisioning profile准入"):
+                    seal.seal(root, signing_mode="apple-development")
+                copy.assert_not_called()
+            self.assertFalse(any("--force" in call for call in calls))
 
     def test_development_selects_unique_identity_for_framework_and_host_only(self):
         with tempfile.TemporaryDirectory() as directory:

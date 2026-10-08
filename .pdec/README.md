@@ -131,3 +131,5 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 `test-core-config-prepare`验证生产setup早失败时保留已发布指针、默认URL及调用输入，覆盖纯复制数值语义；CGO0/with_gvisor、离线依赖。`compile-android-config-prepare-core`及对应JNI操作在独立目录使用NDK28/API26编译实际Android ARM64源码，不覆盖原ABI产物，不安装或启动VPN。编译成功不能代替真实JVM/CheckJNI和设备业务验收。
 
 同步配置验证登记test-android-owned-config、test-android-owned-options、test-android-config-protocol-green、compile-android-owned-config-core/jni及test/run-android-config-jni。公开JSON与函数表不使用账户、VPN或网络；产物保存在独立.test/android-owned-config-abi，不覆盖已安装APK来源。state race和全Core回归复用已登记入口。
+
+启动报告验收入口：`test-android-start-report`、`test-android-start-report-first-error` 和 `test-android-startup-full` 使用公开内存资源执行真实生产State/Shutdown及race；`compile-android-start-report-core/jni` 在独立目录编译Android ARM64生产ABI，不安装或启动VPN。macOS候选启动通过已安装CUA工具入口登记，不能将该登记值当作CLI命令。封装工具回归只签公开无权利夹具；真实App的profile和启动另验。

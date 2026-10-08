@@ -38,21 +38,265 @@ type State struct {
 	mu              sync.Mutex
 	resource        Resource
 	lease           *OnceLease
+	pendingLeases   []*OnceLease
 	runtime         time.Time
 	inputCleanupErr error
+	blockedCode     string
+}
+
+const (
+	startCodeInvalidFD           = "invalidFD"
+	startCodeNotReady            = "notReady"
+	startCodeOpenFailed          = "openFailed"
+	startCodeOpenPanic           = "openPanic"
+	startCodeResourceCloseFailed = "resourceCloseFailed"
+	startCodeResourceClosePanic  = "resourceClosePanic"
+	startCodeInputCleanupFailed  = "inputCleanupFailed"
+	startCodeInputCleanupPanic   = "inputCleanupPanic"
+	startCodeReleasePanic        = "releasePanic"
+	startCodeInternalPanic       = "internalPanic"
+)
+
+// StartReport 描述一次启动尝试结束后由 State 能直接证明的资源状态。
+// RetainsLease 仅表示 State 仍持有 lease 指针，不证明外部 JNI 引用已释放。
+type StartReport struct {
+	Started            bool
+	Entered            bool
+	CleanupUnconfirmed bool
+	RetainsResource    bool
+	RetainsLease       bool
+	Running            bool
+	Code               string
+}
+
+// StartWithInputCleanupReport 在同一把状态锁内完成旧资源收口、新资源启动、
+// 输入清理与最终报告。任一无法确认的清理结果都会保留可达责任并永久阻断新启动。
+func (s *State) StartWithInputCleanupReport(
+	fd int,
+	ready bool,
+	release func(),
+	open func(*OnceLease) (Resource, error),
+	inputCleanup func() error,
+) (report StartReport) {
+	s.mu.Lock()
+	started := false
+	entered := false
+	attemptCode := ""
+	var activeLease *OnceLease
+	defer func() {
+		if recover() != nil {
+			if activeLease != nil {
+				s.retainPendingLeaseLocked(activeLease)
+			}
+			s.markBlockedLocked(startCodeInternalPanic)
+			started = false
+		}
+
+		cleanupErr, cleanupPanicked := callInputCleanup(inputCleanup)
+		if cleanupErr != nil || cleanupPanicked {
+			cleanupCode := startCodeInputCleanupFailed
+			if cleanupPanicked {
+				cleanupCode = startCodeInputCleanupPanic
+				cleanupErr = errors.New("输入清理发生panic")
+			}
+			if s.inputCleanupErr == nil {
+				s.inputCleanupErr = cleanupErr
+			}
+			s.markBlockedLocked(cleanupCode)
+			if started {
+				s.closeCurrentLocked()
+			}
+			started = false
+		}
+
+		code := attemptCode
+		if s.blockedCode != "" {
+			code = s.blockedCode
+		}
+		report = StartReport{
+			Started:            started,
+			Entered:            entered,
+			CleanupUnconfirmed: s.blockedCode != "",
+			RetainsResource:    s.resource != nil,
+			RetainsLease:       s.lease != nil || len(s.pendingLeases) != 0,
+			Running:            !s.runtime.IsZero(),
+			Code:               code,
+		}
+		s.mu.Unlock()
+	}()
+
+	activeLease = NewOnceLease(release)
+	if !s.stopLocked() {
+		if releaseLease(activeLease) {
+			s.retainPendingLeaseLocked(activeLease)
+			s.markBlockedLocked(startCodeReleasePanic)
+		}
+		activeLease = nil
+		return
+	}
+	if fd <= 0 {
+		if releaseLease(activeLease) {
+			s.retainPendingLeaseLocked(activeLease)
+			s.markBlockedLocked(startCodeReleasePanic)
+			activeLease = nil
+			return
+		}
+		activeLease = nil
+		if fd < 0 {
+			attemptCode = startCodeInvalidFD
+			return
+		}
+		if !ready {
+			attemptCode = startCodeNotReady
+			return
+		}
+		s.runtime = time.Now()
+		started = true
+		return
+	}
+	if !ready {
+		attemptCode = startCodeNotReady
+		if releaseLease(activeLease) {
+			s.retainPendingLeaseLocked(activeLease)
+			s.markBlockedLocked(startCodeReleasePanic)
+		}
+		activeLease = nil
+		return
+	}
+
+	entered = true
+	s.retainPendingLeaseLocked(activeLease)
+	resource, err, panicked := callOpen(open, activeLease)
+	if panicked {
+		s.markBlockedLocked(startCodeOpenPanic)
+		activeLease = nil
+		return
+	}
+	s.removePendingLeaseLocked(activeLease)
+	if err != nil || resource == nil {
+		attemptCode = startCodeOpenFailed
+		if resource != nil {
+			s.resource, s.lease = resource, activeLease
+			activeLease = nil
+			s.closeCurrentLocked()
+			return
+		}
+		if releaseLease(activeLease) {
+			s.retainPendingLeaseLocked(activeLease)
+			s.markBlockedLocked(startCodeReleasePanic)
+		}
+		activeLease = nil
+		return
+	}
+	s.resource, s.lease, s.runtime = resource, activeLease, time.Now()
+	activeLease = nil
+	started = true
+	return
+}
+
+func (s *State) markBlockedLocked(code string) {
+	if s.blockedCode == "" {
+		s.blockedCode = code
+	}
+}
+
+func (s *State) retainPendingLeaseLocked(lease *OnceLease) {
+	if lease == nil {
+		return
+	}
+	for _, current := range s.pendingLeases {
+		if current == lease {
+			return
+		}
+	}
+	s.pendingLeases = append(s.pendingLeases, lease)
+}
+
+func (s *State) removePendingLeaseLocked(lease *OnceLease) {
+	for index, current := range s.pendingLeases {
+		if current == lease {
+			s.pendingLeases = append(s.pendingLeases[:index], s.pendingLeases[index+1:]...)
+			return
+		}
+	}
+}
+
+func callOpen(open func(*OnceLease) (Resource, error), lease *OnceLease) (resource Resource, err error, panicked bool) {
+	defer func() {
+		if recover() != nil {
+			resource = nil
+			err = errors.New("资源构造发生panic")
+			panicked = true
+		}
+	}()
+	if open == nil {
+		return nil, errors.New("资源构造入口为空"), false
+	}
+	resource, err = open(lease)
+	return
+}
+
+func callInputCleanup(cleanup func() error) (err error, panicked bool) {
+	if cleanup == nil {
+		return nil, false
+	}
+	defer func() {
+		if recover() != nil {
+			err = errors.New("输入清理发生panic")
+			panicked = true
+		}
+	}()
+	err = cleanup()
+	return
+}
+
+func closeResource(resource Resource) (err error, panicked bool) {
+	defer func() {
+		if recover() != nil {
+			err = errors.New("资源关闭发生panic")
+			panicked = true
+		}
+	}()
+	err = resource.Close()
+	return
+}
+
+func releaseLease(lease *OnceLease) (panicked bool) {
+	defer func() {
+		if recover() != nil {
+			panicked = true
+		}
+	}()
+	lease.Release()
+	return false
 }
 
 // StopLocked 的内部逻辑只由同一把状态锁的持有者调用，不重入 Stop。
 func (s *State) stopLocked() bool {
-	if s.inputCleanupErr != nil {
+	if s.blockedCode != "" || s.inputCleanupErr != nil {
 		return false
 	}
-	if s.resource != nil && s.resource.Close() != nil {
-		return false
+	return s.closeCurrentLocked()
+}
+
+func (s *State) closeCurrentLocked() bool {
+	if s.resource != nil {
+		err, panicked := closeResource(s.resource)
+		if err != nil || panicked {
+			code := startCodeResourceCloseFailed
+			if panicked {
+				code = startCodeResourceClosePanic
+			}
+			s.markBlockedLocked(code)
+			return false
+		}
 	}
-	s.runtime = time.Time{}
 	s.resource = nil
-	s.lease.Release()
+	s.runtime = time.Time{}
+	if releaseLease(s.lease) {
+		s.markBlockedLocked(startCodeReleasePanic)
+		return false
+	}
 	s.lease = nil
 	return true
 }
@@ -67,57 +311,7 @@ func (s *State) Start(fd int, ready bool, release func(), open func(*OnceLease) 
 // StartWithInputCleanup 在生命周期锁内收回尚未采纳的输入。
 // 首次输入关闭错误永久保留，未知所有权下不能报告停止成功或启动新代。
 func (s *State) StartWithInputCleanup(fd int, ready bool, release func(), open func(*OnceLease) (Resource, error), inputCleanup func() error) (started bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	defer func() {
-		if inputCleanup == nil {
-			return
-		}
-		if err := inputCleanup(); err != nil {
-			if started {
-				s.stopLocked()
-			}
-			if s.inputCleanupErr == nil {
-				s.inputCleanupErr = err
-			}
-			s.runtime = time.Time{}
-			started = false
-		}
-	}()
-	if !s.stopLocked() {
-		if release != nil {
-			release()
-		}
-		return false
-	}
-	if fd <= 0 {
-		if release != nil {
-			release()
-		}
-		if fd < 0 || !ready {
-			return false
-		}
-		s.runtime = time.Now()
-		return true
-	}
-	lease := NewOnceLease(release)
-	if !ready {
-		lease.Release()
-		return false
-	}
-	resource, err := open(lease)
-	if err != nil || resource == nil {
-		if resource != nil {
-			s.resource, s.lease = resource, lease
-			// 部分启动清理失败时保留所有权，不能提前释放 JNI 引用。
-			s.stopLocked()
-		} else {
-			lease.Release()
-		}
-		return false
-	}
-	s.resource, s.lease, s.runtime = resource, lease, time.Now()
-	return true
+	return s.StartWithInputCleanupReport(fd, ready, release, open, inputCleanup).Started
 }
 
 func (s *State) Stop() bool         { s.mu.Lock(); defer s.mu.Unlock(); return s.stopLocked() }

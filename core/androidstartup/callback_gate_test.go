@@ -255,3 +255,83 @@ func TestPreexistingCleanupFailurePreservesPartialStateWithoutRetry(t *testing.T
 		t.Fatal("被拒绝新 callback 未释放一次")
 	}
 }
+
+func callShutdownCloseRecover(
+	shutdown *Shutdown,
+	gate *CallbackGate,
+	lease *OnceLease,
+	closeListener func() error,
+) (err error, recovered any) {
+	defer func() { recovered = recover() }()
+	err = shutdown.Close(gate, lease, closeListener)
+	return
+}
+
+func TestShutdownListenerErrorAndReleasePanicRemainSticky(t *testing.T) {
+	gate := NewCallbackGate(1)
+	listenerCalls, releaseCalls := 0, 0
+	lease := NewOnceLease(func() {
+		releaseCalls++
+		panic("公开release panic")
+	})
+	var shutdown Shutdown
+	first, recovered := callShutdownCloseRecover(&shutdown, gate, lease, func() error {
+		listenerCalls++
+		return errors.New("公开listener关闭失败")
+	})
+	if first == nil || recovered != nil {
+		t.Fatal("listener错误叠加release panic未收敛为稳定失败")
+	}
+	second := shutdown.Close(gate, lease, func() error {
+		listenerCalls++
+		return nil
+	})
+	if second == nil || listenerCalls != 1 || releaseCalls != 1 {
+		t.Fatalf("panic越过sync.Once后丢失首次失败：second=%v listeners=%d releases=%d", second, listenerCalls, releaseCalls)
+	}
+}
+
+func TestShutdownListenerPanicStillReleasesAndRemainsSticky(t *testing.T) {
+	gate := NewCallbackGate(1)
+	listenerCalls, releaseCalls := 0, 0
+	lease := NewOnceLease(func() { releaseCalls++ })
+	var shutdown Shutdown
+	first, recovered := callShutdownCloseRecover(&shutdown, gate, lease, func() error {
+		listenerCalls++
+		panic("公开listener close panic")
+	})
+	if first == nil || recovered != nil {
+		t.Fatal("listener close panic未收敛为稳定失败")
+	}
+	second := shutdown.Close(gate, lease, func() error {
+		listenerCalls++
+		return nil
+	})
+	if second == nil || listenerCalls != 1 || releaseCalls != 1 {
+		t.Fatalf("listener panic未完成一次清理并保留失败：second=%v listeners=%d releases=%d", second, listenerCalls, releaseCalls)
+	}
+}
+
+func TestShutdownReleasePanicRemainsSticky(t *testing.T) {
+	gate := NewCallbackGate(1)
+	listenerCalls, releaseCalls := 0, 0
+	lease := NewOnceLease(func() {
+		releaseCalls++
+		panic("公开release panic")
+	})
+	var shutdown Shutdown
+	first, recovered := callShutdownCloseRecover(&shutdown, gate, lease, func() error {
+		listenerCalls++
+		return nil
+	})
+	if first == nil || recovered != nil {
+		t.Fatal("release panic未收敛为稳定失败")
+	}
+	second := shutdown.Close(gate, lease, func() error {
+		listenerCalls++
+		return nil
+	})
+	if second == nil || listenerCalls != 1 || releaseCalls != 1 {
+		t.Fatalf("release panic未保留失败：second=%v listeners=%d releases=%d", second, listenerCalls, releaseCalls)
+	}
+}

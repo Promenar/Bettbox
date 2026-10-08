@@ -193,3 +193,7 @@ macOS系统代理事务通过内部AuthorizedSCSessionFactory取得原生Authori
 Go setupConfig持有runLock，通过cloneSetupParams复制调用输入、prepareSetupConfigLocked建立局部候选、commitSetupConfigLocked发布并应用。准备失败保留已发布配置指针和原默认探测URL；复制保持既有tolerance数值转换语义。Mihomo ParseRawConfig仍会临时修改General并可能触及geodata及持久fake-IP缓存，准备层不提供全资源回滚。Android统一提交需在调用解析器前标ENTERED，以epoch/revision绑定options与TUN采纳；该联合接线尚待验收。
 
 Android同步配置中间层：Go生产入口以runLock执行epoch/revision CAS、STAGED初始状态、ENTERED准备/提交及同次options深副本；回执严格区分staged/applied/rejected/unknown，未知保留责任并粘滞阻断。JNI同步桥及Kotlin严格十字段codec已实现，但未接入唯一Native owner。Core全包、state race、实际Kotlin JVM、NDK28/API26 ARM64 Go/JNI编译及17项JNI函数表ASAN验证通过；真实Android JVM/CheckJNI、带版本TUN准入、HTTP/FFI旁路收敛、epoch换代、完整App及业务验收另验。回执 `docs/validation/2026-10-07-three-platform/android-owned-config-validation.json`。
+
+Android TUN资源状态由 `androidstartup.State` 锁内StartReport表达，兼容bool仅从同次报告派生；报告在输入收口完成后生成，清理未知粘滞阻断，确认Close之前保留已启动runtime。RetainsLease仅表明State的可达指针责任。CallbackGate Shutdown保留首个listener错误，等待pin后安全转换release panic，重复关闭不能清洗失败。该模块尚未提供带配置版本的Android TUN ABI。
+
+macOS宿主签名与启动准入分别验收。当前封装器未实现provisioning profile信任和权利授权链，完整候选任何非空权利配置均提前拒绝；无权利公开探针单独保留。签后读取实际权利核对预检快照，清单固定launch_validated=false。真实App的DP Keychain权利保持，匹配profile由Xcode签名方案承载。

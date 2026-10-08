@@ -1931,3 +1931,34 @@ STAGED与initial composite、runLock内epoch/revision CAS及同次options，ENTE
 
 ### HLG
 使用标准append dry-run/apply追加当前事实，保留历史。
+
+## 2026-10-08T17:16:26+08:00 · Android生产启动报告与macOS候选profile准入
+
+type: maintenance
+scope: ["Bettbox", "Android", "macOS"]
+status: done
+tags: ["android", "macos", "release", "handover"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 5c140a954c5dff33f5cd9259506a1498e9552ec4afdba9fc9685e6cada22cc27
+
+### Summary
+Android生产State/Shutdown报告前置条件闭合；macOS实际候选启动被系统拒绝，profile准备及完整发行验收未完成。Goal保持active，本轮有实际实施和验证进展。用户确认Android/macOS优先，iOS保留开发版。
+
+### Changed
+State新增同锁最终StartReport，旧bool从报告派生；未知资源、lease及runtime保留，首个清理错误粘滞。Shutdown安全转换listener/release panic，等待pin后只尝试一次释放。macOS封装器对未经profile授权校验的非空权利配置提前拒绝，核对实际签后权利，launch_validated固定false，真实App权利未改。
+
+### Validation
+实际初始报告8项RED失败/12项初始GREEN通过；混合故障6项RED失败，修复及panic不得传播断言后的7项定向race通过；完整androidstartup race及core CGO0/with_gvisor通过；NDK28/API26 Android ARM64 Go c-shared与生产JNI链接通过。主控复核独立审阅的runtime误清、首码覆盖及重复关闭伪成功三个缺陷，全部闭合。macOS封装实际21项RED一失败、24项GREEN通过，独立只读复核无确认P1/P2。严格deep验签exit0，CUA启动NSCocoa256/Launchd POSIX163失败，本地OS日志分类missing matching profile/invalid profile；嵌入profile不存在，两标准安装目录计数0。
+
+### Next
+在真实Android lib_android入口以同runLock核对epoch/revision并完成FDLease采纳，保留检查式清理合同；随后唯一Native owner、HTTP/FFI/quickStart收敛与Dart回执及整包CheckJNI/设备验证。macOS待用户在Xcode准备团队/profile，再完成授权链集成、系统启动、DP Keychain和SC写入恢复及有效节点流量。
+
+### Risks
+资源公开替身及编译链接不证明实际系统TUN/JVM行为；RetainsLease仅指针责任。当前APK没有本轮源码修改，不能升级为可用发行版。旧生产macOS App及Core正常退出；仍运行的黑窗是公开探针，当前进程路径及CUA截图确认，入口为空组件，不是完整客户端。未强杀未知owner或改签候选。真实有效上游、支付商商户/门店/渠道及交易返佣验收未完成。无原始秘密/证书/profile/系统日志外泄。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC说明、registry及两个联合计划；新增两份脱敏验证回执。
+
+### HLG
+通过已安装HLG append dry-run后apply追加事实链并重建索引；只记录当前进展和后续边界，不声明Goal完成。

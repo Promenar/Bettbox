@@ -214,6 +214,42 @@ def artifact(app, name, identifier):
     return fields
 
 
+def require_supported_entitlement_profile(root, destination_relative):
+    if destination_relative == PROBE_DESTINATION:
+        return {}
+    path = root / "macos/Runner/Release.entitlements"
+    if not path.is_file() or path.is_symlink() or path.stat().st_size > 16384:
+        raise RuntimeError("候选权利配置无效")
+    for parent in path.parents:
+        if parent == root:
+            break
+        if parent.is_symlink():
+            raise RuntimeError("候选权利配置无效")
+    try:
+        entitlements = plistlib.loads(path.read_bytes())
+    except (ValueError, TypeError, plistlib.InvalidFileException):
+        raise RuntimeError("候选权利配置无效") from None
+    if not isinstance(entitlements, dict):
+        raise RuntimeError("候选权利配置无效")
+    # 此封装器没有profile信任与受限权利授权校验，空访问组数组也不能放行。
+    if entitlements:
+        raise RuntimeError("完整候选需要经过provisioning profile准入验证")
+    # 没有profile授权校验时仅支持无权利宿主；返回快照用于验签后核对。
+    return entitlements
+
+
+def verified_host_entitlements(app, expected):
+    raw = tool(["/usr/bin/codesign", "-d", "--entitlements", ":-", str(app)]).stdout
+    if not isinstance(raw, bytes) or len(raw) > 16384:
+        raise RuntimeError("宿主实际权利不符")
+    try:
+        actual = plistlib.loads(raw) if raw else {}
+    except (ValueError, TypeError, plistlib.InvalidFileException):
+        raise RuntimeError("宿主实际权利不符") from None
+    if not isinstance(actual, dict) or actual != expected:
+        raise RuntimeError("宿主实际权利不符")
+
+
 def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
     if signing_mode not in ("adhoc", "apple-development"):
         raise RuntimeError("候选签名模式不符")
@@ -223,6 +259,7 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
     signing_identity = selected[0] if selected is not None else "-"
     source = root / SOURCE; destination = root / destination_relative
     checked_tree(source)
+    expected_entitlements = require_supported_entitlement_profile(root, destination_relative)
     # build父目录必须是项目内实际目录；不覆盖既有候选。
     identity.public_parents(root, source.parent)
     if destination.parent.exists(): identity.public_parents(root, destination.parent)
@@ -259,6 +296,7 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
         host_argv += ["--entitlements", str(root / "macos/Runner/Release.entitlements")]
     tool(host_argv + [str(destination)])
     tool(["/usr/bin/codesign", "--verify", "--deep", "--strict", str(destination)])
+    verified_host_entitlements(destination, expected_entitlements)
     host_raw = tool(["/usr/bin/codesign", "-d", "--verbose=4", str(destination)]).stderr
     if selected is not None:
         host_identity = development_host(host_raw, selected)
@@ -277,6 +315,7 @@ def seal(root=ROOT, destination_relative=DESTINATION, signing_mode="adhoc"):
     if after != baseline or source_after != baseline or digest(source / "Contents/MacOS/Bettbox") != source_host:
         raise RuntimeError("签名期间固定产物或原宿主漂移")
     report = {"schema": 1, "passed": True, "signingmode": signing_mode, "notarized": False,
+              "launch_validated": False,
               "source": SOURCE.as_posix(), "destination": destination_relative.as_posix(),
               "nested_frameworks": len(frameworks), "artifacts": after,
               "host_sha256": digest(destination / "Contents/MacOS/Bettbox"),

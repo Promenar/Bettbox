@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — Android启动报告与macOS启动准入
+
+- Android生产State增加最终启动报告；修复混合关闭故障下runtime误清、首错覆盖及Shutdown panic后重复伪成功。初始8项及混合6项失败复现，定向、race、core与Android原生编译通过；唯一owner及设备接线另验。
+- macOS开发候选严格验签通过但实际启动因缺少有效profile被系统拒绝。封装器在未建立profile授权链时拒绝完整候选非空权利，并核对签后实际权利；24项回归通过。真实Keychain权利保持，不将签名成功升级为启动或发行通过。
+
 ## Android同步配置接口与原生回执
 
 - 新增Go版本核验、初始状态暂存、同次options复制及未知结果阻断；增加JNI同步接口与严格Kotlin回执解析。

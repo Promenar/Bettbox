@@ -19,3 +19,13 @@ scripts/seal_macos_candidate.py及对应test由同一施工者独占；主控管
 ## 实际结果
 
 20项封装回归通过，真实apple-development操作exit0；10个框架与宿主严格验签通过，Core/helper字节保持不变。Team由选定指纹匹配叶证书OU核验，CN括号后缀与真实Team不同，不可替代。旧候选保留于build/macos-local-candidate-before-c9b0355；候选没有公证或公开发布。正常应用与系统代理运行验收待会话解锁后执行。
+
+## 实际启动准入与profile条件
+
+正常旧ad hoc App已通过菜单退出，关联Core进程消失。Apple Development候选严格验签通过，但实际Launchd spawn失败163，系统安全日志固定分类显示missing_matching_profile及invalid_profile；标准本机profiles目录计数均0，候选没有embedded.provisionprofile。其签入权利仅keychain-access-groups空数组；空数组不免除受限权利准入。当前flutter_secure_storage默认使用数据保护钥匙串，不能通过移除权利或关闭数据保护绕开。
+
+签名工具必须在copy/sign前拒绝尚未完成profile准入的完整候选，不能以证书存在或codesign strict通过替代OS准入。主控独占seal工具/测试和聚合记录；先以生产入口建立缺profile失败回归，再实施固定拒绝门禁。当前手动seal尚无profile信任验证、权利匹配或有效Xcode授权材料消费能力；仅附加任意profile文件不得绕过门禁。profile的完整支持需核验Apple官方SDK方法及Xcode输出，实际运行、数据保护Keychain写读与冷启动仍独立验收。
+
+已向用户询问可用Xcode团队及Bettbox macOS开发profile条件，不读取账号、私钥或profile内容至模型。本地计数和错误分类由执行器产生，日志/profile原文不外泄。Apple TN3137与TN3125为profile授权依据。
+
+封装器准入阶段不实现profile签发或信任验证。完整候选任何非空entitlement配置在copy/sign前拒绝；已有嵌入profile也不能替代授权链。无权利公开夹具保持，签后实际entitlement匹配快照才发布签名清单，launch_validated固定false。24项回归和独立只读审阅通过。真实App权利未修改，Xcode签名/profile适配与系统启动为后续依赖。

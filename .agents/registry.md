@@ -86,3 +86,6 @@
 - docs/validation/2026-10-07-three-platform/core-config-prepare-validation.json — setup失败发布边界十三场景及实际Android Go/JNI编译证据
 
 - docs/validation/2026-10-07-three-platform/android-owned-config-validation.json — 同步配置、严格回执、实际ARM64编译及JNI函数表证据与未接线边界
+
+- docs/validation/2026-10-07-three-platform/android-start-report-validation.json — 生产State/Shutdown红绿、race、编译链接及TUN接线边界
+- docs/validation/2026-10-07-three-platform/macos-profile-admission-validation.json — 真实候选启动拒绝分类、profile缺口和封装准入回归
