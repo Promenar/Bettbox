@@ -10,7 +10,7 @@
 
 `Relay` 使用单SDK worker、有界mailbox及nonblocking poll，分别限制4KiB控制帧与10MiB业务帧。ACK授予第一帧许可，连续credit只证明上一帧已写入Core，不代表业务完成。每方向只有一个完整帧缓存；Core HUP在背压时保留，排空缓存后读取到明确EOF。停止丢弃已读缓存、半帧或未读输入时固定失败31；正常0只证明本代Core已确认回收，不承诺取消后的业务结果交付。
 
-`Host` 通过六个固定ABI发行不透明handle，SDK在单worker中运行，内核提交核对后再次检查原期限。撤销保留停止出生记录；缺Core记录时不得用helper消失推断Core完成。未发行启动路径的预检失败只在SDK实际返回后释放槽。Flutter薄桥由Runner窗口持有，Identity与Host六份Swift源进入Runner Sources；Debug身份不同于生产身份链，不用于生产链验收。
+`Host` 通过固定ABI发行不透明handle，SDK在单worker中运行，内核提交核对后再次检查原期限。撤销保留停止出生记录；缺Core记录时不得用helper消失推断Core完成。未发行启动路径的预检失败只在SDK实际返回后释放槽。Flutter薄桥由Runner窗口持有，Identity与Host六份Swift源进入Runner Sources；Debug身份不同于生产身份链，不用于生产链验收。
 
 `lib/clash/supervisor` 的Session持有唯一helper Process与退出Future，先撤销再关闭stdin，确认EOF、exit0与native出生消失后才清除owner。最多8项待发送动作；ClashService的macOS分支通过Application/RPC使用该Session，异步消费者有独立限额，未知任务阻止新代。
 
@@ -40,3 +40,5 @@ python3 -m unittest discover -s scripts/tests -p test_check_macos_supervisor.py 
 探针ad hoc签名不携带entitlements，不加载账户、配置或系统代理。正常候选保留Release钥匙串权利；实际系统AMFI曾拒绝带受限entitlements的ad hoc探针，即使严格验签通过。ClashService、SC事务、Keychain冷启动及有效订阅流量尚待联合验收；完整可分发应用尚未交付。
 
 macOS应用接线：ClashService通过生产Application/Session/RPC管理启动、重启、请求、就绪和停止，不创建旧控制socket、不直接启动/终止Core、不进行legacy fallback。含就绪等待最多8个请求，重启排队最多8个；RPC结果序列化预算16MiB，单事件1MiB，异步事件批次最多32个且序列化预算16MiB。事件监听器的Future返回值可观察，失败与全部结束分别跟踪，未知任务不能被Coregone清洗。回执 `docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json` 确认真实Flutter两代Application/RPC、32个公开child及native停止，181项Flutter测试与静态分析通过；正常main的登录、SC与有效流量另验。
+
+`confirmPreflightStopped(generation)` 只确认同代未发行reservation的内部预检撤销，要求SDK worker已结束且无helper/Core记录；不能替代已发行启动链的出生消失确认。Dart停止调用超时后保留worker，迟到结果须通过新的停止确认才能释放。

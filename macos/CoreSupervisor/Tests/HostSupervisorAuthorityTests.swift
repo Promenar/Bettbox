@@ -121,15 +121,21 @@ private func fixture(deadline: TimeInterval = 5) -> (Facts, HostSupervisorAuthor
         let (preflight, preflightBridge) = fixture(deadline: 0.03)
         let preflightGate = DispatchSemaphore(value: 0); preflight.preflightGate = preflightGate
         require(code(invoke(preflightBridge, "reserveSupervisorLaunch", ["generation": 1])) == "timeout", "预检未回launch也必须内部撤销")
+        require(!truth(invoke(preflightBridge, "confirmPreflightStopped", ["generation": 1])), "SDK仍活跃不能确认停止")
         require(code(invoke(preflightBridge, "reserveSupervisorLaunch", ["generation": 2])) == "sdk_busy", "预检晚返回前不能排新任务")
         for _ in 0..<16 { preflightGate.signal() }
-        var higher: Result<Any?, HostSupervisorFailure>?
+        var preflightStopped = false
         for _ in 0..<100 {
-            let attempt = invoke(preflightBridge, "reserveSupervisorLaunch", ["generation": 2])
-            if code(attempt) != "sdk_busy" { higher = attempt; break }
+            if truth(invoke(preflightBridge, "confirmPreflightStopped", ["generation": 1])) {
+                preflightStopped = true; break
+            }
         }
-        require(higher != nil, "SDK退出后应释放未发行ticket")
-        require(fields(higher!)["generation"] as? UInt64 == 2, "未发行ticket释放后仍使用更高代次")
+        require(preflightStopped, "SDK退出后的内部撤销可确认未发行预检停止")
+        require(!truth(invoke(preflightBridge, "confirmPreflightStopped", ["generation": 2])), "错代不能消费停止证据")
+        require(code(invoke(preflightBridge, "confirmPreflightStopped", ["generation": 1, "launch": "伪造"])) == "invalid_arguments", "预检停止拒绝额外字段")
+        let higher = invoke(preflightBridge, "reserveSupervisorLaunch", ["generation": 2])
+        require(fields(higher)["generation"] as? UInt64 == 2, "确认后可预检更高代次")
+        require(!truth(invoke(preflightBridge, "confirmPreflightStopped", ["generation": 2])), "已发行reservation不得用预检停止清理")
 
         let (missingCore, missingCoreBridge) = fixture()
         let missingLaunch = fields(invoke(missingCoreBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String

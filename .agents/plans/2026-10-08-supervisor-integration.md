@@ -47,3 +47,11 @@ ClashService仅macOS走生产Session；其它平台保持既有实现。macOS没
 验证：新增真实生产RPC测试覆盖匹配、超载、内存限额、发送失败、超时撤销、事件同步消费、重复回包、撤销后迟到；Session停止通知测试；Flutter全量测试及静态分析。独立审阅后在真实Flutter探针使用RPC两代getIsInit与并发child，明确源码摘要、停止及原App恢复。回滚仅还原本节涉及文件，保留未知Session所有权，不启动旧macOS控制通道。
 
 macOS应用接线：ClashService通过生产Application/Session/RPC管理启动、重启、请求、就绪和停止，不创建旧控制socket、不直接启动/终止Core、不进行legacy fallback。含就绪等待最多8个请求，重启排队最多8个；RPC结果序列化预算16MiB，单事件1MiB，异步事件批次最多32个且序列化预算16MiB。事件监听器的Future返回值可观察，失败与全部结束分别跟踪，未知任务不能被Coregone清洗。回执 `docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json` 确认真实Flutter两代Application/RPC、32个公开child及native停止，181项Flutter测试与静态分析通过；正常main的登录、SC与有效流量另验。
+
+## 预检失败的原生停止证据
+
+目标：固定 helper 身份预检失败且没有发行 reservation 时，允许实际 Application 在原生 worker 结束后重试。新增 `confirmPreflightStopped(generation)` 只读取当前 native ticket：代次匹配、worker 已结束、ticket 已撤销且停止、reservation 未发行、helper/Core 出生与 proof 均不存在时返回 true。此结果不授予 SC 权限。已发行 reservation、迟到 worker、错代次、未知状态均返回 false；Dart 不根据 owner getter 清理失败。
+
+文件所有权：主控串行修改 HostSupervisorAuthority、Session、对应 Swift/Dart 测试和受影响文档/PDEC。验收：先保留真实失败测试；执行登记的 host 测试、Session 测试、Flutter 全量与 analyze；独立审阅未知状态保留与迟到时序。回滚仅还原上述文件，不启动 legacy 通道。不涉及系统配置、签名密钥、支付或用户数据。
+
+验收结果：保留1项真实失败红例，修复后184项Flutter测试、analyze与host生产typecheck/交错fixture通过，独立审阅未发现P1/P2。真实Application/Session重试采用native/transport fixture；签名探针及正常main未执行本版。

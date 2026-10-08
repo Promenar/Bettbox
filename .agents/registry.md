@@ -41,3 +41,5 @@
 - docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json — 真实Flutter两代Session、32个公开child退出、完整App恢复及ad hoc entitlement拒绝边界
 
 - docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json — MacService传输接线、应用协调器/RPC实际Flutter与事件追踪负例；正常main/SC另验
+
+- docs/validation/2026-10-07-three-platform/macos-preflight-recovery-validation.json — 未发行reservation的预检撤销证据、实际Session/Application重试及未知owner保留

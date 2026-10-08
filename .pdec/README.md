@@ -100,3 +100,5 @@ macOS owned-child fixture 使用固定任务产物，公开协议帧与预填内
 `probe-macos-flutter-supervisor` 在固定独立入口构建真实Flutter引擎，绑定两个探针输入摘要及预登记Core/helper摘要，连续运行两代getIsInit与每代16个公开child；退出、双管道EOF及native停止均确认后才通过。原正常App完整文件摘要恢复，源码和锁核验纳入成功条件；未知owner保留，不强杀、不创建新代次。固定探针候选采用无entitlements的ad hoc签名。正常候选保留Release钥匙串权利，严格验签不能证明AMFI允许启动；其签名与安全存储另验。实际两代通过回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。
 
 `test-supervisor-rpc` 覆盖生产RPC、就绪判断、Application协调策略与真实ClashMessage派发；Session证据在协调器测试中明确为fake。实际负例复现早回包后sender失败/挂起、旧initial错误/新tail漏等和多listener中途throw，保留回归。`probe-macos-flutter-supervisor` 的独立入口使用同一生产Application/RPC两代真实Go getIsInit与退出；不加载账户或启用SC。正常main、正式Keychain签名和专用HTTP/SC路由独立验收，不能用该探针宣称可用发行。
+
+预检恢复保持现有host/Session/full-test/analyze执行位置，新增同代原生停止确认不改变构建/部署权限。输入摘要已更新；184项Flutter测试与host fixture不替代完整应用发行验收。

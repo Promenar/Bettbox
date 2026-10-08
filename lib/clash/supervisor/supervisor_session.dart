@@ -579,7 +579,19 @@ class SupervisorSession {
       _closeInput();
       if (_exit == null) {
         if (_workers != 0 || _launch != null) throw protocolFailure;
-        if (_sticky) throw protocolFailure;
+        if (_sticky) {
+          // getter为空不能证明原生预检已结束；只接受匹配代次的原生撤销证据。
+          final confirmed = await _worker(
+            native.call('confirmPreflightStopped', {'generation': _generation}),
+          ).timeout(_remaining(watch, stopBudget));
+          if (confirmed != true ||
+              _workers != 0 ||
+              _launch != null ||
+              hasUnconfirmedOwner) {
+            throw protocolFailure;
+          }
+          _sticky = false;
+        }
         state = SupervisorState.stopped;
         return true;
       }

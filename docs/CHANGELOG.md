@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — macOS预检失败恢复
+
+- 修复未发行reservation的预检拒绝导致客户端无法重试：通过原生同代撤销证据恢复，保留迟到worker和所有已发行/未知进程所有权。
+- 失败测试先复现；184项Flutter测试、静态分析及原生host测试通过。实际Application/Session覆盖重试，native和transport采用fixture；正常应用及系统代理尚未验收。
+
 ## 2026-10-08 — macOS应用传输与有界RPC
 
 - macOS ClashService使用生产Application/Session/RPC，移除该平台旧控制socket、直接Core回收与fallback。

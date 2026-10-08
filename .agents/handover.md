@@ -1187,3 +1187,34 @@ macOS绕开旧socket、直接Core Process/reaper和legacy fallback；请求/重�
 
 ### HLG
 结构化append dry-run/apply追加，保持goal active；完整发行交付仍待完成。
+
+## 2026-10-08T09:00:15+08:00 · macOS未发行预检恢复及同代原生停止证据
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["supervisor", "preflight", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 0278d31720c67bd8fef2d78008a3c45958dc33a713aa7eb522ed1f1b0147fa3f
+
+### Summary
+Android/macOS优先交付，iOS保留开发版。修复macOS预检拒绝后无法恢复的实际Session路径；完整发行目标保持active。
+
+### Changed
+新增confirmPreflightStopped只消费native同代未发行reservation、已撤销/停止、worker结束且无helper/Core记录的证据。Dart无launch/exit/worker才请求，确认超时保留worker；已发行/未知owner不清洗。未改变系统代理、账户、签名密钥、支付和.video_agent。
+
+### Validation
+1项真实失败红例exit1；修复后184项Flutter全量测试exit0、analyze No issues found。host生产typecheck、编译和交错fixture均exit0，source_unchanged=true。独立原生审阅未发现P1/P2。实际Application/Session重试覆盖，但native/transport为fixture。公开回执macos-preflight-recovery-validation.json；PDEC validate0/execution_ready=true。
+
+### Next
+专用HTTP入口及可信nativeSC消费授权；正常main/Keychain签名冷启动；Android正式APK和有效订阅流量；iOS开发版研究及服务端业务联调。
+
+### Risks
+本版未重跑真实签名Flutter探针与正常main；CF/NoSLA健康未新验。系统代理原生backend和注册尚未接线，正常签名与有效订阅/支付商条件仍需验收。预检恢复不是SC授权或完整发行证明。
+
+### DIA
+已同步架构、平台验收、模块README、CHANGELOG、registry、计划、PDEC说明及公开回执。
+
+### HLG
+使用结构化append dry-run/apply追加，保留原记录，goal active。

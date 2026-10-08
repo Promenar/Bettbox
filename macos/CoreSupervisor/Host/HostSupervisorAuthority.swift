@@ -209,6 +209,16 @@ final class HostSupervisorAuthority {
                 case "revokeLaunch":
                     let fields = try dictionary(arguments, ["launch", "generation"]), value = try matching(fields)
                     revoke(value); respond(reply, .success(nil))
+                case "confirmPreflightStopped":
+                    let fields = try dictionary(arguments, ["generation"])
+                    let generation = UInt64(try integer(fields["generation"], maximum: Int64.max))
+                    // 未发行reservation的SDK已终止并内部撤销，才能证明预检无进程所有权。
+                    let stopped = busy == nil && ticket.map { value in
+                        value.generation == generation && value.revoked && value.stopped &&
+                        !value.issuedReservation && value.helper == nil && value.core == nil &&
+                        !value.helperProofEverIssued && !value.coreAttempted
+                    } == true
+                    respond(reply, .success(stopped))
                 case "confirmStopped":
                     let fields = try dictionary(arguments, ["launch", "generation"]), value = try matching(fields)
                     let stopped = value.revoked && value.helper.map(gone) == true && (!(value.coreAttempted || value.helperProofEverIssued) || value.core.map(gone) == true)

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bett_box/clash/supervisor/supervisor_codec.dart';
+import 'package:bett_box/clash/supervisor/supervisor_application.dart';
+import 'package:bett_box/clash/supervisor/supervisor_events.dart';
 import 'package:bett_box/clash/supervisor/supervisor_native.dart';
 import 'package:bett_box/clash/supervisor/supervisor_session.dart';
 import 'package:bett_box/clash/supervisor/supervisor_transport.dart';
@@ -22,8 +24,12 @@ class FakeNative implements SupervisorNative {
   Completer<Object?>? binding;
   Completer<Object?>? reservation;
   bool confirmed = true;
+  bool preflightRejected = false;
+  bool preflightStopped = false;
+  Completer<Object?>? preflightConfirmation;
   bool revoked = false;
   int issuedHelperProofs = 0;
+  int generation = 1;
   final delays = <String, Duration>{};
   @override
   Future<Object?> call(String method, Map<String, Object> args) async {
@@ -32,6 +38,8 @@ class FakeNative implements SupervisorNative {
     if (delay != null) await Future<void>.delayed(delay);
     switch (method) {
       case 'reserveSupervisorLaunch':
+        if (preflightRejected) throw const SupervisorFailure('公开预检拒绝');
+        generation = args['generation'] as int;
         if (reservation != null) return reservation!.future;
         return {
           'launch': launch,
@@ -42,14 +50,17 @@ class FakeNative implements SupervisorNative {
         if (revoked) throw const SupervisorFailure('旧launch已撤销，仅记录出生');
         issuedHelperProofs++;
         if (binding != null) return binding!.future;
-        return {'handle': 'supervisor-handle', 'generation': 1};
+        return {'handle': 'supervisor-handle', 'generation': generation};
       case 'bindCoreChain':
-        return {'handle': 'core-handle', 'generation': 1};
+        return {'handle': 'core-handle', 'generation': generation};
       case 'recheckCoreChain':
-        return {'valid': true, 'generation': 1};
+        return {'valid': true, 'generation': generation};
       case 'revokeLaunch':
         revoked = true;
         return null;
+      case 'confirmPreflightStopped':
+        if (preflightConfirmation != null) return preflightConfirmation!.future;
+        return preflightStopped;
       case 'confirmStopped':
         return confirmed;
     }
@@ -63,6 +74,7 @@ class FakeTransport implements SupervisorTransport {
   final exited = Completer<int>();
   final frames = <Map<String, dynamic>>[];
   bool wrongLaunch = false;
+  int generation = 1;
   bool exitBeforeEof = false;
   bool closeObserved = false;
   Completer<void>? blockedWrite;
@@ -93,7 +105,7 @@ class FakeTransport implements SupervisorTransport {
         () => emit({
           'type': 'core_ready',
           'protocol': 1,
-          'generation': 1,
+          'generation': generation,
           'launch': wrongLaunch
               ? '00000000-0000-0000-0000-000000000000'
               : launch,
@@ -101,7 +113,9 @@ class FakeTransport implements SupervisorTransport {
         }),
       );
     } else if (value['type'] == 'hello') {
-      Timer.run(() => emit({'type': 'ack', 'protocol': 1, 'generation': 1}));
+      Timer.run(
+        () => emit({'type': 'ack', 'protocol': 1, 'generation': generation}),
+      );
     } else if (value.containsKey('action') && blockedWrite != null) {
       await blockedWrite!.future;
     }
@@ -126,6 +140,7 @@ class FakeFactory implements SupervisorTransportFactory {
   @override
   Future<SupervisorTransport> spawn(String path, int generation) async {
     starts++;
+    transport.generation = generation;
     if (delayedSpawn != null) return delayedSpawn!.future;
     Timer.run(
       () => transport.emit({
@@ -196,6 +211,70 @@ void main() {
         factory: factory,
         onResult: (_) {},
       );
+    });
+
+    test('未发行预检失败仅在原生确认后允许实际Session停止及重试', () async {
+      native.preflightRejected = true;
+      await expectLater(session.start(1), throwsA(isA<SupervisorFailure>()));
+      await tick();
+      expect(factory.starts, 0);
+      expect(await session.stop(), false);
+      native.preflightStopped = true;
+      expect(await session.stop(), true);
+      expect(session.state, SupervisorState.stopped);
+      native.preflightRejected = false;
+      await session.start(2);
+      expect(factory.starts, 1);
+      expect(session.state, SupervisorState.ready);
+      expect(await session.stop(), true);
+    });
+
+    test('停止确认迟到保持worker所有权且不提前释放失败会话', () async {
+      native.preflightRejected = true;
+      native.preflightConfirmation = Completer<Object?>();
+      session = SupervisorSession(
+        native: native,
+        factory: factory,
+        onResult: (_) {},
+        stopBudget: const Duration(milliseconds: 25),
+      );
+      await expectLater(session.start(1), throwsA(isA<SupervisorFailure>()));
+      expect(await session.stop(), false);
+      expect(session.hasUnconfirmedOwner, true);
+      expect(factory.starts, 0);
+      native.preflightConfirmation!.complete(true);
+      await tick();
+      native.preflightConfirmation = null;
+      native.preflightStopped = true;
+      expect(await session.stop(), true);
+    });
+
+    test('实际Application使用实际Session在预检拒绝后重试更高代次', () async {
+      native.preflightRejected = true;
+      var builds = 0;
+      final app = SupervisorApplication(
+        buildSession: (result, revoked) {
+          builds++;
+          return SupervisorSession(
+            native: native,
+            factory: FakeFactory(FakeTransport()),
+            onResult: result,
+            onRevoked: revoked,
+          );
+        },
+        onEvent: (_) => SupervisorEventBatch([]),
+      );
+      await expectLater(app.initialize(), throwsA(isA<SupervisorFailure>()));
+      expect(await app.preload(), false);
+      await expectLater(app.restart(), throwsA(isA<SupervisorFailure>()));
+      expect(builds, 1);
+      native.preflightStopped = true;
+      native.preflightRejected = false;
+      await app.restart();
+      expect(builds, 2);
+      expect(app.generation, 2);
+      expect(await app.preload(), true);
+      expect(await app.shutdown(), true);
     });
 
     test('停止立即同步通知请求消费者并合并重复stop', () async {

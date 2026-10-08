@@ -1079,16 +1079,16 @@
     "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
     "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "220c7f096b81ce43cd0cf112523ff82ce1268d7101f7f2185f802563c4e3ab63",
     "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
-    "lib/clash/supervisor/supervisor_session.dart": "e8062e4e3622abf43de207ee22da437aa59f75f7bffff0f4cb98531820e99fc5",
+    "lib/clash/supervisor/supervisor_session.dart": "32d260f832680b00a23462978698189fb1108e0dad32294862914e32bcdb3e45",
     "lib/clash/supervisor/supervisor_codec.dart": "b86e7ea71c642ddef4a8e2b3b3c83e9ba8b01acb11d19b3660204cc6a399fa2f",
     "lib/clash/supervisor/supervisor_transport.dart": "8b5cb1a194ab2b5be5ffd5654ebee46b8d96306142d2b1dfd8d397641fa1b5a6",
     "lib/clash/supervisor/supervisor_native.dart": "4430e134e3860344f9d302d71711cc2f73a9896c8fb1e029df7065a6f5224ce6",
     "lib/clash/supervisor/supervisor_method_channel.dart": "22b85155c960b9fdafecee35f49009b6acc496c25e70b3aa7314d0de7e60e755",
-    "test/clash/supervisor/supervisor_session_test.dart": "4c7ddbdde7fa97600bd3dd22c98cbe8357fe025f52e24340394d0fd459554074",
+    "test/clash/supervisor/supervisor_session_test.dart": "326c7c9cccc22c416d516357ae14b097f83a9171e48df74d46807a422493c9fe",
     "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
-    "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+    "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "3c1cb20c6a02c0e8ba87da88bbdab1cc0c3803dbcfaed2fdce5fe19027051563",
     "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
-    "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "f64ffc5a21dd796caf801e9f87a82401100690dd352329bff0362c812235e6f6",
+    "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "b1644c80c4b02d06fece4d726351e493d15601376f21c86c41101ba20b5b58fb",
     "macos/CoreSupervisor/Tests/SignedProduction/runner.py": "0c2b1697118515387d6a052b89257ffd4890e7a3611a75d217dff3481a4f0a51",
     "macos/CoreSupervisor/Tests/SignedProduction/Core.c": "4074a699e2cea2aa19fdfe617f46a3a5719f06356ab48b57324e6a8d91b3909c",
     "macos/CoreSupervisor/Tests/SignedProduction/test_runner.py": "22b662a46ac9b18eaabf96ffa64c6964deb40758d4f0da9b12afbdf572d9a914",
@@ -1155,6 +1155,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "4e92959514b74729908d28b5b5db089dc30a7a156db5ae8b7baa2e77d80a87a4"
+    "contract_digest": "7ec0972da6d69289b1b65025a82ab993572f105d0e190280c074fc991da1b176"
   }
 }

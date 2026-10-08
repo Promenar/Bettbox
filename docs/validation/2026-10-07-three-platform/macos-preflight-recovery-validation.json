@@ -1,0 +1,50 @@
+{
+  "scope": "macOS未发行reservation预检恢复；不包含系统代理或发行验收",
+  "base_commit": "2889e5a39d58c404e842057e41edf6bacc4da18b",
+  "source_hashes": {
+    "lib/clash/supervisor/supervisor_session.dart": "32d260f832680b00a23462978698189fb1108e0dad32294862914e32bcdb3e45",
+    "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "3c1cb20c6a02c0e8ba87da88bbdab1cc0c3803dbcfaed2fdce5fe19027051563",
+    "macos/CoreSupervisor/Tests/HostSupervisorAuthorityTests.swift": "b1644c80c4b02d06fece4d726351e493d15601376f21c86c41101ba20b5b58fb",
+    "test/clash/supervisor/supervisor_session_test.dart": "326c7c9cccc22c416d516357ae14b097f83a9171e48df74d46807a422493c9fe"
+  },
+  "red_test": {
+    "exit_code": 1,
+    "failed_cases": 1,
+    "source_hashes": {
+      "lib/clash/supervisor/supervisor_session.dart": "e8062e4e3622abf43de207ee22da437aa59f75f7bffff0f4cb98531820e99fc5",
+      "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
+      "test/clash/supervisor/supervisor_session_test.dart": "199b741e4f0a5e76378af136f6d88697d5710774f0cf6f40d248edf184d80b7b"
+    }
+  },
+  "host": {
+    "status": "passed",
+    "steps": [
+      {
+        "step": "host-production-typecheck",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-compile",
+        "exit_code": 0
+      },
+      {
+        "step": "host-fake-run",
+        "exit_code": 0
+      }
+    ],
+    "source_unchanged": true
+  },
+  "flutter": {
+    "full_tests": 184,
+    "exit_code": 0,
+    "analyze": "No issues found",
+    "actual_session_and_application_retry": true,
+    "native_and_transport_are_fixtures": true
+  },
+  "independent_review": "未发现可复现P1/P2；静态审阅",
+  "limitations": [
+    "本版未重新运行真实Flutter签名探针或正常main",
+    "系统代理原生backend/注册入口尚未接线",
+    "macOS正常签名、Keychain、有效订阅流量和Android正式包尚待验收"
+  ]
+}
