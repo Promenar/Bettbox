@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:bett_box/common/app_localizations.dart';
 import 'package:bett_box/common/system.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/services.dart';
@@ -53,7 +54,13 @@ class Service {
     });
   }
 
-  Future<bool?> stopVpn() => methodChannel.invokeMethod<bool>('stopVpn');
+  Future<bool?> stopVpn() async {
+    final completed = await methodChannel.invokeMethod<bool>('stopVpn');
+    if (completed != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    return completed;
+  }
 
   Future<bool?> smartStop() => methodChannel.invokeMethod<bool>('smartStop');
 

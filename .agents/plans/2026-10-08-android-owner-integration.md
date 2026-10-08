@@ -137,3 +137,16 @@ Android新增startOwnedTunNative/stopOwnedTunNative JNI入口，传递epoch/conf
 ## 实际权限路径收口
 
 AppPlugin使用VpnPermissionRequests在Activity主线程关联系统授权弹窗，共享同一在途弹窗且逐请求一次完成；拒绝、缺少Activity、prepare/launch异常、正常detach与engine退出均报告false。配置变更保留弹窗并重新注册Activity listener；进程唯一请求码不复用，旧结果不能完成新弹窗。VpnPlugin授权回调先核验原始intent，成功才初始化service engine并继续建立；拒绝停止匹配intent。冷恢复后的权限请求切回主线程，prepare异常走真实启动失败。主控独占controller/两处实际adapter/公开JVM夹具，先RED再GREEN并独立审阅；完整Android编译与设备授权弹窗另验。
+
+## 普通停止响应前置实施
+
+两组普通stop channel保留Boolean协议，在nativeGate等待旧建立/FD finally、同次Core.stopTun与平台收尾、匹配generation的状态提交后才返回；失败、旧票据或提交异常返回false。挂起receiver unregister失败不吞错且保留安装责任，unbind未知保留connection引用并粘滞阻断。请求响应期间不自动销毁service engine，避免完成响应随messenger丢失；这是临时保留，后续必须落实带request/engine身份的消费ack与destroy准入。内部无响应stop保留原同代销毁检查。主控独占VpnWorkGate/VpnPlugin/ServicePlugin/SuspendModule和公开协程夹具；先占位RED再生产GREEN、实际release Kotlin编译、未施工者独立复审、DIA/HLG。
+
+智能停止的suspend JNI仍为void且Core吞异常，不能将普通stop完成证据用于smartStop全完成；checked suspend、listener关闭、init/reset/HTTP旁路与Dart shutdown超时/固定true须随唯一owner联合解决。前后台共同native client不得依赖后台为null的service getter。当前设计建议已由只读独立Agent核对现有实现；owner不存在且尚未采用。
+
+
+## Dart普通停止结果接线
+
+Android普通stop/stopVpn响应等待同次native工作门禁中的TUN关闭、平台资源关闭和匹配代次的STOP提交；失败返回false并保留阻断与未确认绑定责任。Dart两个普通停止包装器对false/null抛出现有本地化错误，后台引擎显式调用Vpn.stop，运行时间与偏好只在普通停止确认后更新。JVM屏障回归与真实release Kotlin工程编译通过；Dart实际包装器红例复现2项失败、修复6项通过，完整Flutter测试225项通过。smartStop、typed owner、关闭后engine ACK及新APK设备验证尚未完成。调用方等待响应期间暂留engine，不能据此宣称完整关闭或发行可用。
+
+静态分析无问题，独立原生/Dart审阅未发现P1/P2。GlobalState分支仅静态审阅；listener先关闭而Native失败时保留状态，可能形成部分停止态。相关证据：`docs/validation/2026-10-07-three-platform/android-stop-completion-validation.json`。

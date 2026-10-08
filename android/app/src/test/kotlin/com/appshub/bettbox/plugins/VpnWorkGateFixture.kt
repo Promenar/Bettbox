@@ -10,6 +10,8 @@ import kotlinx.coroutines.yield
 object VpnWorkGateFixture {
     @JvmStatic
     fun main(args: Array<String>) = runBlocking {
+        check(!VpnWorkGate().stop({ true }, { false }, { it })) { "关闭失败不能返回停止成功" }
+        stopResponseWaitsForCloseAndCommit()
         val gate = VpnWorkGate()
         val state = VpnLifecycle<Any>()
         val established = CompletableDeferred<Unit>()
@@ -49,6 +51,51 @@ object VpnWorkGateFixture {
         recoveryWaitsAndRejectsRevokedIntent()
         inputCloseFailureCannotBeClearedByOldStop()
         println("VPN work gate fixture passed")
+    }
+
+    private suspend fun stopResponseWaitsForCloseAndCommit() = kotlinx.coroutines.coroutineScope {
+        val gate = VpnWorkGate()
+        val entered = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        var committed = false
+        val reply = async {
+            gate.stop({ true }, {
+                entered.complete(Unit)
+                release.await()
+                true
+            }, { closed -> committed = closed; closed })
+        }
+        entered.await()
+        check(!reply.isCompleted && !committed)
+        release.complete(Unit)
+        check(reply.await() && committed)
+        var calls = 0
+        check(!gate.stop({ false }, { calls++; true }, { error("旧停止不能提交") }))
+        check(calls == 0)
+        var failureCommitted = false
+        check(!gate.stop({ true }, { throw IllegalStateException("公开替身关闭失败") }, {
+            failureCommitted = !it
+            it
+        }))
+        check(failureCommitted)
+        val state = VpnLifecycle<Any>()
+        val a = checkNotNull(state.begin(Any()))
+        check(state.started(a))
+        val oldStop = state.invalidate()
+        val closeEntered = CompletableDeferred<Unit>()
+        val closeReleased = CompletableDeferred<Unit>()
+        val oldReply = async {
+            gate.stop({ state.generation == oldStop }, {
+                closeEntered.complete(Unit); closeReleased.await(); true
+            }, { state.stopped(oldStop, it, false) })
+        }
+        closeEntered.await()
+        val newStop = state.invalidate()
+        closeReleased.complete(Unit)
+        check(!oldReply.await())
+        check(state.phase == VpnLifecycle.Phase.STOPPING)
+        check(gate.stop({ state.generation == newStop }, { true }, { state.stopped(newStop, it, false) }))
+        check(state.phase == VpnLifecycle.Phase.IDLE)
     }
 
     private suspend fun recoveryWaitsAndRejectsRevokedIntent() = kotlinx.coroutines.coroutineScope {

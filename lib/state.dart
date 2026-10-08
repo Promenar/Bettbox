@@ -10,6 +10,7 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/l10n/l10n.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart';
+import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
 import 'package:bett_box/xboard/node_packager.dart' as xboard_node_packager;
@@ -439,17 +440,22 @@ class GlobalState {
       stopUpdateTasks();
       return;
     }
-    startTime = null;
     if (system.isAndroid && isService) {
       await clashLibHandler?.stopListener();
     } else {
       await clashCore.stopListener();
     }
     if (!includeVpnService) {
+      startTime = null;
       stopUpdateTasks();
       return;
     }
-    await service?.stopVpn();
+    if (system.isAndroid && isService) {
+      await Vpn().stop();
+    } else {
+      await service?.stopVpn();
+    }
+    startTime = null;
     final prefs = await preferences.sharedPreferencesCompleter.future;
     await prefs?.setBool('is_vpn_running', false);
     if (system.isDesktop) {

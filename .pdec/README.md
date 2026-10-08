@@ -147,3 +147,6 @@ TUN 配置预留验证入口：`test-android-tun-reservation`、`test-android-co
 租约处置验证使用`test-android-lease-disposition`、`test-android-fd-lease`、`test-android-startup-full`和`compile-android-tun-reservation-core`。缓存JVM夹具只操作公开数字与关闭计数。
 
 `test-vpn-permission-red/green`验证权限controller公开JVM行为；`compile-android-permission-adapter`使用缓存官方Gradle8.14入口和独立offline缓存，发行凭据仅由既有本机signing_environment注入编译进程。实际release Kotlin工程编译通过，不替代正式APK、安装及设备授权验收。
+
+
+Android普通停止新增独立JVM red/green输出、release Kotlin适配编译及Dart channel回归操作；均沿用已批准本机例外。原生编译证据不代替APK安装或真实VPN流量验收。

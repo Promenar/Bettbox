@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """用已有构建缓存执行生产 VPN 工作门禁的公开协程夹具。"""
+import argparse
 import hashlib
 import json
 import os
@@ -16,6 +17,11 @@ SOURCES = [
 ]
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-name", default="android-vpn-work-gate")
+    name = parser.parse_args().output_name
+    if not name or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-" for c in name):
+        raise ValueError("输出名称无效")
     cache = ROOT / '.test/android-build'
     compiler = sorted(cache.glob('gradle-home-*/wrapper/dists/gradle-8.14-all/*/gradle-8.14/lib/kotlin-compiler-embeddable-2.0.21.jar'))
     coroutine = sorted(cache.glob('gradle-home-*/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.9.0/*/kotlinx-coroutines-core-jvm-1.9.0.jar'))
@@ -29,7 +35,7 @@ def main():
         raise ValueError('unsafe_input_path')
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
     java = Path(subprocess.check_output(['/usr/libexec/java_home'], text=True).strip()) / 'bin/java'
-    output = ROOT / '.test/android-vpn-work-gate/classes.jar'
+    output = ROOT / '.test' / name / 'classes.jar'
     output.parent.mkdir(parents=True, exist_ok=True)
     env = {'PATH': '/usr/bin:/bin', 'HOME': str(Path.home())}
     commands = [

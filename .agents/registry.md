@@ -113,3 +113,5 @@
 - docs/validation/2026-10-07-three-platform/android-tun-protocol-validation.json — Kotlin严格启停解析、finally完成核验及真实Go公开回执消费
 
 - docs/validation/2026-10-07-three-platform/android-vpn-permission-validation.json — 实际授权路径、公开JVM回归、独立复审及release Kotlin完整工程编译；设备另验
+
+- docs/validation/2026-10-07-three-platform/android-stop-completion-validation.json — 普通停止原生完成响应、Dart失败传播、实际Kotlin编译及设备待验边界

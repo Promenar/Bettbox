@@ -1,0 +1,148 @@
+{
+  "native_compile": {
+    "exit_code": 0,
+    "source_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "350d0d61e191bf52e2ab11bb228ecee352bb058675470547fc270e1c8253ff94",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "4cd873d2694b19323c75eb1e7f905e19e821148e7b373e966b7247f80d949973",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
+      "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "b08e8eaae8f0e7bc4de787556c79a1fca4eaa6176c69bb31d64338a222038e6f"
+    },
+    "source_unchanged": true,
+    "diagnostic": {},
+    "boundary": "实际release Kotlin工程编译，凭据不回显；非APK/设备/发行验收"
+  },
+  "jvm": {
+    "fixture_exit": 0,
+    "fixture_entrypoints": 2,
+    "actual_Android": false,
+    "compiler": "Gradle8.14 Kotlin2.0.21",
+    "coroutine": "1.9.0",
+    "production_sources": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "bd97efec4ac22e018eb49a2ed96fa50a16749697556ec4ef15a5de7c6bf47122",
+      "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "33df2cbc38d71ed71b1f33af873d0f4c2bd4a1fb3810ad192951d50247cb80d7",
+      "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt": "b31827efa3501d5defb356b9bf3b9ffc05f7ad897b06925cac3b3bd4a9103700"
+    },
+    "boundary": "实际生产协程门禁，公开异步屏障；不替代Service/Binder/JNI或真实FD设备验证。"
+  },
+  "dart": {
+    "red": {
+      "exit_code": 1,
+      "tests": [
+        {
+          "result": "success",
+          "hidden": true
+        },
+        {
+          "result": "success",
+          "hidden": true
+        },
+        {
+          "result": "failure",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "failure",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": true
+        }
+      ],
+      "stdout_sha256": "503460c5bcb51127240911586941cd81f4b078ef327c232be787c9b049c862f1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "green": {
+      "exit_code": 0,
+      "tests": [
+        {
+          "result": "success",
+          "hidden": true
+        },
+        {
+          "result": "success",
+          "hidden": true
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": false
+        },
+        {
+          "result": "success",
+          "hidden": true
+        }
+      ],
+      "stdout_sha256": "9d42c143ee0731c5b351808708db75aa8f182398142f0fb3696e66e9f8909313",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": false
+    },
+    "full": {
+      "exit_code": 0,
+      "test_counts": {
+        "success": 225
+      },
+      "stdout_sha256": "fdc65f459a7d51e7651faf4d9c3a820ff9f8ffe2d806fccf4a43f48486790f5a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "analyze": {
+      "exit_code": 0,
+      "tests": [],
+      "stdout_sha256": "d4411b6af2079caceb2b673eeb225edb9f9ab5eb6afce67dfa3a6c9e0e8574b8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": true
+    }
+  },
+  "source_sha256": {
+    "lib/plugins/service.dart": "6cb46d477d3e01de4cf15ba983812cbe2902be2928b1bfcb7db4afc75ddf1ad9",
+    "lib/plugins/vpn.dart": "b34d903ca3cd8dc651a53ac88e923093dd3059ac5af3db70da590e49c5c14fc7",
+    "lib/state.dart": "ed2c0ad75233ee119ab7823ea93cacf12b534c116e9cab9cc4f5b4d8180fc8b8",
+    "test/plugins/android_stop_completion_test.dart": "bc9272223660c892a71b811c7c06e90c45490b7868dbf3cf7059a24b7c5411d9"
+  },
+  "independent_review": "原生与Dart限定复核未发现P1/P2，主控核对diff与实际命令证据",
+  "boundaries": [
+    "JVM和Dartchannel替身非设备",
+    "GlobalState状态分支仅静态复核，无直接自动测试",
+    "listener先关闭可能形成部分停止态",
+    "smartStop与typed owner未完成",
+    "等待普通stop回执期间保留engine，ACK退出待完成",
+    "新APK尚未安装与验证"
+  ]
+}

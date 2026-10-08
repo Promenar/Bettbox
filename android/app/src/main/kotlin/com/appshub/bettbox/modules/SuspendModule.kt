@@ -67,16 +67,19 @@ class SuspendModule(private val context: Context) {
         updateSuspendState()
     }
 
-    fun uninstall() {
-        if (!isInstalled) return
-        isInstalled = false
-
-        runCatching {
+    fun uninstall(): Boolean {
+        if (!isInstalled) return true
+        return try {
             context.unregisterReceiver(receiver)
+            isInstalled = false
             if (isSuspended) {
                 Core.suspended(false)
                 isSuspended = false
             }
+            true
+        } catch (_: Exception) {
+            // 保留未确认的注册责任；调用方不得提交清理成功。
+            false
         }
     }
 }

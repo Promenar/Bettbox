@@ -60,8 +60,7 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         when (call.method) {
             "startVpn" -> handleStartVpn(call, result)
             "stopVpn" -> {
-                VpnPlugin.handleStop(force = true)
-                result.success(true)
+                VpnPlugin.handleStop(force = true) { VpnPlugin.completeStopResult(result, it) }
             }
             "smartStop" -> {
                 VpnPlugin.handleSmartStop()

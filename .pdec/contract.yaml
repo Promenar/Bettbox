@@ -2531,6 +2531,69 @@
       "timeout_seconds": 600,
       "artifacts": [],
       "verification": "缓存官方Gradle8.14直接入口、独立offline发行依赖缓存；既有signing_environment本机安全注入，仅Kotlin编译，不回显凭据、不打包或安装"
+    },
+    "test-android-stop-response-red": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_vpn_work_gate.py",
+        "--output-name",
+        "android-stop-response-red"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实生产协程门禁及公开停止响应夹具，不执行Service/JNI/FD"
+    },
+    "test-android-stop-response-green": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_vpn_work_gate.py",
+        "--output-name",
+        "android-stop-response-green"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实生产协程门禁及公开停止响应夹具，不执行Service/JNI/FD"
+    },
+    "compile-android-stop-response-adapter": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "../.test/android-build/gradle-home-lp_vc0bs/wrapper/dists/gradle-8.14-all/c2qonpi39x1mddn7hk5gh9iqj/gradle-8.14/bin/gradle",
+        ":app:compileReleaseKotlin",
+        "--offline",
+        "--no-daemon",
+        "--gradle-user-home",
+        "../.test/android-permission-gradle-home",
+        "-Ptarget-platform=android-arm64"
+      ],
+      "cwd": "android",
+      "timeout_seconds": 600,
+      "artifacts": [],
+      "verification": "普通停止响应实际Android release Kotlin工程编译；本机安全签名环境注入，仅编译，不安装/发行"
+    },
+    "test-android-stop-dart": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "--machine",
+        "test/plugins/android_stop_completion_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "实际Dart Service/Vpn包装器与mock平台channel，非设备"
     }
   },
   "deployment": {
@@ -2739,12 +2802,12 @@
     "scripts/check_android_tun_lease.py": "af34e306b45260817a1a480fd93b94f509dc7647ac3dd91ec2ad2d74a116b088",
     "android/core/src/test/cpp/jni_failure_fixture.cpp": "1548b452ae5b4540251ceccfb871405ce234379f2490b1a3721543a53dcd36a0",
     "android/core/src/main/cpp/jni_helper.h": "94c8ea35845d2e0b57bdca798bb85dc4fa926e3748403f4d56a179d92816b747",
-    "scripts/check_android_vpn_work_gate.py": "b260fd129bd1ca419f50606e23c5efda4b9293fcb83d510fb5fd8cb6433a2057",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "2778ce3b7501b569310477f70fb0befdcd8cd9ac6824718b441a39cff71733d8",
+    "scripts/check_android_vpn_work_gate.py": "ae20f570820d3f4e0d9df87bbd9468846cac41e2beda59367634c7f0cdf27b48",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
-    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "628fa79bb638beca4c4e17ab9429c36d888667cfdce6119a5bcc9f72a8bfe364",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "33df2cbc38d71ed71b1f33af873d0f4c2bd4a1fb3810ad192951d50247cb80d7",
     "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "4a54de20794463effa8ffd5035e5158b19d187496d8ae8171617a89b24c001f4",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "6fb501fda7ffacf82f804a67d535a309eaabe5b98ba849ca5d8586ddee38ffec",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "350d0d61e191bf52e2ab11bb228ecee352bb058675470547fc270e1c8253ff94",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "bd97efec4ac22e018eb49a2ed96fa50a16749697556ec4ef15a5de7c6bf47122",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BaseServiceInterface.kt": "8f4e1095b5fe1966720ac966d673a172a7ff6ac539e60c0cf4750689ab1cd9fc",
     "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxService.kt": "c6a65dbb9ac2755546c0a546dd94c389c0e38a227f3b73806ebf7adc317ed416",
@@ -2793,7 +2856,13 @@
     "scripts/check_android_vpn_permission.py": "7fca56dc6aca7fb56fd3bcdc44f98d5f71a85ae0c0b91439a9f7bdfca5fbb59d",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09",
     "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequestsFixture.kt": "f5406bd2d9d885bf6984ceca96021ffd3c86b387820dc26b5711f4fb6a861417",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853"
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "4cd873d2694b19323c75eb1e7f905e19e821148e7b373e966b7247f80d949973",
+    "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "b08e8eaae8f0e7bc4de787556c79a1fca4eaa6176c69bb31d64338a222038e6f",
+    "test/plugins/android_stop_completion_test.dart": "bc9272223660c892a71b811c7c06e90c45490b7868dbf3cf7059a24b7c5411d9",
+    "lib/plugins/service.dart": "6cb46d477d3e01de4cf15ba983812cbe2902be2928b1bfcb7db4afc75ddf1ad9",
+    "lib/plugins/vpn.dart": "b34d903ca3cd8dc651a53ac88e923093dd3059ac5af3db70da590e49c5c14fc7",
+    "lib/state.dart": "ed2c0ad75233ee119ab7823ea93cacf12b534c116e9cab9cc4f5b4d8180fc8b8"
   },
   "platform_extensions": {
     "android": {
@@ -2869,6 +2938,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "2935647ec7848e5f8e50f9e4ddb8b520dd1d7092dfbd77202f0a960b7176bea5"
+    "contract_digest": "cce5d9f832007e5191d45b490a873d78ccc974d9a49ed0e45978758ca6b8a46c"
   }
 }

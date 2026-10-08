@@ -9,6 +9,8 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Handler
+import android.os.Looper
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
@@ -58,6 +60,16 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     @Volatile
     private var isBind = false
     private val isBinding = AtomicBoolean(false)
+    private val stopResultHandler = Handler(Looper.getMainLooper())
+    private val unconfirmedConnections = mutableSetOf<ServiceConnection>()
+
+    internal fun completeStopResult(result: MethodChannel.Result, completed: Boolean) {
+        stopResultHandler.post {
+            runCatching { result.success(completed) }
+                .onFailure { android.util.Log.e("VpnPlugin", "停止完成响应投递失败") }
+        }
+    }
+
     private val nativeGate = VpnWorkGate()
     private val lifecycleScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val lifecycle = VpnLifecycle<BaseServiceInterface>()
@@ -161,8 +173,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
 
             "stop" -> {
-                handleStop()
-                result.success(true)
+                handleStop { completeStopResult(result, it) }
             }
 
             "getLocalIpAddresses" -> {
@@ -697,13 +708,17 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         ""
     }
 
-    fun handleStop(force: Boolean = false) {
+    fun handleStop(force: Boolean = false, completion: ((Boolean) -> Unit)? = null) {
         val serviceRef: BaseServiceInterface?
         val connectionRef: ServiceConnection?
         val shouldForceStop: Boolean
         val stopGeneration: Long
         GlobalState.runLock.withLock {
-            if (!force && lifecycle.phase == VpnLifecycle.Phase.IDLE && !startRequested) return
+            if (!force && lifecycle.phase == VpnLifecycle.Phase.IDLE && !startRequested &&
+                !localCleanupFailed && !GlobalState.isCurrentlyStopping()) {
+                completion?.invoke(true)
+                return
+            }
             startRequested = false
             intents.cancel()
             connectionRef = serviceConnection
@@ -720,53 +735,71 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
 
         lifecycleScope.launch {
-            withContext(NonCancellable) {
-                nativeGate.run {
-                    val current = GlobalState.runLock.withLock {
-                        lifecycle.phase == VpnLifecycle.Phase.STOPPING &&
-                            stopGeneration == currentGeneration()
-                    }
-                    if (!current) return@run
-                    val stopped = Core.stopTun() && !localCleanupFailed
-                    if (!stopped) {
-                        GlobalState.runLock.withLock { lifecycle.stopped(stopGeneration, false, false) }
-                        android.util.Log.e("VpnPlugin", "TUN 停止失败，保持启动阻断")
-                        return@run
-                    }
-                    suspendModule?.uninstall()
-                    suspendModule = null
-                    serviceRef?.stop()
-                    val context = BettboxApplication.getAppContext()
-                    runCatching {
-                        connectionRef?.let { context.unbindService(it) }
-                    }.onFailure { android.util.Log.e("VpnPlugin", "服务解绑失败") }
-                    if (shouldForceStop) {
-                        context.stopService(Intent(context, BettboxVpnService::class.java))
-                        context.stopService(Intent(context, BettboxService::class.java))
-                    }
-                    GlobalState.runLock.withLock {
-                        if (lifecycle.stopped(stopGeneration, true, false)) {
-                            isBind = false
-                            isBinding.set(false)
-                            bettBoxService = null
-                            GlobalState.isSmartStopped = false
-                            GlobalState.updateIsStopping(false)
-                            GlobalState.updateRunState(RunState.STOP)
-                            ServicePlugin.notifyRunStateChanged(RunState.STOP)
-                        }
-                    }
-                }
-                if (GlobalState.runLock.withLock { lifecycle.phase == VpnLifecycle.Phase.IDLE }) {
-                    withContext(Dispatchers.Main) {
+            var completed = false
+            try {
+                withContext(NonCancellable) {
+                    completed = nativeGate.stop(current = {
                         GlobalState.runLock.withLock {
-                            if (!startRequested && lifecycle.phase == VpnLifecycle.Phase.IDLE && currentGeneration() == stopGeneration) {
-                                GlobalState.handleTryDestroy()
+                            lifecycle.phase == VpnLifecycle.Phase.STOPPING && stopGeneration == currentGeneration()
+                        }
+                    }, close = {
+                        if (!Core.stopTun() || localCleanupFailed) false else {
+                            var platformClosed = true
+                            if (closeStopPlatform { check(suspendModule?.uninstall() != false) { "挂起监听释放未确认" } }) suspendModule = null else platformClosed = false
+                            if (!closeStopPlatform { serviceRef?.stop() }) platformClosed = false
+                            val context = BettboxApplication.getAppContext()
+                            if (!closeStopPlatform { connectionRef?.let { context.unbindService(it) } }) {
+                                GlobalState.runLock.withLock { connectionRef?.let { unconfirmedConnections.add(it) } }
+                                platformClosed = false
+                            }
+                            if (shouldForceStop) {
+                                if (!closeStopPlatform { context.stopService(Intent(context, BettboxVpnService::class.java)) }) platformClosed = false
+                                if (!closeStopPlatform { context.stopService(Intent(context, BettboxService::class.java)) }) platformClosed = false
+                            }
+                            platformClosed
+                        }
+                    }, commit = { stopped ->
+                        GlobalState.runLock.withLock {
+                            if (lifecycle.stopped(stopGeneration, stopped, false)) {
+                                isBind = false
+                                isBinding.set(false)
+                                bettBoxService = null
+                                GlobalState.isSmartStopped = false
+                                GlobalState.updateIsStopping(false)
+                                GlobalState.updateRunState(RunState.STOP)
+                                ServicePlugin.notifyRunStateChanged(RunState.STOP)
+                                true
+                            } else false
+                        }
+                    })
+                    // 请求响应期间保留engine；带身份的消费ack与destroy准入由统一owner接线。
+                    if (completion == null && completed) {
+                        withContext(Dispatchers.Main) {
+                            GlobalState.runLock.withLock {
+                                if (!startRequested && lifecycle.phase == VpnLifecycle.Phase.IDLE && currentGeneration() == stopGeneration) {
+                                    GlobalState.handleTryDestroy()
+                                }
                             }
                         }
                     }
                 }
+            } catch (_: Throwable) {
+                completed = false
+                GlobalState.runLock.withLock { localCleanupFailed = true; markBlocked() }
+                android.util.Log.e("VpnPlugin", "停止完成未确认，保持资源责任")
+            } finally {
+                completion?.invoke(completed)
             }
         }
+    }
+
+    private fun closeStopPlatform(action: () -> Unit): Boolean = try {
+        action()
+        true
+    } catch (_: Throwable) {
+        GlobalState.runLock.withLock { localCleanupFailed = true }
+        android.util.Log.e("VpnPlugin", "平台停止收尾未确认")
+        false
     }
 
     private fun currentGeneration(): Long = lifecycle.generation

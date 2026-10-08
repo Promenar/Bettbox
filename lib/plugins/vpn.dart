@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bett_box/clash/clash.dart';
+import 'package:bett_box/common/app_localizations.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/foundation.dart';
@@ -63,7 +64,13 @@ class Vpn {
     });
   }
 
-  Future<bool?> stop() => methodChannel.invokeMethod<bool>('stop');
+  Future<bool?> stop() async {
+    final completed = await methodChannel.invokeMethod<bool>('stop');
+    if (completed != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    return completed;
+  }
 
   Future<List<String>> getLocalIpAddresses() async {
     return await methodChannel.invokeListMethod<String>(

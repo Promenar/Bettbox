@@ -2334,3 +2334,34 @@ VpnPermissionRequests、AppPlugin、VpnPlugin及公开夹具；更新PDEC、架�
 
 ### HLG
 使用append先dry-run再apply记录，目标保持active。
+
+## 2026-10-08T22:43:20+08:00 · Android普通停止原生确认与Dart失败传播
+
+type: implementation
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "stop", "validation"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 64d27b30842f35011055df545697deee11d753c5fd5d7181bfbc6cd681202c4f
+
+### Summary
+普通停止响应等待原生关闭及匹配代次STOP提交，失败不作为成功；完整三端发行目标未完成。
+
+### Changed
+VpnWorkGate.stop与VpnPlugin/ServicePlugin回执、SuspendModule责任保留；Service/Vpn Dart拒绝false/null，后台调用Vpn.stop，清理本地运行标记推迟至成功。
+
+### Validation
+生产门禁JVM红绿；实际release Kotlin工程编译exit0且4源摘要一致；Dart2失败红例、6项绿例；Flutter225项通过，analyze无问题；独立原生及Dart审阅无P1/P2。公开回执android-stop-completion-validation.json。
+
+### Next
+落实唯一Android配置/TUN owner、typed completion和engine ACK，checked shutdown与智能暂停；构建安装新APK及真实流量；完整macOS界面签名与业务验收，iOS开发版和服务端E2E。
+
+### Risks
+GlobalState仅静态复核，无直接分支回归；listener先关闭有部分停止态。smartStop未确认；普通回执期间暂留engine；未安装新APK。macOS黑窗运行测试探针，完整App未验收。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、计划、PDEC说明及registry与公开回执。
+
+### HLG
+标准append先dry-run后apply，保留跨会话事实与未验收边界。
