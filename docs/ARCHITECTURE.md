@@ -257,3 +257,8 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 smartStop 在 VpnWorkGate 中串行关闭，只有关闭和同代生命周期提交成功才返回成功；Handler 实际投递前再次检查 generation。关闭/挂起监听卸载失败、JNI 挂起调用抛异常及旧代提交均不确认，旧异常不得阻断新代。Core.suspended 的 Boolean 只表达 JNI void 调用是否抛异常，不表示 engine ACK。
 
 Service/Vpn 的 Dart 包装器仅接受 true。SmartAutoStopManager 使用 completeSmartStop，将同一 Dart 会话及原生挂起状态作为显示清理准入，在同步 commit 内设置智能停止标记并清时间/流量。该会话对象不是完整 native owner token；智能恢复、唯一 owner、带身份 ACK 与真实设备交错另行验收。
+
+
+### Android 首次前台发布确认
+
+`BaseServiceInterface.startForeground` 返回同代前台发布布尔结果。VPN 服务首次速度通知返回 false 时使用基础通知，实际平台调用完成后才更新通知缓存；构造异常由启动失败路径处理。`VpnPlugin` 仅在当前 ticket 仍为 RUNNING 且前台确认成功后发布 START。该确认属于 Android 平台前台步骤，不代表唯一 Native owner 或 typed Go engine ACK；更新恢复资格与持久停止意图按 `.agents/plans/2026-10-09-android-package-restart.md` 接线和验收。

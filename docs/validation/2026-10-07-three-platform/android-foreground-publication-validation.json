@@ -1,0 +1,55 @@
+{
+  "base_source_commit": "b55f5b77ef5c28dce9f0011f3bf62e514186790c",
+  "production_source_hashes": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "170fd67882ca3d67f739f7f319fd2811de1424900a79416728df4a299ee03258",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "dfebdc74a3a70eb30c980619a91883341763e7529c77a36690483a8579c74069",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/SmartResumeAwaiter.kt": "333878cdb01d921c6b512a90efd578f900239dcca10020377ec76cbf96ffd084",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/ForegroundPublication.kt": "90388d223a2ef2a5dda0c547453b1974f3cf81bf3d84eba4ad9fffae96e7a4b8",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "5e0c5c4349662155139da87805837823bafd9642ae8899747130099940fa5110",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt": "0d030e42bdff19c5f0c9e5425bfb5307780d403dbdfd95fa5611e36fe37e1893",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/BaseServiceInterface.kt": "b83e4d22525cd4bbafb60b7f2ecfd822c4d32d2c05cfdd3debbda8d7e3687cc5",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxService.kt": "a6a714c8eb3c60f469310d5d4b51b6ce49190b0216f01911c00809436b1ec23c",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxVpnService.kt": "2e8f35de49c01e4c2ab61d0491a5f7ec1b24fd92642a9c4085c9ba6c7083219d",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "755df2479e540cb774fa7a82b38acdf6013e90404626c68d0b61ca34680c406c",
+    "scripts/check_android_vpn_work_gate.py": "c24ab40fbfb6bc6aa9382c3e3631ba3d8f987ba98e88d41ad2162486dfa3a73e"
+  },
+  "red": {
+    "exit_code": 1,
+    "failure": "速度未发布时必须基础前台兜底",
+    "extracted_previous_decision_used_by_service": true
+  },
+  "green": {
+    "fixture_exit_code": 0,
+    "entrypoints": 2,
+    "checks": [
+      "速度false触发基础通知",
+      "速度true不重复发布",
+      "双false不响应成功",
+      "基础异常传播",
+      "速度构造异常传播而非伪成功",
+      "RUNNING同代失败收回ticket",
+      "旧ticket失败不影响新代"
+    ]
+  },
+  "release_kotlin_compile": {
+    "exit_code": 0,
+    "build_successful": true,
+    "production_sources_unchanged_after_compile": true,
+    "fixture_only_additions_after_compile": true
+  },
+  "independent_review": {
+    "agent": "android_package_restart_review",
+    "confirmed_p1": 0,
+    "scope": "源码前台确认接线；非设备/更新资格完成"
+  },
+  "device_verified": false,
+  "package_restart_eligibility_implemented": false,
+  "full_apk_rebuilt": false,
+  "release_verified": false,
+  "limitations": [
+    "纯生产Kotlin夹具与完整编译不替代熄屏、Android Service/Binder、缓存重复刷新和真实OS前台行为。",
+    "仅速度发布返回false走基础兜底；构造异常传播至失败清理，不承诺全部速度异常兜底。",
+    "持久恢复资格、停止入口撤销、更新广播门禁及覆盖安装设备回归尚未实施。"
+  ]
+}

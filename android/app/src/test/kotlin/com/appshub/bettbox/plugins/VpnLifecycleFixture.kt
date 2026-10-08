@@ -13,6 +13,7 @@ object VpnLifecycleFixture {
         timeoutAfterRunningRetainsOrigin()
         failedBeforeReceiptRetainsRequestOrigin()
         resumeForegroundPendingSnapshot()
+        initialForegroundRequiresActualPublication()
         println("VPN lifecycle fixture passed")
     }
 
@@ -181,6 +182,46 @@ object VpnLifecycleFixture {
             val terminal = snapshot(phase, false, true)
             check(!terminal.pending && terminal.receipt == null)
         }
+    }
+
+    private fun initialForegroundRequiresActualPublication() = kotlinx.coroutines.runBlocking {
+        var basicCalls = 0
+        // 熄屏抑制速度刷新时，首次前台仍须由基础通知发布。
+        check(com.appshub.bettbox.services.confirmInitialForeground(true,
+            publishSpeed = { false }, publishBasic = { basicCalls++; true }))
+        check(basicCalls == 1) { "速度未发布时必须基础前台兜底" }
+        basicCalls = 0
+        check(com.appshub.bettbox.services.confirmInitialForeground(true,
+            publishSpeed = { true }, publishBasic = { basicCalls++; false }))
+        check(basicCalls == 0)
+        check(!com.appshub.bettbox.services.confirmInitialForeground(true,
+            publishSpeed = { false }, publishBasic = { false }))
+        check(com.appshub.bettbox.services.confirmInitialForeground(false,
+            publishSpeed = { error("未选择速度通知") }, publishBasic = { true }))
+        var failed = false
+        try {
+            com.appshub.bettbox.services.confirmInitialForeground(false,
+                publishSpeed = { false }, publishBasic = { error("平台发布失败") })
+        } catch (_: IllegalStateException) { failed = true }
+        check(failed)
+        failed = false
+        basicCalls = 0
+        try {
+            com.appshub.bettbox.services.confirmInitialForeground(true,
+                publishSpeed = { error("速度通知构造失败") },
+                publishBasic = { basicCalls++; true })
+        } catch (_: IllegalStateException) { failed = true }
+        check(failed && basicCalls == 0)
+        // Core 已进入 RUNNING 后，前台失败仍须收回同代 ticket。
+        val lifecycle = VpnLifecycle<Any>()
+        val ticket = checkNotNull(lifecycle.begin(Any()))
+        check(lifecycle.started(ticket))
+        check(lifecycle.failed(ticket, true))
+        check(lifecycle.phase == VpnLifecycle.Phase.IDLE)
+        check(!lifecycle.publish(ticket.service, ticket.generation) { error("失败 ticket 不可发布") })
+        val replacement = checkNotNull(lifecycle.begin(Any()))
+        check(!lifecycle.failed(ticket, false))
+        check(lifecycle.current(replacement))
     }
 
 }

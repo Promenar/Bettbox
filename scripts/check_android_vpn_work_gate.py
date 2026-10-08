@@ -13,6 +13,7 @@ SOURCES = [
     ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt',
     ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt',
     ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/plugins/SmartResumeAwaiter.kt',
+    ROOT / 'android/app/src/main/kotlin/com/appshub/bettbox/services/ForegroundPublication.kt',
     ROOT / 'android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt',
     ROOT / 'android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt',
 ]

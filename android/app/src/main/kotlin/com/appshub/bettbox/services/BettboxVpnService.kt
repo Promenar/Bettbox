@@ -202,8 +202,8 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     }
 
     @SuppressLint("ForegroundServiceType")
-    override suspend fun startForeground(generation: Long?) {
-        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return
+    override suspend fun startForeground(generation: Long?): Boolean {
+        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return false
         ensureNotificationChannel()
         val title: String
         val content: String
@@ -239,34 +239,36 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
 
         val pendingProfile = pendingSpeedProfile
         val pendingSpeed = pendingSpeedInfo
-        if (!GlobalState.isSmartStopped && isFirstTime && isSpeedNotificationEnabled && pendingProfile != null && pendingSpeed != null) {
-            updateNotificationSpeed(pendingProfile, pendingSpeed, notificationGeneration, firstForeground = true)
-            return
-        }
-
-        VpnPlugin.publishForeground(this, notificationGeneration) {
-            lastNotificationText = null
-            hasStartedForeground = true
-            this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
-        }
+        val preferSpeed = !GlobalState.isSmartStopped && isFirstTime &&
+            isSpeedNotificationEnabled && pendingProfile != null && pendingSpeed != null
+        return confirmInitialForeground(preferSpeed, publishSpeed = {
+            updateNotificationSpeed(checkNotNull(pendingProfile), checkNotNull(pendingSpeed),
+                notificationGeneration, firstForeground = true)
+        }, publishBasic = {
+            VpnPlugin.publishForeground(this, notificationGeneration) {
+                this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+                lastNotificationText = null
+                hasStartedForeground = true
+            }
+        })
     }
 
     @SuppressLint("ForegroundServiceType")
     internal suspend fun updateNotificationSpeed(profileName: String, speedInfo: String,
-                                                generation: Long? = null, firstForeground: Boolean = false) {
-        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return
+                                                generation: Long? = null, firstForeground: Boolean = false): Boolean {
+        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return false
         if (!VpnPlugin.publishForeground(this, notificationGeneration) {
             pendingSpeedProfile = profileName
             pendingSpeedInfo = speedInfo
-        }) return
+        }) return false
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
         if (powerManager?.isInteractive == false) {
-            return
+            return false
         }
 
         if (GlobalState.isSmartStopped) {
-            return
+            return false
         }
 
         val separator = " ︙ "
@@ -289,15 +291,17 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             .setTicker(combinedText)
             .build()
 
-        if (hasStartedForeground || firstForeground) {
-            runCatching {
-                VpnPlugin.publishForeground(this, notificationGeneration) {
-                    if (combinedText == lastNotificationText) return@publishForeground
-                    lastNotificationText = combinedText
-                    hasStartedForeground = true
-                    this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
-                }
-            }.onFailure { Log.e(TAG, "速度通知发布失败") }
+        if (!hasStartedForeground && !firstForeground) return false
+        return runCatching {
+            VpnPlugin.publishForeground(this, notificationGeneration) {
+                if (combinedText == lastNotificationText) return@publishForeground
+                this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+                lastNotificationText = combinedText
+                hasStartedForeground = true
+            }
+        }.getOrElse {
+            Log.e(TAG, "速度通知发布失败")
+            false
         }
     }
 

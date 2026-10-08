@@ -2768,3 +2768,34 @@ SDK36覆盖安装实际自动运行，接收器直接请求start；未作为正�
 
 ### HLG
 通过标准append记录同源构建、设备设置还原、组合传输判定勘误及未闭合边界。
+
+## 2026-10-09T02:28:18+08:00 · Android首次前台发布确认候选与更新资格前提
+
+type: development
+scope: ["Bettbox", "Android"]
+status: partial
+tags: ["foreground", "package-restart", "regression", "review"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: b44b2b2bd0a0cd27c9631b9a253b77ab4d5efb7e66db61412088297a47f7b699
+
+### Summary
+更新恢复设计核查定位三个前提：完整停止入口、实际前台确认、持久撤销失败。已修复首次前台确认源码，更新资格尚未实施。
+
+### Changed
+主控拥有服务接口、两个服务、VpnPlugin、生产helper与夹具脚本；前台返回Boolean，速度false基础兜底，缓存后置，START需实际前台确认。同步PDEC、计划、回执及验收文档。
+
+### Validation
+旧生产决策基础发布断言red1；最终生产JVM2入口green，补验RUNNING后失败及旧ticket拒绝。实际Release Kotlin编译终态0/BUILD SUCCESSFUL，后续只补夹具，生产摘要复核一致。独立原生android_package_restart_review只读复审无确认P1，提示速度构造异常传播而非兜底与设备边界；主控已收窄文档并补验生命周期。
+
+### Next
+接入专属非秘密更新资格：当前成功START授予，普通停止/撤销同步清除，智能暂停保留，持久撤销失败不得伪成功；SDK36广播锁内明确门禁。候选源码完成后统一APK构建和熄屏/覆盖安装设备回归。
+
+### Risks
+当前安装a21276f不含前台源码修复；没有真实设备熄屏/速度构造故障注入。资格commit失败跨进程问题需明确处理；唯一owner/typed Go ACK、有效代理HTTPS、macOS解锁/登录及iOS发行条件不因本修复关闭。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、registry、实施计划、公开验收回执及PDEC。
+
+### HLG
+标准append记录独立设计发现、前提源码红绿与下一步，整体Goal保持active。

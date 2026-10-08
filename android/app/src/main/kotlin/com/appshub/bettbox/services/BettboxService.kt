@@ -72,8 +72,8 @@ class BettboxService : Service(), BaseServiceInterface {
         createBettboxNotificationBuilder()
 
     @SuppressLint("ForegroundServiceType")
-    override suspend fun startForeground(generation: Long?) {
-        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return
+    override suspend fun startForeground(generation: Long?): Boolean {
+        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return false
         ensureNotificationChannel()
         val title: String
         val content: String
@@ -106,7 +106,7 @@ class BettboxService : Service(), BaseServiceInterface {
             .setTicker(combinedText)
             .build()
 
-        VpnPlugin.publishForeground(this, notificationGeneration) {
+        return VpnPlugin.publishForeground(this, notificationGeneration) {
             if (!hasStartedForeground) {
                 this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
                 hasStartedForeground = true

@@ -649,7 +649,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                         suspendModule = SuspendModule(BettboxApplication.getAppContext())
                         suspendModule?.install()
                     }
-                    ticket.service.startForeground(ticket.generation)
+                    val foregroundPublished = ticket.service.startForeground(ticket.generation)
+                    if (!foregroundPublished) {
+                        if (isCurrent(ticket)) failStart(ticket, Core.stopTun(), notifyOnFailure)
+                        return@start
+                    }
                     GlobalState.runLock.withLock {
                         if (lifecycle.current(ticket) && lifecycle.phase == VpnLifecycle.Phase.RUNNING) {
                             GlobalState.updateRunState(RunState.START)

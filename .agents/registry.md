@@ -142,3 +142,6 @@
 
 - docs/validation/2026-10-07-three-platform/android-a21276f-apk-validation.json — 同源正式签名构建、安装回读、普通停止/冷启动与覆盖安装启动边界
 - docs/validation/2026-10-07-three-platform/android-a21276f-smart-resume-device-validation.json — 匹配暂停、空规则/关闭恢复、组合 VPN transport 修正及设置还原
+
+- .agents/plans/2026-10-09-android-package-restart.md — 更新恢复资格、停止意图、首次前台确认与错误/设备验收计划
+- docs/validation/2026-10-07-three-platform/android-foreground-publication-validation.json — 首次前台确认生产夹具红绿、Kotlin编译与独立复核及未覆盖设备边界

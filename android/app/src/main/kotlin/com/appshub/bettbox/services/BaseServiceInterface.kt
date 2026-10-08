@@ -26,7 +26,7 @@ import android.graphics.BitmapFactory
 interface BaseServiceInterface {
     suspend fun start(options: VpnOptions): Int
     fun stop()
-    suspend fun startForeground(generation: Long? = null)
+    suspend fun startForeground(generation: Long? = null): Boolean
 }
 
 suspend fun Service.createBettboxNotificationBuilder(): NotificationCompat.Builder =

@@ -351,3 +351,10 @@ FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binde
 源码测试与设备验收各自绑定版本：`android-a21276f-apk-validation.json` 记录构建/安装/停止态；`android-a21276f-smart-resume-device-validation.json` 记录匹配规则、清空规则及关闭功能的计时、前台服务和系统 VPN 网络。前台异常、Binder 断开、主线程延迟、快速交错、唯一 owner/engine ACK、有效代理 HTTPS 和真机不能由普通恢复路径替代。
 
 SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageReplacedReceiver` 在 SDK36 直接请求启动；安装前的普通停止意图没有保留。这项行为需独立修复和回归，不计作正常冷启动通过。macOS 黑色窗口的原因未确认，界面检查等待解锁；进程存活不能替代渲染验收。候选没有达到完整发行验收。
+
+
+## Android 首次前台发布确认源码候选
+
+服务接口 `startForeground` 返回同代实际发布结果。首次速度通知返回 false（包括熄屏抑制、智能暂停和旧代拒绝）时尝试基础通知；实际平台调用完成后才更新缓存与前台标记。`performStartCore` 收到 false 不发布 START，当前代执行失败清理。速度构造异常传播到失败清理，不把所有异常描述为基础兜底。
+
+生产 helper 的旧决策忽略速度结果，在基础前台调用次数断言失败；修复后的 JVM 两入口、RUNNING 后同代失败与旧 ticket 拒绝用例通过。完整 Android release Kotlin 编译成功，编译后仅补夹具，生产来源摘要不变；独立只读复审无确认 P1。公开回执为 `android-foreground-publication-validation.json`。源码候选尚未打入新 APK，不能用它宣布熄屏设备、持久更新资格或覆盖安装停止意图通过。
