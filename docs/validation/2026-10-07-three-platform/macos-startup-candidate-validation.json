@@ -1,0 +1,197 @@
+{
+  "date": "2026-10-09",
+  "source_commit": "c0bcb9c8de2348f4747f234a80f0ae5c1ff9f5be",
+  "scope": "完整macOS开发候选构建、独立开发签名、旧会话正常退出与实际启动阶段",
+  "build": {
+    "commands_succeeded": true,
+    "source_unchanged": true,
+    "locks_unchanged": true,
+    "build_channel": "local-macos-development",
+    "host_signing_mode": "unsigned",
+    "target": "macos-arm64",
+    "started_at": "2026-10-08T20:15:56.421070+00:00",
+    "completed_at": "2026-10-08T20:17:16.767687+00:00"
+  },
+  "frozen_build_receipt": {
+    "exit_code": 0,
+    "source_sha256": {
+      "lib/main.dart": "897e8bb7d96ecb5a09bd395902d4cddc7200a93b41600b3809f1fb46c40ef1c0",
+      "lib/common/startup_trace.dart": "1caf6f52f123685975b77b4fc7feaae78df1c115b2908d737ed60dca3d61ea42",
+      "scripts/validate_desktop.py": "e02095c72332d0938cedf6d80f24bbf92a432be32f323baf67783ce886bdb28c"
+    },
+    "source_unchanged": true,
+    "contract_unchanged": true
+  },
+  "seal": {
+    "passed": true,
+    "signingmode": "apple-development",
+    "entitlement_profile": "local-development",
+    "distribution": "non-distribution",
+    "host_sha256": "5b5ac6f62f055658b741875d53a10ae494c3dc4e4142fd4efac4a185e0b1db11",
+    "host_cdhash": "847ffd22db12d2b986a35096b497f42df5e03603",
+    "nested_frameworks": 10,
+    "artifacts": {
+      "BettboxCore": {
+        "cdhash": "460a42a5b549acdd4a969feb1748c39f6b5ae97e",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "029558b9d6008931cb078f82618256874923c1e02d1c9afebf4459fb8153f3d9",
+        "signingmode": "adhoc"
+      },
+      "BettboxCoreSupervisor": {
+        "cdhash": "338d00162fac366dd5a632c28f0c23b52c9c3695",
+        "identifier": "com.appshub.bettbox.core.supervisor",
+        "schema": 1,
+        "sha256": "79780a33f78a530e40f6cfdb2e076fa7c6ca7447676793b32655b109c88f4cfb",
+        "signingmode": "adhoc"
+      }
+    }
+  },
+  "old_exit": {
+    "command_exit_code": 0,
+    "sent_exit_marker": true,
+    "failed_exit_marker": false,
+    "old_processes": {
+      "12132": {
+        "present": true
+      },
+      "12142": {
+        "present": true
+      },
+      "12143": {
+        "present": true
+      }
+    }
+  },
+  "old_exit_terminal": {
+    "12132": {
+      "present": false,
+      "process_state": ""
+    },
+    "12142": {
+      "present": false,
+      "process_state": ""
+    },
+    "12143": {
+      "present": false,
+      "process_state": ""
+    }
+  },
+  "backup": {
+    "previous_bundle_preserved": true,
+    "backup": "build/macos-local-development-before-c0bcb9c",
+    "old_host_and_children_exited": true
+  },
+  "launch": {
+    "pid": 74583,
+    "host_sha256": "5b5ac6f62f055658b741875d53a10ae494c3dc4e4142fd4efac4a185e0b1db11",
+    "source_commit": "c0bcb9c8de2348f4747f234a80f0ae5c1ff9f5be",
+    "strict_signature_verified": true,
+    "log": "startup-private.log",
+    "candidate_type": "local-development",
+    "window_verified": false
+  },
+  "startup_stages": [
+    {
+      "stage": "singleInstance",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "singleInstance",
+      "phase": "complete",
+      "elapsed_ms": 30
+    },
+    {
+      "stage": "version",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "version",
+      "phase": "complete",
+      "elapsed_ms": 1
+    },
+    {
+      "stage": "configuration",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "corePreload",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "configuration",
+      "phase": "complete",
+      "elapsed_ms": 1
+    },
+    {
+      "stage": "corePreload",
+      "phase": "complete",
+      "elapsed_ms": 1719
+    },
+    {
+      "stage": "dashboardAssets",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "dashboardAssets",
+      "phase": "complete",
+      "elapsed_ms": 5
+    },
+    {
+      "stage": "rustBridge",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "rustBridge",
+      "phase": "complete",
+      "elapsed_ms": 1
+    },
+    {
+      "stage": "androidBridge",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "androidBridge",
+      "phase": "complete",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "window",
+      "phase": "begin",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "window",
+      "phase": "complete",
+      "elapsed_ms": 4
+    },
+    {
+      "stage": "application",
+      "phase": "complete",
+      "elapsed_ms": 0
+    },
+    {
+      "stage": "firstFrame",
+      "phase": "complete",
+      "elapsed_ms": 0
+    }
+  ],
+  "seal_regression_tests": {
+    "passed": 35,
+    "exit_code": 0
+  },
+  "first_frame_callback_observed": true,
+  "visible_window_verified": false,
+  "screen_locked": true,
+  "black_screen_root_cause_confirmed": false,
+  "system_proxy_and_effective_vpn_verified": false,
+  "release_verified": false,
+  "boundary": "本机Apple Development候选，非Developer ID公证发行；函数返回和帧回调不能代替可见窗口、账户或有效代理验收。"
+}

@@ -2835,6 +2835,21 @@
       "timeout_seconds": 180,
       "artifacts": [],
       "verification": "生产严格解析器与NativeRuntimeIdentity比较夹具，非实际JNI或Android设备"
+    },
+    "launch-macos-local-development-trace": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "build/macos-local-development/Bettbox.app/Contents/MacOS/Bettbox"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/macos-startup-trace-build/launch.json",
+        ".test/macos-startup-trace-build/startup-private.log"
+      ],
+      "verification": "旧宿主/两个子进程确认退出后，启动已严格验签的本机开发候选；输出仅保存在0600本机日志，模型只读取固定启动阶段；不付款或放宽系统权限，不代表窗口/代理验收。"
     }
   },
   "deployment": {
@@ -3224,6 +3239,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "5f1d2d00b1ba0b2cdcc311003905e87745efd0b1cefac5a6c7ef2de6adc8f894"
+    "contract_digest": "3146461e9f165221a93b53a17e435bf63c94cb1e08633696ba6c7fbc186b5083"
   }
 }

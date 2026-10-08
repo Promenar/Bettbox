@@ -160,3 +160,5 @@
 - .agents/plans/2026-10-09-macos-startup-diagnosis.md — 黑屏启动阶段调查、固定日志边界与真实窗口验收要求
 
 - docs/validation/2026-10-07-three-platform/macos-startup-trace-validation.json — 固定阶段诊断源摘要、回归与未覆盖窗口边界
+
+- docs/validation/2026-10-07-three-platform/macos-startup-candidate-validation.json — 同源完整开发构建、严格签名、旧会话退出及实际首帧边界

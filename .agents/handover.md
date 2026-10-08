@@ -2985,3 +2985,34 @@ main保持原初始化次序，固定枚举阶段记录开始、10秒pending、�
 
 ### HLG
 标准append预演后追加，索引由工具重建。
+
+## 2026-10-09T04:22:23+08:00 · macOS同源开发候选构建与真实首帧阶段验收
+
+type: maintenance
+scope: ["Bettbox", "macOS"]
+status: partial
+tags: ["macos", "startup", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 8604d35014507d4fd26587418e1295c657ef48afc4365f6bf3fc43738a845ab2
+
+### Summary
+源码c0bcb9c完整macOS开发候选构建和开发签名通过，实际进程启动到runApp及首帧回调。该候选没有停在首帧前初始化；黑屏原因与可见窗口仍未确认。
+
+### Changed
+旧候选经自身--exit通道请求退出，宿主12132及子进程12142/12143确认均消失后，将完整旧目录保留为build/macos-local-development-before-c0bcb9c。新严格验签候选放在build/macos-local-development/Bettbox.app，受限0600日志只向模型输出固定阶段。PDEC登记直接启动捕获入口。
+
+### Validation
+同一次完整构建session61662终态退出0，源/契约/锁摘要保持；开发签名session55798退出0，Apple Development与空本机开发权利严格核验。封装器35项回归通过。新宿主74583、helper74591和Core74592启动；全部固定初始化阶段返回，内核预加载1719ms，观察到application与firstFrame标记，无固定pending/failed。原日志没有已检索的Flutter错误签名；这不是无错误的完备证明。公开回执macos-startup-candidate-validation.json。
+
+### Next
+解锁后读取实际窗口，验证黑屏是否存在及账户恢复；如仍黑屏，沿首帧之后的窗口显示、绘制和应用状态定位。继续Android唯一owner、配置/资源完成回执和ACK联合采用及业务全路径。
+
+### Risks
+工具仍报告Mac锁屏。首帧回调不能证明GPU输出或可见窗口。新包属于本机Apple Development，不是Developer ID公证发行，系统代理与有效VPN流量未完成。三端账户、订阅、邀请返佣、支付及iOS真机/发行条件保持待验收。
+
+### DIA
+已同步平台验收、变更记录、PDEC说明、registry及公开候选回执。
+
+### HLG
+标准append预演后追加，索引由工具重建。
