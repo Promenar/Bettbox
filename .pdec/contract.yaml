@@ -913,7 +913,7 @@
         "scripts/check_macos_flutter_supervisor.py",
         "--output-name",
         "run-20261008-engine",
-        "run-20261008-engine-entitlements",
+        "run-20261008-application",
         "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
         "--expected-helper-sha256",
         "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa"
@@ -921,9 +921,25 @@
       "cwd": ".",
       "timeout_seconds": 1050,
       "artifacts": [
-        ".test/three-platform-release/macos-flutter-supervisor/run-20261008-engine-entitlements/RESULT.json",
+        ".test/three-platform-release/macos-flutter-supervisor/run-20261008-application/RESULT.json",
         "build/macos-flutter-supervisor/Bettbox.app"
       ]
+    },
+    "test-supervisor-rpc": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "test/clash/supervisor/supervisor_rpc_test.dart",
+        "test/clash/supervisor/supervisor_readiness_test.dart",
+        "test/clash/supervisor/supervisor_application_test.dart",
+        "test/clash/supervisor/supervisor_event_dispatch_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "artifacts": []
     }
   },
   "deployment": {
@@ -1063,12 +1079,12 @@
     "macos/CoreSupervisor/Tests/Relay/FakeRuntime.swift": "507615c09382aaca87db704906e5bb107ce5cad489a628a52f8d919f4bf1d77e",
     "macos/CoreSupervisor/Tests/Relay/CodecMain.swift": "220c7f096b81ce43cd0cf112523ff82ce1268d7101f7f2185f802563c4e3ab63",
     "macos/CoreSupervisor/Tests/Relay/relay_driver.py": "babd2c78a04348fc670cbb09409f875b466ecb5ace59baee2ea92872d375ed69",
-    "lib/clash/supervisor/supervisor_session.dart": "8d2fcf3d67798b1f012bd098959905c7d36aa568e61f5eb01c949b03b4b58fe2",
+    "lib/clash/supervisor/supervisor_session.dart": "e8062e4e3622abf43de207ee22da437aa59f75f7bffff0f4cb98531820e99fc5",
     "lib/clash/supervisor/supervisor_codec.dart": "b86e7ea71c642ddef4a8e2b3b3c83e9ba8b01acb11d19b3660204cc6a399fa2f",
     "lib/clash/supervisor/supervisor_transport.dart": "8b5cb1a194ab2b5be5ffd5654ebee46b8d96306142d2b1dfd8d397641fa1b5a6",
     "lib/clash/supervisor/supervisor_native.dart": "4430e134e3860344f9d302d71711cc2f73a9896c8fb1e029df7065a6f5224ce6",
     "lib/clash/supervisor/supervisor_method_channel.dart": "22b85155c960b9fdafecee35f49009b6acc496c25e70b3aa7314d0de7e60e755",
-    "test/clash/supervisor/supervisor_session_test.dart": "f22edef839d38f73a039e73d47b55269a7072191f55b9e8e76441dd9e4d7e839",
+    "test/clash/supervisor/supervisor_session_test.dart": "4c7ddbdde7fa97600bd3dd22c98cbe8357fe025f52e24340394d0fd459554074",
     "macos/CoreSupervisor/Host/HostSupervisorFlutter.swift": "2cc0cbf41363f6bd830de5302b13d54abc6e034beec0cfe79fdd2e679e67fef3",
     "macos/CoreSupervisor/Host/HostSupervisorAuthority.swift": "e861e20fdcc09fb6a35c4e686f1e67cdc17b1666cf45779a6ae89d631317c149",
     "macos/CoreSupervisor/Host/HostSupervisorProduction.swift": "27e98e7faae103b55be217fe77f638bfeccb60e72959cb602993e2b2116fcfcf",
@@ -1088,9 +1104,21 @@
     "scripts/tests/test_seal_macos_candidate.py": "88ce12c96f7df792a4f166c4111c652e086854d8b2535382497e81f95387488d",
     "scripts/check_macos_flutter_supervisor.py": "2273e582a54a4bab5b4f485628c83f441c05e0590037397debf812de1432bb28",
     "scripts/tests/test_macos_flutter_supervisor.py": "0c716db1caf247daeaff971a4c517ffa87f7026a8e3270a357b10600d1f46062",
-    "integration_test/macos_supervisor_probe.dart": "16b9be905360033f18bf7cf96b21590b5d65d88386fa420146a7d0ff22b8b7fd",
-    "integration_test/probe_contract.dart": "2b224770259d6ea055380d41410e1c2a90d992cff76925ad5c3459f53457bb90",
-    "test/probe_contract_test.dart": "366fef79d952be639192601811e639f5d2ab996fcad2160c26b3b7b32c67805e"
+    "integration_test/macos_supervisor_probe.dart": "9ec1c50053eeb0fe3ffd9d18f59e372e5dd1a43ad575998bf69061f004102457",
+    "integration_test/probe_contract.dart": "2122ec69ac5972e5801872dd0a2577fdb7914fbfa390c80275dbc90a639883f5",
+    "test/probe_contract_test.dart": "6db6f5cd5122bd322f96dc551ab5571aba539aa26492d04efb84f57c3fd0f682",
+    "lib/clash/service.dart": "b53929942e6b43e6c652bee863d940175c6ea154830dd5cb456bcf71c41796f2",
+    "lib/clash/message.dart": "17726e98cfa0335b702668d2efa16ef1b6538ebd3cae36d853572f3baf9ef810",
+    "lib/clash/supervisor/supervisor_rpc.dart": "6e04cf51c67fbedb1f674bfefe5f1a3ecf82b0b60f1214e42585068f109c28ba",
+    "test/clash/supervisor/supervisor_rpc_test.dart": "da109fa9ac44688a912c499f1172d1f9977bfbecf53be80ae86d06078f02e61d",
+    "lib/clash/supervisor/supervisor_readiness.dart": "f31b3031d27939f7a76c6d9d479ab596e60c7b943efac76a4bbf4b5b86599a12",
+    "test/clash/supervisor/supervisor_readiness_test.dart": "dbba1b7fec6a308fbab668ca863d32fef81a1386899556d0fad57c5d4f989285",
+    "lib/clash/supervisor/supervisor_application.dart": "ade6e51735570a514583b6d7326769815013959e9c3da77f619b82c009104e66",
+    "test/clash/supervisor/supervisor_application_test.dart": "d0577ef65d5f2683a75919f4be09817aa3dc52c36d985b62426ef81818eaccb7",
+    "lib/models/core.dart": "68449608162d56e47d3872223ee5106e352d20da8d06ef529ab5e430c67b3291",
+    "lib/manager/clash_manager.dart": "b826849ff3f446c7eb140afdfcb8680cfeec7705a999c25b3dfbe253cb20e534",
+    "test/clash/supervisor/supervisor_event_dispatch_test.dart": "29f2ab362977cbc653b8f530b92541168cdcf88430ae20b5d9efc7e20bbf471a",
+    "lib/clash/supervisor/supervisor_events.dart": "a0b1a4d8dcead830f1120cfbccc4027a01addb3abcde213c0435c41f19dae8c6"
   },
   "platform_extensions": {
     "android": {
@@ -1127,6 +1155,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "c3b3796f4542663dae78a5973ebae6a8c209873ad4ec9bb6b04a52a030600181"
+    "contract_digest": "4e92959514b74729908d28b5b5db089dc30a7a156db5ae8b7baa2e77d80a87a4"
   }
 }

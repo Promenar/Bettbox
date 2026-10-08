@@ -198,6 +198,25 @@ void main() {
       );
     });
 
+    test('停止立即同步通知请求消费者并合并重复stop', () async {
+      var revoked = 0;
+      session = SupervisorSession(
+        native: native,
+        factory: factory,
+        onResult: (_) {},
+        onRevoked: () {
+          revoked++;
+        },
+      );
+      await session.start(1);
+      final first = session.stop();
+      expect(revoked, 1);
+      final second = session.stop();
+      expect(identical(first, second), true);
+      expect(await first, true);
+      expect(revoked, 1);
+    });
+
     test('真实入口握手顺序、正常EOF早于exit0、出生消失确认', () async {
       await session.start(1);
       expect(session.state, SupervisorState.ready);

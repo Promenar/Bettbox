@@ -94,7 +94,7 @@ class _ClashContainerState extends ConsumerState<ClashManager>
   }
 
   @override
-  void onRequest(TrackerInfo trackerInfo) async {
+  void onRequest(TrackerInfo trackerInfo) {
     ref.read(requestsProvider.notifier).addRequest(trackerInfo);
     super.onRequest(trackerInfo);
   }

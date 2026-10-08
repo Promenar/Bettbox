@@ -3,27 +3,40 @@ import 'dart:async';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:flutter/foundation.dart';
+import 'supervisor/supervisor_events.dart';
+import 'supervisor/supervisor_codec.dart';
 
 class ClashMessage {
   final controller = StreamController<Map<String, Object?>>.broadcast();
 
   ClashMessage._() {
     controller.stream.listen((message) {
-      if (message.isEmpty) return;
-      final m = AppMessage.fromJson(message);
-      for (final AppMessageListener listener in _listeners) {
-        switch (m.type) {
-          case AppMessageType.log:
-            listener.onLog(Log.fromJson(m.data));
-          case AppMessageType.delay:
-            listener.onDelay(Delay.fromJson(m.data));
-          case AppMessageType.request:
-            listener.onRequest(TrackerInfo.fromJson(m.data));
-          case AppMessageType.loaded:
-            listener.onLoaded(m.data);
-        }
-      }
+      dispatch(message);
     });
+  }
+
+  // macOS专用通道同步消费事件，避免额外异步队列持有原始载荷。
+  SupervisorEventBatch dispatch(Map<String, Object?> message) {
+    if (message.isEmpty) return SupervisorEventBatch(const []);
+    final m = AppMessage.fromJson(message);
+    final work = <Future<void>>[];
+    for (final listener in _listeners.toList()) {
+      try {
+        final task = switch (m.type) {
+          AppMessageType.log => listener.onLog(Log.fromJson(m.data)),
+          AppMessageType.delay => listener.onDelay(Delay.fromJson(m.data)),
+          AppMessageType.request => listener.onRequest(
+            TrackerInfo.fromJson(m.data),
+          ),
+          AppMessageType.loaded => listener.onLoaded(m.data),
+        };
+        if (task is Future<void>) work.add(task);
+      } catch (_) {
+        work.add(Future<void>.error(const SupervisorFailure('事件监听器拒绝')));
+        break;
+      }
+    }
+    return SupervisorEventBatch(work);
   }
 
   static final ClashMessage instance = ClashMessage._();
@@ -36,6 +49,7 @@ class ClashMessage {
   }
 
   void addListener(AppMessageListener listener) {
+    if (_listeners.length >= 32) throw const SupervisorFailure('事件监听器已满');
     _listeners.add(listener);
   }
 

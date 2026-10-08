@@ -1,5 +1,13 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — macOS应用传输与有界RPC
+
+- macOS ClashService使用生产Application/Session/RPC，移除该平台旧控制socket、直接Core回收与fallback。
+- 请求、重启、结果和异步事件有界；发送与回包双确认，统一deadline及独立cancel；失败通知不能清洗未知消费者。
+- 六项失败复现闭合：RPC/readiness三项、挂起sender两项、真实事件派发中途throw一项；独立回审通过，181项全量测试及静态分析通过。
+- 真实Flutter通过同一Application/RPC两代getIsInit与32个公开child退出；正常main、SC、安全存储与有效业务流量待验收。
+
+
 ## 2026-10-08 — macOS真实Flutter会话验证
 
 - 新增独立Flutter探针，真实生产helper/Go Core连续两代getIsInit与32个公开child退出验收通过；正常App、源码和锁保持一致。

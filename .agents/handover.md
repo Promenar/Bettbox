@@ -1156,3 +1156,34 @@ Android/macOS优先交付，iOS保留开发版及发行研究。真实Flutter独
 
 ### HLG
 以结构化append dry-run/apply追加；目标保持active，待后续主流程与平台交付。
+
+## 2026-10-08T08:51:32+08:00 · macOS应用协调器及有界RPC真实Flutter接线验收
+
+type: maintenance
+scope: ["Bettbox", "macOS", "three-platform-release"]
+status: progress
+tags: ["release", "supervisor", "rpc", "events"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 5791bfda0b6eb6bda2ef5582742ee9acc2a72ff842f548237e2cf2b5b7d34757
+
+### Summary
+Android/macOS优先发行，iOS保留开发版及发行研究。MacService的传输/RPC已接入生产Application/Session，真实Flutter两代验证通过，正常应用与SC业务全路径尚未发行验收。
+
+### Changed
+macOS绕开旧socket、直接Core Process/reaper和legacy fallback；请求/重启准入8，结果16MiB序列化预算，单事件1MiB、异步批次32/16MiB、监听器32。发送与回包双确认、总deadline和独立cancel；事件失败与全部任务settled分开，未知消费者阻止新代。AppMessageListener返回Future可观察，onRequest去除无await async。未改字段或生成代码、账户、系统代理、服务端或.video_agent。
+
+### Validation
+181项当前Flutter全量测试通过，Flutter analyze No issues found。生产Application/RPC真实Flutter两代READY/RESULT/STOP/PASS，32个公开true child exit及双EOF，host exit0与nativeCore出生消失；source/locks/probe-inputs/original-restored均true，检查probe进程0。六个失败红例：旧initial/新tail/迟到sender3项、挂起sender2项、真实多listener派发中途throw1项；实际exit1及源码SHA保留。独立审阅全部已复现P2闭合。公开回执 docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json。PDEC validate0/execution_ready=true。
+
+### Next
+接专用HTTP入口与nativeSC消费授权，验证正常main和Keychain签名冷启动；Android JNI/Service/config owner整包与正式APK及有效订阅流量；iOS开发版和发行研究；服务端支付商商户条件具备后真实业务联调。
+
+### Risks
+真实探针使用同一生产协调器/RPC但不运行正常main的ClashService业务或账户。normalRelease钥匙串权利的ad hocAMFI拒绝边界仍在，无DeveloperID/公证；旧startListener在owned模式被Go拒绝，专用HTTP/SC尚未完成，不能宣称可用代理发行。协调器测试的nativeSession是fake，仅真实探针证明正常退出路径；未知消费者保留，不以Coregone清洗。未操作真实资金，Apple团队、有效订阅及付呗商户/安全注入需外部条件。
+
+### DIA
+已同步架构、平台验收、模块README、CHANGELOG、PDEC说明、registry、实施计划及公开回执。
+
+### HLG
+结构化append dry-run/apply追加，保持goal active；完整发行交付仍待完成。

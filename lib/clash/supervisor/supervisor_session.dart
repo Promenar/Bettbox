@@ -21,6 +21,7 @@ class SupervisorSession {
     required this.native,
     required this.factory,
     required this.onResult,
+    this.onRevoked,
     this.startBudget = const Duration(seconds: 5),
     this.stopBudget = const Duration(seconds: 9),
     this.queueLimit = 8,
@@ -35,6 +36,7 @@ class SupervisorSession {
   final SupervisorNative native;
   final SupervisorTransportFactory factory;
   final FutureOr<void> Function(Object? result) onResult;
+  final void Function()? onRevoked;
   final Duration startBudget;
   final Duration stopBudget;
   final int queueLimit;
@@ -536,6 +538,12 @@ class SupervisorSession {
     }
     ++_epoch; // 先撤销意图，任何SDK/flush迟到都不能重建ready。
     state = SupervisorState.stopping;
+    try {
+      onRevoked?.call();
+    } catch (_) {
+      _sticky = true;
+      error ??= '会话撤销通知失败';
+    }
     _permit = false;
     if (_stage != null && !_stage!.isCompleted) {
       _stage!.completeError(protocolFailure);

@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:bett_box/clash/supervisor/supervisor_method_channel.dart';
+import 'package:bett_box/clash/supervisor/supervisor_application.dart';
 import 'package:bett_box/clash/supervisor/supervisor_session.dart';
 import 'package:bett_box/clash/supervisor/supervisor_transport.dart';
 
@@ -108,23 +109,23 @@ class _ChildObservation {
 
 class _ProbeHost {
   _ProbeHost() {
-    session = SupervisorSession(
-      native: const MethodChannelSupervisorNative(),
-      factory: ProcessSupervisorTransportFactory(),
-      onResult: _result,
+    application = SupervisorApplication(
+      buildSession: (result, revoked) => SupervisorSession(
+        native: const MethodChannelSupervisorNative(),
+        factory: ProcessSupervisorTransportFactory(),
+        onResult: result,
+        onRevoked: revoked,
+      ),
+      onEvent: (_) => throw const _ProbeFailure(),
     );
   }
 
-  late final SupervisorSession session;
+  late final SupervisorApplication application;
   final _cancellation = Completer<void>();
   final _children = <_ChildObservation>[];
   StreamSubscription<List<int>>? _stdin;
-  Completer<void>? _expectedResult;
-  int _generation = 0;
   bool _canceled = false;
   bool _terminal = false;
-  bool _invalidResult = false;
-  bool _resultSeen = false;
   Timer? _retentionTimer;
 
   void watchCancellation() {
@@ -144,7 +145,9 @@ class _ProbeHost {
     _canceled = true;
     _cancellation.complete();
     // 撤销即时执行，只有run负责输出终态；stop自身合并并发调用。
-    unawaited(session.stop().then<void>((_) {}, onError: (Object _) {}));
+    unawaited(
+      application.shutdown().then<void>((_) {}, onError: (Object _) {}),
+    );
   }
 
   Future<T> _observe<T>(Future<T> future, Duration budget) {
@@ -156,23 +159,6 @@ class _ProbeHost {
 
   void _checkActive() {
     if (_canceled) throw const _Canceled();
-    if (_invalidResult) throw const _ProbeFailure();
-  }
-
-  void _result(Object? value) {
-    final expected = _expectedResult;
-    if (_terminal || _canceled) return;
-    if (expected == null ||
-        _resultSeen ||
-        !acceptsProbeResult(value, _generation)) {
-      _invalidResult = true;
-      if (expected != null && !expected.isCompleted) {
-        expected.completeError(const _ProbeFailure());
-      }
-      return;
-    }
-    _resultSeen = true;
-    expected.complete();
   }
 
   void _mark(String marker) => stdout.writeln(marker);
@@ -181,16 +167,9 @@ class _ProbeHost {
     try {
       for (var generation = 1; generation <= 2; generation++) {
         _checkActive();
-        _generation = generation;
-        _resultSeen = false;
-        _expectedResult = Completer<void>();
-        // 在发送前安装错误观察，避免极早回调泄漏原始异常。
-        unawaited(
-          _expectedResult!.future.then<void>((_) {}, onError: (Object _) {}),
-        );
-        await _observe(session.start(generation), const Duration(seconds: 20));
+        await _observe(application.restart(), const Duration(seconds: 30));
         _checkActive();
-        if (session.state != SupervisorState.ready) {
+        if (!application.isReady) {
           throw const _ProbeFailure();
         }
         _mark('BETTBOX_PROBE_READY_$generation');
@@ -201,30 +180,28 @@ class _ProbeHost {
           for (final child in wave)
             child.observe().timeout(const Duration(seconds: 15)),
         ]);
-        final sent = session.sendAction(
-          id: 'probe-$generation',
-          method: 'getIsInit',
-          data: null,
-        );
-        await _observe(
-          Future.wait<void>([sent, _expectedResult!.future, childrenDone]),
+        final response = application.request(method: 'getIsInit');
+        final results = await _observe(
+          Future.wait<Object?>([response, childrenDone]),
           const Duration(seconds: 20),
         );
+        if (!acceptsProbeResult(results[0], generation)) {
+          throw const _ProbeFailure();
+        }
         _checkActive();
-        if (session.state != SupervisorState.ready ||
+        if (!application.isReady ||
             wave.any((child) => child.hasUnknownOwner)) {
           throw const _ProbeFailure();
         }
         _mark('BETTBOX_PROBE_RESULT_$generation');
-        final stopped = await session.stop();
+        final stopped = await application.shutdown();
         _checkActive();
         if (!stopped ||
-            session.hasUnconfirmedOwner ||
-            session.state != SupervisorState.stopped) {
+            application.hasUnconfirmedOwner ||
+            application.isReady) {
           throw const _ProbeFailure();
         }
         _mark('BETTBOX_PROBE_STOP_$generation');
-        _expectedResult = null;
       }
       _checkActive();
       if (_children.any((child) => child.hasUnknownOwner)) {
@@ -240,10 +217,10 @@ class _ProbeHost {
     if (_terminal) return;
     bool stopped = false;
     try {
-      stopped = await session.stop();
+      stopped = await application.shutdown();
     } catch (_) {}
     if (stopped &&
-        !session.hasUnconfirmedOwner &&
+        !application.hasUnconfirmedOwner &&
         !_children.any((child) => child.hasUnknownOwner)) {
       await _complete('BETTBOX_PROBE_FAIL_CLEAN', 70);
       return;

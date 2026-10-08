@@ -1,0 +1,128 @@
+{
+  "execution": {
+    "cancel_sent": false,
+    "classification": "ACCEPTED",
+    "host_exit": 0,
+    "host_locator": 10119,
+    "markers": [
+      "BETTBOX_PROBE_READY_1",
+      "BETTBOX_PROBE_RESULT_1",
+      "BETTBOX_PROBE_STOP_1",
+      "BETTBOX_PROBE_READY_2",
+      "BETTBOX_PROBE_RESULT_2",
+      "BETTBOX_PROBE_STOP_2",
+      "BETTBOX_PROBE_PASS"
+    ],
+    "owner_retained_unknown": false
+  },
+  "independent_review": "全部已复现P2静态闭合；最新生产Session/Application/RPC/Batch由主控实际执行核验",
+  "input_artifacts": {
+    "BettboxCore": {
+      "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+      "identifier": "com.appshub.bettbox.core",
+      "schema": 1,
+      "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+      "signingmode": "adhoc"
+    },
+    "BettboxCoreSupervisor": {
+      "cdhash": "cd4ebafffac90a9f77cf067aff73717f89050fbf",
+      "identifier": "com.appshub.bettbox.core.supervisor",
+      "schema": 1,
+      "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+      "signingmode": "adhoc"
+    }
+  },
+  "limitations": [
+    "未运行正常main的ClashService业务全路径",
+    "SC/专用HTTP授权接线及有效订阅流量待验收",
+    "正常App带Release钥匙串权利，ad hoc严格验签不代表可启动或安全存储成功",
+    "非Developer ID/公证发行；未操作真实资金"
+  ],
+  "locks_unchanged": true,
+  "original_host_sha256": "f1946550ae467f11fe6902e08799aeefab833005f2e9b1e9446870d53ba6fa9f",
+  "original_restored": true,
+  "passed": true,
+  "probe_input_sha256": {
+    "integration_test/macos_supervisor_probe.dart": "9ec1c50053eeb0fe3ffd9d18f59e372e5dd1a43ad575998bf69061f004102457",
+    "integration_test/probe_contract.dart": "2122ec69ac5972e5801872dd0a2577fdb7914fbfa390c80275dbc90a639883f5"
+  },
+  "probe_inputs_unchanged": true,
+  "probe_process_count_at_inspection": 0,
+  "regressions": {
+    "dispatch_mid_throw_red": {
+      "exit": 1,
+      "failures": 1,
+      "source": {
+        "lib/clash/message.dart": "90e8b91167fb14c5b60939881855e89f6c73924abc8c3052c9382b2c99508826",
+        "lib/clash/supervisor/supervisor_rpc.dart": "0f1b88d89813b0da9c149ada490e23cc9f5b36872a76f0ff57188a9108e2f89a",
+        "test/clash/supervisor/supervisor_event_dispatch_test.dart": "29f2ab362977cbc653b8f530b92541168cdcf88430ae20b5d9efc7e20bbf471a"
+      }
+    },
+    "hanging_sender_red": {
+      "exit": 1,
+      "failures": 2,
+      "source": {
+        "lib/clash/supervisor/supervisor_rpc.dart": "339858b39f6e719a06e3f9140426e9d20e82d57a73784979eb43f2e1f6f68bf3",
+        "test/clash/supervisor/supervisor_rpc_test.dart": "effe315042ce8a40310461c7ce5613962fedab41c26040156a9062f9453003b5"
+      }
+    },
+    "rpc_and_readiness_red": {
+      "exit": 1,
+      "failures": 3,
+      "source": {
+        "lib/clash/service.dart": "ecc9c4d7c6c4b9f6ef2ad8fc1f98e7bd4b57f497f170605b89674fed924421b9",
+        "lib/clash/supervisor/supervisor_readiness.dart": "4ccde8aa25c02daf13d74cd3c8357dc0cb5aa52a1011b5d0f84a02b1132c249a",
+        "lib/clash/supervisor/supervisor_rpc.dart": "9bac6b54a5a70c0c67978743dd24ce5ae512e013610af73840d78731ff580b14",
+        "test/clash/supervisor/supervisor_readiness_test.dart": "dbba1b7fec6a308fbab668ca863d32fef81a1386899556d0fad57c5d4f989285",
+        "test/clash/supervisor/supervisor_rpc_test.dart": "3207a278d7656cc855180c6e40e7d045eb00e3e246398bba4aae7cc1698054ed"
+      }
+    }
+  },
+  "schema": 1,
+  "scope": "应用生产协调器/RPC与真实Flutter两代getIsInit、32个公开child；ClashService适配已接线但正常main/SC/账户未运行验收",
+  "seal": {
+    "artifacts": {
+      "BettboxCore": {
+        "cdhash": "eaa9d12a2ca70f2cba42a1d334239987c8cec05c",
+        "identifier": "com.appshub.bettbox.core",
+        "schema": 1,
+        "sha256": "2c5149b58be15cbce608ebce20ba48789000b1e507ef3dbd8033315992fa6a8b",
+        "signingmode": "adhoc"
+      },
+      "BettboxCoreSupervisor": {
+        "cdhash": "cd4ebafffac90a9f77cf067aff73717f89050fbf",
+        "identifier": "com.appshub.bettbox.core.supervisor",
+        "schema": 1,
+        "sha256": "f35798b489fc8c3c0dd5d6f4f3246e6ff0eadd9cbcdf70ff65e12554a8e2d3aa",
+        "signingmode": "adhoc"
+      }
+    },
+    "destination": "build/macos-flutter-supervisor/Bettbox.app",
+    "entitlement_profile": "probe-none",
+    "host_cdhash": "f1b8db6700173d229e59ff2ddc6090df5592344a",
+    "host_sha256": "8d5494594c7f973d2f73ef82d5de67875740219d338b1a091bdd84b37728c169",
+    "nested_frameworks": 10,
+    "notarized": false,
+    "passed": true,
+    "schema": 1,
+    "scope": "完整bundle开发签名；不证明应用会话、系统代理或发行资格",
+    "signingmode": "adhoc",
+    "source": "build/macos/Build/Products/Release/Bettbox.app"
+  },
+  "source_sha256": {
+    "lib/clash/message.dart": "17726e98cfa0335b702668d2efa16ef1b6538ebd3cae36d853572f3baf9ef810",
+    "lib/clash/service.dart": "b53929942e6b43e6c652bee863d940175c6ea154830dd5cb456bcf71c41796f2",
+    "lib/clash/supervisor/supervisor_application.dart": "ade6e51735570a514583b6d7326769815013959e9c3da77f619b82c009104e66",
+    "lib/clash/supervisor/supervisor_events.dart": "a0b1a4d8dcead830f1120cfbccc4027a01addb3abcde213c0435c41f19dae8c6",
+    "lib/clash/supervisor/supervisor_readiness.dart": "f31b3031d27939f7a76c6d9d479ab596e60c7b943efac76a4bbf4b5b86599a12",
+    "lib/clash/supervisor/supervisor_rpc.dart": "6e04cf51c67fbedb1f674bfefe5f1a3ecf82b0b60f1214e42585068f109c28ba",
+    "lib/clash/supervisor/supervisor_session.dart": "e8062e4e3622abf43de207ee22da437aa59f75f7bffff0f4cb98531820e99fc5",
+    "lib/manager/clash_manager.dart": "b826849ff3f446c7eb140afdfcb8680cfeec7705a999c25b3dfbe253cb20e534",
+    "lib/models/core.dart": "68449608162d56e47d3872223ee5106e352d20da8d06ef529ab5e430c67b3291"
+  },
+  "source_unchanged": true,
+  "tests": {
+    "flutter_analyze": "No issues found",
+    "flutter_full": 181
+  }
+}

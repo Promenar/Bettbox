@@ -30,10 +30,20 @@ relay使用nonblocking poll，每次读取只填当前帧所需字节；stdout�
 
 独立审阅发现的commit跨截止、SDK后出生变化与HUP背压缺口已修复，实际输出缓存取消和HUP残留输入红例得到复现。Core未取得出生记录时保持未知；未发行reservation的预检失败只有SDK退出后释放。host主动EOF正常完成仅证明已捕获的本代Core回收，不承诺取消后的未来业务结果；缓存或未读输入丢弃固定失败。
 
-Runner工程已纳入Host/Identity源码及固定通道，真实Go Core与生产helper/native host独立进程链已验证；helper打包与最终宿主开发签名已验收；ClashService路由及SC消费尚未接入。应用验证需在相同冻结版本确认完整签名seal、真实动作/结果、IOSink背压与退出、系统代理事务和账户有效流量。Android继续整包JNI/Service/配置所有者接线与正式APK验收；iOS保留开发版及发行方案研究。
+Runner工程已纳入Host/Identity源码及固定通道，真实Go Core与生产helper/native host独立进程链已验证；helper打包与最终宿主开发签名已验收；ClashService的macOS传输/RPC路由已接入，SC消费尚未接入。应用验证需在相同冻结版本确认完整签名seal、真实动作/结果、IOSink背压与退出、系统代理事务和账户有效流量。Android继续整包JNI/Service/配置所有者接线与正式APK验收；iOS保留开发版及发行方案研究。
 
-封装验收：生产helper快照编译、签后FD核验、Xcode复制和最终bundle源/锁一致通过；Core/helper先签与清单绑定，10个framework及宿主开发seal按内到外完成。成功清单链接写入红例失败后修复为排他no-follow发布并经独立回审。下一关键路径为完整ClashService/SC路由与安全存储签名；不以整包签名代替运行证据。
+封装验收：生产helper快照编译、签后FD核验、Xcode复制和最终bundle源/锁一致通过；Core/helper先签与清单绑定，10个framework及宿主开发seal按内到外完成。成功清单链接写入红例失败后修复为排他no-follow发布并经独立回审。下一关键路径为SC路由与正常应用安全存储签名；不以整包签名代替运行证据。
 
 真实Flutter探针入口为 `integration_test/macos_supervisor_probe.dart`，通过生产MethodChannel、Session、helper与固定真实Go Core连续完成两代getIsInit。每代16个公开true子进程分别确认exit和双管道EOF；Session停止确认helper exit0、控制EOF与native出生消失，最终宿主exit0。未确认所有者保留且禁止新代次。驱动明确冻结两个探针输入摘要，独立签名候选只用于探针，正常App按完整文件摘要恢复。50项macOS工具测试、158项Flutter测试与静态分析通过；回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。
 
 探针ad hoc签名不携带entitlements，不加载账户、配置或系统代理。正常候选保留Release钥匙串权利；实际系统AMFI曾拒绝带受限entitlements的ad hoc探针，即使严格验签通过。ClashService、SC事务、Keychain冷启动及有效订阅流量尚待联合验收；完整可分发应用尚未交付。
+
+## macOS应用请求接线
+
+主控独占 lib/clash/service.dart、message.dart、supervisor_session.dart 与新增 supervisor_rpc.dart。RPC每代最多8个在途请求、已接收待交付结果总预算16MiB；单事件1MiB，直接调用既有监听器；异步批次最多32个/序列化16MiB，监听器注册最多32个；失败通知与全部任务settled独立，未知消费者阻止新代，不加入异步broadcast队列。每个请求固定单调ID、精确方法及五键Go结果匹配，发送失败、超时、畸形/重复/未知回包撤销整代，正常超载只拒绝新增请求。停止立即拒绝请求并取消计时器，unknown owner保留Session，不创建新helper。
+
+ClashService仅macOS走生产Session；其它平台保持既有实现。macOS没有socket、直接Core Process或legacy fallback，preload必须等待已完成握手。正常restart串行停止确认后才创建新代次；shutdown/destroy走同一停止通道。RPC交付前等待发送与回包双确认，统一deadline和独立cancel覆盖挂起sender；结果仅保存在可撤销item中。RPC返回继续使用既有ActionResult/Result类型；不把Dart状态或endpoint作为SC授权。旧startListener在owned模式被Go明确拒绝，原生专用HTTP/SC入口须联合接线后才构成可用代理。
+
+验证：新增真实生产RPC测试覆盖匹配、超载、内存限额、发送失败、超时撤销、事件同步消费、重复回包、撤销后迟到；Session停止通知测试；Flutter全量测试及静态分析。独立审阅后在真实Flutter探针使用RPC两代getIsInit与并发child，明确源码摘要、停止及原App恢复。回滚仅还原本节涉及文件，保留未知Session所有权，不启动旧macOS控制通道。
+
+macOS应用接线：ClashService通过生产Application/Session/RPC管理启动、重启、请求、就绪和停止，不创建旧控制socket、不直接启动/终止Core、不进行legacy fallback。含就绪等待最多8个请求，重启排队最多8个；RPC结果序列化预算16MiB，单事件1MiB，异步事件批次最多32个且序列化预算16MiB。事件监听器的Future返回值可观察，失败与全部结束分别跟踪，未知任务不能被Coregone清洗。回执 `docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json` 确认真实Flutter两代Application/RPC、32个公开child及native停止，181项Flutter测试与静态分析通过；正常main的登录、SC与有效流量另验。

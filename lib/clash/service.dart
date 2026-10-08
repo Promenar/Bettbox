@@ -12,6 +12,12 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/utils/frame_codec.dart';
 import 'package:bett_box/utils/platform_check.dart';
 import 'package:path/path.dart' as p;
+import 'message.dart';
+import 'supervisor/supervisor_codec.dart';
+import 'supervisor/supervisor_method_channel.dart';
+import 'supervisor/supervisor_application.dart';
+import 'supervisor/supervisor_session.dart';
+import 'supervisor/supervisor_transport.dart';
 
 class ClashService extends ClashHandlerInterface {
   static ClashService? _instance;
@@ -30,6 +36,7 @@ class ClashService extends ClashHandlerInterface {
   TransportType _transportType = TransportType.unixSocket;
   String? _socketPath;
   int? _tcpPort;
+  SupervisorApplication? _macApplication;
 
   factory ClashService() {
     _instance ??= ClashService._internal();
@@ -37,7 +44,25 @@ class ClashService extends ClashHandlerInterface {
   }
 
   ClashService._internal() {
-    _initTransport();
+    if (Platform.isMacOS) {
+      _macApplication = SupervisorApplication(
+        buildSession: (result, revoked) => SupervisorSession(
+          native: const MethodChannelSupervisorNative(),
+          factory: ProcessSupervisorTransportFactory(),
+          onResult: result,
+          onRevoked: revoked,
+        ),
+        onEvent: clashMessage.dispatch,
+      );
+      unawaited(
+        _macApplication!.initialize().then<void>(
+          (_) {},
+          onError: (Object _) {},
+        ),
+      );
+    } else {
+      _initTransport();
+    }
   }
 
   Future<void> _initTransport() async {
@@ -110,6 +135,16 @@ class ClashService extends ClashHandlerInterface {
 
   @override
   Future<void> reStart() async {
+    if (Platform.isMacOS) {
+      isStarting = true;
+      _isDestroying = false;
+      try {
+        await _macApplication!.restart();
+      } finally {
+        isStarting = false;
+      }
+      return;
+    }
     final completer = Completer<void>();
     final previous = _restartCompleter;
     _restartCompleter = completer;
@@ -176,7 +211,8 @@ class ClashService extends ClashHandlerInterface {
         if (started) {
           await _waitForCoreReady();
           isStarting = false;
-          if (system.isWindows && globalState.config.appSetting.enableHighPriority) {
+          if (system.isWindows &&
+              globalState.config.appSetting.enableHighPriority) {
             unawaited(
               helperClient
                   .setProcessPriority(
@@ -230,6 +266,7 @@ class ClashService extends ClashHandlerInterface {
   @override
   destroy() async {
     _isDestroying = true;
+    if (Platform.isMacOS) return _macApplication!.shutdown();
     final server = await serverCompleter.future;
     await server.close();
     await _deleteSocketFile();
@@ -238,6 +275,9 @@ class ClashService extends ClashHandlerInterface {
 
   @override
   sendMessage(String message) async {
+    if (Platform.isMacOS) {
+      throw const SupervisorFailure('macOS要求受控请求通道');
+    }
     if (_isDestroying || globalState.isExiting) {
       return;
     }
@@ -284,6 +324,7 @@ class ClashService extends ClashHandlerInterface {
   @override
   shutdown() async {
     _isDestroying = true;
+    if (Platform.isMacOS) return _macApplication!.shutdown();
     if (system.isWindows) {
       await helperClient.stopCore();
     }
@@ -297,7 +338,11 @@ class ClashService extends ClashHandlerInterface {
     Duration timeout = const Duration(seconds: 2),
   }) async {
     if (_isDestroying || globalState.isExiting || isStarting) return false;
-    if (!socketCompleter.isCompleted) return false;
+    if (Platform.isMacOS) {
+      if (_macApplication?.isReady != true) return false;
+    } else if (!socketCompleter.isCompleted) {
+      return false;
+    }
     try {
       final result = await invoke<bool>(
         method: ActionMethod.getIsInit,
@@ -311,8 +356,58 @@ class ClashService extends ClashHandlerInterface {
 
   @override
   Future<bool> preload() async {
+    if (Platform.isMacOS) {
+      return _macApplication!.preload();
+    }
     await serverCompleter.future;
     return true;
+  }
+
+  @override
+  Future<T> invoke<T>({
+    required ActionMethod method,
+    dynamic data,
+    Duration? timeout,
+    FutureOr<T> Function()? onTimeout,
+    T? defaultValue,
+  }) async {
+    if (!Platform.isMacOS) {
+      return super.invoke<T>(
+        method: method,
+        data: data,
+        timeout: timeout,
+        onTimeout: onTimeout,
+        defaultValue: defaultValue,
+      );
+    }
+    try {
+      final raw = await _macApplication!.request(
+        method: method.name,
+        data: data,
+        timeout: timeout ?? const Duration(seconds: 30),
+      );
+      final result = ActionResult.fromJson(raw);
+      final Object? value =
+          method == ActionMethod.getConfig ||
+              method == ActionMethod.convertAgeSecretKeyToPublicKey
+          ? result.toResult
+          : result.data;
+      if (value is! T) throw const SupervisorFailure('内核结果类型拒绝');
+      return value;
+    } on TimeoutException {
+      if (onTimeout != null) return onTimeout();
+      final Object? value =
+          defaultValue ??
+          (T == String
+              ? ''
+              : T == bool
+              ? false
+              : T == Map
+              ? <dynamic, dynamic>{}
+              : null);
+      if (value is T) return value;
+      rethrow;
+    }
   }
 }
 

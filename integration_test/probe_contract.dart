@@ -4,7 +4,7 @@ bool acceptsProbeResult(Object? value, int generation) {
   return value is Map &&
       value.length == keys.length &&
       value.keys.every(keys.contains) &&
-      value['id'] == 'probe-$generation' &&
+      value['id'] == 'g$generation-r1' &&
       value['method'] == 'getIsInit' &&
       value['data'] == false &&
       value['code'] is int &&

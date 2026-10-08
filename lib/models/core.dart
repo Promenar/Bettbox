@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_annotation_target
 
+import 'dart:async';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -8,13 +9,13 @@ part 'generated/core.freezed.dart';
 part 'generated/core.g.dart';
 
 abstract mixin class AppMessageListener {
-  void onLog(Log log) {}
+  FutureOr<void> onLog(Log log) {}
 
-  void onDelay(Delay delay) {}
+  FutureOr<void> onDelay(Delay delay) {}
 
-  void onRequest(TrackerInfo connection) {}
+  FutureOr<void> onRequest(TrackerInfo connection) {}
 
-  void onLoaded(String providerName) {}
+  FutureOr<void> onLoaded(String providerName) {}
 }
 
 // abstract mixin class ServiceMessageListener {

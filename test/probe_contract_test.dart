@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../integration_test/probe_contract.dart';
 
 Map<String, Object> valid(int generation) => {
-  'id': 'probe-$generation',
+  'id': 'g$generation-r1',
   'method': 'getIsInit',
   'data': false,
   'code': 0,

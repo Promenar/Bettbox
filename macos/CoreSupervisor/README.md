@@ -12,7 +12,7 @@
 
 `Host` 通过六个固定ABI发行不透明handle，SDK在单worker中运行，内核提交核对后再次检查原期限。撤销保留停止出生记录；缺Core记录时不得用helper消失推断Core完成。未发行启动路径的预检失败只在SDK实际返回后释放槽。Flutter薄桥由Runner窗口持有，Identity与Host六份Swift源进入Runner Sources；Debug身份不同于生产身份链，不用于生产链验收。
 
-`lib/clash/supervisor` 的Session持有唯一helper Process与退出Future，先撤销再关闭stdin，确认EOF、exit0与native出生消失后才清除owner。最多8项待发送动作，异步结果消费者的资源限额由应用接线负责；该Session尚未替换ClashService现行启动路径。
+`lib/clash/supervisor` 的Session持有唯一helper Process与退出Future，先撤销再关闭stdin，确认EOF、exit0与native出生消失后才清除owner。最多8项待发送动作；ClashService的macOS分支通过Application/RPC使用该Session，异步消费者有独立限额，未知任务阻止新代。
 
 ## 验证
 
@@ -38,3 +38,5 @@ python3 -m unittest discover -s scripts/tests -p test_check_macos_supervisor.py 
 真实Flutter探针入口为 `integration_test/macos_supervisor_probe.dart`，通过生产MethodChannel、Session、helper与固定真实Go Core连续完成两代getIsInit。每代16个公开true子进程分别确认exit和双管道EOF；Session停止确认helper exit0、控制EOF与native出生消失，最终宿主exit0。未确认所有者保留且禁止新代次。驱动明确冻结两个探针输入摘要，独立签名候选只用于探针，正常App按完整文件摘要恢复。50项macOS工具测试、158项Flutter测试与静态分析通过；回执为 `docs/validation/2026-10-07-three-platform/macos-flutter-supervisor-validation.json`。
 
 探针ad hoc签名不携带entitlements，不加载账户、配置或系统代理。正常候选保留Release钥匙串权利；实际系统AMFI曾拒绝带受限entitlements的ad hoc探针，即使严格验签通过。ClashService、SC事务、Keychain冷启动及有效订阅流量尚待联合验收；完整可分发应用尚未交付。
+
+macOS应用接线：ClashService通过生产Application/Session/RPC管理启动、重启、请求、就绪和停止，不创建旧控制socket、不直接启动/终止Core、不进行legacy fallback。含就绪等待最多8个请求，重启排队最多8个；RPC结果序列化预算16MiB，单事件1MiB，异步事件批次最多32个且序列化预算16MiB。事件监听器的Future返回值可观察，失败与全部结束分别跟踪，未知任务不能被Coregone清洗。回执 `docs/validation/2026-10-07-three-platform/macos-application-supervisor-validation.json` 确认真实Flutter两代Application/RPC、32个公开child及native停止，181项Flutter测试与静态分析通过；正常main的登录、SC与有效流量另验。
