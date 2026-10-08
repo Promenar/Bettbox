@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "scope": "macos-session-system-proxy-recovery-gate",
+  "source_base_commit": "6cabea49d09b16ea635df7c78f02647bd20c3422",
+  "source_sha256": {
+    "lib/clash/supervisor/supervisor_session.dart": "ae6ebfa957ffa22e7a79ad9d55fcf008f8f12260e045d962ebda8d802d7dc939",
+    "lib/clash/supervisor/supervisor_system_proxy.dart": "8aedd52ea57a9e1cc70d8e4229c6a90313b91722be7c2081b621038ca6a46bda",
+    "test/clash/supervisor/supervisor_session_test.dart": "2bfaf1a785321978316deda96dfaba223b1820a73e7e598bfb89b69830ad3eef",
+    "test/clash/supervisor/supervisor_system_proxy_test.dart": "6c061285d4592a6c00b8f3f9465134ade2f96cf64e8477beb2d6616359ed0328"
+  },
+  "tests": {
+    "session": 24,
+    "strict_reply": 5
+  },
+  "red_regressions": [
+    {
+      "case": "恢复conflict保留Core/stdin",
+      "expected_stop": false,
+      "actual_before_fix": true,
+      "exit_code": 1
+    },
+    {
+      "case": "恢复超时保留底层单次操作",
+      "expected_native_calls": 1,
+      "actual_before_fix": 2,
+      "exit_code": 1
+    }
+  ],
+  "green_contract_digest": "49e7ba25ea9e2e323a84db6533405e3dce39b6e922c123541b53f2a57f87e168",
+  "independent_review": "未参与施工的Agent复核single-flight P2闭合；未重跑",
+  "client_integrated": false,
+  "boundary": "生产Session与严格解析使用fake native/transport；Host使旧activate失效、Application正常收尾、配置门禁、退出失败以及真实SC权限/流量未验收。",
+  "full_flutter_tests": 200,
+  "flutter_analyze": "passed"
+}

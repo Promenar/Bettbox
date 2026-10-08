@@ -11,6 +11,14 @@ SPEC.loader.exec_module(MODULE)
 
 
 class SupervisorCheckTests(unittest.TestCase):
+    def test_host_compiles_shared_sc_core_and_coordinator(self):
+        steps = dict(MODULE.commands(Path('/source'), Path('/work'), '/sdk'))
+        for step in ('host-production-typecheck', 'host-fake-compile'):
+            self.assertIn('/source/plugins/proxy/macos/Classes/Core/Transaction.swift', steps[step])
+            self.assertIn('/source/macos/CoreSupervisor/Host/HostSystemProxyCoordinator.swift', steps[step])
+        self.assertNotIn('/source/plugins/proxy/macos/Classes/Core/Transaction.swift',
+                         steps['production-helper-compile'])
+
     def test_production_c_syntax_does_not_enable_public_fixture(self):
         steps = MODULE.commands(Path('/source'), Path('/work'), '/sdk')
         self.assertNotIn('-DOWNED_PUBLIC_FIXTURE', steps[0][1])
@@ -50,9 +58,17 @@ class SupervisorCheckTests(unittest.TestCase):
                 file = root / 'macos/CoreSupervisor' / name
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_bytes(b'public fixture')
+            for name in MODULE.CORE_SOURCE_NAMES:
+                file = root / 'plugins/proxy/macos/Classes/Core' / name
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_bytes(b'public core fixture')
             before = MODULE.hashes(root)
             file = root / 'macos/CoreSupervisor' / MODULE.SOURCE_NAMES[0]
             file.write_bytes(b'changed fixture')
+            self.assertNotEqual(before, MODULE.hashes(root))
+            core = root / 'plugins/proxy/macos/Classes/Core/Transaction.swift'
+            before = MODULE.hashes(root)
+            core.write_bytes(b'changed core fixture')
             self.assertNotEqual(before, MODULE.hashes(root))
             file.unlink()
             file.symlink_to(root / 'macos/CoreSupervisor' / MODULE.SOURCE_NAMES[1])

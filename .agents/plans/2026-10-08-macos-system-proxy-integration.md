@@ -43,3 +43,15 @@ schema3 使用独立历史类型及严格 canonical 解码，不默认补入新�
 schema4 非 verified journal 只允许所有 owned 组持久和运行均等于 before、服务稳定且启用、双摘要等于基线时零配置写入清理；written、混合、外部改变、缺失或 present 均返回 recoveryRequired 并保留 journal。verified 恢复仅对仍等于 written 且守卫未变的 owned 组执行 CAS，最后双读 before 和摘要通过才清除 journal。恢复不要求活着的启动能力。
 
 测试至少覆盖 SOCKS/认证/未知字段改动摘要、持久与运行基线独立、unknown 专用能力及 present 拒绝、能力失效和提交撤销、v3 canonical 兼容、v4 零写清理与保守拒绝、恢复 CAS 冲突和 clear 失败。实际权限、宿主授权路径、端到端流量和发布签名独立验收，不以核心夹具替代。
+
+## 宿主与正常应用实施合同
+
+HostSystemProxyCoordinator唯一持有ProxyLifecycle；生产工厂只组装，不在主线程做SC或journal IO。同份Core直接编入Runner/Host测试模块，不复制或扩大public。Host state只异步投递SDK/SC工作，能力current仅读NSLock lease；SC worker不sync回state。冷recover仅idle/restored且零unresolved允许reserve，最多挂起首个请求；其他请求固定拒绝。恢复参数不依赖活proof，不接受路径或任意配置。
+
+固定方法为activateOwnedSystemProxy（精确handle、generation、listenerEpoch、host、port、state、bypass）、restoreSystemProxy（generation、listenerEpoch）、recoverSystemProxy（空map）。SC结果精确status、transactionGeneration、changedGroups、unresolvedGroups，固定枚举及有界整数；Core代次与事务代次独立。原生在同一Ticket/私有coreHandle/proof/内核链两次核对之间执行SDK recheck后才mint能力。recover必须失效等待SDK的旧activate；迟到结果不能重新mint或发布active。同epoch只允许相同已活动endpoint幂等，更大epoch必须先恢复。未知/pending保留责任并阻断confirmStopped、新reserve和退出。
+
+SupervisorApplication统一串行运行、代理偏好、配置、restart/shutdown；业务准入有界。正常收尾先原生restore，再通过未关闭的私有RPC发ownedHttpStop并核对同代/同epoch/stopped，然后RPC close、Session revoke、stdin close与既有EOF/出生消失确认。内部RPC不走自身preload/生命周期队列，避免自锁。Session全部故障、启动失败、迟到spawn也必须独立经过无proof恢复门禁；非idle/restored保留Core/stdin。
+
+Go专用owner会在initClash/setupConfig/updateConfig/shutdown前关闭endpoint，故这四类RPC都必须先恢复SC和关闭入口，配置成功再按最新运行/代理偏好重建入口；旧startListener/stopListener明确被拒绝，Mac Service必须覆盖。state仅实际成功后提交运行时间与prefs，ProxyManager转交偏好且不调用networksetup。macOS退出失败保留窗口/tray、恢复责任并允许重试，不能finally无条件exit或先清停止标记。
+
+冷空journal当前仍先configuration.lock；permissionDenied/busy可能阻断未接管的应用，这是源码确定的顺序及未验证运行风险。判空免SC锁如需采用须独立Core失败回归和审阅，Host包不能隐式改语义。SC写入权限、Authorization Services与真实生效独立验证，不采用root/setuid回退。

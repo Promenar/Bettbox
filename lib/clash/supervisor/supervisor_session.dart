@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'supervisor_codec.dart';
 import 'supervisor_native.dart';
 import 'supervisor_transport.dart';
+import 'supervisor_system_proxy.dart';
 
 enum SupervisorState { idle, starting, ready, stopping, stopped, failed }
 
@@ -69,6 +70,64 @@ class SupervisorSession {
   int _sequence = 0;
   int? _awaitingCredit;
   bool _creditReceived = false;
+  bool _systemProxySafe = false;
+  Future<bool>? _systemProxyRecovery;
+
+  // 恢复不依赖Core存活；失败或超时保留资源，迟到原生工作仍计入worker。
+  Future<bool> recoverSystemProxy() {
+    if (_systemProxySafe) return Future.value(true);
+    final pending = _systemProxyRecovery;
+    if (pending != null) {
+      return pending.timeout(stopBudget, onTimeout: () => false);
+    }
+    final recovery = () async {
+      try {
+        final reply = await _worker(
+          native.call('recoverSystemProxy', const {}),
+        );
+        final result = SystemProxyResult.fromReply(reply);
+        _systemProxySafe = result.permitsEndpointRelease;
+        return _systemProxySafe;
+      } catch (_) {
+        return false;
+      }
+    }();
+    _systemProxyRecovery = recovery;
+    unawaited(
+      recovery.then<void>((_) {
+        if (identical(_systemProxyRecovery, recovery)) {
+          _systemProxyRecovery = null;
+        }
+      }),
+    );
+    return recovery.timeout(stopBudget, onTimeout: () => false);
+  }
+
+  Future<SystemProxyResult> activateSystemProxy(
+    OwnedHttpEndpoint endpoint,
+    List<String> bypass,
+  ) async {
+    if (state != SupervisorState.ready ||
+        _handle == null ||
+        endpoint.generation != _generation ||
+        _systemProxyRecovery != null) {
+      throw const SupervisorFailure('系统代理会话未就绪');
+    }
+    final epoch = _epoch;
+    _systemProxySafe = false;
+    final reply = await _worker(
+      native.call('activateOwnedSystemProxy', {
+        ...endpoint.toNativeArguments(),
+        'handle': _handle!,
+        'bypass': List<String>.of(bypass),
+      }),
+    ).timeout(startBudget);
+    final result = SystemProxyResult.fromReply(reply);
+    if (epoch != _epoch || state != SupervisorState.ready) {
+      throw protocolFailure;
+    }
+    return result;
+  }
 
   // 未确认退出时保留定位信息和Process，调用者不能用状态字符串授权SC。
   bool get hasUnconfirmedOwner =>
@@ -186,14 +245,8 @@ class SupervisorSession {
       ) {
         _attach(transport);
         if (!_current(epoch)) {
-          unawaited(
-            _revoke().catchError((Object _) {
-              _sticky = true;
-              error ??= '会话撤销失败';
-            }),
-          );
-          _recordCanceledHelper();
-          _closeInput();
+          // 迟到spawn同样进入恢复门禁，不能直接关闭控制管道。
+          unawaited(stop());
         }
         return transport;
       });
@@ -499,6 +552,9 @@ class SupervisorSession {
 
   Future<void> _revoke() async {
     if (_launch == null || _revoked) return;
+    if (!_systemProxySafe && !await recoverSystemProxy()) {
+      throw const SupervisorFailure('系统代理恢复尚未确认');
+    }
     await _worker(
       native.call('revokeLaunch', {
         'launch': _launch!,
@@ -524,6 +580,7 @@ class SupervisorSession {
 
   void _closeInput() {
     if (_transport == null || _inputClosed) return;
+    if (!_systemProxySafe) throw const SupervisorFailure('系统代理恢复尚未确认');
     _inputClosed = true;
     _inputClose = _transport!.closeInput().catchError((Object _) {
       _sticky = true;
@@ -567,6 +624,9 @@ class SupervisorSession {
   Future<bool> _stop() async {
     final watch = Stopwatch()..start();
     try {
+      if (!await recoverSystemProxy().timeout(_remaining(watch, stopBudget))) {
+        throw const SupervisorFailure('系统代理恢复尚未确认');
+      }
       // host worker可能不返回；发起revoke后即关闭stdin，不等待SDK恢复。
       final revoke = _revoke();
       unawaited(

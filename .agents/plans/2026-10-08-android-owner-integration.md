@@ -29,3 +29,11 @@ service/vpn 两通道共用 typed dispatcher。前台 state/controller/manager �
 红回归直接使用生产 owner/backend/ledger：旧配置提交被 STOP 替代、取消后真实 Applied 保留、A options不能配B快照、排队版本推进的同意图重准备、无 Activity/权限拒绝/旧结果、旧回执晚投递、重复 stop、未知停止不清状态、不销毁 engine、listener close未知及直接旁路拒绝。Dart测试必须覆盖真实 state/manager/main入口，不能用镜像控制器替代。
 
 主控更新 PDEC 输入摘要并确认 execution_ready 后执行登记的 JVM/Go/Flutter检查、正式 Android 编译、独立串行审阅与模拟器验收。设备同时核对请求、权威状态、真实TUN、listener、通知和界面；有效上游节点协议流量另验。出现未知 owner/journal 时保留恢复责任，不通过卸载、清数据或旧旁路清洗。回滚仅撤除未采用代码；已采用资源按确认收尾合同恢复。
+
+## Go/JNI与平台adapter定稿要求
+
+配置准备对象只带baseRevision和载荷，不由调用方指定实际revision。Go同步提交在同一配置锁校验expectedConfigRevision、登记ENTERED、分配revision、完成提交并复制同次Android options；返回Applied(configRevision, options)，不能事后getOptions拼接。TUN启动增加expectedConfigRevision，在同一锁核对相应快照并采纳输入。suspend、TUN stop、listener stop和shutdown需要真实checked结果；void不得制造完成证据。具体同步入口及callback载体由主控结合现有Go/JNI定稿。
+
+owner执行锁内分类和捕获immutable NativeCompletion(generation, operation, outcome, snapshot)，之后完成Deferred。候选borrowedFd模型不采用：adapter在入Core前取消时关闭自身正数输入；入Core前标已交接，现有TunFDLease peek/claim/finally及Go采纳合同负责关闭一次。关闭失败永久blocked不得由后续true清洗。VpnLifecycle不发行第二套权威generation，WorkGate仅作为唯一owner下的adapter单元，protect和断连带本lease身份。
+
+权限等待区分Granted/Denied/NoActivity/Cancelled/LaunchFailed，旧结果不能复用为新请求；配置detach保留等待、永久detach完成并清引用。receipt ledger仅关联owner handle并主线程once投递，不能分配generation/revision。engine ack须requestId、revision、engine身份都匹配，owner仍同一stopped状态且无lease/新工作/unknown才可锁内摘取并主线程锁外destroy；缺ack保留engine。

@@ -12,7 +12,7 @@ final class HostSupervisorFlutterBridge {
             self.authority.call(call.method, arguments: call.arguments) { response in
                 switch response {
                 case .success(let value): result(value)
-                case .failure(let error): result(FlutterError(code: error.code, message: "身份链请求未完成", details: nil))
+                case .failure(let error): result(FlutterError(code: error.code, message: "原生宿主请求未完成", details: nil))
                 }
             }
         }

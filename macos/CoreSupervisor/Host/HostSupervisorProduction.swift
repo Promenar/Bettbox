@@ -21,5 +21,9 @@ private final class SSIProductionHostFacts: SSIHostFacts {
     }
 }
 func makeHostSupervisorAuthority() -> HostSupervisorAuthority {
-    HostSupervisorAuthority(facts: SSIProductionHostFacts(), authority: makeSSIHostAuthority())
+    let transaction = ProxyTransaction(configuration: SystemConfigurationBackend(),
+                                       journal: ProtectedJournalBackend())
+    let coordinator = HostSystemProxyCoordinator(lifecycle: ProxyLifecycle(transaction: transaction))
+    return HostSupervisorAuthority(facts: SSIProductionHostFacts(), authority: makeSSIHostAuthority(),
+                                   proxy: coordinator)
 }

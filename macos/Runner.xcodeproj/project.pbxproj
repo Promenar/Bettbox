@@ -42,6 +42,14 @@
 		F50091052CF74B7700D43AEA /* BettboxCore in CopyFiles */ = {isa = PBXBuildFile; fileRef = F50091042CF74B7700D43AEA /* BettboxCore */; };
 		F5AA39AF2DA1D9FB00F5C816 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = F5AA39AE2DA1D9FB00F5C816 /* LaunchAtLogin */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		B8C010080000000000000107 /* HostSystemProxyCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000007 /* HostSystemProxyCoordinator.swift */; };
+		B8C010080000000000000108 /* Contract.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000008 /* Contract.swift */; };
+		B8C010080000000000000109 /* JournalCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C010080000000000000009 /* JournalCoding.swift */; };
+		B8C01008000000000000010A /* Lifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C01008000000000000000A /* Lifecycle.swift */; };
+		B8C01008000000000000010B /* ProtectedJournalBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C01008000000000000000B /* ProtectedJournalBackend.swift */; };
+		B8C01008000000000000010C /* SCProxyDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C01008000000000000000C /* SCProxyDictionary.swift */; };
+		B8C01008000000000000010D /* SystemConfigurationBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C01008000000000000000D /* SystemConfigurationBackend.swift */; };
+		B8C01008000000000000010E /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C01008000000000000000E /* Transaction.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,6 +151,14 @@
 		CA9CA9C2D0B5E93A91F45924 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		F50091042CF74B7700D43AEA /* BettboxCore */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "$(BETTBOX_CORE_EXECUTABLE)"; path = "../libclash/macos/$(BETTBOX_CORE_EXECUTABLE)"; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
+		B8C010080000000000000007 /* HostSystemProxyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Host/HostSystemProxyCoordinator.swift; sourceTree = "<group>"; };
+		B8C010080000000000000008 /* Contract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/Contract.swift; sourceTree = SOURCE_ROOT; };
+		B8C010080000000000000009 /* JournalCoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/JournalCoding.swift; sourceTree = SOURCE_ROOT; };
+		B8C01008000000000000000A /* Lifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/Lifecycle.swift; sourceTree = SOURCE_ROOT; };
+		B8C01008000000000000000B /* ProtectedJournalBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/ProtectedJournalBackend.swift; sourceTree = SOURCE_ROOT; };
+		B8C01008000000000000000C /* SCProxyDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/SCProxyDictionary.swift; sourceTree = SOURCE_ROOT; };
+		B8C01008000000000000000D /* SystemConfigurationBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/SystemConfigurationBackend.swift; sourceTree = SOURCE_ROOT; };
+		B8C01008000000000000000E /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../plugins/proxy/macos/Classes/Core/Transaction.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +192,14 @@
 				B8C010080000000000000004 /* SSIAuthority.swift */,
 				B8C010080000000000000005 /* SSIFile.swift */,
 				B8C010080000000000000006 /* SSIAppleBackend.swift */,
+				B8C010080000000000000007 /* HostSystemProxyCoordinator.swift */,
+				B8C010080000000000000008 /* Contract.swift */,
+				B8C010080000000000000009 /* JournalCoding.swift */,
+				B8C01008000000000000000A /* Lifecycle.swift */,
+				B8C01008000000000000000B /* ProtectedJournalBackend.swift */,
+				B8C01008000000000000000C /* SCProxyDictionary.swift */,
+				B8C01008000000000000000D /* SystemConfigurationBackend.swift */,
+				B8C01008000000000000000E /* Transaction.swift */,
 			);
 			path = CoreSupervisor;
 			sourceTree = "<group>";
@@ -530,6 +554,14 @@
 				B8C010080000000000000104 /* SSIAuthority.swift in Sources */,
 				B8C010080000000000000105 /* SSIFile.swift in Sources */,
 				B8C010080000000000000106 /* SSIAppleBackend.swift in Sources */,
+				B8C010080000000000000107 /* HostSystemProxyCoordinator.swift in Sources */,
+				B8C010080000000000000108 /* Contract.swift in Sources */,
+				B8C010080000000000000109 /* JournalCoding.swift in Sources */,
+				B8C01008000000000000010A /* Lifecycle.swift in Sources */,
+				B8C01008000000000000010B /* ProtectedJournalBackend.swift in Sources */,
+				B8C01008000000000000010C /* SCProxyDictionary.swift in Sources */,
+				B8C01008000000000000010D /* SystemConfigurationBackend.swift in Sources */,
+				B8C01008000000000000010E /* Transaction.swift in Sources */,
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,

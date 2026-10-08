@@ -68,3 +68,5 @@
 - .agents/plans/2026-10-08-android-owner-integration.md — Android配置owner、typed完成回执、跨engine与资源收尾联合计划
 - docs/validation/2026-10-07-three-platform/android-f881880-build-validation.json — f881880正式编译/验签/安装来源、冷启动、直连通路及上游未验收边界
 - docs/validation/2026-10-07-three-platform/macos-sc-schema4-validation.json — schema4来源摘要、61项回归、独立回审与真实系统接线边界
+- docs/validation/2026-10-07-three-platform/macos-session-recovery-gate-validation.json — Session恢复冲突/底层单次操作红绿、24+5项验证及正常应用接线边界
+- docs/validation/2026-10-07-three-platform/macos-host-system-proxy-validation.json — Host恢复/启动授权接线、SDK编译及隔离夹具证据

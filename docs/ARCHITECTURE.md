@@ -177,3 +177,5 @@ Android Service 启停由生产 VpnWorkGate 串行覆盖 establish、重试、JN
 JNI 初始化逐项检查class/globalref/method与pending exception；加载失败统一回收String globalref并清除方法IDs。字符串构造成功后才进入Java callback，失败返回固定结果，不描述原始异常。生产helper与真实JNI_OnLoad的9项公开函数表故障夹具通过，实际ARM64链接通过；不等同于实际JVM、CheckJNI或线程attach验收。
 
 macOS系统代理事务核心使用schema4：启动依赖不可反序列化的credential-blind能力，保留unknown认证事实并拒绝已识别present；服务级持久与运行未拥有字段摘要分别守卫SOCKS、认证、PAC URL及未知配置。verified恢复在stage后、commit前再次检查运行侧，外部变化时保留原journal且不提交；部分组冲突不阻断其他组的受限恢复。旧schema3严格canonical读取，不能自动升级为新能力。61项实际Swift测试和独立复审通过，回执为 `validation/2026-10-07-three-platform/macos-sc-schema4-validation.json`；正常宿主/Dart接线及真实写入、恢复、流量尚未验收。
+
+macOS Session在revoke与stdin关闭前要求原生recoverSystemProxy返回idle/restored且零未解决组；恢复失败保留资源。底层恢复Future保留直到真实结束，每个调用者独立有界等待，pending时拒绝activate。专用入口回包与原生SC结果精确解析，不能把端点参数当Ticket/proof授权。24项Session和5项解析通过，回执 `validation/2026-10-07-three-platform/macos-session-recovery-gate-validation.json`；正常Application配置/收尾顺序与Host迟到activate撤销尚待联合验收。

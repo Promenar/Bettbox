@@ -20,8 +20,15 @@ SOURCE_NAMES = (
     'Relay/SDKMailbox.swift', 'Relay/RelayMain.swift', 'Relay/main.swift',
     'Tests/Relay/Bridge.h', 'Tests/Relay/CodecMain.swift', 'Tests/Relay/FakeRuntime.swift',
     'Tests/Relay/relay_driver.py', 'Host/HostSupervisorAuthority.swift',
+    'Host/HostSystemProxyCoordinator.swift',
     'Host/HostSupervisorProduction.swift', 'Host/HostSupervisorFlutter.swift',
     'Tests/HostSupervisorAuthorityTests.swift',
+)
+
+CORE_SOURCE_NAMES = (
+    'Contract.swift', 'JournalCoding.swift', 'Lifecycle.swift',
+    'ProtectedJournalBackend.swift', 'SCProxyDictionary.swift',
+    'SystemConfigurationBackend.swift', 'Transaction.swift',
 )
 
 
@@ -31,6 +38,11 @@ def hashes(root):
         path = root / 'macos/CoreSupervisor' / name
         if not path.is_file() or path.is_symlink():
             raise ValueError('原生固定源码缺失或为符号链接')
+        result[str(path.relative_to(root))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    for name in CORE_SOURCE_NAMES:
+        path = root / 'plugins/proxy/macos/Classes/Core' / name
+        if not path.is_file() or path.is_symlink():
+            raise ValueError('共享代理事务源码缺失或为符号链接')
         result[str(path.relative_to(root))] = hashlib.sha256(path.read_bytes()).hexdigest()
     return result
 
@@ -92,12 +104,14 @@ def commands(root, work, sdk):
         result.append(('relay-' + fault, ['python3', str(tests / 'Relay/relay_driver.py'), '--helper', str(work / 'relay-fake'), '--case', 'fault', '--fake-fault', fault]))
     for case, fault in [('paused-hup', 'hup-while-paused'), ('pending-host-eof', 'fullpipe-result')]:
         result.append(('relay-' + case, ['python3', str(tests / 'Relay/relay_driver.py'), '--helper', str(work / 'relay-fake'), '--case', case, '--fake-fault', fault]))
-    host_sources = [str(source / 'Host' / name) for name in ('HostSupervisorAuthority.swift', 'HostSupervisorProduction.swift')]
+    core_sources = [str(root / 'plugins/proxy/macos/Classes/Core' / name) for name in CORE_SOURCE_NAMES]
+    host_sources = [str(source / 'Host' / name) for name in ('HostSupervisorAuthority.swift', 'HostSystemProxyCoordinator.swift', 'HostSupervisorProduction.swift')]
     result.extend([
         ('host-production-typecheck', swift + ['-typecheck', '-import-objc-header', str(source / 'Bridge.h')]
-         + [str(identity / name) for name in ('SSIAuthority.swift', 'SSIAppleBackend.swift', 'SSIFile.swift')] + host_sources),
+         + [str(identity / name) for name in ('SSIAuthority.swift', 'SSIAppleBackend.swift', 'SSIFile.swift')] + core_sources + host_sources),
         ('host-fake-compile', swift + ['-parse-as-library', str(identity / 'SSIAuthority.swift'),
-         str(source / 'Host/HostSupervisorAuthority.swift'), str(tests / 'HostSupervisorAuthorityTests.swift'), '-o', str(work / 'host-fake')]),
+         str(source / 'Host/HostSupervisorAuthority.swift'), str(source / 'Host/HostSystemProxyCoordinator.swift')]
+         + core_sources + [str(tests / 'HostSupervisorAuthorityTests.swift'), '-o', str(work / 'host-fake')]),
         ('host-fake-run', [str(work / 'host-fake')]),
     ])
     return result

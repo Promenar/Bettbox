@@ -1714,3 +1714,34 @@ SOCKS摘要缺陷47项中1项失败；恢复stage后外部active改变在61项�
 
 ### HLG
 通过标准append dry-run及apply追加事实；索引由脚本重建。
+
+## 2026-10-08T14:23:10+08:00 · macOS Host系统代理授权与Session恢复门禁验证
+
+type: development
+scope: ["Bettbox", "macOS"]
+status: done
+tags: ["release", "system-proxy", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 543925d9f81f80818e41ccf74173c8e3f58ab0805ef8586bd7a3cc71d1590b9d
+
+### Summary
+Host复用同份schema4核心，Session全部收尾经过恢复门禁；本阶段隔离验证完成，正常应用与发行验收尚未完成。总体Goal保持active。
+
+### Changed
+新增HostSystemProxyCoordinator及严格原生方法，Runner编入共享Core；Session恢复single-flight与严格回执解析；同步PDEC、实施计划与公开回执。
+
+### Validation
+真实check_macos_supervisor全步骤通过，receipt supervisor-check-tfa6j845；显式recover期间reserve悬置及unsafe revoke成功问题经真实失败修复，独立只读复核确认P2关闭。Flutter全量200项通过，analyze无问题，工具7项与PBX lint通过。PDEC digest 49e7ba25ea9e2e323a84db6533405e3dce39b6e922c123541b53f2a57f87e168 ready。
+
+### Next
+接入SupervisorApplication串行运行/代理偏好/配置与正常停止，再更新Service、ProxyManager、state及退出流程；Android配置owner联合接线继续。
+
+### Risks
+未写真实系统代理、未重建完整Runner、迟到SC completion专门夹具未覆盖；未知恢复仍保留endpoint/Core，真实权限与流量另验。Flutter并行执行曾触发生成目录删除错误，串行重跑正常，不认定权限问题或修改权限。iOS按用户裁定保留开发版及发行研究，上游节点和支付商条件仍待处理。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、registry、两份公开回执及计划。
+
+### HLG
+使用标准append dry-run/apply，索引由工具重建。

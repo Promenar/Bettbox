@@ -56,6 +56,48 @@ private final class AfterRecheckAuthority: SSIHostProofAuthority {
     func recheck(_ proof: SSICoreProof) throws { try actual.recheck(proof); after() }
     func revoke(launch: UUID, generation: UInt64) { actual.revoke(launch: launch, generation: generation) }
 }
+private final class ProxyCoordinator: HostSystemProxyCoordinating {
+    private let lock = NSLock()
+    var prepareResult = SafeResult(status: .idle, generation: 0)
+    var recoverResult = SafeResult(status: .idle, generation: 0)
+    var startResult = SafeResult(status: .applied, generation: 1, changedGroups: 3)
+    var restoreResult = SafeResult(status: .restored, generation: 2, changedGroups: 3)
+    var holdPreparation = false
+    var holdRecovery = false
+    private var preparation: ((SafeResult) -> Void)?
+    private var recovery: ((SafeResult) -> Void)?
+    let recoveryEntered = DispatchSemaphore(value: 0)
+    private(set) var starts: [EndpointEvidence] = []
+    private(set) var restores = 0
+    private(set) var recoveries = 0
+
+    func prepare(completion: @escaping (SafeResult) -> Void) {
+        lock.lock()
+        if holdPreparation { preparation = completion; lock.unlock(); return }
+        let result = prepareResult; lock.unlock(); completion(result)
+    }
+    func completePreparation() {
+        lock.lock(); let completion = preparation; preparation = nil; let result = prepareResult; lock.unlock()
+        completion?(result)
+    }
+    func recover(completion: @escaping (SafeResult) -> Void) {
+        lock.lock(); recoveries += 1
+        if holdRecovery { recovery = completion; lock.unlock(); recoveryEntered.signal(); return }
+        let result = recoverResult; lock.unlock(); recoveryEntered.signal(); completion(result)
+    }
+    func completeRecovery() {
+        lock.lock(); let completion = recovery; recovery = nil; let result = recoverResult; lock.unlock()
+        completion?(result)
+    }
+    func start(_ capability: CredentialBlindEndpointCapability, completion: @escaping (SafeResult) -> Void) {
+        lock.lock(); starts.append(capability.endpoint); let result = startResult; lock.unlock(); completion(result)
+    }
+    func restore(completion: @escaping (SafeResult) -> Void) {
+        lock.lock(); restores += 1; let result = restoreResult; lock.unlock(); completion(result)
+    }
+    var startCount: Int { lock.lock(); defer { lock.unlock() }; return starts.count }
+    var restoreCount: Int { lock.lock(); defer { lock.unlock() }; return restores }
+}
 private func invoke(_ bridge: HostSupervisorAuthority, _ method: String, _ fields: [String: Any]) -> Result<Any?, HostSupervisorFailure> {
     let done = DispatchSemaphore(value: 0)
     var value: Result<Any?, HostSupervisorFailure>?
@@ -72,13 +114,23 @@ private func fields(_ result: Result<Any?, HostSupervisorFailure>) -> [String: A
 private func truth(_ result: Result<Any?, HostSupervisorFailure>) -> Bool {
     guard case .success(let value) = result, let bool = value as? Bool else { fatalError("应返回布尔") }; return bool
 }
-private func fixture(deadline: TimeInterval = 5) -> (Facts, HostSupervisorAuthority) {
+private func fixture(deadline: TimeInterval = 5, proxy: ProxyCoordinator = ProxyCoordinator()) -> (Facts, HostSupervisorAuthority) {
     let facts = Facts()
-    return (facts, HostSupervisorAuthority(facts: facts, authority: SSIAuthority(backend: facts), replyQueue: DispatchQueue(label: "test.reply"), deadline: deadline))
+    return (facts, HostSupervisorAuthority(facts: facts, authority: SSIAuthority(backend: facts), proxy: proxy,
+                                           replyQueue: DispatchQueue(label: "test.reply"), deadline: deadline))
 }
 @main enum HostSupervisorAuthorityTests {
     static func main() {
         let (facts, bridge) = fixture()
+        let coldRecovery = fields(invoke(bridge, "recoverSystemProxy", [:]))
+        require(Set(coldRecovery.keys) == ["status", "transactionGeneration", "changedGroups", "unresolvedGroups"],
+                "冷恢复只能返回固定安全字段")
+        require(coldRecovery["status"] as? String == "idle", "空journal冷恢复必须明确返回idle")
+        require((coldRecovery["transactionGeneration"] as? NSNumber)?.uint64Value == 0,
+                "冷恢复事务代次必须来自原生生命周期")
+        require((coldRecovery["changedGroups"] as? NSNumber)?.intValue == 0 &&
+                (coldRecovery["unresolvedGroups"] as? NSNumber)?.intValue == 0,
+                "空journal冷恢复不得报告系统代理变更")
         for invalid in [true, NSNumber(value: 1.0), 0, -1, "1"] as [Any] {
             require(code(invoke(bridge, "reserveSupervisorLaunch", ["generation": invalid])) == "invalid_arguments", "代次必须为严格整数")
         }
@@ -107,7 +159,11 @@ private func fixture(deadline: TimeInterval = 5) -> (Facts, HostSupervisorAuthor
         // guestUnique 将多次进入；为已在执行的 job 提供足够许可，绝不创建新 job。
         for _ in 0..<16 { gate.signal() }
         slow.set(12, .absent)
-        require(truth(invoke(slowBridge, "confirmStopped", slowStop)), "超时保留helper出生记录")
+        var slowStopped = false
+        for _ in 0..<100 {
+            if truth(invoke(slowBridge, "confirmStopped", slowStop)) { slowStopped = true; break }
+        }
+        require(slowStopped, "SDK worker退出后才可用保留的helper出生记录确认停止")
         require(code(invoke(slowBridge, "bindSupervisor", slowStop.merging(["pid": 12]) { _, new in new })) != nil, "迟到不能恢复权限")
 
         let (cancel, cancelBridge) = fixture()
@@ -154,8 +210,13 @@ private func fixture(deadline: TimeInterval = 5) -> (Facts, HostSupervisorAuthor
         coreDelay.set(12, .absent); coreDelay.set(13, .unknown)
         require(!truth(invoke(coreDelayBridge, "confirmStopped", coreStop)), "Core SDK开始前的出生记录不能丢失")
         coreDelay.set(13, .absent)
-        require(truth(invoke(coreDelayBridge, "confirmStopped", coreStop)), "两出生明确消失才能停止")
+        require(!truth(invoke(coreDelayBridge, "confirmStopped", coreStop)), "SDK worker仍占槽时不能提前确认停止")
         for _ in 0..<16 { coreGate.signal() }
+        var coreStopped = false
+        for _ in 0..<100 {
+            if truth(invoke(coreDelayBridge, "confirmStopped", coreStop)) { coreStopped = true; break }
+        }
+        require(coreStopped, "SDK worker退出且两出生明确消失才能停止")
         if !CommandLine.arguments.contains("--recheck-only") {
         let (cross, crossBridge) = fixture(deadline: 0.03)
         let crossLaunch = fields(invoke(crossBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String
@@ -171,13 +232,143 @@ private func fixture(deadline: TimeInterval = 5) -> (Facts, HostSupervisorAuthor
             changed.set(13, .present(SSIStamp(pid: 13, parent: 12, effectiveUID: 501, realUID: 501, birthSeconds: 31, birthMicros: 1)))
             FileHandle.standardOutput.write(Data("SDK_AFTER_RECHECK_MUTATED\n".utf8))
         }
-        let changedBridge = HostSupervisorAuthority(facts: changed, authority: changedAuthority, replyQueue: DispatchQueue(label: "test.changed.reply"))
+        let changedBridge = HostSupervisorAuthority(facts: changed, authority: changedAuthority,
+            proxy: ProxyCoordinator(), replyQueue: DispatchQueue(label: "test.changed.reply"))
         let changedLaunch = fields(invoke(changedBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String
         let changedHelper = fields(invoke(changedBridge, "bindSupervisor", ["launch": changedLaunch, "generation": 1, "pid": 12]))["handle"] as! String
         let changedCore = fields(invoke(changedBridge, "bindCoreChain", ["handle": changedHelper, "pid": 13]))["handle"] as! String
         require(code(invoke(changedBridge, "recheckCoreChain", ["handle": changedCore])) == "identity_failed", "SDK后提交点出生变化不能发行valid")
         guard case .present(let mutated) = changed.kernelRead(13) else { fatalError("出生变化必须实际发生") }
         require(mutated.birthSeconds == 31, "SDK之后出生变化必须发生，不能仅靠断言预期")
+
+        let coldProxy = ProxyCoordinator(); coldProxy.holdPreparation = true
+        let (_, coldBridge) = fixture(proxy: coldProxy)
+        let coldDone = DispatchSemaphore(value: 0)
+        var coldReservation: Result<Any?, HostSupervisorFailure>?
+        coldBridge.call("reserveSupervisorLaunch", arguments: ["generation": 1]) {
+            coldReservation = $0; coldDone.signal()
+        }
+        require(coldDone.wait(timeout: .now() + 0.03) == .timedOut, "cold recover完成前不得调用reserve")
+        require(code(invoke(coldBridge, "reserveSupervisorLaunch", ["generation": 2])) == "system_proxy_recovering",
+                "cold recover期间只允许挂起一个reserve")
+        coldProxy.completePreparation()
+        require(coldDone.wait(timeout: .now() + 1) == .success &&
+                fields(coldReservation!)["generation"] as? UInt64 == 1, "cold recover安全后才发行reservation")
+
+        let blockedProxy = ProxyCoordinator()
+        blockedProxy.prepareResult = SafeResult(status: .permissionDenied, generation: 0)
+        let (_, blockedBridge) = fixture(proxy: blockedProxy)
+        require(code(invoke(blockedBridge, "reserveSupervisorLaunch", ["generation": 1])) ==
+                "system_proxy_recovery_required", "cold recover非安全状态必须阻断reserve")
+        require(fields(invoke(blockedBridge, "recoverSystemProxy", [:]))["status"] as? String == "idle",
+                "显式无proof恢复可以解除cold阻断")
+
+        let heldRecoveryProxy = ProxyCoordinator(); heldRecoveryProxy.holdRecovery = true
+        let (_, heldRecoveryBridge) = fixture(proxy: heldRecoveryProxy)
+        let heldRecoveryDone = DispatchSemaphore(value: 0)
+        var heldRecoveryResult: Result<Any?, HostSupervisorFailure>?
+        heldRecoveryBridge.call("recoverSystemProxy", arguments: [:]) {
+            heldRecoveryResult = $0; heldRecoveryDone.signal()
+        }
+        require(heldRecoveryProxy.recoveryEntered.wait(timeout: .now() + 1) == .success,
+                "显式recover必须先进入native coordinator")
+        let rejectedReserveDone = DispatchSemaphore(value: 0)
+        var rejectedReserve: Result<Any?, HostSupervisorFailure>?
+        heldRecoveryBridge.call("reserveSupervisorLaunch", arguments: ["generation": 1]) {
+            rejectedReserve = $0; rejectedReserveDone.signal()
+        }
+        require(rejectedReserveDone.wait(timeout: .now() + 0.1) == .success &&
+                code(rejectedReserve!) == "system_proxy_recovering",
+                "显式recover期间reserve必须立即拒绝，不能挂入cold pending槽")
+        heldRecoveryProxy.completeRecovery()
+        require(heldRecoveryDone.wait(timeout: .now() + 1) == .success &&
+                fields(heldRecoveryResult!)["status"] as? String == "idle", "显式recover完成必须回安全wire")
+        require(fields(invoke(heldRecoveryBridge, "reserveSupervisorLaunch", ["generation": 1]))["generation"] as? UInt64 == 1,
+                "显式recover安全完成后才可发行新reservation")
+
+        let heldFailureProxy = ProxyCoordinator(); heldFailureProxy.holdRecovery = true
+        heldFailureProxy.recoverResult = SafeResult(status: .conflict, generation: 1, unresolvedGroups: 1)
+        let (_, heldFailureBridge) = fixture(proxy: heldFailureProxy)
+        let heldFailureDone = DispatchSemaphore(value: 0)
+        heldFailureBridge.call("recoverSystemProxy", arguments: [:]) { _ in heldFailureDone.signal() }
+        require(heldFailureProxy.recoveryEntered.wait(timeout: .now() + 1) == .success,
+                "失败恢复必须先进入native coordinator")
+        heldFailureProxy.completeRecovery()
+        require(heldFailureDone.wait(timeout: .now() + 1) == .success, "显式recover失败也必须完成原请求")
+        require(code(invoke(heldFailureBridge, "reserveSupervisorLaunch", ["generation": 1])) ==
+                "system_proxy_recovery_required", "显式recover失败后必须保持reserve阻断")
+
+        let proxy = ProxyCoordinator()
+        let (proxyFacts, proxyBridge) = fixture(proxy: proxy)
+        let proxyLaunch = fields(invoke(proxyBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String
+        let proxyStop: [String: Any] = ["launch": proxyLaunch, "generation": 1]
+        let proxyHelper = fields(invoke(proxyBridge, "bindSupervisor", proxyStop.merging(["pid": 12]) { _, new in new }))["handle"] as! String
+        let proxyCore = fields(invoke(proxyBridge, "bindCoreChain", ["handle": proxyHelper, "pid": 13]))["handle"] as! String
+        let activation: [String: Any] = ["handle": proxyCore, "generation": 1, "listenerEpoch": 1,
+            "host": "127.0.0.1", "port": 7890, "state": "active", "bypass": ["localhost"]]
+        require(code(invoke(proxyBridge, "activateOwnedSystemProxy", activation.merging(["extra": true]) { _, new in new })) ==
+                "invalid_arguments", "代理激活拒绝额外字段")
+        for invalid in [true, NSNumber(value: 1.0), 0, -1] as [Any] {
+            require(code(invoke(proxyBridge, "activateOwnedSystemProxy",
+                                activation.merging(["listenerEpoch": invalid]) { _, new in new })) == "invalid_arguments",
+                    "listenerEpoch必须为严格正整数")
+        }
+        let applied = fields(invoke(proxyBridge, "activateOwnedSystemProxy", activation))
+        require(Set(applied.keys) == ["status", "transactionGeneration", "changedGroups", "unresolvedGroups"] &&
+                applied["status"] as? String == "applied", "激活只返回固定安全wire")
+        require(proxy.startCount == 1 && proxy.starts.first?.host == "127.0.0.1", "原生proof后二次核验才提交SC start")
+        require(fields(invoke(proxyBridge, "activateOwnedSystemProxy", activation))["status"] as? String == "applied" &&
+                proxy.startCount == 1, "相同epoch与端点只能幂等返回")
+        require(code(invoke(proxyBridge, "activateOwnedSystemProxy",
+                            activation.merging(["port": 7891]) { _, new in new })) == "stale",
+                "相同epoch不得更换端点")
+        require(code(invoke(proxyBridge, "activateOwnedSystemProxy",
+                            activation.merging(["listenerEpoch": 2]) { _, new in new })) == "stop_unconfirmed",
+                "更高epoch必须等待旧SC责任恢复")
+        require(code(invoke(proxyBridge, "restoreSystemProxy", ["generation": 1, "listenerEpoch": 2])) == "stale",
+                "restore必须匹配原生保存的epoch")
+        let restored = fields(invoke(proxyBridge, "restoreSystemProxy", ["generation": 1, "listenerEpoch": 1]))
+        require(restored["status"] as? String == "restored" && proxy.restoreCount == 1,
+                "restore不依赖活proof并清理原生责任")
+
+        let failedProxy = ProxyCoordinator()
+        failedProxy.startResult = SafeResult(status: .recoveryRequired, generation: 1)
+        failedProxy.restoreResult = SafeResult(status: .restored, generation: 2, unresolvedGroups: 1)
+        let (failedFacts, failedBridge) = fixture(proxy: failedProxy)
+        let failedLaunch = fields(invoke(failedBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String
+        let failedStop: [String: Any] = ["launch": failedLaunch, "generation": 1]
+        let failedHelper = fields(invoke(failedBridge, "bindSupervisor", failedStop.merging(["pid": 12]) { _, new in new }))["handle"] as! String
+        let failedCore = fields(invoke(failedBridge, "bindCoreChain", ["handle": failedHelper, "pid": 13]))["handle"] as! String
+        let failedActivation = activation.merging(["handle": failedCore]) { _, new in new }
+        require(fields(invoke(failedBridge, "activateOwnedSystemProxy", failedActivation))["status"] as? String ==
+                "recoveryRequired", "SC失败必须作为安全状态返回")
+        require(code(invoke(failedBridge, "revokeLaunch", failedStop)) == "system_proxy_recovery_required",
+                "存在未解决组时revoke不得清除SC责任")
+        failedFacts.set(12, .absent); failedFacts.set(13, .absent)
+        require(!truth(invoke(failedBridge, "confirmStopped", failedStop)), "SC责任未清时不能确认停止")
+        require(code(invoke(failedBridge, "reserveSupervisorLaunch", ["generation": 2])) ==
+                "system_proxy_recovery_required", "SC责任未清时不能发行新代次")
+
+        let raceProxy = ProxyCoordinator()
+        let (raceFacts, raceBridge) = fixture(proxy: raceProxy)
+        let raceLaunch = fields(invoke(raceBridge, "reserveSupervisorLaunch", ["generation": 1]))["launch"] as! String
+        let raceStop: [String: Any] = ["launch": raceLaunch, "generation": 1]
+        let raceHelper = fields(invoke(raceBridge, "bindSupervisor", raceStop.merging(["pid": 12]) { _, new in new }))["handle"] as! String
+        let raceCore = fields(invoke(raceBridge, "bindCoreChain", ["handle": raceHelper, "pid": 13]))["handle"] as! String
+        let raceGate = DispatchSemaphore(value: 0); raceFacts.sdkGate = raceGate
+        let raceDone = DispatchSemaphore(value: 0)
+        var raceActivation: Result<Any?, HostSupervisorFailure>?
+        raceBridge.call("activateOwnedSystemProxy", arguments: activation.merging(["handle": raceCore]) { _, new in new }) {
+            raceActivation = $0; raceDone.signal()
+        }
+        require(raceFacts.entered.wait(timeout: .now() + 1) == .success, "激活必须进入真实proof recheck")
+        require(fields(invoke(raceBridge, "recoverSystemProxy", [:]))["status"] as? String == "idle",
+                "无proof恢复必须能同步废止pending激活")
+        for _ in 0..<16 { raceGate.signal() }
+        require(raceDone.wait(timeout: .now() + 1) == .success && code(raceActivation!) != nil,
+                "恢复后的迟到SDK不能重新发布激活")
+        require(raceProxy.startCount == 0, "恢复后迟到SDK不得调用SC start")
+        _ = proxyFacts
         print("HostSupervisorAuthority 测试完成")
     }
 }

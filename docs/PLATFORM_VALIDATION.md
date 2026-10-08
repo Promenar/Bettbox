@@ -1,5 +1,7 @@
 # 共享客户端与平台验收
 
+2026-10-08 当前Android正式候选为f881880，同源构建/正式验签/安装回读通过；DIRECT模式本机HTTP代理200与Chrome HTTPS通过，两轮停止均确认tun0和7890消失，设置已恢复规则模式。上游节点协议代理、邀请网页注册归属和真实付款未验收。macOS schema4核心61项、Session恢复门禁24项与严格回执5项通过并完成独立复审；宿主同份核心SDK编译与夹具检查通过，Flutter全量200项通过；正常Application接线正在实施，尚无可分发完整应用。iOS按用户裁定保留开发版与发行方案研究，当前交付优先Android/macOS。详见各独立公开回执。
+
 2026-10-08 Android VPN 路径实测：23 个订阅节点加载，首页显示自动及8个地域；系统授权后建立 `tun0`。直连模式核心代理 HTTPS 200、浏览器显示 trace；默认代理及香港全局路径失败，停止后同URL恢复，`tun0`撤销、应用回到就绪，任务ADB转发已移除。23个TCP端点可连接、12个AnyTLS TLS证书验证通过，但这些不证明协议认证或节点转发。订阅密码均不等于开发用户UUID；辅助Mihomo仅VMess，不作为相同协议对照。代理节点流量仍未通过，见 `validation/2026-10-07-three-platform/android-vpn-path-validation.json`。
 
 2026-10-08 正式 Android 候选 `e7b5a87` 已构建、验签并覆盖安装，回读 APK SHA256 一致；账户字段原生输入类型 `0x800b1` 已关闭纠错和建议。模拟器中文输入法改写 ADB 按键，切换已有 Alphabet 后公开 ASCII 与真实邮箱完整匹配；真实登录、账号身份、邀请入口及冷启动恢复通过，首页显示 64 MB 配额，输入法设置已恢复。8 项通道回归和完整 Flutter 192 项通过。VPN 真实流量、节点实际呈现、邀请注册闭环和支付尚未验收，未公开发布。见 `validation/2026-10-07-three-platform/android-e7b5a87-apk-validation.json`。

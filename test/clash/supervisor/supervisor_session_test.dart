@@ -8,6 +8,7 @@ import 'package:bett_box/clash/supervisor/supervisor_events.dart';
 import 'package:bett_box/clash/supervisor/supervisor_native.dart';
 import 'package:bett_box/clash/supervisor/supervisor_session.dart';
 import 'package:bett_box/clash/supervisor/supervisor_transport.dart';
+import 'package:bett_box/clash/supervisor/supervisor_system_proxy.dart';
 
 const launch = '12345678-1234-1234-1234-123456789abc';
 Future<void> tick() => Future<void>.delayed(Duration.zero);
@@ -31,12 +32,22 @@ class FakeNative implements SupervisorNative {
   int issuedHelperProofs = 0;
   int generation = 1;
   final delays = <String, Duration>{};
+  String proxyRecoveryStatus = 'idle';
+  Completer<Object?>? proxyRecovery;
   @override
   Future<Object?> call(String method, Map<String, Object> args) async {
     calls.add(method);
     final delay = delays[method];
     if (delay != null) await Future<void>.delayed(delay);
     switch (method) {
+      case 'recoverSystemProxy':
+        if (proxyRecovery != null) return proxyRecovery!.future;
+        return {
+          'status': proxyRecoveryStatus,
+          'transactionGeneration': 0,
+          'changedGroups': 0,
+          'unresolvedGroups': proxyRecoveryStatus == 'conflict' ? 1 : 0,
+        };
       case 'reserveSupervisorLaunch':
         if (preflightRejected) throw const SupervisorFailure('公开预检拒绝');
         generation = args['generation'] as int;
@@ -211,6 +222,74 @@ void main() {
         factory: factory,
         onResult: (_) {},
       );
+    });
+
+    test('恢复冲突保留Core和stdin且允许恢复后重试停止', () async {
+      await session.start(1);
+      native.proxyRecoveryStatus = 'conflict';
+      expect(await session.stop(), false);
+      expect(native.calls, contains('recoverSystemProxy'));
+      expect(native.calls, isNot(contains('revokeLaunch')));
+      expect(transport.closeObserved, false);
+      expect(session.hasUnconfirmedOwner, true);
+      native.proxyRecoveryStatus = 'restored';
+      expect(await session.stop(), true);
+      expect(transport.closeObserved, true);
+    });
+
+    test('等待恢复时不能提前撤权或关闭stdin', () async {
+      await session.start(1);
+      native.proxyRecovery = Completer<Object?>();
+      final stopping = session.stop();
+      await until(() => native.calls.contains('recoverSystemProxy'));
+      expect(native.calls, isNot(contains('revokeLaunch')));
+      expect(transport.closeObserved, false);
+      native.proxyRecovery!.complete({
+        'status': 'restored',
+        'transactionGeneration': 1,
+        'changedGroups': 2,
+        'unresolvedGroups': 0,
+      });
+      expect(await stopping, true);
+    });
+
+    test('恢复超时保留底层single-flight并阻止并发activate', () async {
+      session = SupervisorSession(
+        native: native,
+        factory: factory,
+        onResult: (_) {},
+        stopBudget: const Duration(milliseconds: 10),
+      );
+      await session.start(1);
+      native.proxyRecovery = Completer<Object?>();
+      expect(await session.recoverSystemProxy(), false);
+      expect(await session.recoverSystemProxy(), false);
+      expect(
+        native.calls.where((value) => value == 'recoverSystemProxy').length,
+        1,
+      );
+      await expectLater(
+        session.activateSystemProxy(
+          OwnedHttpEndpoint.fromReply({
+            'generation': 1,
+            'listenerEpoch': 1,
+            'host': '127.0.0.1',
+            'port': 7890,
+            'state': 'active',
+          }, generation: 1),
+          const [],
+        ),
+        throwsA(isA<SupervisorFailure>()),
+      );
+      expect(native.calls, isNot(contains('activateOwnedSystemProxy')));
+      native.proxyRecovery!.complete({
+        'status': 'idle',
+        'transactionGeneration': 0,
+        'changedGroups': 0,
+        'unresolvedGroups': 0,
+      });
+      await tick();
+      expect(await session.stop(), true);
     });
 
     test('未发行预检失败仅在原生确认后允许实际Session停止及重试', () async {
@@ -437,6 +516,7 @@ void main() {
       bytes.setRange(4, bytes.length, body);
       transport.stdout.add(bytes);
       await observed;
+      await until(() => native.calls.contains('bindSupervisor'));
       // 撤销后的bind仅供停止出生ledger，不能获得helper/Core授权。
       expect(native.issuedHelperProofs, 0);
       expect(

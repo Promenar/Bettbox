@@ -2,6 +2,9 @@
 
 ## 2026-10-08 — Android、macOS 交付验证
 
+- macOS Host使用同份SC事务核心；显式恢复期间新启动立即拒绝，恢复未知不清洗旧owner。实际SDK编译、原生夹具和7项工具测试通过，完整Runner及真实系统代理另验。
+- macOS Session全部收尾经过无proof恢复门禁，恢复冲突保留Core/stdin；底层恢复单次操作保持到真实完成，不由调用者超时清洗。24项Session、5项严格解析与独立回审通过，Flutter全量200项通过；正常Application接线与真实系统配置另验。
+
 - f881880 Android ARM64正式候选构建、签名、16KiB产物检查及模拟器安装回读通过；冷启动、开发账户恢复及直连模式本机HTTP代理/浏览器HTTPS通路通过，两轮停止均确认TUN与监听释放；上游协议流量另验。独立回执为 `validation/2026-10-07-three-platform/android-f881880-build-validation.json`。
 - Android真实完成回执与跨engine配置owner联合接线计划已形成；现有布尔受理返回不能作为启动/停止完成依据。
 - macOS schema4核心加入专用入口能力、独立持久/运行未拥有字段摘要及严格旧journal兼容；SOCKS摘要与恢复提交前外部修改缺陷经失败回归修复，61项Swift测试及独立回审通过。正常应用接线与真实系统代理另验。
