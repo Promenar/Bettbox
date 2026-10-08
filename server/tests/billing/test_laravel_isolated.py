@@ -18,9 +18,27 @@ TASK = '1' * 32
 CHECKS = ['negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
           'repeat_commission_once', 'cancel_refund_once', 'outbox_at_least_once_consumer_idempotent',
           'historical_negative_processing_no_open', 'fubei_open_and_event_once', 'fixture_work_removed']
+CHECKS += ['migration_actual_class', 'migration_history_preserved', 'migration_empty_down_preserves_history',
+           'migration_up_after_empty_down', 'migration_foreign_keys_valid', 'migration_same_isolated_connection',
+           'migration_evidence_attempt_retained', 'migration_evidence_review_retained',
+           'migration_evidence_outbox_retained', 'migration_evidence_commission_retained',
+           'migration_collision_order_id', 'migration_collision_level']
+CHECKS += ['migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox']]
+CHECKS += ['migration_unexpected_RuntimeException_propagated', 'migration_unexpected_UnexpectedValueException_propagated',
+           'migration_migrator_exact_path', 'migration_migrator_batch_recorded',
+           'migration_migrator_repeat_noop', 'migration_migrator_rollback_history_preserved',
+           'migration_migrator_failure_atomic', 'migration_migrator_down_failure_atomic']
 
 
 class LaravelIsolatedTest(unittest.TestCase):
+    def test_real_migration_input_and_completion_are_required(self):
+        self.assertIn('server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php', runner.CANDIDATE_INPUTS)
+        hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
+        payload = {'ok': True, 'checks': [x for x in CHECKS if not x.startswith('migration_')], 'source_hashes': {},
+                   'environment_loaded': False, 'production_database_loaded': False}
+        with self.assertRaises(runner.RunnerFailure):
+            runner.result_summary(json.dumps(payload).encode(), hashes)
+
     def exercise(self, failure=None):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary).resolve()
@@ -105,7 +123,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 51)
+        self.assertEqual(len(receipt['source_hashes']), 53)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)

@@ -170,3 +170,5 @@
 - docs/validation/2026-10-07-three-platform/listener-factory-preflight-validation.json — 真实工厂配置失败、端口释放与 TLS 握手回归及未覆盖资源边界
 
 - docs/validation/2026-10-07-three-platform/payment-readiness-validation.json — 当前候选纯契约、SQLite 并发与真实 Laravel 隔离来源核验及生产开放门禁
+
+- docs/validation/2026-10-07-three-platform/laravel-migration-validation.json — 真实 Laravel Migrator 生命周期、迁移上下行故障原子性与生产恢复边界

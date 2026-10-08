@@ -298,3 +298,7 @@ Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2
 ### 协议工厂配置失败边界
 
 HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避免配置失败返回空资源时遗失端口。有效文件证书 loader 可能建立 watcher，需显式生命周期治理；配置预检不是全资源纯操作。传统 Close 仅返回监听关闭结果，完整服务 owner 必须另外登记并收尾握手、accepted 连接、协议 service、异步 UDP 和任务，不以端口释放推断 drain。
+
+### 账务 SQLite 迁移
+
+账务迁移通过固定连接的显式事务协调政策检查和所有 DDL，失败撤销部分创建或删除；Schema builder 与业务查询沿用该连接。已有支付尝试、人工核对、outbox 或新佣金日志时拒绝 down。Migrator 成功记录提交独立于迁移内部事务，部署恢复需先核对 schema 与迁移仓库，不将重跑视为自动恢复。

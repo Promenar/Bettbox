@@ -173,3 +173,5 @@ Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule �
 首次初始化配置 kind5 的本机验证使用既有离线 Go/NDK 工具链；真实核心主包、监听登记与关闭 race、生产 Kotlin 协议夹具及 Release Kotlin 编译分别验收。实际 ARM64 输出在 `.test/android-initial-core/`，不覆盖已安装候选，也不安装、启动或发行。
 
 `test-listener-factory-preflight` 使用真实 HTTP/SOCKS/Mixed 工厂和 loopback 端口进行 race 回归；合成 TLS 身份仅在进程内消费，客户端启用证书校验，不调用公网、真实节点或用户凭据。`compile-android-factory-core` 输出独立 ARM64 核心目录，不覆盖已安装候选。
+
+`test-laravel-isolated` 冻结 53 个公开输入，在禁网只读临时容器内执行固定单文件 Migrator 生命周期及 up/down 故障原子性；生产库、配置与凭据不挂载。检查迁移内部事务，不代表 Artisan 部署、迁移仓库后续提交或强杀恢复已验收。

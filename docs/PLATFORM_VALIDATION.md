@@ -402,3 +402,9 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 ## 服务端支付候选当前来源核验
 
 2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 18 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
+
+## SQLite 账务真实迁移与故障原子性
+
+2026-10-09 在 NoSLA 禁网只读 128 MiB 临时容器中，真实 Laravel Migrator 精确单候选文件、专用空 SQLite 和公开历史行完成 135 项检查；53 个冻结输入无漂移，容器与目录清理确认。迁移 up 后段 SQL 故障与 down 后段删除故障实际先失败；显式同连接事务修复后部分 DDL 撤销。历史佣金保留、成功批次、重复无副作用、空证据回滚和四类账务证据拒绝 down 均通过。仅准确原生 RuntimeException 与固定政策消息视为政策拒绝，两类无关异常原样传播。
+
+公开证据见 `validation/2026-10-07-three-platform/laravel-migration-validation.json`。Migrator 后续成功记录写入/删除与迁移内部 DDL 不在同一事务；这两个窗口、外层嵌套事务、强杀/掉电、Artisan 命令及生产迁移/备份仍未验收，不能将隔离通过等同生产上线。

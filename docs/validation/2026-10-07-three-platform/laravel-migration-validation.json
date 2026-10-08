@@ -1,0 +1,132 @@
+{
+  "recorded_at": "2026-10-08T21:27:30.246339+00:00",
+  "base_commit": "00d9733e1a8bbf94ce6f130d3aa8514610ad8cff",
+  "candidate_sources_sha256": {
+    "server/patches/billing/overlay/app/Services/Billing/Atomic.php": "7edc446afa66271f69fd4070c3282c9e9cef3d74f6931a5492ab4b551b12b036",
+    "server/patches/billing/overlay/app/Services/Billing/Outbox.php": "fef564372ff642f85a4ec391010fb050021032970518129f3aebca023f20fa25",
+    "server/patches/billing/overlay/app/Services/OrderService.php": "1f72fe5f3aec8f443a09fb796779928418ff9007841131867e7fc849b949f4e3",
+    "server/patches/billing/overlay/app/Jobs/OrderHandleJob.php": "0c9a05f549aa9b19b318f060a27507bbeb331dadd5b75ed4d2270a035adbe071",
+    "server/patches/billing/overlay/app/Console/Commands/CheckCommission.php": "e654b9e3199b8186dd0a7fd220292f5a4a6b2dc9463c90a4f8eadfa6733de6e1",
+    "server/patches/billing/overlay/app/Console/Commands/CheckOrder.php": "4cd5f8a0d1891e99d4e15411a1e4781cb727160f02f32bfd126eb95b6d1c32b1",
+    "server/patches/billing/overlay/app/Http/Controllers/V1/User/OrderController.php": "695c79d528d2c0a64c6e0d81c8b3aa4e672fa44286607ab016da46af8f179795",
+    "server/patches/billing/overlay/app/Http/Controllers/V1/Guest/PaymentController.php": "fb6e751c3285bdec737614187a745ed079f206309f43e35a394499111aa60872",
+    "server/patches/billing/overlay/database/migrations/billing_atomic_schema.sql": "ff4731c0b7c1c7e98d3db06f5dea8e3c5e4dcbcd13ef935c52e3d416d4d807c3",
+    "server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php": "f748a1c7fffbe1f3cef27f75803ae2a4b672e3a8654a6f3103536ff75bd76d0e",
+    "server/plugins/Fubei/Plugin.php": "f7909751b3ca4568b1989890ec016021cd0e430aa26f9b81f5e259eee7c34784",
+    "server/plugins/Fubei/Amount.php": "e89cdd93254d835a92986b89a4d6bb45f2e53ec4ab9a910d60d067b80ddda6db",
+    "server/plugins/Fubei/Client.php": "cfff915f32b8b6b4e8b9dbc6a2fe021cffbae9f4ae1540b52f8fa2e1335fbc2e",
+    "server/plugins/Fubei/JsonAmount.php": "2a2354cab9870266b1e997db369d76a128b82be851491b5cec73702fb8616181",
+    "server/plugins/Fubei/Notification.php": "06fe891043e99656be16c6803f7b08288de2246b5640c3d2ee8dff96cbaa78bf",
+    "server/plugins/Fubei/RawNotification.php": "c3b0e8c3d2cb404771ccc98e593d67857db4d3a1f0dde996284beac693b1280c",
+    "server/plugins/Fubei/Signature.php": "93f8cac4be9105845b35eb58a81c08b791c5913ac9e7d0b1fb3fa7987e26fecb",
+    "server/tests/billing/laravel_check.php": "8fc399c0d8c0198ee2e182f3d3063c2e24b7443f3e31ee74159e84c01746ba65",
+    "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
+    "server/tests/billing/laravel_migration_check.php": "393510118293e673d3b543cfefd25e178a7511e6fe3e70925ef1c9a5d437cd33"
+  },
+  "real_red": [
+    {
+      "task_id": "b7f4dd34947d4b8a84043a8990bc937e",
+      "status": "failed",
+      "failed_check": "migration_unexpected_RuntimeException_propagated",
+      "cleanup_verified": true,
+      "receipt_sha256": "8553b98c74c5094eff11cce513b35336ecff097c26e0c0690348e917301452c0"
+    },
+    {
+      "task_id": "2e478b92ddd643c5b70cf260ddac595c",
+      "status": "failed",
+      "failed_check": "migration_migrator_failure_atomic",
+      "cleanup_verified": true,
+      "receipt_sha256": "d195d1aae41159ea93d30c1aa284f9f6b47cbf525e2e87381aefd7897576d0fe"
+    },
+    {
+      "task_id": "3d90766da0f240eba622ad6169d89909",
+      "status": "failed",
+      "failed_check": "migration_migrator_down_failure_atomic",
+      "cleanup_verified": true,
+      "receipt_sha256": "eb789549937686abdc0a4950da8669c7802fe107387432659b8afca87e881545"
+    }
+  ],
+  "real_green": {
+    "task_id": "db9e76d28ec34badbe90ad858b2e879c",
+    "status": "passed",
+    "source_unchanged": true,
+    "cleanup_verified": true,
+    "frozen_inputs": 53,
+    "checks_count": 135,
+    "migration_checks": [
+      "migration_empty_v2_payment_attempt",
+      "migration_empty_v2_billing_review",
+      "migration_empty_v2_billing_outbox",
+      "migration_empty_v2_billing_mutex",
+      "migration_empty_v2_commission_log",
+      "migration_empty_v2_order",
+      "migration_empty_v2_payment",
+      "migration_empty_fixture_migrations",
+      "migration_actual_class",
+      "migration_unexpected_RuntimeException_propagated",
+      "migration_unexpected_UnexpectedValueException_propagated",
+      "migration_up_v2_payment_attempt",
+      "migration_up_v2_billing_review",
+      "migration_up_v2_billing_outbox",
+      "migration_up_v2_billing_mutex",
+      "migration_history_preserved",
+      "migration_foreign_keys_valid",
+      "migration_empty_down_preserves_history",
+      "migration_down_v2_payment_attempt",
+      "migration_down_v2_billing_review",
+      "migration_down_v2_billing_outbox",
+      "migration_down_v2_billing_mutex",
+      "migration_up_after_empty_down",
+      "migration_collision_v2_payment_attempt",
+      "migration_collision_v2_billing_review",
+      "migration_collision_v2_billing_outbox",
+      "migration_collision_v2_billing_mutex",
+      "migration_collision_order_id",
+      "migration_collision_level",
+      "migration_evidence_attempt_retained",
+      "migration_evidence_review_retained",
+      "migration_evidence_outbox_retained",
+      "migration_evidence_commission_retained",
+      "migration_migrator_exact_path",
+      "migration_migrator_batch_recorded",
+      "migration_migrator_repeat_noop",
+      "migration_migrator_down_failure_atomic",
+      "migration_migrator_rollback_history_preserved",
+      "migration_migrator_failure_atomic",
+      "migration_same_isolated_connection"
+    ],
+    "receipt_sha256": "c8b66ee14060ce6a67009113747f389f0bee796161a68bfdb47e47b19b3b3f6e",
+    "image": "sha256:896e4926e0d7f18d223d58770590c74ab6f05ecb21f1b74ef5357ed20f44c676",
+    "network": "none",
+    "business_database_mounted": false,
+    "source_environment_loaded": false
+  },
+  "runner_tests": {
+    "exit_code": 0,
+    "count": 9,
+    "actual_PHP": false
+  },
+  "scope": "真实 Laravel Migration 类、DB/Schema 与 Migrator 固定单文件路径的隔离调用；真实订单/返佣原回归保留",
+  "not_verified": [
+    "生产数据库 schema 与迁移仓库、停写及一致备份",
+    "Artisan 命令与生产迁移执行器",
+    "up 提交后仓库写入失败、down 提交后仓库删除失败及恢复",
+    "进程强杀、掉电和数据库损坏恢复",
+    "真实插件安装发现/启用、认证和支付网关传输",
+    "完整 Laravel 业务并发与真实付款"
+  ],
+  "production_deployed": false,
+  "release_verified": false,
+  "independent_review": {
+    "reviewer": "billing_release_readiness",
+    "read_only": true,
+    "confirmed_remaining_P1_P2": 0,
+    "boundary": "只复核源码；实际执行证据由主控核验"
+  },
+  "apply_safety_tests": {
+    "exit_code": 0,
+    "count": 7,
+    "scope": "公开临时文件、冻结输入及安全回滚；未部署生产"
+  },
+  "overlay_hashes_verified": 20
+}

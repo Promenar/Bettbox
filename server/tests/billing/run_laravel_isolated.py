@@ -40,11 +40,13 @@ CANDIDATE_INPUTS = (
     'server/patches/billing/overlay/app/Http/Controllers/V1/User/OrderController.php',
     'server/patches/billing/overlay/app/Http/Controllers/V1/Guest/PaymentController.php',
     'server/patches/billing/overlay/database/migrations/billing_atomic_schema.sql',
+    'server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php',
     'server/plugins/Fubei/Plugin.php', 'server/plugins/Fubei/Amount.php',
     'server/plugins/Fubei/Client.php', 'server/plugins/Fubei/JsonAmount.php',
     'server/plugins/Fubei/Notification.php', 'server/plugins/Fubei/RawNotification.php',
     'server/plugins/Fubei/Signature.php', 'server/tests/billing/laravel_check.php',
     'server/tests/billing/laravel_support.php',
+    'server/tests/billing/laravel_migration_check.php',
 )
 IMAGE_SOURCE_CONTAINER = 'xboard-test-xboard-1'
 DIGEST = re.compile(r'sha256:[a-f0-9]{64}\Z')
@@ -123,7 +125,17 @@ def result_summary(raw, hashes):
         raise RunnerFailure('fixture_checks_invalid')
     required = {'negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
                 'repeat_commission_once', 'cancel_refund_once', 'outbox_at_least_once_consumer_idempotent',
-                'historical_negative_processing_no_open', 'fubei_open_and_event_once', 'fixture_work_removed'}
+                'historical_negative_processing_no_open', 'fubei_open_and_event_once', 'fixture_work_removed',
+                'migration_actual_class', 'migration_history_preserved', 'migration_empty_down_preserves_history',
+                'migration_up_after_empty_down', 'migration_foreign_keys_valid', 'migration_same_isolated_connection',
+                'migration_evidence_attempt_retained', 'migration_evidence_review_retained',
+                'migration_evidence_outbox_retained', 'migration_evidence_commission_retained',
+                'migration_collision_order_id', 'migration_collision_level',
+                'migration_unexpected_RuntimeException_propagated', 'migration_unexpected_UnexpectedValueException_propagated',
+                'migration_migrator_exact_path', 'migration_migrator_batch_recorded',
+                'migration_migrator_repeat_noop', 'migration_migrator_rollback_history_preserved',
+                'migration_migrator_failure_atomic', 'migration_migrator_down_failure_atomic'}
+    required.update('migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'])
     if not required.issubset(checks) or value.get('environment_loaded') is not False or value.get('production_database_loaded') is not False:
         raise RunnerFailure('fixture_contract_incomplete')
     reported = value.get('source_hashes')

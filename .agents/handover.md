@@ -3140,3 +3140,34 @@ Laravel 回执对应18个候选输入、SQLite并发17个输入均与当前一�
 
 ### HLG
 标准append dry-run后apply，保留完整目标和下步。
+
+## 2026-10-09T05:29:36+08:00 · 账务 SQLite 迁移上下行故障原子性修复
+
+type: maintenance
+scope: ["Bettbox", "Xboard", "NoSLA"]
+status: partial
+tags: ["release", "billing", "migration", "validation"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: bac5cc74e6f4663bf09e507aab4e8a2c889875f6118a76c2245bbbdc673cc937
+
+### Summary
+真实 Laravel Migrator 复现 up 后段 SQL 失败残留已创建表，以及 down 后段删除异常残留部分删除。候选迁移显式固定连接事务修复，两条真实红绿通过；生产库未迁移，完整三端 Goal 未完成。
+
+### Changed
+迁移 up/down 同连接 Schema/查询/DDL 与政策检查事务化，SQLite driver guard保持；真实迁移fixture、固定53输入执行器及严格完成标签；修复helper任意RuntimeException误吞为政策拒绝，原异常精确类/固定消息才接受。迁移和overlay说明manifest摘要同步。
+
+### Validation
+实际 up red task2e478b92ddd643c5b70cf260ddac595c，down red task3d90766da0f240eba622ad6169d89909；helper误吞 red taskb7f4dd34947d4b8a84043a8990bc937e。最终 taskdb9e76d28ec34badbe90ad858b2e879c 135检查通过，含40迁移项、53冻结输入无漂移及容器目录清理；当前20候选源逐字节核验一致。9执行器回归、7应用安全回归通过，20 overlay哈希一致，PDEC execution_ready=true。独立串行只读复核未发现当前范围内剩余P1/P2。
+
+### Next
+验证完整Laravel业务并发与插件安装发现、未知下单恢复，核对生产schema/备份/迁移执行器；推进Android唯一owner联合采用、macOS黑屏窗口验收、有效节点和业务全路径。
+
+### Risks
+迁移内部DDL事务不包含Migrator后续记录写入/删除；此窗口、外层嵌套事务、进程强杀/掉电、Artisan命令和生产备份恢复未验，异常后须先核对schema与迁移仓库。框架认证/插件发现/支付传输为显式夹具，真实付款和生产部署未完成。macOS锁屏导致画面验收未通过。
+
+### DIA
+已同步账务PLAN、支付README及overlay、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC README、registry和两份公开验证记录。
+
+### HLG
+标准append dry-run后apply，保留真实红绿和完整目标。

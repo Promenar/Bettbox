@@ -144,6 +144,8 @@ try {
     touch($temporary.'/fixture.sqlite');
     $db=Illuminate\Support\Facades\DB::connection(); $pdo=$db->getPdo();
     fixtureCheck($db->getDatabaseName()===$temporary.'/fixture.sqlite','dedicated_file_database');
+    require fixtureFile($candidate,'server/tests/billing/laravel_migration_check.php');
+    fixtureMigrationLifecycle($db,$candidate);
     // 公开迁移字段的空 DDL；不复制源表或运行含外部 Artisan 副作用的应用迁移。
     $pdo->exec(<<<'SQL'
 CREATE TABLE v2_user(id INTEGER PRIMARY KEY AUTOINCREMENT,invite_user_id INTEGER NULL,plan_id INTEGER NULL,group_id INTEGER NULL,email TEXT UNIQUE,password TEXT,token TEXT,uuid TEXT,transfer_enable INTEGER DEFAULT 0,u INTEGER DEFAULT 0,d INTEGER DEFAULT 0,expired_at INTEGER NULL,balance INTEGER DEFAULT 0,commission_balance INTEGER DEFAULT 0,commission_type INTEGER DEFAULT 1,commission_rate INTEGER NULL,discount INTEGER NULL,speed_limit INTEGER NULL,device_limit INTEGER NULL,next_reset_at INTEGER NULL,last_reset_at INTEGER NULL,reset_count INTEGER DEFAULT 0,banned INTEGER DEFAULT 0,is_admin INTEGER DEFAULT 0,created_at INTEGER,updated_at INTEGER);

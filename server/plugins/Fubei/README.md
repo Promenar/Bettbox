@@ -24,7 +24,7 @@
 
 插件通过账务 Atomic 服务创建不可变支付尝试，平台使用32位 external_no，Xboard 原36位 trade_no 保持不变。回调只用未认证的有界外部号定位尝试，再使用快照的安全 secret_ref、身份、商户与门店核对原始签名和归属，由 SQLite 事务核对快照应收金额、商户、门店、平台流水及订单状态；只有事务到账后返回原订单号交给通用开通流程。未安装账务服务、未执行迁移或数据库目标未经适配时失败关闭，不回退到无快照付款。
 
-**插件尚不具备生产上线条件。** SQLite 计费候选位于 `server/patches/billing`。独立 SQLite 多进程验收和真实 Laravel 隔离集成均已通过；Laravel 验收经过真实 HTTP Kernel、Eloquent、订单服务、同步队列、返佣命令和持久 outbox，认证、插件发现和支付网关传输使用显式夹具。生产数据库迁移、真实插件安装发现、商户配置和人工付款尚未验收，插件保持默认禁用。
+**插件尚不具备生产上线条件。** SQLite 计费候选位于 `server/patches/billing`。独立 SQLite 多进程验收和真实 Laravel 隔离集成均已通过；Laravel 验收经过真实 HTTP Kernel、Eloquent、订单服务、同步队列、返佣命令和持久 outbox，认证、插件发现和支付网关传输使用显式夹具。真实 Migrator 的隔离迁移、批次、重复执行、回滚及中途 DDL 故障原子性已通过。生产数据库迁移、真实插件安装发现、商户配置和人工付款尚未验收，插件保持默认禁用。
 
 网络结果未知后，候选复用同一支付尝试与外部号，但重复 checkout 仍会调用二维码创建接口。相同外部号不构成已验证的官方网关幂等保证；管理员需只读核对平台订单。自动查单、关单、二维码结果持久化与完整人工核对工作流尚未实现。已有未完成尝试不允许切换支付配置或应收金额，需人工核对或安全关闭平台订单后处理。取消后付款或重复流水冲突不能自动开通，保留人工核对证据。到账事务同时持久化 payment.notify.success outbox；开通失败时事件保留，开通完成后由订单任务及每分钟 check:order 恢复交付。钩子保持 Order 参数形状，通过非持久 relation `$order->billing_event->id` 提供稳定事件ID。消费者必须按该ID幂等；进程崩溃、租约过期和部分钩子成功会重复交付，只有至少一次交付语义，不能承诺跨系统 exactly-once。隔离框架已验证按事件 ID 幂等的测试消费者；线上全部消费者的适配仍待核对。
 
@@ -38,7 +38,7 @@ php server/tests/fubei/run.php
 
 当前候选的 117 项纯契约测试已在 NoSLA 禁网、只读、64 MiB 容器中通过，未挂载业务数据库或凭据。SQLite 独立连接并发测试已通过，覆盖到账、取消、开通、返佣和 outbox；真实 Laravel 串行隔离测试已覆盖 checkout、重复回调、套餐开通、流量重置、返佣与补偿。
 
-Xboard 实际安装发现/启用生命周期、完整框架并发、生产消费者幂等、官方下单响应和人工小额付款仍待验收。公开证据见 `docs/validation/2026-10-07-three-platform/payment-readiness-validation.json`。测试身份均为公开虚构 fixture，只用于规则测试。
+Xboard 实际安装发现/启用生命周期、完整框架并发、生产消费者幂等、官方下单响应和人工小额付款仍待验收。公开证据见 `docs/validation/2026-10-07-three-platform/payment-readiness-validation.json` 与 `laravel-migration-validation.json`。迁移内部事务不包含 Migrator 成功记录的后续写入或删除，异常后需核对 schema 与迁移仓库再恢复。测试身份均为公开虚构 fixture，只用于规则测试。
 
 ## 官方规则来源
 
