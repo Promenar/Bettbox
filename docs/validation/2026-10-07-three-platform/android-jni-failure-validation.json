@@ -1,0 +1,39 @@
+{
+  "red_source_sha": "5c0cc6029155c8a1057799df4b092cbafcb686eb",
+  "red_exit": 1,
+  "red_failed_cases": 5,
+  "green_exit": 0,
+  "green_failed_cases": 0,
+  "cases": [
+    "FindClass失败不得进入NewGlobalRef或方法查找",
+    "NewGlobalRef失败不得方法查找",
+    "第一方法查找失败不得继续第二查找",
+    "NewByteArray失败不得region/object调用",
+    "region失败不得object调用"
+  ],
+  "green_source_sha256": {
+    "android/core/src/main/cpp/jni_helper.cpp": "b8557dcdcd1506bf22bbba62b79622b91c4079aaf2f2fc8aaec5fa7f590d2afd",
+    "android/core/src/main/cpp/jni_helper.h": "9b098aa24e7d71180b7054a502785961e8d2555dc4fca7d4584855f282d12fba",
+    "android/core/src/main/cpp/core.cpp": "54e1353f636cd77cb8d70f801075c431dc273bd60f7cde169359443d2a4309c1",
+    "android/core/src/test/cpp/jni_failure_fixture.cpp": "6915139c400dca2876bb82434900595b87c49bda7b193de88c8f30452cb78586"
+  },
+  "NDK_JNI_header_sha256": "5df9074457c041b372f2c68ff646d6e8600cd673a223885e8df21c44c94ec667",
+  "android_arm64_jni_link_exit": 0,
+  "boundary": "生产helper与公开JNI函数表故障注入，macOS执行，malloc声明shim；不运行真实JVM，不证明真实JNI加载、global ref或设备OOM。",
+  "official_contract": "https://developer.android.com/training/articles/perf-jni?hl=zh-cn",
+  "OnLoad_red": {
+    "cases": 9,
+    "failed": 2,
+    "exit": 1,
+    "core_source_sha256": "24598c009aea338453942f8b2bd6ed5972c2aff516bd6c999996947f7a1ac097",
+    "fixture_sha256": "40da97af6055d6e0a0199da7b5580f0cc15077806251f4fa204111f046a7c4f9"
+  },
+  "OnLoad_green": {
+    "cases": 9,
+    "failed": 0,
+    "exit": 0,
+    "global_ref_failure_cleanup": "protect/peek查找失败恰一次String globalref释放，未注册回调"
+  },
+  "android_jni_library_sha256": "4d3a3b44a54ce08ed3427987bd7434d08cda14777e0bb7a2fcc1ee62937462d4",
+  "independent_review": "helper及真实OnLoad静态复审无新增P1/P2；真实JVM/CheckJNI/attach/并发引用待设备验证。"
+}

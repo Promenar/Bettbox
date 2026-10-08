@@ -1114,6 +1114,56 @@
         ".test/android-tun-abi/libcore.so"
       ],
       "verification": "实际生产 JNI 源与本工作树新生成 Go C ABI 链接；不替代 Android 装机及 JNI 行为验证"
+    },
+    "compile-jni-failure-fixture": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "clang++",
+        "-std=c++17",
+        "-DLIBCLASH",
+        "-I.test/android-tun-abi",
+        "-I.test/android-jni-failure/include",
+        "-Iandroid/core/src/main/cpp",
+        "android/core/src/main/cpp/jni_helper.cpp",
+        "android/core/src/main/cpp/core.cpp",
+        "android/core/src/test/cpp/jni_failure_fixture.cpp",
+        "-o",
+        ".test/android-jni-failure/fixture"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60,
+      "artifacts": [
+        ".test/android-jni-failure/fixture"
+      ],
+      "verification": "生产 JNI helper + 公共函数表故障注入，不运行JVM、不访问FD/网络；NDK原始JNI头与仅malloc声明shim"
+    },
+    "test-jni-failure-fixture": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        ".test/android-jni-failure/fixture"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 10,
+      "artifacts": []
+    },
+    "test-android-vpn-work-gate": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "python3",
+        "scripts/check_android_vpn_work_gate.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 150,
+      "artifacts": [
+        ".test/android-vpn-work-gate/receipt.json"
+      ],
+      "verification": "实际生产纯Kotlin工作gate的公开协程屏障；缓存Kotlin2.0.21/coroutines1.9，不替代Android工程与设备"
     }
   },
   "deployment": {
@@ -1317,9 +1367,22 @@
     "android/core/src/main/java/com/appshub/bettbox/core/TunInterface.kt": "c0a1e9c1cc1c4e255d030f2843405a79fabdaf45cdb0d7eae2a7a9ed6781a3d3",
     "android/core/src/main/java/com/appshub/bettbox/core/TunFDLease.kt": "f6b4d292f4bccf90f2d6847b922c4fd7e8158db798a1191ebe731beb8a25de40",
     "android/core/src/test/kotlin/com/appshub/bettbox/core/TunFDLeaseFixture.kt": "d8e57f3a5336ad295728ecc1c703af9bcfc1517e22537c88426d563742ee2304",
-    "android/core/src/main/cpp/core.cpp": "4bb60215e20ead965766b45e4fd5ae0ad480f26797398b98586cd30df3f74006",
-    "android/core/src/main/cpp/jni_helper.cpp": "ab982e5deaf0c917d55d0a2da638a7bf9f4ec23eb53fc8ee788b61c627a6ab19",
-    "scripts/check_android_tun_lease.py": "af34e306b45260817a1a480fd93b94f509dc7647ac3dd91ec2ad2d74a116b088"
+    "android/core/src/main/cpp/core.cpp": "54e1353f636cd77cb8d70f801075c431dc273bd60f7cde169359443d2a4309c1",
+    "android/core/src/main/cpp/jni_helper.cpp": "b8557dcdcd1506bf22bbba62b79622b91c4079aaf2f2fc8aaec5fa7f590d2afd",
+    "scripts/check_android_tun_lease.py": "af34e306b45260817a1a480fd93b94f509dc7647ac3dd91ec2ad2d74a116b088",
+    "android/core/src/test/cpp/jni_failure_fixture.cpp": "6915139c400dca2876bb82434900595b87c49bda7b193de88c8f30452cb78586",
+    "android/core/src/main/cpp/jni_helper.h": "9b098aa24e7d71180b7054a502785961e8d2555dc4fca7d4584855f282d12fba",
+    "scripts/check_android_vpn_work_gate.py": "b260fd129bd1ca419f50606e23c5efda4b9293fcb83d510fb5fd8cb6433a2057",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "2778ce3b7501b569310477f70fb0befdcd8cd9ac6824718b441a39cff71733d8",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "628fa79bb638beca4c4e17ab9429c36d888667cfdce6119a5bcc9f72a8bfe364",
+    "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "4a54de20794463effa8ffd5035e5158b19d187496d8ae8171617a89b24c001f4",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "70f0348ffebccef69bafcb46c46cc56b85335ee11c64524c60446e0f221c54a5",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "bd97efec4ac22e018eb49a2ed96fa50a16749697556ec4ef15a5de7c6bf47122",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/BaseServiceInterface.kt": "8f4e1095b5fe1966720ac966d673a172a7ff6ac539e60c0cf4750689ab1cd9fc",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxService.kt": "c6a65dbb9ac2755546c0a546dd94c389c0e38a227f3b73806ebf7adc317ed416",
+    "android/app/src/main/kotlin/com/appshub/bettbox/services/BettboxVpnService.kt": "565522d3012417d29fac1ec967b00e2d8b75244d22cfbeb8d65fd4282a27008b",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt": "b31827efa3501d5defb356b9bf3b9ffc05f7ad897b06925cac3b3bd4a9103700"
   },
   "platform_extensions": {
     "android": {
@@ -1395,6 +1458,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "aca0ab72bedc0159e2af8c37486d12e0159f91c4b7f7a284409af760f14d87b3"
+    "contract_digest": "2f1aa1eed96c5ff2d0b2a72dc7240ec9753b50c4aae2ade98fe6f6ead848e58a"
   }
 }

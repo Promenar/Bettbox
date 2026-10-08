@@ -61,3 +61,7 @@
 
 - docs/validation/2026-10-07-three-platform/native-fd-ownership-contract.json — 原生FD构造合同红绿回归、独立复审及未接线边界
 - docs/validation/2026-10-07-three-platform/android-tun-abi-validation.json — 实际 Android ARM64 Go/JNI 编译链接、FD 输入清理回归及未覆盖设备边界
+
+- .agents/plans/2026-10-08-macos-system-proxy-integration.md — 正常应用SC/endpoint授权、恢复次序及认证unknown待裁定设计
+- docs/validation/2026-10-07-three-platform/android-jni-failure-validation.json — JNI helper与真实OnLoad九项函数表故障回归，非真实JVM
+- docs/validation/2026-10-07-three-platform/android-vpn-lifecycle-validation.json — 生产协程门禁红绿、绑定/恢复/旧通知controller夹具与设备边界

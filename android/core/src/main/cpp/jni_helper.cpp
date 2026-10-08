@@ -10,12 +10,40 @@ static jclass c_string;
 static jmethodID m_new_string;
 static jmethodID m_get_bytes;
 
-void initialize_jni(JavaVM *vm, JNIEnv *env) {
-    global_vm = vm;
+static bool clear_pending_exception(JNIEnv *env) {
+    if (!env->ExceptionCheck()) return false;
+    env->ExceptionClear();
+    return true;
+}
 
-    c_string = reinterpret_cast<jclass>(new_global(find_class("java/lang/String")));
+void release_jni_initialization(JNIEnv *env) {
+    clear_pending_exception(env);
+    if (c_string) del_global(c_string);
+    c_string = nullptr;
+    m_new_string = nullptr;
+    m_get_bytes = nullptr;
+}
+
+bool initialize_jni(JavaVM *vm, JNIEnv *env) {
+    release_jni_initialization(env);
+    global_vm = vm;
+    const auto local_class = find_class("java/lang/String");
+    if (clear_pending_exception(env) || !local_class) return false;
+    c_string = reinterpret_cast<jclass>(new_global(local_class));
+    env->DeleteLocalRef(local_class);
+    if (clear_pending_exception(env) || !c_string) {
+        release_jni_initialization(env);
+        return false;
+    }
+    const auto fail = [&]() {
+        release_jni_initialization(env);
+        return false;
+    };
     m_new_string = find_method(c_string, "<init>", "([B)V");
+    if (clear_pending_exception(env) || !m_new_string) return fail();
     m_get_bytes = find_method(c_string, "getBytes", "()[B");
+    if (clear_pending_exception(env) || !m_get_bytes) return fail();
+    return true;
 }
 
 JavaVM *global_java_vm() {
@@ -47,10 +75,19 @@ char *jni_get_string(JNIEnv *env, jstring str) {
 }
 
 jstring jni_new_string(JNIEnv *env, const char *str) {
+    if (!str || !c_string || !m_new_string) return nullptr;
     const auto length = static_cast<int>(strlen(str));
     const auto array = env->NewByteArray(length);
+    if (clear_pending_exception(env) || !array) return nullptr;
     env->SetByteArrayRegion(array, 0, length, reinterpret_cast<const jbyte *>(str));
-    return reinterpret_cast<jstring>(env->NewObject(c_string, m_new_string, array));
+    if (clear_pending_exception(env)) {
+        env->DeleteLocalRef(array);
+        return nullptr;
+    }
+    const auto result = reinterpret_cast<jstring>(env->NewObject(c_string, m_new_string, array));
+    env->DeleteLocalRef(array);
+    if (clear_pending_exception(env)) return nullptr;
+    return result;
 }
 
 int jni_catch_exception(JNIEnv *env) {

@@ -7,7 +7,8 @@ struct scoped_jni {
     int require_release;
 };
 
-extern void initialize_jni(JavaVM *vm, JNIEnv *env);
+extern bool initialize_jni(JavaVM *vm, JNIEnv *env);
+extern void release_jni_initialization(JNIEnv *env);
 
 extern jstring jni_new_string(JNIEnv *env, const char *str);
 

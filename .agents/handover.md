@@ -1621,3 +1621,34 @@ Go adapter采用State/CallbackGate/Shutdown/FDLease；配置快照释放runLock�
 
 ### HLG
 标准append dry-run后apply；当前施工文件未提交，保留精确源摘要与执行边界。
+
+## 2026-10-08T13:02:11+08:00 · Android完整启动工作门禁与JNI异常路径候选闭合
+
+type: implementation
+scope: ["android", "jni", "macos", "release"]
+status: in_progress
+tags: ["vpn", "lifecycle", "jni", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 1deaa2610cf333a8f05e99df651078b4c6aba52ef67e1d98f05d6e74c15da6e4
+
+### Summary
+完成Android完整启动工作gate、绑定意图与通知末端门禁候选，JNI异常初始化及真实OnLoad缺口红绿修正；两个独立原生审阅包闭合。Android/macOS优先，iOS保留开发及发行研究。Goal保持active，正式设备/上游/支付/Apple外部条件尚未闭合。
+
+### Changed
+生产VpnWorkGate覆盖establish/重试/JNI/finally；停止先撤销代际并等待真实工作收尾。每次独立Connection/intent票据，已注册尚未connected亦解绑；迟到权限/超时/断连拒绝旧意图。主进程首次合法启动保留intent执行Core停止锁恢复，5秒不洗白。通知局部Builder，共享速度/已发布状态在固定service/generation门禁提交。JNI初始化bool、逐项异常短路、OnLoad统一String globalref及IDs收尾。新增公开fixture与PDEC本机离线入口，测试入口仅test目录。Mac SC接线计划记录可信应用基、endpoint授权、真实unknown认证/未拥有摘要及冷恢复边界，未写SC设置。
+
+### Validation
+实际生产工作gate异步屏障修前编译成功/退出1，旧establish未完成却已确认停止；绿版本两个入口退出0，含恢复取消/输入关闭阻断/绑定/旧通知。JNI helper原5例失败，修到绿；完整生产OnLoad9例中2失败（protect/peek pending继续），修复后9例0失败，且恰一次Stringgref删除。NDK28.2/API26 ARM64真实JNI链接退出0。CPP与Kotlin独立回审均无新增可确认P1/P2，git diff --check0。Kotlin夹具编译器2.0.21/coroutines1.9不替代工程2.1.0。
+
+### Next
+提交候选并推送验证SHA，然后完整正式Android工程构建、验签/16KiB/装机及设备普通启停/快切/smart/cold验证。后续有效NativeTun构造测试及配置所有者全写入口另核。Android构建期间冻结整个相关源范围，之后推进Mac SC正常main接线及权限/认证unknown真实验收。
+
+### Risks
+VM函数表不是真实JVM；purecontroller/gate不覆盖Binder、SharedPreferences、进程判定或通知设备性能。每次局部通知Builder增加工厂调用量需观察。上游HTTP500/500/403且cached expired，用户检查问题待回复，不续费不改生产。Mac签名/SC及iOSTeam/NE/支付商权限仍未完成发行。未读取/修改.video_agent或秘密。
+
+### DIA
+已同步ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、registry、MacSC实施计划及JNI/lifecycle公开回执。
+
+### HLG
+标准append先dry-run后apply，保存代码候选和真实红绿范围；尚未将任何候选标为可用发行。

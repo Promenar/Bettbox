@@ -67,10 +67,11 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                         GlobalState.getCurrentVPNPlugin()?.notifyScreenStateChanged(true)
                     }
                 }
-                lastNotificationText = null
+                val generation = VpnPlugin.foregroundGeneration(this@BettboxVpnService) ?: return
+                VpnPlugin.publishForeground(this@BettboxVpnService, generation) { lastNotificationText = null }
                 resetNotificationBuilder()
                 CoroutineScope(Dispatchers.Main).launch {
-                    startForeground()
+                    startForeground(generation)
                 }
             }
         }
@@ -144,26 +145,27 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             setHttpProxy(ProxyInfo.buildDirectProxy("127.0.0.1", options.port, options.bypassDomain))
         }
 
-        establish()?.detachFd()?.also { return it }
+        establish()?.detachFd()?.also { isStopped = false; return it }
         Log.e(TAG, "Establish VPN rejected by system")
         -1
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val generation = VpnPlugin.foregroundGeneration(this) ?: return START_STICKY
         if (intent?.action == "UPDATE_NOTIFICATION_SPEED") {
             val profileName = intent.getStringExtra("profileName") ?: ""
             val speedInfo = intent.getStringExtra("speedInfo") ?: ""
-            isSpeedNotificationEnabled = true
+            if (!VpnPlugin.publishForeground(this, generation) { isSpeedNotificationEnabled = true }) return START_STICKY
             if (!GlobalState.isSmartStopped && hasStartedForeground) {
                 CoroutineScope(Dispatchers.Main).launch {
-                    updateNotificationSpeed(profileName, speedInfo)
+                    updateNotificationSpeed(profileName, speedInfo, generation)
                 }
             }
         } else if (intent?.action == "RESTORE_NOTIFICATION") {
-            isSpeedNotificationEnabled = false
+            if (!VpnPlugin.publishForeground(this, generation) { isSpeedNotificationEnabled = false }) return START_STICKY
             if (hasStartedForeground) {
                 CoroutineScope(Dispatchers.Main).launch {
-                    startForeground()
+                    startForeground(generation)
                 }
             }
         }
@@ -181,32 +183,27 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             } else {
                 stopForeground(true)
             }
-        }.onFailure { Log.e(TAG, "Failed to stop foreground: ${it.message}") }
+        }.onFailure { Log.e(TAG, "前台通知停止失败") }
 
         runCatching {
             getSystemService(android.app.NotificationManager::class.java)
                 ?.cancel(GlobalState.NOTIFICATION_ID)
-        }.onFailure { Log.e(TAG, "Failed to cancel notification: ${it.message}") }
+        }.onFailure { Log.e(TAG, "通知取消失败") }
 
         stopSelf()
     }
 
-    @Volatile
-    private var cachedBuilder: NotificationCompat.Builder? = null
-
     fun resetNotificationBuilder() {
-        cachedBuilder = null
+        // 通知使用局部构造器，每次读取当前图标。
     }
 
     private suspend fun notificationBuilder(): NotificationCompat.Builder {
-        if (cachedBuilder == null) {
-            cachedBuilder = createBettboxNotificationBuilder()
-        }
-        return cachedBuilder!!
+        return createBettboxNotificationBuilder()
     }
 
     @SuppressLint("ForegroundServiceType")
-    override suspend fun startForeground() {
+    override suspend fun startForeground(generation: Long?) {
+        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return
         ensureNotificationChannel()
         val title: String
         val content: String
@@ -218,7 +215,6 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             content = getString(R.string.service_running)
         }
 
-        lastNotificationText = null
         val builder = notificationBuilder()
 
         val separator = " ︙ "
@@ -240,24 +236,29 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             .build()
 
         val isFirstTime = !hasStartedForeground
-        if (isFirstTime) {
-            hasStartedForeground = true
-        }
 
         val pendingProfile = pendingSpeedProfile
         val pendingSpeed = pendingSpeedInfo
-        if (isFirstTime && isSpeedNotificationEnabled && pendingProfile != null && pendingSpeed != null) {
-            updateNotificationSpeed(pendingProfile, pendingSpeed)
+        if (!GlobalState.isSmartStopped && isFirstTime && isSpeedNotificationEnabled && pendingProfile != null && pendingSpeed != null) {
+            updateNotificationSpeed(pendingProfile, pendingSpeed, notificationGeneration, firstForeground = true)
             return
         }
 
-        this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+        VpnPlugin.publishForeground(this, notificationGeneration) {
+            lastNotificationText = null
+            hasStartedForeground = true
+            this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+        }
     }
 
     @SuppressLint("ForegroundServiceType")
-    internal suspend fun updateNotificationSpeed(profileName: String, speedInfo: String) {
-        pendingSpeedProfile = profileName
-        pendingSpeedInfo = speedInfo
+    internal suspend fun updateNotificationSpeed(profileName: String, speedInfo: String,
+                                                generation: Long? = null, firstForeground: Boolean = false) {
+        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return
+        if (!VpnPlugin.publishForeground(this, notificationGeneration) {
+            pendingSpeedProfile = profileName
+            pendingSpeedInfo = speedInfo
+        }) return
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
         if (powerManager?.isInteractive == false) {
@@ -270,10 +271,6 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
 
         val separator = " ︙ "
         val combinedText = "$profileName$separator$speedInfo"
-        if (combinedText == lastNotificationText) {
-            return
-        }
-        lastNotificationText = combinedText
 
         val builder = notificationBuilder()
         val spannable = android.text.SpannableString(combinedText)
@@ -292,10 +289,15 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             .setTicker(combinedText)
             .build()
 
-        if (hasStartedForeground) {
+        if (hasStartedForeground || firstForeground) {
             runCatching {
-                this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
-            }.onFailure { Log.e(TAG, "updateNotificationSpeed startForeground error: ${it.message}") }
+                VpnPlugin.publishForeground(this, notificationGeneration) {
+                    if (combinedText == lastNotificationText) return@publishForeground
+                    lastNotificationText = combinedText
+                    hasStartedForeground = true
+                    this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+                }
+            }.onFailure { Log.e(TAG, "速度通知发布失败") }
         }
     }
 
@@ -316,7 +318,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                 super.onTransact(code, data, reply, flags).also { success ->
                     if (!success) GlobalState.getCurrentTilePlugin()?.handleStop()
                 }
-            }.getOrElse { Log.e(TAG, "onTransact failed: ${it.message}"); false }
+            }.getOrElse { Log.e(TAG, "服务绑定事务失败"); false }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -336,7 +338,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             VpnPlugin.handleStop()
             getSystemService(android.app.NotificationManager::class.java)
                 ?.cancel(GlobalState.NOTIFICATION_ID)
-        }.onFailure { Log.e(TAG, "onRevoke error: ${it.message}") }
+        }.onFailure { Log.e(TAG, "VPN 撤销处理失败") }
         super.onRevoke()
     }
 

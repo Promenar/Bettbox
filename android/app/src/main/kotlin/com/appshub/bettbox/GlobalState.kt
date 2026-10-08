@@ -37,7 +37,6 @@ object GlobalState {
 
     private const val TOGGLE_DEBOUNCE_MS = 1000L
     private const val PENDING_TIMEOUT_MS = 5000L
-    private const val STOP_LOCK_TIMEOUT_MS = 5000L
 
     @Volatile
     private var lastToggleAt = 0L
@@ -80,8 +79,7 @@ object GlobalState {
         pendingTimeoutJob = scope.launch {
             delay(PENDING_TIMEOUT_MS)
             if (currentRunState == RunState.PENDING) {
-                android.util.Log.w("GlobalState", "PENDING state timeout, resetting to STOP")
-                updateRunState(RunState.STOP)
+                android.util.Log.w("GlobalState", "PENDING 超时，等待生命周期完成确认")
             }
         }
     }
@@ -106,13 +104,7 @@ object GlobalState {
             val ts = sp.getLong("stop_lock_ts", 0L)
             if (ts == 0L) return false
 
-            val now = System.currentTimeMillis()
-            if (now - ts > STOP_LOCK_TIMEOUT_MS) {
-                sp.edit().remove("stop_lock_ts").apply()
-                false
-            } else {
-                true
-            }
+            true
         }.getOrDefault(false)
     }
 
@@ -151,21 +143,18 @@ object GlobalState {
 
         updateRunState(RunState.PENDING)
         startPendingTimeout()
-        runLock.withLock {
-            getCurrentTilePlugin()?.handleStart() ?: initServiceEngine()
-        }
+        getCurrentTilePlugin()?.handleStart() ?: initServiceEngine()
         return true
     }
 
     fun handleStop(skipDebounce: Boolean = false) {
         if (!skipDebounce && !acquireToggleSlot()) return
-        if (currentRunState != RunState.START) return
+        if (currentRunState == RunState.STOP) return
 
         updateRunState(RunState.PENDING)
         startPendingTimeout()
-        runLock.withLock {
-            getCurrentTilePlugin()?.handleStop()
-        }
+        VpnPlugin.handleStop()
+        getCurrentTilePlugin()?.handleStop()
     }
 
     private fun acquireToggleSlot(): Boolean {

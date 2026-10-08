@@ -1,0 +1,37 @@
+{
+  "fixture_exit": 0,
+  "fixture_entrypoints": 2,
+  "actual_Android": false,
+  "compiler": "Gradle8.14 Kotlin2.0.21",
+  "coroutine": "1.9.0",
+  "production_sources": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "1fa605ed51f7936a474772034045841dcb21ee4cc77ede3dacfbf9b8806a15f2",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "2778ce3b7501b569310477f70fb0befdcd8cd9ac6824718b441a39cff71733d8",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnIntentController.kt": "bd97efec4ac22e018eb49a2ed96fa50a16749697556ec4ef15a5de7c6bf47122",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "628fa79bb638beca4c4e17ab9429c36d888667cfdce6119a5bcc9f72a8bfe364",
+    "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnLifecycleFixture.kt": "b31827efa3501d5defb356b9bf3b9ffc05f7ad897b06925cac3b3bd4a9103700"
+  },
+  "boundary": "实际生产协程门禁，公开异步屏障；不替代Service/Binder/JNI或真实FD设备验证。",
+  "red": {
+    "exit_code": 1,
+    "compile_passed": true,
+    "failure": "旧 establish 未完成时已经确认停止",
+    "source_sha256": {
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnWorkGate.kt": "985c1ff9debddf08b4d3e811fc6b85c1b80eb945f659c8671863cfb6725950de",
+      "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnLifecycle.kt": "5dcaa399b8f3042ec554c8485687e27141f7ab210668d09d7c3e4608153f4ffe",
+      "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnWorkGateFixture.kt": "93751b3aeff2d37917c8b31eea830ee42854638ae6ca61504af2b29b94617edd"
+    },
+    "actual_Android": false,
+    "boundary": "真实Plugin共享gate的协程屏障，未访问真实FD或Binder。"
+  },
+  "independent_review": "原4项高优先级发现已静态闭合，无新增可确认P1/P2；实际工程/设备验收另行。",
+  "case_groups": [
+    "建立未完成前停止不得确认及新代不得入场",
+    "取消恢复拒绝旧意图，旧恢复不能停止新代",
+    "输入close失败保留阻断",
+    "同Service旧通知票据拒绝",
+    "绑定代次拒绝旧回调",
+    "失败停止拒绝新启动",
+    "恢复只保留当前意图"
+  ]
+}

@@ -13,14 +13,15 @@ import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.R
 import com.appshub.bettbox.models.VpnOptions
+import com.appshub.bettbox.plugins.VpnPlugin
 
 class BettboxService : Service(), BaseServiceInterface {
 
-    @Volatile
-    private var cachedBuilder: NotificationCompat.Builder? = null
     private val binder = LocalBinder()
     @Volatile
     private var hasStartedForeground = false
+    @Volatile
+    private var isStopped = false
 
     private val fairMemoryHelper = FairMemoryHelper("BettboxService")
 
@@ -37,9 +38,14 @@ class BettboxService : Service(), BaseServiceInterface {
         fun getService() = this@BettboxService
     }
 
-    override suspend fun start(options: VpnOptions) = 0
+    override suspend fun start(options: VpnOptions): Int {
+        isStopped = false
+        return 0
+    }
 
     override fun stop() {
+        if (isStopped) return
+        isStopped = true
         hasStartedForeground = false
 
         runCatching {
@@ -48,25 +54,26 @@ class BettboxService : Service(), BaseServiceInterface {
             } else {
                 stopForeground(true)
             }
-        }.onFailure { android.util.Log.e("BettboxService", "Failed to stop foreground: ${it.message}") }
+        }.onFailure { android.util.Log.e("BettboxService", "前台通知停止失败") }
 
         runCatching {
             getSystemService(android.app.NotificationManager::class.java)
                 ?.cancel(GlobalState.NOTIFICATION_ID)
-        }.onFailure { android.util.Log.e("BettboxService", "Failed to cancel notification: ${it.message}") }
+        }.onFailure { android.util.Log.e("BettboxService", "通知取消失败") }
 
         stopSelf()
     }
 
     fun resetNotificationBuilder() {
-        cachedBuilder = null
+        // 通知使用局部构造器，每次读取当前图标。
     }
 
     private suspend fun notificationBuilder() =
-        cachedBuilder ?: createBettboxNotificationBuilder().also { cachedBuilder = it }
+        createBettboxNotificationBuilder()
 
     @SuppressLint("ForegroundServiceType")
-    override suspend fun startForeground() {
+    override suspend fun startForeground(generation: Long?) {
+        val notificationGeneration = generation ?: VpnPlugin.foregroundGeneration(this) ?: return
         ensureNotificationChannel()
         val title: String
         val content: String
@@ -99,11 +106,13 @@ class BettboxService : Service(), BaseServiceInterface {
             .setTicker(combinedText)
             .build()
 
-        if (!hasStartedForeground) {
-            this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
-            hasStartedForeground = true
-        } else {
-            getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)
+        VpnPlugin.publishForeground(this, notificationGeneration) {
+            if (!hasStartedForeground) {
+                this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+                hasStartedForeground = true
+            } else {
+                getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)
+            }
         }
     }
 

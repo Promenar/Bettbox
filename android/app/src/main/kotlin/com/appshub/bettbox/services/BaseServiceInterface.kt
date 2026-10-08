@@ -26,7 +26,7 @@ import android.graphics.BitmapFactory
 interface BaseServiceInterface {
     suspend fun start(options: VpnOptions): Int
     fun stop()
-    suspend fun startForeground()
+    suspend fun startForeground(generation: Long? = null)
 }
 
 suspend fun Service.createBettboxNotificationBuilder(): NotificationCompat.Builder =
@@ -112,7 +112,7 @@ fun Service.startForeground(notification: Notification, useSpecialType: Boolean 
             startForeground(GlobalState.NOTIFICATION_ID, notification)
         }
     }.onFailure {
-        android.util.Log.e("BaseServiceInterface", "startForeground failed: ${it.message}")
+        android.util.Log.e("BaseServiceInterface", "前台通知发布失败")
         startForeground(GlobalState.NOTIFICATION_ID, notification)
     }
 }
