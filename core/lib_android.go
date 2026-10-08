@@ -82,6 +82,58 @@ var (
 	tunHandler atomic.Pointer[TunHandler]
 )
 
+var ownedTunBridge = androidOwnedTunBridge{configLock: &runLock, coordinator: &productionAndroidConfigCoordinator, state: &tunState}
+
+// 回执只包含固定状态，不把输入FD、回调指针或原始异常传回客户端。
+func ownedTunResultJSON(result androidOwnedTunResult) *C.char {
+	encoded, err := json.Marshal(result)
+	if err != nil {
+		return nil
+	}
+	return C.CString(string(encoded))
+}
+
+func handleStartOwnedTun(owner androidstartup.TunOwnership, fd int, callback unsafe.Pointer) androidOwnedTunResult {
+	release := func() {
+		if callback != nil {
+			releaseObject(callback)
+		}
+	}
+	var fdLease *androidstartup.FDLease
+	if fd > 0 {
+		fdLease, _ = androidstartup.NewFDLease(fd, syscall.Close)
+	}
+	cleanup := func() error {
+		err := fdLease.ReleaseUnadopted()
+		if err != nil {
+			gate := androidstartup.NewCallbackGate(4)
+			gate.CloseAdmission()
+			tunHandler.CompareAndSwap(nil, &TunHandler{gate: gate})
+		}
+		return err
+	}
+	return ownedTunBridge.start(owner, fd, release, cleanup, func(*androidTunReservation) androidTunOpen {
+		// prepare在runLock内，仅复制值；返回的构造函数在锁外执行。
+		if currentConfig == nil || fd > 0 && callback == nil {
+			return nil
+		}
+		config := androidTunConfig{ready: true, device: currentConfig.General.Tun.Device, stack: currentConfig.General.Tun.Stack, disableICMPForwarding: currentConfig.General.Tun.DisableICMPForwarding, mtu: uint32(currentConfig.General.Tun.MTU), ipv6: currentConfig.General.IPv6}
+		return func(lease *androidstartup.OnceLease) (androidstartup.Resource, error) {
+			handler := &TunHandler{callback: callback, gate: androidstartup.NewCallbackGate(4), lease: lease}
+			tunHandler.Store(handler)
+			listener, err, cleanupErr := t.StartOwned(fd, config.device, config.stack, config.disableICMPForwarding, config.mtu, config.ipv6, fdLease.Adopt)
+			handler.listener = listener
+			if err == nil && listener == nil {
+				err = errors.New("TUN构造未返回资源")
+			}
+			if cleanupErr != nil {
+				handler.shutdown.SeedCleanupFailure(cleanupErr)
+			}
+			return handler, err
+		}
+	})
+}
+
 func init() {
 	initTunHook()
 	dialer.DefaultSocketHook = func(network, address string, conn syscall.RawConn) error {
@@ -249,6 +301,16 @@ func quickStart(initParamsChar *C.char, paramsChar *C.char, stateParamsChar *C.c
 //export startTUN
 func startTUN(fd C.int, callback unsafe.Pointer) bool {
 	return handleStartTun(int(fd), callback)
+}
+
+//export startTUNOwned
+func startTUNOwned(epoch, revision, generation C.longlong, fd C.int, callback unsafe.Pointer) *C.char {
+	return ownedTunResultJSON(handleStartOwnedTun(androidstartup.TunOwnership{Epoch: int64(epoch), ConfigRevision: int64(revision), Generation: int64(generation)}, int(fd), callback))
+}
+
+//export stopTUNOwned
+func stopTUNOwned(epoch, revision, generation C.longlong) *C.char {
+	return ownedTunResultJSON(ownedTunBridge.stop(androidstartup.TunOwnership{Epoch: int64(epoch), ConfigRevision: int64(revision), Generation: int64(generation)}))
 }
 
 //export getRunTime

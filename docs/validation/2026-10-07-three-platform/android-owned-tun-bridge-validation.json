@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-10-08T21:28:15.104052+08:00",
+  "base_commit": "512640d4ccc55f112d143d8c8f95e4531723d581",
+  "source_sha256": {
+    "core/android_tun_owned.go": "66c433923f2140ed64eb22b1b6b016a8589ae379c4fa5ab4d7778242f6e79bf4",
+    "core/android_tun_owned_test.go": "83346dac106438e1ab39bd6fdce454841c98ac90b59a1314e59f47bd9a101484",
+    "core/android_tun_reservation.go": "cb32c9c56cf6e90fff2982025057e142eb905a57ea717971c6dd9932f66d44fd",
+    "core/androidstartup/rejected_input.go": "9f732f682594d1d2a69905155d4fab62b60c2fed210a84379bae43c83459bb15",
+    "core/lib_android.go": "8e038a4de68b3f02d07a82260b3c45c21c1f648323dcef7238fd347ff8c1e1b0"
+  },
+  "red": {
+    "initial_contract_tests": 5,
+    "failed": 5,
+    "compilable_placeholder": true
+  },
+  "green": {
+    "bridge_tests": 9,
+    "identity_drift_subcases": 2,
+    "core_CGO0_exit": 0,
+    "startup_race_exit": 0,
+    "android_c_shared_exit": 0,
+    "jni_same_header_link_exit": 0
+  },
+  "exports": [
+    "startTUNOwned",
+    "stopTUNOwned"
+  ],
+  "artifact_sha256": {
+    ".test/android-tun-reservation-abi/libclash.h": "a07b680d19a5320ebce3b2352d75beddd85bc1352042f4223d2c4cff82ffa41a",
+    ".test/android-tun-reservation-abi/libclash.so": "a1e0b6763e588e05a1567947de625202e5b57b52c0a2a33dd82b6720438d926d",
+    ".test/android-checked-release-jni/libcore-preclaim.so": "8ece9ad69a56fd8f2f2b88023ce9dee6aabc034ad6f63c30527c1ec3cac4a0f8"
+  },
+  "independent_review": "限定生产文件未发现确定P1/P2，主控已复核实际结果与边界",
+  "limits": [
+    "公共Resource测试没有使用真实FD/JVM",
+    "C JSON分配释放及消费者尚待采用验证",
+    "旧配置和启停旁路尚未收敛",
+    "Java回调重入owner尚未验证",
+    "尚未重建或安装新APK"
+  ]
+}

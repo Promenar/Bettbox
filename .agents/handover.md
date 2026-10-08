@@ -2210,3 +2210,34 @@ core.cpp检查删除与claim异常，helper提供粘滞标记；新增六项函�
 
 ### HLG
 通过append dry-run及apply追加本记录。
+
+## 2026-10-08T21:28:15+08:00 · Android Go带身份TUN导出与生产配置预留接线
+
+type: maintenance
+scope: ["android-native"]
+status: done
+tags: ["android", "tun", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 6ed948b38ee3c35a95e1be5860edb55ffd6149e1bb6177d82b7461bae938839a
+
+### Summary
+新增带配置版本和资源代次的生产Go启停入口，保持同次资源完成事实。
+
+### Changed
+androidOwnedTunBridge串行TUN操作，锁内预留和复制、锁外State/NativeTun构造与关闭、锁内finish。State拒绝输入报告增加同次旧资源快照；lib_android实际导出startTUNOwned/stopTUNOwned。
+
+### Validation
+可编译占位契约RED五项失败，最终九项桥接及两项单侧身份漂移子场景通过；全core CGO0、startup race、Android ARM64 c-shared和同次JNI链接exit0。ELF确认两个实际导出符号，独立审阅未发现确定P1/P2。回执 docs/validation/2026-10-07-three-platform/android-owned-tun-bridge-validation.json。
+
+### Next
+JNI类型化启停桥及严格Kotlin消费/最终finally快照；实际VpnPlugin唯一owner采用，旧配置/启停旁路收敛，然后正式APK设备回归及有效节点流量。macOS匹配profile后完整App验收；iOS开发版与发行研究；服务端真实邀请返佣和支付外部条件。
+
+### Risks
+新增C入口尚未被JNI/Kotlin调用，不代表整包接通。公开Resource不代表真实FD/CheckJNI。旧FFI/HTTP/quickStart旁路、Java回入owner和C JSON分配释放消费者尚未验证；仍不得公开可用发行版。
+
+### DIA
+已同步架构、CHANGELOG、平台验证、registry及公开回执。
+
+### HLG
+通过append dry-run和apply追加交接。

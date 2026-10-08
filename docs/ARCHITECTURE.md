@@ -211,3 +211,5 @@ Android State提供值身份TunOwnership（epoch/configRevision/generation）。
 Go OnceLease用atomic状态区分Held/Released/Unknown，回调执行中不发布完成，panic后Unknown粘滞，重复sync.Once调用不清洗失败。Kotlin TunFDLease提供同步不可变处置快照；CLAIMED只表示已交接，不表示Go释放。关闭进行中用closing阻止重入提前确认，完成后才发布RELEASED，失败为UNKNOWN；数字FD不重试。新快照尚未进入实际typed JNI桥。
 
 JNI实际启动入口对领取前global ref删除检查并清除异常，失败保存库生命周期cleanup unknown；Java claim异常同样保存移交未知。未知责任阻断后续启动，stop仍尝试Go资源回收但不得报告整体成功。六项公开函数表ASAN场景修复前有三项失败，修复后全部通过；既有17项释放、9项故障回归及NDK28/API26 ARM64生产JNI链接通过。该证据不覆盖真实JVM/CheckJNI、并发准入、typed owner或新APK。
+
+Android Go新增带epoch/configRevision/generation的startTUNOwned/stopTUNOwned C导出。生产桥在配置锁内预留并复制构造值，锁外调用State和实际NativeTun，最后锁内核验；拒绝输入从同次State报告捕获旧资源身份，stop须同时匹配reservation与State。准备异常、输入/关闭未知保留阻断，fd0仅在非VPN模式采用。九项桥接测试含两项单侧身份漂移、全core CGO0、startup race、NDK28/API26 ARM64 c-shared及同次JNI链接通过，ELF包含两个导出符号。JNI/Kotlin调用方、旧FFI/HTTP/quickStart配置和启停旁路尚未采用/收敛，不能将该ABI候选称为完整客户端或设备验收。

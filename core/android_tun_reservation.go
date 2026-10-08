@@ -14,6 +14,7 @@ const androidConfigErrorTunReservation = "invalidTunReservation"
 type androidTunReservation struct {
 	epoch       int64
 	revision    int64
+	generation  int64
 	vpnRequired bool
 	options     *state.AndroidVpnOptions
 	settled     bool

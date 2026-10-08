@@ -121,3 +121,7 @@ Go OnceLease增加并发安全的held/released/unknown值状态；释放panic粘
 ## JNI领取前失败收尾
 
 生产startNativeTun的领取前引用删除须检查ExceptionCheck/Clear；删除后异常粘滞标记JNI cleanup unknown，不重试引用。claim发生Java异常时FD移交归属未确认，同样阻断；普通claim负值且无异常仍由Kotlinfinally收尾未领取FD。JNI未知期间禁止新start，stop仍尝试Go旧资源收口，但结果不得报告整体清理成功。主控独占core.cpp/jni_helper及PDEC；公开JNI函数表夹具独占施工后由主控RED/GREEN/ASAN验证，独立审阅及实际NDK链接。该Boolean链路拒绝洗白未知，不替代带request/resource身份的typed桥或实际CheckJNI。
+
+## 生产Go带身份启停入口
+
+主控独占android_tun_owned.go、lib_android.go、reservation generation字段与State拒绝报告快照。新增C导出携带epoch/configRevision/generation，生产桥串行锁只治理TUN操作；runLock内预留及复制构造参数，锁外调用State/Java及drain，完成后锁内核验。拒绝输入使用RejectInputWithCleanup并由同次报告捕获旧资源身份；停止必须匹配预留及State完整身份。普通旧接口不得停受管State；JNI/Kotlin owner采用及配置HTTP/FFI旁路收敛另包实施，不将新增ABI称为整包已接通。测试使用真实协调器与State、公开Resource，覆盖版本拒绝、旧stop、配置构造期间拒绝、清理未知及fd0模式；先编译RED，随后GREEN、startup race、core回归、Android ARM64 c-shared、独立审阅及DIA/HLG。

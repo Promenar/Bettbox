@@ -105,3 +105,5 @@
 - docs/validation/2026-10-07-three-platform/android-lease-disposition-validation.json — Go原子租约完成、Kotlin领取状态和关闭重入红绿
 
 - docs/validation/2026-10-07-three-platform/android-jni-preclaim-validation.json — JNI领取前异常红绿、独立审阅及ARM64链接边界
+
+- docs/validation/2026-10-07-three-platform/android-owned-tun-bridge-validation.json — Go带身份TUN生产C导出、配置预留、资源匹配及未采用边界

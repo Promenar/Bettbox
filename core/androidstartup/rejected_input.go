@@ -7,6 +7,11 @@ type RejectedInputReport struct {
 	Blocked               bool
 	RetainsInputLease     bool
 	Code                  string
+	Ownership             TunOwnership
+	HasOwnership          bool
+	Running               bool
+	RetainsResource       bool
+	RetainsLease          bool
 }
 
 // RejectInputWithCleanup不调用stopLocked或open，保持既有连接资源和runtime。
@@ -31,10 +36,18 @@ func (s *State) RejectInputWithCleanup(release func(), cleanup func() error) Rej
 		s.retainPendingLeaseLocked(lease)
 		s.markBlockedLocked(startCodeReleasePanic)
 	}
-	return RejectedInputReport{
+	report := RejectedInputReport{
 		InputCleanupConfirmed: cleanupErr == nil && !cleanupPanicked && !releasePanicked,
 		Blocked:               s.blockedCode != "",
 		RetainsInputLease:     releasePanicked,
 		Code:                  s.blockedCode,
+		Running:               !s.runtime.IsZero(),
+		RetainsResource:       s.resource != nil,
+		RetainsLease:          s.lease != nil || len(s.pendingLeases) != 0,
 	}
+	if s.owner != nil {
+		report.Ownership = *s.owner
+		report.HasOwnership = true
+	}
+	return report
 }
