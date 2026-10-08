@@ -49,6 +49,7 @@ CANDIDATE_INPUTS = (
     'server/plugins/Fubei/Signature.php', 'server/tests/billing/laravel_check.php',
     'server/tests/billing/laravel_support.php',
     'server/tests/billing/laravel_migration_check.php',
+    'server/tests/billing/laravel_concurrency_check.php',
 )
 IMAGE_SOURCE_CONTAINER = 'xboard-test-xboard-1'
 DIGEST = re.compile(r'sha256:[a-f0-9]{64}\Z')
@@ -123,7 +124,7 @@ def result_summary(raw, hashes):
     if not isinstance(value, dict) or value.get('ok') is not True:
         raise RunnerFailure('fixture_assertion_failed')
     checks = value.get('checks')
-    if not isinstance(checks, list) or not checks or len(checks) > 200 or any(not isinstance(item, str) or not LABEL.fullmatch(item) for item in checks):
+    if not isinstance(checks, list) or not checks or len(checks) > 300 or any(not isinstance(item, str) or not LABEL.fullmatch(item) for item in checks):
         raise RunnerFailure('fixture_checks_invalid')
     required = {'negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
                 'repeat_commission_once', 'cancel_refund_once', 'outbox_at_least_once_consumer_idempotent',
@@ -141,6 +142,10 @@ def result_summary(raw, hashes):
                 'migration_command_plan_no_write','migration_command_failure_fixed_and_atomic',
                 'migration_command_real_rollback','migration_command_real_up','migration_command_repeat_noop',
                 'migration_command_foreign_batch_retained','migration_command_financial_evidence_retained'}
+    required.update({'parallel_reaped_deadline_no_cleanup_responsibility','parallel_create_one_order_balance_once','parallel_cancel_refund_once',
+                     'parallel_notify_open_reset_event_once','parallel_cancel_paid_consistent_winner',
+                     'parallel_commission_order_opened','parallel_commission_balance_log_once'})
+    required.update(name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission'])
     required.update('migration_collision_' + name for name in ['v2_billing_mutex','v2_payment_attempt','v2_billing_review','v2_billing_outbox'])
     if not required.issubset(checks) or value.get('environment_loaded') is not False or value.get('production_database_loaded') is not False:
         raise RunnerFailure('fixture_contract_incomplete')
@@ -152,7 +157,7 @@ def result_summary(raw, hashes):
         raise RunnerFailure('fixture_source_evidence_mismatch')
     return {'checks': checks, 'external_payment_verified': False, 'authentication_stubbed': True,
             'plugin_discovery_stubbed': True, 'gateway_transport_stubbed': True,
-            'concurrency_verified_by_this_fixture': False}
+            'concurrency_verified_by_this_fixture': True}
 
 
 def write_receipt(root, task_id, receipt):

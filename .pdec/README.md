@@ -174,4 +174,7 @@ Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule �
 
 `test-listener-factory-preflight` 使用真实 HTTP/SOCKS/Mixed 工厂和 loopback 端口进行 race 回归；合成 TLS 身份仅在进程内消费，客户端启用证书校验，不调用公网、真实节点或用户凭据。`compile-android-factory-core` 输出独立 ARM64 核心目录，不覆盖已安装候选。
 
-`test-laravel-isolated` 冻结 55 个公开输入，在禁网只读临时容器内执行固定单文件 Migrator、真实 ConsoleKernel 命令及 DDL/仓库 INSERT/DELETE 失败原子性；生产库、配置与凭据不挂载。生产自动注册、真实 Artisan 启动、停写/备份和强杀恢复尚未验收。
+`test-laravel-isolated` 冻结 56 个公开输入，在禁网只读临时容器内执行固定单文件 Migrator、真实 ConsoleKernel 命令及 DDL/仓库 INSERT/DELETE 失败原子性；生产库、配置与凭据不挂载。生产自动注册、真实 Artisan 启动、停写/备份和强杀恢复尚未验收。
+
+
+真实 Laravel 业务并发保持同一禁网临时执行位置、128 MiB 与64 PID限制；两进程只操作本 fixture 空 SQLite，结果只返回固定检查标签。真实 Laravel 两进程、共同起跑、独立重连和操作区间重叠已验证同用户只创建一单、重复取消退款一次、重复通知开通/流量/消费一次、取消与到账合法赢家状态和返佣余额/日志一次。197 项检查、56 个冻结输入在 NoSLA 禁网只读 128 MiB 临时容器通过；实际进程收尾 deadline 责任缺陷已通过红绿回归修复。仅单轮两进程、旧网关夹具和同步队列，不代表同时等待同一 mutex 的测量、压力测试或真实付呗并发。 生产库、配置及凭据不挂载，优惠券、多级/循环邀请和异步队列另验。

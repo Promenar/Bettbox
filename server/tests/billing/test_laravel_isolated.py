@@ -33,6 +33,11 @@ CHECKS += ['migration_repository_insert_failure_atomic','migration_repository_de
            'migration_command_real_rollback','migration_command_real_up','migration_command_repeat_noop',
            'migration_command_foreign_batch_retained','migration_command_financial_evidence_retained']
 
+CHECKS += ['parallel_reaped_deadline_no_cleanup_responsibility','parallel_create_one_order_balance_once','parallel_cancel_refund_once',
+           'parallel_notify_open_reset_event_once','parallel_cancel_paid_consistent_winner',
+           'parallel_commission_order_opened','parallel_commission_balance_log_once']
+CHECKS += [name+'_overlap' for name in ['parallel_create','parallel_cancel','parallel_notify','parallel_cancel_paid','parallel_commission']]
+
 
 class LaravelIsolatedTest(unittest.TestCase):
     def test_real_migration_input_and_completion_are_required(self):
@@ -42,6 +47,15 @@ class LaravelIsolatedTest(unittest.TestCase):
                    'environment_loaded': False, 'production_database_loaded': False}
         with self.assertRaises(runner.RunnerFailure):
             runner.result_summary(json.dumps(payload).encode(), hashes)
+
+    def test_real_concurrency_input_and_overlap_are_required(self):
+        self.assertIn('server/tests/billing/laravel_concurrency_check.php', runner.CANDIDATE_INPUTS)
+        for failure in ['parallel', 'parallel_overlap']:
+            with self.subTest(failure=failure):
+                receipt, _ = self.exercise(failure)
+                self.assertEqual(receipt['status'], 'failed')
+                self.assertEqual(receipt['failure_category'], 'fixture_contract_incomplete')
+                self.assertTrue(receipt['cleanup_verified'])
 
     def exercise(self, failure=None):
         with tempfile.TemporaryDirectory() as temporary:
@@ -62,6 +76,10 @@ class LaravelIsolatedTest(unittest.TestCase):
                        'environment_loaded': False, 'production_database_loaded': False}
             if failure == 'evidence':
                 payload['source_hashes'][next(iter(reported))] = '0' * 64
+            if failure == 'parallel':
+                payload['checks'] = [x for x in CHECKS if not x.startswith('parallel_')]
+            if failure == 'parallel_overlap':
+                payload['checks'] = [x for x in CHECKS if not x.endswith('_overlap')]
             if failure == 'contract':
                 payload['checks'] = CHECKS[:-1]
             if failure == 'missing':
@@ -127,7 +145,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 55)
+        self.assertEqual(len(receipt['source_hashes']), 56)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)

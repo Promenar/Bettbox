@@ -29,3 +29,6 @@ python3 server/tests/billing/test_apply.py
 `billing:migrate` 默认仅输出计划；`--execute` 在同一 SQLite 顶层事务内执行固定候选文件和 Migrator 成功记录写入，`--execute --rollback` 仅接受最后批次单独属于候选且无新增账务证据。真实 ConsoleKernel 隔离调用、仓库 INSERT/DELETE 故障注入和完整快照核对通过；失败返回固定非零回执，不输出底层异常。重复执行遵循 Migrator 记录，不承担已记录但损坏 schema 的修复。生产命令自动发现、真实 Artisan 启动、schema 核对、停写/备份、强杀/掉电及并发部署仍待验收。
 
 候选文件经安全应用后，隔离目录中的命令为 `php artisan billing:migrate`（计划）、`php artisan billing:migrate --execute`（执行）与 `php artisan billing:migrate --execute --rollback`（受限回滚）。生产执行需先完成 PLAN 中的部署门禁；不使用普通全目录 migrate 来替代共同事务命令。
+
+
+真实 Laravel 双进程创建、取消、通知、取消/到账竞争和返佣已通过隔离验收，证据见 `docs/validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。仅验证单轮双进程与同步任务；优惠券、多级/循环返佣、免费/管理员付款和实际异步队列尚未覆盖。

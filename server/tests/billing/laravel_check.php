@@ -182,6 +182,7 @@ SQL);
     $positive=App\Models\Payment::create(['uuid'=>'PUBLIC_POSITIVE','payment'=>'FixtureLegacy','name'=>'公开网关','enable'=>true,'config'=>[],'handling_fee_fixed'=>100]);
     $fubeiPayment=App\Models\Payment::create(['uuid'=>'PUBLIC_FUBEI','payment'=>'Fubei','name'=>'公开付呗','enable'=>true,'config'=>['enabled'=>true,'identity_mode'=>'merchant','app_id'=>'PUBLIC_APP','merchant_id'=>123,'store_id'=>456,'secret_ref'=>'public_fixture','gateway'=>'https://gateway.example.test','gateway_hosts'=>'gateway.example.test','notify_hosts'=>'fixture.example.test','payment_hosts'=>'pay.example.test']]);
     $kernel=$app->make(Illuminate\Contracts\Http\Kernel::class);
+    $app['router']->middleware('api')->post('/fixture/cancel',fn(Illuminate\Http\Request $req)=>$app->make(App\Http\Controllers\V1\User\OrderController::class)->cancel($req));
     $app['router']->middleware('api')->post('/fixture/checkout',fn(Illuminate\Http\Request $req)=>$app->make(App\Http\Controllers\V1\User\OrderController::class)->checkout($req));
     $app['router']->middleware('api')->post('/api/v1/guest/payment/notify/{method}/{uuid}',[App\Http\Controllers\V1\Guest\PaymentController::class,'notify']);
     $request=function($path,array $data,$user=null,?string $raw=null) use ($app,$kernel) {
@@ -244,12 +245,17 @@ SQL);
     fixtureCheck($request('/api/v1/guest/payment/notify/Fubei/PUBLIC_FUBEI',$notification,null,$raw)->getStatusCode()===200,'fubei_raw_form_signature_through_kernel');
     fixtureCheck($request('/api/v1/guest/payment/notify/Fubei/PUBLIC_FUBEI',$notification,null,$raw)->getStatusCode()===200,'fubei_duplicate_callback_kernel'); $fbOrder->refresh();
     fixtureCheck((int)$fbOrder->status===3 && $db->table('fixture_consumer')->where('order_id',$fbOrder->id)->count()===1,'fubei_open_and_event_once');
+    require fixtureFile($candidate,'server/tests/billing/laravel_concurrency_check.php');
+    // fork 前释放旧 PDO 引用，各子进程重新建立连接。
+    $pdo=null;
+    fixtureLaravelConcurrency($db,$temporary,$makeUser,$plan,$positive,$request);
+    $pdo=$db->getPdo();
     fixtureCheck($pdo===$db->getPdo() && $db->getDatabaseName()===$temporary.'/fixture.sqlite','same_isolated_connection');
     foreach ($hashes as $path=>$digest) fixtureCheck(!is_link($path) && hash_file('sha256',$path)===$digest,'source_unchanged_'.basename($path));
     $db->disconnect(); fixtureRemove($temporary);
     fixtureCheck(!file_exists($temporary),'fixture_work_removed'); $temporary=null;
     ob_end_clean();
-    echo json_encode(['ok'=>true,'mode'=>'laravel_kernel_eloquent_file_sqlite','checks'=>$checks,'source_hashes'=>$hashes,'environment_loaded'=>false,'production_database_loaded'=>false,'stubs'=>['request_user_resolver','plugin_directory_discovery','legacy_gateway_verification','gateway_network_transport'],'real_paths'=>['http_kernel_and_api_middleware','application_exception_handler','payment_service','eloquent','order_service','sync_order_job','traffic_reset','commission_console_command','order_compensation_command','hook_manager','outbox'],'concurrency'=>'独立PDO多进程由另一fixture验收，本脚本只验收框架串行集成','external_payment'=>'未验收'],JSON_UNESCAPED_UNICODE).PHP_EOL;
+    echo json_encode(['ok'=>true,'mode'=>'laravel_kernel_eloquent_file_sqlite','checks'=>$checks,'source_hashes'=>$hashes,'environment_loaded'=>false,'production_database_loaded'=>false,'stubs'=>['request_user_resolver','plugin_directory_discovery','legacy_gateway_verification','gateway_network_transport'],'real_paths'=>['http_kernel_and_api_middleware','application_exception_handler','payment_service','eloquent','order_service','sync_order_job','traffic_reset','commission_console_command','order_compensation_command','hook_manager','outbox'],'concurrency'=>'真实 Laravel 双进程创建/取消/通知/取消到账竞争/返佣，同文件 SQLite，操作区间重叠','external_payment'=>'未验收'],JSON_UNESCAPED_UNICODE).PHP_EOL;
 } catch (Throwable $error) {
     while (ob_get_level()>0) ob_end_clean();
     echo json_encode(['ok'=>false,'stage'=>$stage,'exception_class'=>get_class($error),'exception_file'=>basename($error->getFile()),'exception_line'=>$error->getLine(),'http_witness'=>$GLOBALS['fixture_http_witness']??[],'checks'=>$checks,'temporary_retained_for_executor_cleanup'=>$temporary!==null],JSON_UNESCAPED_UNICODE).PHP_EOL;

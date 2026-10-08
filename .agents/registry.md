@@ -175,3 +175,6 @@
 
 - .agents/plans/2026-10-09-billing-atomic-migrator.md — 固定账务迁移与成功记录共同事务、真实命令验收计划
 - docs/validation/2026-10-07-three-platform/atomic-migrator-validation.json — 迁移仓库故障红绿、ConsoleKernel 命令与当前源摘要
+
+- .agents/plans/2026-10-09-laravel-business-concurrency.md — 真实 Laravel 独立进程账务竞争、所有权和验收范围
+- docs/validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json — 共同起跑、业务不变量与 PID 收尾红绿证据

@@ -3202,3 +3202,34 @@ fixture 手工注册命令，不证明生产自动发现；强杀、掉电、并
 
 ### HLG
 经标准 append dry-run 后 apply 追加当前记录，保留历史及生成索引。
+
+## 2026-10-09T05:50:15+08:00 · Laravel 双进程账务验收与子进程收尾红绿
+
+type: maintenance
+scope: ["Bettbox", "server/billing"]
+status: partial
+tags: ["billing", "concurrency", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 99bfd326bf4ea712edd0d927dda1cb1f9c66060e5d62fdb7596da5999e81f909
+
+### Summary
+同用户创建、重复取消、重复付款通知、取消/到账竞争和返佣通过真实 Laravel 双进程单轮验收；三端发行目标未完成，生产支付保持未部署。
+
+### Changed
+新增精确冻结的 laravel_concurrency_check.php，共同起跑、独立连接、PID和单调区间交集检查；生产业务源码无修改。waitpid 成功回收立即撤销清理责任，未回收时才检查超时。执行器强制并发/重叠及收尾检查标签，公开证据同步。
+
+### Validation
+真实初验4f1061c7d005448f84e48809f7775a8c通过195 checks；独立只读审阅发现已回收PID因过期deadline残留清理责任。真实red f3eb739a2d7c4bfea103dece38861556在parallel_reaped_deadline_no_cleanup_responsibility失败；修复green614e50f968954575a5c5c93616e3c014通过197 checks/48 parallel标签/56冻结输入，来源不变与清理确认。主控核对23个候选摘要，10项mock通过；独立复审P2封闭且无新增确认P1/P2。PDEC execution_ready=true。
+
+### Next
+补真实 Laravel 优惠券单次使用、多级/循环邀请、免费/管理员付款和实际异步队列；生产命令注册、插件生命周期和未知付款恢复仍待验。Android完整owner采用、有效节点VPN及macOS解锁后的黑屏/系统代理路径继续。
+
+### Risks
+两进程单轮证明操作区间重叠，不等于同一mutex同时等待测量或压力测试。认证/发现/旧网关/传输为夹具，队列同步，不证明付呗商户并发和生产启用。SIG中断waitpid、信号失败及清理等待未分别注入，整体执行器有界。macOS锁屏阻碍界面验收；真实支付商户条件待满足。
+
+### DIA
+已同步 PLAN、README、ARCHITECTURE、CHANGELOG、PLATFORM_VALIDATION、PDEC、registry及公开来源/并发证据。
+
+### HLG
+通过标准append dry-run/apply追加，生成索引保留历史。

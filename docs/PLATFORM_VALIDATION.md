@@ -401,10 +401,17 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 
 ## 服务端支付候选当前来源核验
 
-2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 22 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
+2026-10-09 当前付呗候选 117 项纯契约测试在 NoSLA 禁网、只读、64 MiB 容器通过；旧纯契约回执的 Plugin.php/adapter.php 已不匹配，当前证据使用新执行回执。真实 Laravel 隔离通过回执对应 23 个候选输入文件，独立 SQLite 多进程通过回执对应 17 个文件，均与当前字节一致，无需重复执行同源检查。证据见 `validation/2026-10-07-three-platform/payment-readiness-validation.json`。框架认证、插件发现和支付网关传输为显式夹具；完整框架并发、生产迁移、商户配置与人工付款尚未验收，生产保持未部署/未启用。
 
 ## SQLite 账务真实迁移与故障原子性
 
 2026-10-09 在 NoSLA 禁网只读 128 MiB 临时容器中，真实 Laravel Migrator 精确单候选文件、专用空 SQLite 和公开历史行完成 135 项检查；53 个冻结输入无漂移，容器与目录清理确认。迁移 up 后段 SQL 故障与 down 后段删除故障实际先失败；显式同连接事务修复后部分 DDL 撤销。历史佣金保留、成功批次、重复无副作用、空证据回滚和四类账务证据拒绝 down 均通过。仅准确原生 RuntimeException 与固定政策消息视为政策拒绝，两类无关异常原样传播。
 
 上述内部 DDL 证据见 `validation/2026-10-07-three-platform/laravel-migration-validation.json`。固定共同事务命令的当前证据见 `validation/2026-10-07-three-platform/atomic-migrator-validation.json`：55 个输入、148 项检查、51 个迁移相关标签；真实仓库 INSERT/DELETE 失败整体撤销，真实 ConsoleKernel 的计划、up/down、重复、外来批次和财务证据拒绝均通过。`billing:migrate` 默认仅输出计划；`--execute` 在同一 SQLite 顶层事务内执行固定候选文件和 Migrator 成功记录写入，`--execute --rollback` 仅接受最后批次单独属于候选且无新增账务证据。真实 ConsoleKernel 隔离调用、仓库 INSERT/DELETE 故障注入和完整快照核对通过；失败返回固定非零回执，不输出底层异常。重复执行遵循 Migrator 记录，不承担已记录但损坏 schema 的修复。生产命令自动发现、真实 Artisan 启动、schema 核对、停写/备份、强杀/掉电及并发部署仍待验收。
+
+
+## Laravel 账务真实双进程验收
+
+真实 Laravel 两进程、共同起跑、独立重连和操作区间重叠已验证同用户只创建一单、重复取消退款一次、重复通知开通/流量/消费一次、取消与到账合法赢家状态和返佣余额/日志一次。197 项检查、56 个冻结输入在 NoSLA 禁网只读 128 MiB 临时容器通过；实际进程收尾 deadline 责任缺陷已通过红绿回归修复。仅单轮两进程、旧网关夹具和同步队列，不代表同时等待同一 mutex 的测量、压力测试或真实付呗并发。
+
+公开证据见 `validation/2026-10-07-three-platform/laravel-business-concurrency-validation.json`。10 项执行器回归包含缺失并发/重叠标签时必须拒绝通过回执。优惠券、多级/循环返佣、免费/管理员付款、实际异步队列、生产插件发现/认证及商户支付另验。生产业务源码未因测试扩大范围而改写。

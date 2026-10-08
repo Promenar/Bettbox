@@ -366,7 +366,7 @@
       "timeout_seconds": 300,
       "artifacts": [],
       "cross_compile": "SSH传输精确公开白名单，NoSLA既有镜像内Laravel框架，非交叉编译",
-      "verification": "55个冻结公开输入；禁网只读128MiB空SQLite，固定单文件Migrator与真实ConsoleKernel；DDL/仓库INSERT与DELETE失败共同撤销；认证/插件发现/网关stub，不挂生产配置和数据；生产自动注册与强杀另验"
+      "verification": "56个公开冻结输入，禁网只读128MiB空SQLite；真实Laravel双进程共享起跑、独立连接与重叠区间，创建/取消/通知/取消付款/返佣单次；保留迁移与Kernel串行回归；认证/发现/网关stub，不挂生产数据配置"
     },
     "test-android-release-signing": {
       "executor": "local-mac",
@@ -3080,9 +3080,9 @@
     "scripts/android_dependency_network.py": "025b56819537f984011196aa9e6dfa8fc3400369267dc131406800b9b8e4ad14",
     "scripts/tests/test_build_android.py": "20b1e4f6106097be2c4b538605187724d05b36cb42688a03c7731321b1e8cf28",
     "scripts/tests/test_android_dependency_network.py": "b25af8eeb09dad2cd2e3724bb110ccc7ddcee9d3cb0e6dcab979710bebbaeca0",
-    "server/tests/billing/run_laravel_isolated.py": "6bec69cc37747ea2ba1030b4e3b144941bab14d3803121636e263122ffb92389",
-    "server/tests/billing/test_laravel_isolated.py": "7ce2e0913eb0fa0f5c4b02fe3010a392f724e6e0066029cdcd50f16e97d7a03f",
-    "server/tests/billing/laravel_check.php": "7f614f9c80c8c3130c444b2263918f76ebef37af945064fe4b7effc54cd57a6f",
+    "server/tests/billing/run_laravel_isolated.py": "4d40753c0bb7216ea46283863e9da07ae936ee7a818da0a4cbfd10689f6798dd",
+    "server/tests/billing/test_laravel_isolated.py": "440ae28f6a736638bf5df619eae97bbf19bb23fcffa0f1396c05a23f1d8ed201",
+    "server/tests/billing/laravel_check.php": "c4bc682b8a10187957ef4d9c620a13313552fa5921589a44d4ce3bcc4872d9ad",
     "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
@@ -3376,7 +3376,8 @@
     "server/tests/billing/laravel_migration_check.php": "014c3f33bfee1c1d508666b4b9cb87644cc0e12760f9bdf93465c3eddd4105a0",
     "server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php": "f748a1c7fffbe1f3cef27f75803ae2a4b672e3a8654a6f3103536ff75bd76d0e",
     "server/patches/billing/overlay/app/Services/Billing/AtomicMigration.php": "a3e636b14eed17a8294db6b076550997e92217a65b5d05aa583bb597ce935a42",
-    "server/patches/billing/overlay/app/Console/Commands/BillingMigrate.php": "706ff6fc43f9bfcf77ff822973e5790221d19f866ec39c8a54a0553255c0d1ee"
+    "server/patches/billing/overlay/app/Console/Commands/BillingMigrate.php": "706ff6fc43f9bfcf77ff822973e5790221d19f866ec39c8a54a0553255c0d1ee",
+    "server/tests/billing/laravel_concurrency_check.php": "5331e7a19f702a098413e672c96f7d60b12aa886ea5228c22c15974d907680de"
   },
   "platform_extensions": {
     "android": {
@@ -3452,6 +3453,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "1f7d0b508d521e00f63f8b0d52e26c14d802a5e7ad46e7467a4fb58553b1c7c0"
+    "contract_digest": "ae1198dbb559bf9c86f4977f586ce4354648a01cfbf9176dc1ea40ef0ef5866b"
   }
 }
