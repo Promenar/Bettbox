@@ -220,3 +220,8 @@ Android 生命周期候选接入完整工作门禁、独立绑定/启动意图�
 `build/macos-local-candidate/Bettbox.app` 已用现有唯一Apple Development身份完成完整bundle签名；10个框架及最终宿主严格验签通过，Core/helper的既有ad hoc身份与字节保持不变。封装工具20项测试通过，证书Team来自所选指纹对应叶证书OU，未读取私钥或输出原始身份。旧候选保留于 `build/macos-local-candidate-before-c9b0355`。回执 `validation/2026-10-07-three-platform/macos-development-signing-validation.json` 记录源摘要和构建来源。
 
 该产物是本机开发候选，未公证；尚未验证正常应用启动、Keychain冷启动、系统授权同意/取消、代理写入恢复及有效上游节点流量，不能声明可用公开发行版。Android、macOS优先交付；iOS按用户选择保留开发版并研究发行方案。
+
+
+### 2026-10-08 生产监听停止回执
+
+Go handleStopListener及stopListener action使用既有StopListenerChecked，在真实登记对象Close均确认时才返回true；isRunning=false仅停止新监听更新准入。handler/action共8个公开替身场景在修复前均失败，修复后通过，core包CGO0/with_gvisor回归通过。回执 `validation/2026-10-07-three-platform/core-listener-stop-action-validation.json` 保存实际源码与日志摘要。夹具未创建socket/TUN或写系统代理，不证明全部连接drain、provider/controller或Android Service结束。既有Android APK与macOS签名候选未包含此后源修改，须按最终集成版本重建验收。

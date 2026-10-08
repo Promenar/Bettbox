@@ -123,3 +123,6 @@ Android任务代理拒绝记录仅投影固定类别：非CONNECT、非法author
 
 
 `test-macos-seal-tools` 验证封装工具的两种签名模式与固定失败边界。`seal-macos-development-candidate` 显式使用现有唯一Apple Development身份；证书和签名工具输出在本机捕获，不向模型输出身份姓名、Team值或私钥。已有候选先保留任务内备份，拒绝覆盖；Core/helper不重签，Release entitlements保持项目配置。该操作不公证、不发布、不启用系统代理；完整应用运行另验。
+
+
+`test-core-listener-stop-action` 在本机CGO0/with_gvisor、离线依赖下运行生产Go handler/action回归。公开InboundListener替身经正式登记入口注入，覆盖失败、panic、去重、其它资源继续关闭和显式重试；不建立系统TUN或访问公网。core全包回归复用 `test-macos-owned-pipe` 的相同Go命令，证据不升级为设备或完整runtime验收。

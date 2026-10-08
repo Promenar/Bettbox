@@ -80,3 +80,5 @@
 
 - .agents/plans/2026-10-08-macos-development-signing.md — 唯一开发签名身份、证书Team来源与本机运行边界
 - docs/validation/2026-10-07-three-platform/macos-development-signing-validation.json — 20项工具回归及真实开发签名候选；应用与发行验收另验
+
+- docs/validation/2026-10-07-three-platform/core-listener-stop-action-validation.json — 生产handler/action检查式关闭的八场景红绿及core包回归

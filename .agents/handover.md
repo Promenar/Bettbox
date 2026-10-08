@@ -1838,3 +1838,34 @@ record-fingerprint: 402b4f1027771e9d177048b44746edffbcc1a8758be94a8d71b9ec16a22d
 
 ### HLG
 通过标准append先dry-run再apply追加，保留事实链。
+
+## 2026-10-08T15:49:36+08:00 · 生产监听停止回执红绿闭合及Android初始配置合同
+
+type: development
+scope: ["Bettbox"]
+status: done
+tags: ["android", "go", "lifecycle", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 2950f9d391b44ebfa377fd495726cad83edd7da23632c0bfd9d2890f443b9960
+
+### Summary
+生产handleStopListener改用已有检查式关闭，停止请求不再忽略登记资源关闭错误。
+
+### Changed
+仅hub.go停止函数与新增生产入口回归；Android联合计划补齐STAGED、epoch、initial composite、HTTP兼容和内存receipt合同。PDEC登记测试。
+
+### Validation
+handler/action八子场景真实red全部失败，green全部通过，core包CGO0/with_gvisor全回归exit0。独立未施工者审阅未发现新增P1/P2。公开回执core-listener-stop-action-validation.json。
+
+### Next
+实现Android唯一Native owner及Go/JNI同步提交、expected epoch/revision TUN采纳；执行真实CheckJNI与设备启停。macOS正常应用/Keychain/SC联合验证待界面工具可用。
+
+### Risks
+检查式成功仅证明登记资源Close返回；不证明accept/drain/provider/controller/full runtime退出。既有APK与签名App不包含此后源修改，最终集成须重建。有效上游、支付商户信息与发行权限条件仍未关闭。
+
+### DIA
+已同步CHANGELOG、平台验证、联合计划、PDEC说明、registry及回执。
+
+### HLG
+标准append先dry-run再apply追加交接事实，不重写历史。

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "scope": "生产Go handler/action登记资源检查式关闭，不证明Android设备或完整runtime停止",
+  "source_sha256": {
+    "core/hub.go": "16076609249d4d4cd329c426f73c481bddf3fd2dcc362de0ef33dc9e4d04a02c",
+    "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073",
+    "core/Clash.Meta/listener/stop_checked.go": "a57a282af1c06607c06a93c6f1f24ca3d3839f3e68b7c6f867bcc01282f0f09e"
+  },
+  "validation": {
+    "red_exit_code": 1,
+    "red_subcases_failed": 8,
+    "green_exit_code": 0,
+    "green_subcases_passed": 8,
+    "core_package_regression_exit_code": 0,
+    "cgo_enabled": false,
+    "build_tags": [
+      "with_gvisor"
+    ],
+    "fixtures": "生产PatchInboundListeners登记公开InboundListener替身，无socket/TUN/系统代理",
+    "independent_review": "独立只读审阅未发现新增P1/P2；!cgo及非owned action边界明确"
+  },
+  "evidence_sha256": {
+    "core-listener-stop-action-red.log": "ef1c1919aeb3919d401c43de9471d8a5b0547d92f13a8cd4e0764e0af0c513f5",
+    "core-listener-stop-action-green.log": "b85de520445e4604af2dbc0c489bcd2233489c43bd9264c26aa2f11c2826656c",
+    "core-listener-stop-package-green.log": "2c2fcaade11b7e32cb04947a0ded629cbc2007e1e94e42c357779cedb1f7f100"
+  },
+  "release_verified": false,
+  "unverified": [
+    "实际Android JVM/JNI/Service回执",
+    "所有连接drain和provider/controller退出",
+    "统一Native owner接线及有效上游流量"
+  ]
+}

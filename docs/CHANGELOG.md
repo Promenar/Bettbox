@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — 生产停止结果确认
+
+- Go监听停止入口接入已有检查式关闭，不再忽略关闭错误并始终返回true；失败对象保留供显式重试，单轮去重并继续关闭其它资源。真实handler/action八场景修复前失败、修复后通过，core包回归通过；不表示完整runtime或Android设备停止验收。
+- Android初始setState采用STAGED合同，首个setup消费同owner的desiredState；HTTP无headers兼容、epoch/revision和有界内存receipt边界纳入联合实施计划，生产接线待验。
+
 ## 2026-10-08 — macOS 开发签名候选
 
 - 完整应用候选使用现有唯一Apple Development身份签名，10个嵌套框架及宿主严格验签通过，Core/helper签后字节保持不变；20项封装工具回归通过。证书Team按指纹匹配叶证书OU，不从CN后缀推断。

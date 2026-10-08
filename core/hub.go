@@ -70,8 +70,7 @@ func handleStopListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
 	isRunning = false
-	listener.StopListener()
-	return true
+	return listener.StopListenerChecked() == nil
 }
 
 func handleGetIsInit() bool {

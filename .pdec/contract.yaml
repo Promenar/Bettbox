@@ -1241,6 +1241,28 @@
         "build/macos-local-candidate/seal.json"
       ],
       "verification": "使用现有唯一AppleDevelopment身份在本机签框架/宿主；签名前保留任务旧候选，Core/helper签后字节不变，不读取私钥、不发布/公证、不启动系统代理。OS认证仅由用户在系统界面处理。"
+    },
+    "test-core-listener-stop-action": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=60s",
+        "-tags",
+        "with_gvisor",
+        "-run",
+        "^TestStopListenerHandlerAndAction",
+        "-v",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "CGO0及GOPROXY/GOSUMDBoff；公开InboundListener由生产handler/action检查关闭结果，无公网、TUN或系统代理；不代表Android设备或全runtime收尾"
     }
   },
   "deployment": {
@@ -1328,7 +1350,7 @@
     "core/state/state.go": "38ab490b6738db46c3f7f6b9d5110ccaf72fa66c0561496d86f6c6d44211b554",
     "core/state/snapshot.go": "c2c9fd4a5b94915a1050567f01bad595bff4efded716a95c18b219fc8a606fb9",
     "core/state/snapshot_test.go": "0eef91b22dacc03cfeb2a4d0fa15f54f22d4778aef6d1eefb83517be3c02318c",
-    "core/hub.go": "109a06c96a424caac84c574087374b2eaa6a9675e06727598a388d3961f0511c",
+    "core/hub.go": "16076609249d4d4cd329c426f73c481bddf3fd2dcc362de0ef33dc9e4d04a02c",
     "core/lib_ios.go": "27831aa1eeab0568ce2cfb280bdc5a7af53a62431cd187ec479248ae3b82d11d",
     "core/lib_android.go": "ca6cbe6e2120beb6650eabfdfa069d7d20875086ae9ec8b1e50251ed61a3b10b",
     "core/client_state_action_test.go": "bae602975d1449df610a2ee56fff7a93f0741f1345cac33742ba2fabc197e9ac",
@@ -1466,7 +1488,8 @@
     "scripts/probe_macos_sc_lock.py": "91d40596591029274a22439f99b75890b378fdecfa965e6233667db9918f93d2",
     "lib/common/system.dart": "12898544d27d2a5dcc6912a5c45a42af552713bbc0db5ae39d67e608dd875da0",
     "test/common/macos_core_privilege_test.dart": "e07c3ac24193b30f98dd49f8707e64ef52e75f8e224f7b39e33407d1421e2730",
-    "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947"
+    "plugins/proxy/macos/Tests/Core/SystemConfigurationSessionTests.swift": "96bac3f456125d9b882fed4c7ef8d1441be4b1c1766c52780f2a21229c979947",
+    "core/listener_stop_action_test.go": "083e4b9a6f84dc1367e1e9b46f0b5f53372774e448c47155e53d7a765a618073"
   },
   "platform_extensions": {
     "android": {
@@ -1542,6 +1565,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "911f6a44e80fb3a5481360005a817a72539629c5d4b3250e80a87436c64aae67"
+    "contract_digest": "a34437544fd9e2615e2c95e28d8b611e7c4d0845bc333bd52f0354cca972f1f0"
   }
 }
