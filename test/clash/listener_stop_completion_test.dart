@@ -5,14 +5,35 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('只确认同次Go动作成功回执并发送检查式停止动作', () async {
-    expect(await confirmListenerStop(requestId: 'public-stop', invoke: (request) async {
-      expect(jsonDecode(request), {'id': 'public-stop', 'method': 'stopListener', 'data': null});
-      return jsonEncode({'id': 'public-stop', 'method': 'stopListener', 'code': 0, 'data': true, 'Port': 0});
-    }), isTrue);
+    expect(
+      await confirmListenerStop(
+        requestId: 'public-stop',
+        invoke: (request) async {
+          expect(jsonDecode(request), {
+            'id': 'public-stop',
+            'method': 'stopListener',
+            'data': null,
+          });
+          return jsonEncode({
+            'id': 'public-stop',
+            'method': 'stopListener',
+            'code': 0,
+            'data': true,
+            'Port': 0,
+          });
+        },
+      ),
+      isTrue,
+    );
   });
 
   test('失败、迟到异次、错误方法、缺字段及畸形回执不能确认停止', () async {
-    final valid = {'id': 'public-stop', 'method': 'stopListener', 'code': 0, 'data': true};
+    final valid = {
+      'id': 'public-stop',
+      'method': 'stopListener',
+      'code': 0,
+      'data': true,
+    };
     final cases = [
       {...valid, 'data': false},
       {...valid, 'id': 'older-stop'},
@@ -26,12 +47,96 @@ void main() {
       [],
     ];
     for (final response in cases) {
-      expect(await confirmListenerStop(requestId: 'public-stop', invoke: (_) async => jsonEncode(response)), isFalse);
+      expect(
+        await confirmListenerStop(
+          requestId: 'public-stop',
+          invoke: (_) async => jsonEncode(response),
+        ),
+        isFalse,
+      );
     }
-    expect(await confirmListenerStop(requestId: 'public-stop', invoke: (_) async => '公开畸形JSON'), isFalse);
+    expect(
+      await confirmListenerStop(
+        requestId: 'public-stop',
+        invoke: (_) async => '公开畸形JSON',
+      ),
+      isFalse,
+    );
   });
 
   test('停止传输错误不转换为成功', () async {
-    await expectLater(confirmListenerStop(requestId: 'public-stop', invoke: (_) async => throw StateError('公开传输异常')), throwsStateError);
+    await expectLater(
+      confirmListenerStop(
+        requestId: 'public-stop',
+        invoke: (_) async => throw StateError('公开传输异常'),
+      ),
+      throwsStateError,
+    );
+  });
+  test('启动回执必须匹配当前请求且明确成功', () async {
+    expect(
+      await confirmListenerStart(
+        requestId: 'public-start',
+        invoke: (request) async {
+          expect(jsonDecode(request), {
+            'id': 'public-start',
+            'method': 'startListener',
+            'data': null,
+          });
+          return jsonEncode({
+            'id': 'public-start',
+            'method': 'startListener',
+            'code': 0,
+            'data': true,
+          });
+        },
+      ),
+      isTrue,
+    );
+  });
+
+  test('启动拒绝、异次或畸形回执不转换为成功', () async {
+    final valid = {
+      'id': 'public-start',
+      'method': 'startListener',
+      'code': 0,
+      'data': true,
+    };
+    for (final response in [
+      {...valid, 'data': false},
+      {...valid, 'id': 'older-start'},
+      {...valid, 'method': 'stopListener'},
+      {...valid, 'code': -1},
+      {...valid, 'code': 0.0},
+      {...valid, 'data': 'true'},
+      {'id': 'public-start', 'data': true},
+      null,
+      [],
+    ]) {
+      expect(
+        await confirmListenerStart(
+          requestId: 'public-start',
+          invoke: (_) async => jsonEncode(response),
+        ),
+        isFalse,
+      );
+    }
+    expect(
+      await confirmListenerStart(
+        requestId: 'public-start',
+        invoke: (_) async => '公开畸形JSON',
+      ),
+      isFalse,
+    );
+  });
+
+  test('启动传输异常不得转换为成功', () async {
+    await expectLater(
+      confirmListenerStart(
+        requestId: 'public-start',
+        invoke: (_) async => throw StateError('公开传输异常'),
+      ),
+      throwsStateError,
+    );
   });
 }

@@ -1,0 +1,94 @@
+{
+  "observed_at": "2026-10-09T07:39:28+08:00",
+  "scope": "实际Dart公共与后台监听启动失败传播，不是完整VPN/owner采用",
+  "source_base_commit": "c1b4d8784fb96a2bbf9f96285c8f094c7007215c",
+  "source_sha256": {
+    "lib/clash/core.dart": "c1d77775a2c78bd5371535d1da9ba7505fd6576c15a6a5e903e95ddd7bac395a",
+    "lib/clash/lib.dart": "442c19cef9353189313de5f76a4f823b91338b2f869d3feaa7cd6a75183e3e4d",
+    "lib/clash/listener_stop_completion.dart": "5787edf10c66a92c0b1fac0407d014469f1f4282e42ac2de5c3380d3cc7f69ef",
+    "lib/state.dart": "bd3e230e9077ecd1b3f1b7459967fe76d4663d66947db4754e3e28aa4249d565",
+    "test/clash/listener_stop_completion_test.dart": "1abcc89ae41c5b2882a178f0561a7be08c05bf8b054dd72fb1f43b7a4ffc432a",
+    "test/clash/listener_stop_confirmation_test.dart": "1e2627a4ac7ed7ecf935c42e5cc3ceb45e8d5289764c01ce753bcb2b6ab040b8",
+    "test/clash/listener_stop_ffi_test.dart": "b5c0004cbf804d7492b20834f4b39dcc47f5da006906238952d3e68e10dd3f9a"
+  },
+  "red": {
+    "public_start_false_ignored": true,
+    "exit_code": 1,
+    "failed": 1
+  },
+  "green": {
+    "targeted_passed": 12,
+    "targeted_exit": 0,
+    "flutter_full_passed": 305,
+    "flutter_full_skipped": 0,
+    "flutter_full_exit": 0,
+    "analyze_exit": 0,
+    "analyze_issues": 0
+  },
+  "actual_ffi": {
+    "build_exit": 0,
+    "library": ".test/listener-stop-ffi/libclash.dylib",
+    "sha256": "55cef5dd5acb116ff5b80ce838e17bf45e4b067a0669ed27759a09a3081ef844",
+    "production_handler_start_stop_assertions_executed_in_full_suite": true,
+    "boundary": "macOS ARM64真实Go C ABI及Dart端口，不是Android JNI/设备或活动监听连接验收"
+  },
+  "independent_review": {
+    "agent": "android_start_admission_review",
+    "new_P1_P2": 0,
+    "tests_run_by_reviewer": false
+  },
+  "current_node_probe": {
+    "binary_sha256": "82a63e566df89153927d26f2fce94446f826b85a9423aeef2692f309e0f8a4d5",
+    "exit_code": 0,
+    "exit_confirmed": true,
+    "elapsed_seconds": 2.48,
+    "results": [
+      {
+        "index": 0,
+        "protocol": "anytls",
+        "stage": "request",
+        "error_class": "transport",
+        "trace_present": false
+      },
+      {
+        "index": 1,
+        "protocol": "anytls",
+        "stage": "request",
+        "error_class": "transport",
+        "trace_present": false
+      },
+      {
+        "index": 2,
+        "protocol": "hysteria2",
+        "stage": "request",
+        "error_class": "authentication",
+        "trace_present": false
+      },
+      {
+        "index": 3,
+        "protocol": "hysteria2",
+        "stage": "request",
+        "error_class": "authentication",
+        "trace_present": false
+      }
+    ],
+    "secrets_reported": false,
+    "boundary": "macOS独立核心协议探测；不证明Android JNI/TUN或系统代理通过。"
+  },
+  "transport_dependency": {
+    "path": "github.com/metacubex/http",
+    "version": "v0.1.7",
+    "sum": "h1:dEaQmijUaR/2QKqgjBUmPZCRuh1zBfDqB6ZRNLwvbHg=",
+    "actual_source_rechecked": true,
+    "http1_current_selection": true,
+    "private_tasks_join_available": false,
+    "permanent_leak_proven": false
+  },
+  "boundaries": [
+    "GlobalState后续副作用未以完整服务设备路径验证，当前提前计时仍待联合owner接线",
+    "主后台IPC和quickStart未await入口、typedcompletion/ACK、engine退出及所有协议/UDP责任仍未完成",
+    "新Dart源码未生成或安装发行APK，也未切换macOS候选",
+    "四条真实节点探测仍失败，不证明密码或配额根因；没有成功代理HTTPS流量",
+    "未修改依赖缓存或版本、系统网络、凭据、生产业务"
+  ]
+}

@@ -378,7 +378,9 @@ class GlobalState {
     }
     startTime ??= DateTime.now();
     if (system.isAndroid && isService) {
-      await clashLibHandler?.startListener();
+      if (await clashLibHandler?.startListener() != true) {
+        throw StateError(appLocalizations.connectionStateUnconfirmed);
+      }
     } else {
       await clashCore.startListener();
     }

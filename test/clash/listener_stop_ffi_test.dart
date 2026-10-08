@@ -18,6 +18,7 @@ void main() {
       final handler = ClashLibHandler.withLibrary(
         DynamicLibrary.open(file.path),
       );
+      expect(await handler.startListener(), isTrue);
       expect(await handler.stopListener(), isTrue);
       expect(await handler.stopListener(), isTrue);
       int? firstEpoch;

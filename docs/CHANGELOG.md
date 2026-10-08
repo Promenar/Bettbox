@@ -1,5 +1,11 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 监听启动失败传播
+
+- 公共Dart启动拒绝内核false，后台FFI消费真实同次Go回执；失败不推进VPN请求与偏好写入。
+- 补充启动拒绝、等待、异常及回执关联回归，并通过真实Go FFI和完整Flutter测试；完整Android owner/ACK与有效流量待验收。
+
+
 ## 2026-10-09 — TCP协议会话收尾与逐请求认证
 
 - HTTP/SOCKS/Mixed实际工厂采用公共会话责任，关闭accepted连接并等待handler及登记的HTTP pipe/route/Peek任务；未知任务和Close失败保留责任。修复复用连接较早认证成功允许后续认证失败请求进入代理的问题。真实工厂、认证、连接复用、Upgrade及scope/race回归、核心测试和Android ARM64编译通过；完整Transport/watcher/UDP及平台owner和发行仍未验收。

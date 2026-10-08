@@ -235,8 +235,10 @@ class ClashLibHandler {
   }
 
   Future<bool> startListener() async {
-    clashFFI.startListener();
-    return true;
+    return confirmListenerStart(
+      requestId: 'startListener#${utils.id}',
+      invoke: invokeAction,
+    );
   }
 
   Future<bool> stopListener() async {

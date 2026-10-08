@@ -305,7 +305,9 @@ class ClashCore {
   }
 
   Future<void> startListener() async {
-    await clashInterface.startListener();
+    if (!await clashInterface.startListener()) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
   }
 
   Future<void> stopListener() async {

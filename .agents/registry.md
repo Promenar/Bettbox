@@ -207,3 +207,6 @@
 - docs/validation/2026-10-07-three-platform/tcp-protocol-lifecycle-validation.json — 真实工厂/认证红绿、连接复用、scope任务和ARM64编译证据
 
 - `docs/validation/2026-10-07-three-platform/macos-window-runtime-validation.json`：真实窗口、未登录页面/公开套餐、正常退出和重新启动的有界证据；黑屏根因及全路径待验证。
+
+- `.agents/plans/2026-10-09-listener-start-confirmation.md`：Dart真实监听启动回执传播与验收边界。
+- `docs/validation/2026-10-07-three-platform/listener-start-confirmation-validation.json`：启动红绿回归、真实Go FFI及当前节点/Transport接口缺口证据。

@@ -8,8 +8,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 class ListenerHandler extends ClashHandlerInterface {
   final Future<bool> Function() stop;
+  final Future<bool> Function()? start;
   int calls = 0;
-  ListenerHandler(this.stop);
+  ListenerHandler(this.stop, {this.start});
+
+  @override
+  Future<bool> startListener() {
+    calls++;
+    return start!();
+  }
 
   @override
   Future<bool> stopListener() {
@@ -27,7 +34,10 @@ void main() {
 
   test('公开停止入口不吞掉检查式关闭失败', () async {
     final handler = ListenerHandler(() async => false);
-    await expectLater(ClashCore.withInterface(handler).stopListener(), throwsStateError);
+    await expectLater(
+      ClashCore.withInterface(handler).stopListener(),
+      throwsStateError,
+    );
     expect(handler.calls, 1);
   });
 
@@ -35,7 +45,9 @@ void main() {
     final closed = Completer<bool>();
     final handler = ListenerHandler(() => closed.future);
     var completed = false;
-    final result = ClashCore.withInterface(handler).stopListener().then((_) { completed = true; });
+    final result = ClashCore.withInterface(handler).stopListener().then((_) {
+      completed = true;
+    });
     await Future<void>.delayed(Duration.zero);
     expect(completed, isFalse);
     closed.complete(true);
@@ -46,7 +58,48 @@ void main() {
 
   test('公开停止入口保留关闭异常', () async {
     final handler = ListenerHandler(() async => throw StateError('公开关闭异常'));
-    await expectLater(ClashCore.withInterface(handler).stopListener(), throwsStateError);
+    await expectLater(
+      ClashCore.withInterface(handler).stopListener(),
+      throwsStateError,
+    );
+    expect(handler.calls, 1);
+  });
+  test('公开启动入口拒绝内核返回false', () async {
+    final handler = ListenerHandler(() async => true, start: () async => false);
+    await expectLater(
+      ClashCore.withInterface(handler).startListener(),
+      throwsStateError,
+    );
+    expect(handler.calls, 1);
+  });
+
+  test('公开启动入口等待同次内核启动回执', () async {
+    final started = Completer<bool>();
+    final handler = ListenerHandler(
+      () async => true,
+      start: () => started.future,
+    );
+    var completed = false;
+    final result = ClashCore.withInterface(handler).startListener().then((_) {
+      completed = true;
+    });
+    await Future<void>.delayed(Duration.zero);
+    expect(completed, isFalse);
+    started.complete(true);
+    await result;
+    expect(completed, isTrue);
+    expect(handler.calls, 1);
+  });
+
+  test('公开启动入口保留内核调用异常', () async {
+    final handler = ListenerHandler(
+      () async => true,
+      start: () async => throw StateError('公开启动异常'),
+    );
+    await expectLater(
+      ClashCore.withInterface(handler).startListener(),
+      throwsStateError,
+    );
     expect(handler.calls, 1);
   });
 }

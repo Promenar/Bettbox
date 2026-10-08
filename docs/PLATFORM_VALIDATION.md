@@ -490,3 +490,9 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 2026-10-09，CUA已能选择确切 `build/macos-local-development/Bettbox.app` 并观察窗口。首页、账户未登录提示和商店公开套餐均实际绘制；页面切换成功。通过正常退出确认宿主及两个内核进程消失，再启动同一候选后首页可访问。宿主摘要与框架诊断候选封装一致，相关Dart源码摘要一致。公开回执见 `validation/2026-10-07-three-platform/macos-window-runtime-validation.json`。
 
 当前观察未复现黑屏，但没有确认先前黑屏根因或证明间歇问题已修复。仅验证未登录页面、公开套餐和一次重新启动；没有账户、邀请、支付及有效VPN验收。候选源码为56b68b2，未集成f91428d的内核改动；签名仍是本机开发，未公证或公开发行。
+
+## Dart监听启动真实回执传播
+
+公共ClashCore启动入口对内核false抛出未确认错误；后台ClashLibHandler通过实际Go invokeAction等待并核验当前请求ID、方法、整数code与布尔data，代替void调用后固定true。GlobalState后台路径拒绝false/null，阻断后续VPN请求、偏好写入与更新任务。公共入口红回归实际复现false被忽略；修复后12项定向回归及完整305项Flutter回归通过，真实Go动态库由生产Handler执行启动/停止。证据见 `validation/2026-10-07-three-platform/listener-start-confirmation-validation.json`。
+
+完整GlobalState后续副作用及Android服务设备路径尚未验证；提前计时、主后台IPC/quickStart未await入口和完整owner/ACK仍待联合接线。没有安装新APK或切换macOS候选。当前四条独立节点协议探测仍为两条AnyTLS transport及两条Hysteria2 authentication失败；这些错误类别不能定位上游具体原因，没有有效代理HTTPS验收。

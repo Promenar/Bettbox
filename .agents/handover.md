@@ -3543,3 +3543,34 @@ CUA锁屏限制已解除；确切本机开发候选首页、账户未登录页�
 
 ### HLG
 通过append追加当前事实，保留先前锁屏与未验收记录，重建索引。
+
+## 2026-10-09T07:40:24+08:00 · Dart监听启动真实回执传播与节点当前探测
+
+type: maintenance
+scope: ["Bettbox", "Android", "Dart", "core"]
+status: partial
+tags: ["listener", "start", "three-platform-release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: b8b19e4118fa0217dc524c0100219997e05617ad5d1abfa3010853759ea23d5c
+
+### Summary
+公共ClashCore启动false被忽略的缺陷已用实际入口红回归复现并修复；后台ClashLibHandler不再在void FFI调用后固定true，而是消费同次Go动作回执。完整发行目标未完成。
+
+### Changed
+共享检查式启动/停止回执解析；公共入口及GlobalState服务分支拒绝false/null，阻断其后的VPN请求、偏好和更新任务。7项源码/测试摘要登记，PDEC仅刷新相关evidence与批准摘要，无操作字段漂移。未安装APK或切换macOS候选。
+
+### Validation
+红回归exit1失败1；定向12项通过，完整Flutter305项通过0跳过，真实Go C ABI构建并由生产Dart Handler执行启动/停止，analyze无问题。独立审阅无新增P1/P2。当前源摘要与回执一致，PDEC execution_ready=true。四条节点协议探测真实进程退出，2.48秒，AnyTLS两条transport失败、Hysteria2两条authentication失败，无代理HTTPS成功。
+
+### Next
+联合采用完整Android owner/ACK及后台直接入口、计时/偏好、退出准入；完成其余协议与UDP资源责任、macOS完整账户/VPN、服务端邀请支付和iOS开发验证。有效上游认证仍需核验，不购买或付费续订。
+
+### Risks
+本项不是完整VPN完成：GlobalState后续副作用没有完整服务设备回归，提前计时和IPC/quickStart未await调用仍存在。当前锁定metacubex/http v0.1.7的私有dial/read/write任务无公开join；主控复核Transport源，scope撤销与pipe关闭不能证明全部内部任务在Close返回前退出，尚未证明永久泄漏。设备有效VPN、发行签名和支付权限等仍待全路径验收。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、registry、计划和启动验证回执。
+
+### HLG
+通过结构化append追加事实链及索引，记录实际进展和后续边界。
