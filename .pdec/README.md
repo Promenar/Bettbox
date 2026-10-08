@@ -150,3 +150,6 @@ TUN 配置预留验证入口：`test-android-tun-reservation`、`test-android-co
 
 
 Android普通停止新增独立JVM red/green输出、release Kotlin适配编译及Dart channel回归操作；均沿用已批准本机例外。原生编译证据不代替APK安装或真实VPN流量验收。
+
+
+Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例外运行；测试使用公开登记监听替身，不创建TUN或真实代理入口。真实engine身份与ACK设备验证独立完成。

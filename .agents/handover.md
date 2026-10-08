@@ -2365,3 +2365,34 @@ GlobalState仅静态复核，无直接分支回归；listener先关闭有部分�
 
 ### HLG
 标准append先dry-run后apply，保留跨会话事实与未验收边界。
+
+## 2026-10-08T22:53:11+08:00 · shutdown监听责任保留与Dart销毁回执等待
+
+type: implementation
+scope: ["Bettbox", "Android", "Go"]
+status: done
+tags: ["shutdown", "ownership", "validation"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 13a0dccf9f49ebc01a2c03a625858f868305f010d0defc17fcf68c2366b86fde
+
+### Summary
+生产shutdown关闭失败不发布成功；Dart不忽略关闭或销毁结果，完整发行目标保持未完成。
+
+### Changed
+Go runLock内关闭新监听准入并StopListenerChecked，false保留isInit及对象并跳过executor；AndroidClashLib使用completeShutdown等待两次回执且destroy仅严格true成功。
+
+### Validation
+真实Go红例3不变量失败，固定源定向成功/失败shutdown与stop action、Go主包完整回归exit0；Flutter230项与静态检查通过。独立生产代码审阅无新增P1/P2；补充销毁异常与成功shutdown测试。
+
+### Next
+统一Native owner接入配置/TUN和checked shutdown/suspend；完成原生messenger/session、同次stop票据、目标engine对象、消费ACK及EXITING门禁；收敛所有destroy入口，再安装新APK验证。macOS完整App界面签名、iOS开发版与服务端业务全路径持续推进。
+
+### Risks
+现有bool不是runtime退出资格；provider/controller/TUN drain等未确认，排队start可重新准入、init/getIsInit锁未统一。无实际Android engine退出或新APK验证。macOS黑窗为测试探针，正常App未验收。
+
+### DIA
+已同步架构、平台验收、CHANGELOG、原生owner计划、PDEC说明、registry及公开回执。
+
+### HLG
+标准append dry-run后apply；保留下一步与未验收边界。

@@ -1,0 +1,75 @@
+{
+  "receipts": {
+    "shutdown-listener-red": {
+      "exit_code": 1,
+      "failure_checks": {
+        "监听关闭失败却确认shutdown成功": true,
+        "关闭未确认却清除初始化状态": true,
+        "shutdown丢弃未确认监听的重试责任": true
+      },
+      "stdout_sha256": "b2a5da4b2cc74b51bad67f13c76c1b4d38bb1c2c3cfa0a7fc5104be3f19bb1d7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "shutdown-completion-go": {
+      "exit_code": 0,
+      "source_sha256": {
+        "core/hub.go": "864d0be57cd89cf8a04b99e70532ffecc56920805ce7dc4b2ff12f47d13c1e2d",
+        "core/shutdown_listener_confirmation_test.go": "8528438392c7df42d090dcfc7d9494bbbcf90786c9cf111fb86559feb452f648",
+        "lib/clash/lib.dart": "3d1aabe5f0deff999958d576c14ae0fa2e60d48761fdab0a4b2ddf3a2bfa8c7c",
+        "lib/clash/shutdown_completion.dart": "147bff19c7982c68bd8b92ddd882eb97492ce6dc69ffdc8b4fcd7700f2863313",
+        "test/clash/shutdown_completion_test.dart": "f408afd2effa0496b5c5fe4e6720a21e3a0dc42e7912d0bd78860b6d170bd6a0"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "fc7b4bc1c6ddf0c5f8e40b5d6bd1506eb7ae5aa9b2df54f2dfe8469727bf43a0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shutdown_failure_pass": true,
+      "shutdown_success_pass": true,
+      "listener_test_pass": true
+    },
+    "shutdown-completion-go-full": {
+      "exit_code": 0,
+      "stdout_sha256": "0dee8cdb328a61f6bf44c86a6efb36b398deedc126206ee32c1cda12dabe5807",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_sha256": "864d0be57cd89cf8a04b99e70532ffecc56920805ce7dc4b2ff12f47d13c1e2d"
+    },
+    "shutdown-completion-full": {
+      "exit_code": 0,
+      "source_sha256": {
+        "core/hub.go": "864d0be57cd89cf8a04b99e70532ffecc56920805ce7dc4b2ff12f47d13c1e2d",
+        "core/shutdown_listener_confirmation_test.go": "8528438392c7df42d090dcfc7d9494bbbcf90786c9cf111fb86559feb452f648",
+        "lib/clash/lib.dart": "3d1aabe5f0deff999958d576c14ae0fa2e60d48761fdab0a4b2ddf3a2bfa8c7c",
+        "lib/clash/shutdown_completion.dart": "147bff19c7982c68bd8b92ddd882eb97492ce6dc69ffdc8b4fcd7700f2863313",
+        "test/clash/shutdown_completion_test.dart": "f408afd2effa0496b5c5fe4e6720a21e3a0dc42e7912d0bd78860b6d170bd6a0"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "7d39d1b69ddbaf288631e121c70b2a27b84f5e132b154ca9f590c60977e5e587",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_results": {
+        "success": 230
+      }
+    },
+    "shutdown-completion-analyze": {
+      "exit_code": 0,
+      "source_sha256": {
+        "core/hub.go": "864d0be57cd89cf8a04b99e70532ffecc56920805ce7dc4b2ff12f47d13c1e2d",
+        "core/shutdown_listener_confirmation_test.go": "8528438392c7df42d090dcfc7d9494bbbcf90786c9cf111fb86559feb452f648",
+        "lib/clash/lib.dart": "3d1aabe5f0deff999958d576c14ae0fa2e60d48761fdab0a4b2ddf3a2bfa8c7c",
+        "lib/clash/shutdown_completion.dart": "147bff19c7982c68bd8b92ddd882eb97492ce6dc69ffdc8b4fcd7700f2863313",
+        "test/clash/shutdown_completion_test.dart": "f408afd2effa0496b5c5fe4e6720a21e3a0dc42e7912d0bd78860b6d170bd6a0"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "f8eaf785320cddd19a55737975405c9b8eaaac3d3a7ec2f973f722a8e2049f7c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": true
+    }
+  },
+  "review": "独立只读复核生产Go/Dart修改未发现新增P1/P2；主控补充成功shutdown与destroy异常回归并复核固定源摘要",
+  "boundaries": [
+    "Go公开监听替身非Android设备",
+    "Dart生产关闭/销毁协调函数，非实际engine退出",
+    "runtime/provider/controller/TUN drain全部关闭未确认",
+    "排队start与并发init/read尚未由owner收敛",
+    "typed engine session/ACK与EXITING准入未完成",
+    "新APK未构建安装"
+  ]
+}

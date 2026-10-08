@@ -88,7 +88,12 @@ func handleForceGc(forceFreeOSMemory bool) {
 }
 
 func handleShutdown() bool {
-	stopListeners()
+	runLock.Lock()
+	defer runLock.Unlock()
+	isRunning = false
+	if listener.StopListenerChecked() != nil {
+		return false
+	}
 	executor.Shutdown()
 	runtime.GC()
 	debug.FreeOSMemory()

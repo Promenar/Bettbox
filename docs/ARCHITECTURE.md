@@ -226,3 +226,12 @@ Android实际权限启动路径使用进程内动态请求码与同次弹窗共�
 Android普通stop/stopVpn响应等待同次native工作门禁中的TUN关闭、平台资源关闭和匹配代次的STOP提交；失败返回false并保留阻断与未确认绑定责任。Dart两个普通停止包装器对false/null抛出现有本地化错误，后台引擎显式调用Vpn.stop，运行时间与偏好只在普通停止确认后更新。JVM屏障回归与真实release Kotlin工程编译通过；Dart实际包装器红例复现2项失败、修复6项通过，完整Flutter测试225项通过。smartStop、typed owner、关闭后engine ACK及新APK设备验证尚未完成。调用方等待响应期间暂留engine，不能据此宣称完整关闭或发行可用。
 
 静态分析无问题，独立原生/Dart审阅未发现P1/P2。GlobalState分支仅静态审阅；listener先关闭而Native失败时保留状态，可能形成部分停止态。相关证据：`docs/validation/2026-10-07-three-platform/android-stop-completion-validation.json`。
+
+
+## shutdown失败传播与engine退出前置条件
+
+shutdown监听失败传播已接入生产handleShutdown：runLock内关闭新监听准入并调用StopListenerChecked，未确认即返回false，保留isInit与失败对象，不执行executor清理。Android ClashLib.shutdown使用completeShutdown，关闭false或异常不销毁，关闭成功后等待destroy；destroy仅在Service回执严格true时成功。Go公开登记监听的实际红例证实原失败吞没、初始化状态丢失及重试责任丢失；固定源版本的失败/成功与stop action回归通过。该改动不证明executor、provider、controller、TUN drain或全部runtime资源退出，不提供engine退出资格。
+
+安全engine退出必须使用同次不可变stop票据，固定原生调用messenger/session和目标engine对象/序号，checked收尾与消费ACK均关联该票据；销毁前原子检查最新intent、配置/权限/绑定操作、未确认资源及目标身份，设置EXITING并在主线程锁外销毁，退出期间排队新启动。Service.destroy、internal autoDestroy及_initService旧destroy入口需共同收敛；当前尚未实现。现有init/getIsInit未统一锁、排队startListener可重新准入，布尔成功不得成为退出许可。
+
+当前固定源版本Go主包完整回归、失败/成功shutdown和stop action定向回归、230项Flutter测试与静态检查通过。证据：`docs/validation/2026-10-07-three-platform/shutdown-completion-validation.json`。

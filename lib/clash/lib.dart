@@ -13,6 +13,7 @@ import 'package:bett_box/state.dart';
 
 import 'generated/clash_ffi.dart';
 import 'interface.dart';
+import 'shutdown_completion.dart';
 
 class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
   static ClashLib? _instance;
@@ -77,8 +78,7 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
 
   @override
   destroy() async {
-    await service?.destroy();
-    return true;
+    return await service?.destroy() == true;
   }
 
   @override
@@ -88,9 +88,7 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
 
   @override
   Future<bool> shutdown() async {
-    await super.shutdown();
-    destroy();
-    return true;
+    return completeShutdown(close: super.shutdown, destroy: destroy);
   }
 
   @override
