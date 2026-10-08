@@ -22,10 +22,12 @@ import 'clash/lib.dart';
 import 'common/common.dart';
 import 'common/external_control.dart';
 import 'common/network_matcher.dart';
+import 'common/startup_trace.dart';
 import 'models/models.dart';
 
 ReceivePort? _serviceReceiverPort;
 ReceivePort? _messageReceiverPort;
+final _startupTrace = StartupTrace(report: commonPrint.log);
 
 Future<void> main(List<String> args) async {
   globalState.isService = false;
@@ -39,7 +41,10 @@ Future<void> main(List<String> args) async {
   }
 
   if (system.isMacOS) {
-    final acquire = await singleInstanceLock.acquire();
+    final acquire = await _startupTrace.run(
+      StartupStage.singleInstance,
+      singleInstanceLock.acquire,
+    );
     if (!acquire) {
       commonPrint.log(
         'SingleInstanceLock: another instance detected or lock failed, exiting',
@@ -52,11 +57,23 @@ Future<void> main(List<String> args) async {
 
   PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
 
-  final version = await system.version;
-  await Future.wait([globalState.initApp(version), clashCore.preload()]);
+  final version = await _startupTrace.run(
+    StartupStage.version,
+    () => system.version,
+  );
+  await Future.wait([
+    _startupTrace.run(
+      StartupStage.configuration,
+      () => globalState.initApp(version),
+    ),
+    _startupTrace.run(StartupStage.corePreload, clashCore.preload),
+  ]);
 
   try {
-    await uiManager.initializeUI();
+    await _startupTrace.run(
+      StartupStage.dashboardAssets,
+      uiManager.initializeUI,
+    );
   } catch (e) {
     commonPrint.log('Failed to initialize UI: $e');
   }
@@ -82,7 +99,7 @@ Future<void> _sendControlCommand(String command) async {
 
 Future<void> _runApp() async {
   try {
-    await RustLib.init();
+    await _startupTrace.run(StartupStage.rustBridge, () => RustLib.init());
   } catch (e) {
     commonPrint.log('Failed to initialize code_forge RustLib: $e');
   }
@@ -94,11 +111,21 @@ Future<void> _runApp() async {
       commonPrint.log('Failed to set high refresh rate: $e');
     }
   }
-  await android?.init();
+  await _startupTrace.run(
+    StartupStage.androidBridge,
+    () async => await android?.init(),
+  );
 
-  await window?.init();
+  await _startupTrace.run(
+    StartupStage.window,
+    () async => await window?.init(),
+  );
   HttpOverrides.global = BettboxHttpOverrides();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _startupTrace.mark(StartupStage.firstFrame);
+  });
   runApp(ProviderScope(child: const Application()));
+  _startupTrace.mark(StartupStage.application);
 }
 
 @pragma('vm:entry-point')

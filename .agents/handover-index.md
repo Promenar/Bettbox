@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T04:09:03+08:00
+> generated_at: 2026-10-09T04:15:27+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -9,7 +9,7 @@
 | continuity-key | continuity | last update | status | scope | title | source |
 | :--- | :---: | :---: | :---: | :--- | :--- | :--- |
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
-| bettbox-three-platform-release | resume | 2026-10-09T04:09:03+08:00 | partial | ["Bettbox", "Android", "Go", "Dart"] | Android实际运行时身份准入与失败IPC收尾 | `.agents/handover.md` · `2026-10-09T04:09:03+08:00` · `fp:c916d21a06` |
+| bettbox-three-platform-release | resume | 2026-10-09T04:15:27+08:00 | partial | ["Bettbox", "macOS", "Dart"] | macOS黑屏调查与正式入口阶段诊断 | `.agents/handover.md` · `2026-10-09T04:15:27+08:00` · `fp:6a41eeaa0f` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
 | three-platform-release | resume | 2026-10-09T03:19:06+08:00 | partial | ["Bettbox", "Android"] | Android a35d73f签名候选更新基础设备验收与完整owner采用计划 | `.agents/handover.md` · `2026-10-09T03:19:06+08:00` · `fp:6056af5196` |
 
@@ -17,6 +17,7 @@
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T04:15:27+08:00 | iso | partial | resume | ["Bettbox", "macOS", "Dart"] | ["macos", "startup", "release"] | macOS黑屏调查与正式入口阶段诊断 | `.agents/handover.md` · `2026-10-09T04:15:27+08:00` · `fp:6a41eeaa0f` |
 | 2026-10-09T04:09:03+08:00 | iso | partial | resume | ["Bettbox", "Android", "Go", "Dart"] | ["android", "runtime-identity", "release"] | Android实际运行时身份准入与失败IPC收尾 | `.agents/handover.md` · `2026-10-09T04:09:03+08:00` · `fp:c916d21a06` |
 | 2026-10-09T03:40:58+08:00 | iso | partial | resume | ["Bettbox", "core", "Android"] | ["android", "runtime-epoch", "owner"] | Go运行时配置epoch与跨实例拒绝验证 | `.agents/handover.md` · `2026-10-09T03:40:58+08:00` · `fp:a783dde30e` |
 | 2026-10-09T03:34:52+08:00 | iso | partial | resume | ["Bettbox", "Android", "core"] | ["android", "owner", "legacy-admission", "race"] | Android公共旧配置及监听入口门禁红绿与并发复核 | `.agents/handover.md` · `2026-10-09T03:34:52+08:00` · `fp:6744d1c2a5` |

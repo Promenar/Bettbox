@@ -2954,3 +2954,34 @@ FFI测试中的JNI回调为替身，JVM engine对象为夹具；不证明真实�
 
 ### HLG
 使用标准append先预演后追加，索引由工具重建。
+
+## 2026-10-09T04:15:27+08:00 · macOS黑屏调查与正式入口阶段诊断
+
+type: maintenance
+scope: ["Bettbox", "macOS", "Dart"]
+status: partial
+tags: ["macos", "startup", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 6a41eeaa0f9519403232632fa9e88bd1efa04091bef3fdd5f8d868d79f63c9ac
+
+### Summary
+用户观察的全黑不是正常界面，原因未确认。正式源码已接入固定启动阶段诊断，便于捕获首帧前的具体等待；当前运行候选没有这份新诊断。
+
+### Changed
+main保持原初始化次序，固定枚举阶段记录开始、10秒pending、函数返回或失败、runApp及首帧回调；不接收错误文本、参数或账户值。诊断输出异常不改变操作结果。
+
+### Validation
+四项诊断回归通过；启用真实Go动态库的Flutter全回归292项全部通过；静态检查退出0。实际进程采样退出0，stdout/stderr为/dev/null。锁屏阻止可见窗口验收，日志和线程采样不能证明渲染正常。公开回执macos-startup-trace-validation.json记录源摘要和范围。
+
+### Next
+在固定源码上重建macOS开发候选并捕获启动阶段；仅在旧会话资源确认退出后启动新候选，解锁后验证窗口。继续Android唯一owner联合采用、账户订阅邀请支付和有效VPN端到端验证。
+
+### Risks
+没有确认黑屏根因或修复，首帧回调不能证明GPU显示和窗口正常。完整三端业务和发行门禁仍未关闭。未触碰用户.video_agent目录。
+
+### DIA
+已同步架构、平台验收、变更记录、诊断计划、registry及公开回执。
+
+### HLG
+标准append预演后追加，索引由工具重建。

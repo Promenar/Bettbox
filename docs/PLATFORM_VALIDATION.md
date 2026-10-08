@@ -374,3 +374,7 @@ SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageR
 Go 运行时配置 epoch 已使用库载入期公开随机身份；完整主包及身份 race 通过，证据见 `docs/validation/2026-10-07-three-platform/android-runtime-epoch-validation.json`。设备 FFI/JNI 实际同实例证明尚未完成，不能用此源码变更替代该门禁。
 
 后台身份准入已接入现有 FFI invokeAction 与两条原生 channel。288 项 Flutter 回归包含新构建 Go 库的真实往返，但该用例的 JNI 回调为 mock；严格 Native 比较与 engine 归属仅有 JVM 夹具及实际 release Kotlin 编译证据。身份失败先提供关联拒绝 IPC，再有限上报，未知资源不报告 STOP 或销毁。完整 owner/ACK、新 APK 与设备真实身份比对待验，证据见 `docs/validation/2026-10-07-three-platform/android-runtime-identity-validation.json`。
+
+### macOS 黑屏定位入口
+
+当前黑屏原因未确认。现有候选进程存活且标准输出/错误指向 `/dev/null`；统一日志缺少 Dart 启动阶段信息，采样中的事件循环及 Metal 线程不能证明正常渲染。源码接入固定启动阶段标记及10秒等待提示，供带输出捕获的开发启动定位首帧之前的等待。四项诊断行为测试及启用真实Go动态库的292项Flutter回归通过；该证据不代表候选重建、实际窗口或黑屏修复通过。锁屏时不执行窗口验收，也不把首帧回调标记当作窗口正常证据。

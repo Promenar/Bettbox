@@ -3125,7 +3125,7 @@
     "lib/plugins/smart_stop_completion.dart": "c6b5ae168471e9e9aed8cb1d42ab13b7497d249db7dde24f240783d450c6466a",
     "test/plugins/smart_stop_completion_test.dart": "06c60b886df21b2e3c6e0d0a6ae424854e4e596fe8cf854084f020346bd92a23",
     "lib/manager/smart_auto_stop_manager.dart": "02450fb7f9a9e4f257f78fb4fe7cd15f49edb24233bff0cbae24743365af4c67",
-    "lib/main.dart": "0f76b39806e19e47550fc41d70c1d24676724088555433ee18472d3088dbf1dc",
+    "lib/main.dart": "897e8bb7d96ecb5a09bd395902d4cddc7200a93b41600b3809f1fb46c40ef1c0",
     "lib/manager/smart_auto_stop_policy.dart": "536a50f70573dfb78450d171911617ea78bf86f808ff5a2d258231494981c6f1",
     "test/manager/smart_auto_stop_policy_test.dart": "f3dba8591c76b514b558b3c84beb08abda3c263e5fc1ca273305235e064c5c62",
     "test/plugins/android_smart_resume_test.dart": "900bfe852d29d1d934b8736eb7de8bb50f0e2e2572eefc2b71fa39a9a609f02c",
@@ -3146,7 +3146,9 @@
     "lib/clash/interface.dart": "08fe4d3dd9d03c09539711b7a6314d710dcff843e91edf9ac34cf7e3fa887d2b",
     "test/clash/native_action_request_test.dart": "e6d4879cefda48ef35a14cf4e2b40e22737a3fb7813ea5454f708d5f4f738ecb",
     "test/clash/action_error_completion_test.dart": "20728b6fb89a1568151213a11e21ed07becce6193dddb42d8a91d5a170169fd7",
-    "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt": "0490c1d81e3f7fe4b0808cc0de49db8f5baffd150785729525b02a0b605a536b"
+    "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt": "0490c1d81e3f7fe4b0808cc0de49db8f5baffd150785729525b02a0b605a536b",
+    "lib/common/startup_trace.dart": "1caf6f52f123685975b77b4fc7feaae78df1c115b2908d737ed60dca3d61ea42",
+    "test/common/startup_trace_test.dart": "5ddbdbabf3990d075e317960ce381020aa45fd4bac7b9a0b5bf37e63c9646c93"
   },
   "platform_extensions": {
     "android": {
@@ -3222,6 +3224,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "0a2fee9b87379eedfa3ba4daa3f053ccde4ffcf47ce535259fc4f48200951957"
+    "contract_digest": "5f1d2d00b1ba0b2cdcc311003905e87745efd0b1cefac5a6c7ef2de6adc8f894"
   }
 }

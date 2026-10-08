@@ -156,3 +156,7 @@
 - docs/validation/2026-10-07-three-platform/android-runtime-epoch-validation.json — 运行时配置身份红绿、范围及跨实例拒绝，设备比对待验
 
 - docs/validation/2026-10-07-three-platform/android-runtime-identity-validation.json — 实际Go FFI身份、两channel源码准入、失败IPC与端口/engine边界
+
+- .agents/plans/2026-10-09-macos-startup-diagnosis.md — 黑屏启动阶段调查、固定日志边界与真实窗口验收要求
+
+- docs/validation/2026-10-07-three-platform/macos-startup-trace-validation.json — 固定阶段诊断源摘要、回归与未覆盖窗口边界

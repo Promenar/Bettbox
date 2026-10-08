@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-09",
+  "scope": "启动诊断接入；不宣称黑屏修复",
+  "source_sha256": {
+    "lib/main.dart": "897e8bb7d96ecb5a09bd395902d4cddc7200a93b41600b3809f1fb46c40ef1c0",
+    "lib/common/startup_trace.dart": "1caf6f52f123685975b77b4fc7feaae78df1c115b2908d737ed60dca3d61ea42",
+    "test/common/startup_trace_test.dart": "5ddbdbabf3990d075e317960ce381020aa45fd4bac7b9a0b5bf37e63c9646c93"
+  },
+  "tests": {
+    "targeted_passed": 4,
+    "full_passed": 292,
+    "full_skipped": 0,
+    "actual_go_ffi_library_enabled": true,
+    "analyze_exit_code": 0,
+    "analyze_result": "No issues found!",
+    "full_test_session": 16904,
+    "analyze_session": 69449
+  },
+  "current_candidate_observations": {
+    "stdout": "/dev/null",
+    "stderr": "/dev/null",
+    "process_sample_exit": 0,
+    "thread_count": 33,
+    "visible_ui_verified": false,
+    "screen_locked": true,
+    "diagnostic_source_in_running_candidate": false
+  },
+  "boundaries": [
+    "固定枚举阶段及状态，不记录异常、参数或账户内容",
+    "pending不取消原操作",
+    "complete仅表示函数返回",
+    "首帧回调不能证明可见窗口正常",
+    "未重建或重启当前候选，黑屏根因未确认"
+  ],
+  "release_verified": false
+}

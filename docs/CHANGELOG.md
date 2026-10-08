@@ -375,3 +375,8 @@ Android新增startOwnedTunNative/stopOwnedTunNative JNI入口，传递epoch/conf
 ## [Unreleased] - Kotlin TUN回执与最终完成核验 (2026-10-08)
 
 Android NativeTunProtocol严格解析Go固定十四字段及大小写敏感的资源身份，校验request/operation、outcome/phase、配置代次、资源快照与VPN模式；拒绝重复键、尾随值、非规范整数、溢出、非法Unicode/转义及错误类型。NativeTunCompletion在Core finally后核验输入处置：Go成功start必须与CLAIMED一致；本地未确认、bridgeBlocked、null或协议错误统一unknown+blocked，保留已成功解析的原生责任。可编译占位契约RED失败、生产解析和最终完成夹具GREEN通过；真实Go生产桥生成九种公开回执后由Kotlin直接消费，通过既有配置parser回归及独立审阅。解析器仍用全局错误码白名单，未按操作分区；实际唯一owner/VpnPlugin采用、真实FD/CheckJNI及新APK另验。
+
+### macOS 启动阶段诊断
+
+- 正式入口记录固定初始化阶段、10秒等待提示和首帧回调，保留原结果与异常；日志不接收异常或账户内容。
+- 四项诊断测试和292项Flutter回归通过；实际候选窗口及黑屏根因待验收。

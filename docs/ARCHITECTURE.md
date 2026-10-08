@@ -282,3 +282,7 @@ Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2
 后台 `_service` 使用现有 FFI invokeAction 的 `getAndroidOwnedConfigStatus` 动作获取同请求状态，经 VPN channel 比较 JNI Core 的身份后才注册正常 IPC 或执行配置/快捷启动；无需增加手写 FFI 绑定。Service/VPN 两 channel 共用严格 NativeConfigProtocol 比较器，Core 首次访问位于异常保护的 lambda 内。JNI 状态读取在后台协程，回执主线程核验原 channel。FFI/JNI 共用默认五秒等待预算，实际 FFI 请求在回包、截止、发送异常或错误类型下关闭 ReceivePort，输入参数 finally 释放。等待截止不能取消原生锁等待，也不能中断同步 JSON 解析。
 
 身份失败的后台保留 engine，先提供关联 code=-1 拒绝 IPC 与重连监听，再有界上报失败。原生按实际 serviceEngine/messenger 对象归属登记拒绝，GlobalState 和原生 requestStart 拒绝后续启动；不以无身份停止、销毁或 STOP 清洗未知资源。Dart 一般动作错误明确完成失败，getConfig/公钥转换维持 Result 合同。该失败记录不等于资源完成回执或 engine 消费 ACK，真实设备、双通道配置/启停联合 owner 与 ACK 退出仍待验收。
+
+### 启动阶段诊断
+
+`main` 的单实例锁、版本、配置恢复、内核预加载、面板资源、Rust 桥、平台桥、窗口初始化和 `runApp` 使用固定阶段标记；等待超过10秒输出 `pending`，原 Future 不被取消。日志仅包含枚举阶段、固定状态和经过毫秒数，不接收异常内容或账户资料，日志输出故障不改变初始化结果。`complete` 仅表示对应函数返回，不能代替函数内部资源验收；`firstFrame` 是 Flutter 帧回调完成，不能代替可见窗口或 GPU 显示验收。启动入口保持原先的初始化次序。
