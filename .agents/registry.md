@@ -199,3 +199,6 @@
 
 - .agents/plans/2026-10-09-macos-framework-error-diagnosis.md — Flutter框架失败隐私诊断及完整macOS候选验收边界
 - docs/validation/2026-10-07-three-platform/macos-framework-error-validation.json — 真实框架红绿、Release构建/开发签名、旧退出与新首帧证据
+
+- .agents/plans/2026-10-09-handshake-listener-lifecycle.md — 公共握手准入、交接、逐资源异步关闭责任与协议边界
+- docs/validation/2026-10-07-three-platform/handshake-listener-lifecycle-validation.json — 真实socket红绿、20项回归、独立终审与ARM64编译证据

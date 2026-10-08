@@ -3196,6 +3196,161 @@
         ".test/macos-framework-error/startup-private.log"
       ],
       "verification": "旧宿主/子进程正常退出，严格验签后以前台受控exec会话启动新开发候选；600日志仅提取固定启动阶段和framework失败计数，不证明窗口或有效VPN"
+    },
+    "test-handshake-listener-lifecycle": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-run",
+        "^TestHandleContext",
+        "github.com/metacubex/mihomo/common/net"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "真实loopback握手、待交付连接、关闭任务race；离线依赖，不代表外层accepted连接或完整owner"
+    },
+    "restore-handshake-test-dependency": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "mod",
+        "download",
+        "github.com/akutz/memconn@v0.1.0"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "只恢复既有go.sum锁定的测试依赖，经官方proxy.golang.org与sum.golang.org验证，保留TLS，不修改系统DNS/代理或依赖版本"
+    },
+    "restore-handshake-websocket-dependency": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "mod",
+        "download",
+        "github.com/coder/websocket@v1.8.12"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "只恢复既有go.sum锁定的测试依赖，经官方proxy.golang.org与sum.golang.org验证，保留TLS，不修改系统DNS/代理或依赖版本"
+    },
+    "restore-handshake-test-graph": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "-run",
+        "^TestHandleContext",
+        "github.com/metacubex/mihomo/common/net"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "官方proxy.golang.org与sum.golang.org补齐现有锁定测试依赖并运行定向真实TCP回归；mod=readonly，不升级依赖或修改系统网络"
+    },
+    "test-handshake-protocol-regressions": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-timeout=90s",
+        "github.com/metacubex/mihomo/common/net",
+        "github.com/metacubex/mihomo/listener/http",
+        "github.com/metacubex/mihomo/listener/socks",
+        "github.com/metacubex/mihomo/listener/mixed",
+        "github.com/metacubex/mihomo/listener/reality",
+        "github.com/metacubex/mihomo/listener"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "公共握手与HTTP/SOCKS/Mixed/Reality/命名监听实际模块race回归，离线、公开loopback夹具，非设备VPN"
+    },
+    "test-handshake-core-regressions": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "test",
+        "-p=2",
+        "-mod=readonly",
+        "-count=1",
+        "-timeout=90s",
+        "-tags",
+        "with_gvisor",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 180,
+      "artifacts": [],
+      "verification": "CGO0离线核心全套回归与实际生产接口编译，不启用设备VPN"
+    },
+    "compile-android-handshake-core": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-ldflags=-w -s -extldflags \"-Wl,-z,max-page-size=16384\"",
+        "-tags=with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/android-handshake-core/libclash.so"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 600,
+      "artifacts": [
+        ".test/android-handshake-core/libclash.so",
+        ".test/android-handshake-core/libclash.h"
+      ],
+      "verification": "公共握手生命周期实际Android ARM64 c-shared编译，保留独立任务制品，不安装APK，不证明全部owner或设备VPN",
+      "cross_compile": "Android ARM64 NDK 28 c-shared"
+    },
+    "restore-handshake-testify-checksum": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "mod",
+        "download",
+        "github.com/stretchr/testify@v1.11.1"
+      ],
+      "cwd": "core",
+      "timeout_seconds": 120,
+      "artifacts": [],
+      "verification": "补齐已由内核模块锁定且现有core/go.sum已有源码摘要的testify go.mod摘要；官方TLS与sum校验，不升级版本"
     }
   },
   "deployment": {
@@ -3212,7 +3367,7 @@
     "pubspec.lock": "1f59d817ae9aaedbb7a27614bda123665b15df6e9a24196e1a09d57c4ca56856",
     "macos/Podfile.lock": "cdcd6076439fa243037e2622bd1b5f88f50831dc788f09f72e8e915ed7250c5c",
     "core/go.mod": "a668af77c5528bce28bf4530a1f443992db432e0a5bbda6de74af77654ccce43",
-    "core/go.sum": "b694415de1d26a4e7a1193325ac4ca101caae8940528368974dafa106e80c54b",
+    "core/go.sum": "d8425d32abdf0896d9f53e5e31fad36fce03412f2cb87f34c5f4592ab2a75fc5",
     "services/helper/Cargo.lock": "c0cc3eab2a4c9f425a807bb60f483ba453eec86f1bc72371d0f80790744269fd",
     "macos/Podfile": "f2024443bc69a9652010081500a9d8b24c8e483a8d63ca525337c8950ab6d438",
     "macos/Runner.xcodeproj/project.pbxproj": "be1b361a33893fb562a281cdc3ab1ceac71e2f550fe22502b0ff4465953c7eab",
@@ -3544,7 +3699,9 @@
     "core/inbound_apply_action_test.go": "c67919052b35d7488381abb5bded710b5c42cbad3bbeccc1adb47d70852266f9",
     "lib/controller.dart": "8c257af4d4afd729ca53b5a05176c76a1b0a706ab9c2202d50a292c7101f1f7c",
     "lib/common/framework_error_reporter.dart": "9278f5f4015faead7a0f776a9a728ac938b9a25e9163c6f741e685459fae7a0e",
-    "test/common/framework_error_reporter_test.dart": "d0f20307ec462d07747f4b4d5942ce720e1f48e886af0f0b0e997a150a0f1b76"
+    "test/common/framework_error_reporter_test.dart": "d0f20307ec462d07747f4b4d5942ce720e1f48e886af0f0b0e997a150a0f1b76",
+    "core/Clash.Meta/common/net/listener.go": "0c684126f7be320b6566205c78d2c8935107ef847c4c450027e8a3e6442628e0",
+    "core/Clash.Meta/common/net/listener_lifecycle_test.go": "98143ac1bdbf6898993ce61a3bfa3c130e5be102961dc780225435ea0c2892fd"
   },
   "platform_extensions": {
     "android": {
@@ -3620,6 +3777,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "1f996d0e52600173602e5562051fbebfc93c14e779a33d7d6cb4f8cc806646bc"
+    "contract_digest": "f74605d1385c555fe4a8b32b6d26fc4d8fad832ed19e06cbbc3ea587b7fa7a9d"
   }
 }

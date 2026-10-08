@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-09",
+  "scope": "公共握手监听器真实任务及未交付连接收尾，不代表外层协议或完整VPN停止",
+  "source_base_commit": "56b68b2408ca503461ffb0572a4c0e3cde4d858c",
+  "source_sha256": {
+    "core/Clash.Meta/common/net/listener.go": "0c684126f7be320b6566205c78d2c8935107ef847c4c450027e8a3e6442628e0",
+    "core/Clash.Meta/common/net/listener_lifecycle_test.go": "98143ac1bdbf6898993ce61a3bfa3c130e5be102961dc780225435ea0c2892fd",
+    "core/go.sum": "d8425d32abdf0896d9f53e5e31fad36fce03412f2cb87f34c5f4592ab2a75fc5"
+  },
+  "red": {
+    "actual_tcp_tests_failed": 3,
+    "channel_race_detected": true,
+    "exit_code": 1,
+    "setup_failures_not_counted_as_red": true
+  },
+  "green": {
+    "handshake_top_level_tests": 20,
+    "common_net_and_http_and_listener_race_exit": 0,
+    "socks_mixed_reality_compile_exit": 0,
+    "socks_mixed_reality_have_tests": false,
+    "core_full_cgo0_exit": 0,
+    "module_versions_changed": false,
+    "existing_testify_mod_checksum_added": true
+  },
+  "independent_review": {
+    "agent": "android_listener_owner_design",
+    "read_only": true,
+    "final_P1_P2": 0,
+    "resolved_findings": [
+      "同轮隐式重试",
+      "父取消后交接",
+      "迟到raw未继承轮次",
+      "旧轮次回退"
+    ]
+  },
+  "build": {
+    "exit_code": 0,
+    "target_os": "android",
+    "target_arch": "arm64",
+    "ndk": "28.2.13676358",
+    "api": 26,
+    "path": ".test/android-handshake-core/libclash.so",
+    "sha256": "3916ecfda4c16d7dfbcb2ba60a02b192e259858786147102f0a06175e83ee685",
+    "header_sha256": "0c5d6d46b8fa8e54660eb3556204af4b8fcb4af8433cba954f7ee80bceb59df5",
+    "load_alignment": [
+      16384,
+      16384,
+      16384,
+      16384
+    ],
+    "installed": false
+  },
+  "boundaries": [
+    "已由Accept交付的连接属于外层消费者，本层Close保留其正常使用",
+    "外层HTTP管道、协议service/watcher与UDP任务须联合收尾",
+    "Android唯一owner及ACK未完成，不以本回归证明有效VPN",
+    "macOS黑屏根因未确认，运行候选未切换",
+    "未修改生产支付或发布发行版"
+  ]
+}

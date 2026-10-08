@@ -3450,3 +3450,34 @@ main在binding后/runApp前安装固定框架失败报告，controller不覆盖�
 
 ### HLG
 标准append预演并应用，保留总体continuity。
+
+## 2026-10-09T07:13:06+08:00 · 公共握手监听真实任务与资源责任收尾
+
+type: maintenance
+scope: ["Bettbox", "core", "Android", "macOS"]
+status: partial
+tags: ["three-platform", "listener", "handshake", "race"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 61ffcb8d9ac2325dd73c1a1243272e96f8382bd9310b9be2e860237fe023ef24
+
+### Summary
+公共握手监听修复及真实回归完成，三端发行总目标保持未完成。
+
+### Changed
+common/net/listener.go登记未交付raw/包装连接和握手任务，Accept同锁提交交接；自然失败取消，逐资源异步Close账本、单调轮次、一秒总预算和失败显式重试。core/go.sum仅补齐已锁定testify go.mod摘要，模块版本未变。
+
+### Validation
+旧实现3项真实TCP失败并检出通道race；20项握手顶层回归、公共net/HTTP/listener完整race通过，SOCKS/Mixed/Reality仅编译无专门测试。核心完整CGO0 exit0；Android ARM64 c-shared exit0，SHA3916ecfda4c16d7dfbcb2ba60a02b192e259858786147102f0a06175e83ee685，四个PT_LOAD均16384。独立android_listener_owner_design最终无P1/P2，主控核验真实命令和ELF。
+
+### Next
+HTTP/SOCKS/Mixed外层accepted/HTTP管道和处理任务接入完整收尾，再治理全部命名/general/UDP资源并采用Android唯一owner/ACK；完成实际账户/订阅/邀请/支付及有效VPN，macOS解锁后检查黑屏；iOS保持开发与发行研究范围。
+
+### Risks
+本层不关闭已由Accept交付的消费者连接；未证明外层协议service/watcher和全局UDP停止。没有安装APK、切换运行macOS候选或修改生产支付。macOS工具报告锁屏，黑屏根因和发行仍未验收，真实商户与iOS团队/真机条件待补齐。
+
+### DIA
+已同步ARCHITECTURE、PLATFORM_VALIDATION、CHANGELOG、PDEC README/契约、registry、计划及公开验证回执。
+
+### HLG
+通过标准append dry-run/apply追加，索引重建；完整目标与剩余边界保持。

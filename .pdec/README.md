@@ -193,3 +193,6 @@ Android启动拒绝传播沿用本机Flutter测试、静态分析及既有离线
 
 
 Realm生命周期沿用本机公开loopback/race验证，并登记实际Android ARM64 c-shared编译入口。仅新增两项相关操作及两份源码摘要，执行位置、离线依赖、设备和生产权限保持。编译产物位于任务独立目录，没有覆盖既有APK或安装。
+
+
+公共握手生命周期使用本机公开loopback/race，协议回归从core主模块运行以采用生产依赖替换；core/go.sum仅补齐内核已锁定testify的go.mod校验项。官方依赖补齐保留TLS和sum校验，不修改版本或系统网络；实际编译产物在独立 `.test/android-handshake-core/`，不安装设备或覆盖发行候选。资源Close预算与任务收尾回归不代替完整owner/设备验收。

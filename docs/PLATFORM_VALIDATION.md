@@ -468,3 +468,10 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 最终源码完整macOS构建成功且源和锁未漂移。旧宿主/两层内核经正常退出通道确认消失，旧包保留在 `build/macos-local-development-before-framework-error-20261009/Bettbox.app`。新 `build/macos-local-development/Bettbox.app` 经Apple Development嵌套签名及严格验签，实际启动宿主/两层内核存在，初始化返回并到达首帧回调，观测窗口内0框架失败标记；私有日志权限600且仅非LLM提取固定类别。证据见 `validation/2026-10-07-three-platform/macos-framework-error-validation.json`。
 
 工具仍报告锁屏，实际画面和黑屏根因未确认。该入口只覆盖Flutter框架捕获错误，未对真实Release候选主动注入故障，不覆盖所有异步/PlatformDispatcher异常。签名仍是本机开发，未公证、公开发布或完成代理/账户全路径。
+
+
+## 公共握手监听任务与待交付连接
+
+真实loopback旧实现的三项回归失败，确认socket Read残留、任务未退出误报成功以及结果通道竞争。20项握手顶层回归覆盖已交接连接读写、父取消、自然Accept故障、迟到raw与包装对象、未知关闭显式重试、阻塞Close预算、不并发重试、轮次单调、nil/typed nil、panic/logger故障和不可比较包装类型。common/net、HTTP及命名监听完整race回归通过；SOCKS、Mixed、Reality编译通过，三包没有专门测试。核心完整CGO0回归和实际Android ARM64 c-shared编译成功，四个加载段均16KiB对齐。独立终审无剩余P1/P2。
+
+证据见 `validation/2026-10-07-three-platform/handshake-listener-lifecycle-validation.json`。仅补齐已锁定testify的模块摘要，模块版本未变。没有安装新APK或切换macOS候选；外层协议连接/管道/任务、Android唯一owner/ACK和有效VPN待完成，macOS黑屏和三端发行仍未验收。
