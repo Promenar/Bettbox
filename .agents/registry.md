@@ -26,6 +26,7 @@
 - .agents/plans/2026-10-08-supervisor-integration.md — macOS helper/host/Dart合同、背压与联合接线验收
 - .agents/plans/2026-10-07-three-platform-release.md — 三端发行目标、关键路径、服务端边界与验收要求
 - .agents/plans/2026-10-08-android-live-account.md — 独立开发验收账户、秘密边界与真实 Android 业务验收
+- .agents/plans/2026-10-08-android-vpn-diagnosis.md — Android真实代理协议、TUN/JNI失败合同与设备验收计划
 - .agents/plans/2026-10-07-macos-proxy-transactions.md — macOS 系统代理事务核心、所有权恢复与原生接线验收
 - SIGNING-POLICY.md — Windows 与 Android 发行签名边界和安全注入
 - ios/README.md、core/iosbridge/README.md — iOS 原生通道、配置快照、内嵌核心与签名验收边界

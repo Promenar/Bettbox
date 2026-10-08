@@ -1497,3 +1497,34 @@ APK为本地正式签名候选，release_verified=false；未公开发布、未�
 
 ### HLG
 使用结构化append先dry-run再apply，记录事实与后续边界。
+
+## 2026-10-08T11:43:53+08:00 · Android VPN节点路径复现与协议层诊断边界
+
+type: investigation
+scope: ["Bettbox", "Android", "NoSLA"]
+status: done
+tags: ["vpn", "upstream", "runtime-validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: f36c81c87d191b1f2682209f22f18a6c334b746cb3218355dd5b23459e8686de
+
+### Summary
+23节点订阅已加载，8地域及自动组呈现；系统VPN授权/建立成功。直连模式核心HTTP代理HTTPS200，浏览器trace可见；默认代理和HK全局失败，停止后相同URL恢复。完整代理发行目标仍未完成。
+
+### Changed
+新增公开脱敏android-vpn-path-validation.json，更新平台验收/CHANGELOG，登记Android协议与TUN/JNI诊断计划；代码与服务配置未改动。
+
+### Validation
+同源正式APK e7b5a87/9b6807f7... 的实际设备和curl请求。tun0/CONNECTED实测；loopback7890监听，未发现额外loopback系统HTTP代理。默认HTTP502、HTTPS CONNECT200后curl35；direct模式HTTPS200且trace存在；HK全局curl35。23TCP端点成功，12AnyTLS TLS证书通过、未禁校验，无旧腾讯/NoSLA IP端点；23密码都不等于测试账户UUID。NoSLA3容器运行，辅助核心只有83VMess，不作AnyTLS/Hysteria2对照。APK字节码捕获lambda调用排除protect递归假设。停止后tun0不存在、serviceReady可见，设置rule/auto，任务ADB forwards全部移除。
+
+### Next
+按已登记计划执行同版本协议层探测，明确Android与上游差异，再对TUN启动错误吞没/protect结果丢失/预配置重入锁三项P2建立实际失败回归并整体修复Go/JNI/Kotlin结果合同。继续完整节点流量、邀请注册、支付和macOS适配，不以直连或TCP/TLS代替代理成功。
+
+### Risks
+当前断网尚未归因；独立审阅的三个代码缺口未证明触发这次故障。真实上游协议认证/额度未验证，未充值、付款、发邮件或发布。用户.video_agent未读写，原始凭据和节点配置只在本机/可信服务器进程内存，不入输出。iOS保持开发版/发行研究。
+
+### DIA
+已同步PLATFORM_VALIDATION、CHANGELOG、诊断计划/registry和公开运行回执。
+
+### HLG
+结构化append先dry-run再apply，保留失败证据与下一关键路径。

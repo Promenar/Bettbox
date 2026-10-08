@@ -1,0 +1,129 @@
+{
+  "source_commit": "e7b5a878df042319f737cc8176106e71f8f3c1e0",
+  "apk_sha256": "9b6807f7bcb3d26208312a59c366aab2898d334ee5913476129fbbaa7af68b34",
+  "device": "Pixel_7 API36 emulator-5554",
+  "observations": {
+    "regions": {
+      "region_label_keys_visible": [
+        "xbRegionHK",
+        "xbRegionTW",
+        "xbRegionSG",
+        "xbRegionJP",
+        "xbRegionKR",
+        "xbRegionUS",
+        "xbRegionMY",
+        "xbRegionDE"
+      ],
+      "auto_visible": true,
+      "service_ready": true
+    },
+    "vpn_system_path": {
+      "tun0_exists": true,
+      "vpn_connected": true,
+      "loopback_http_proxy_present": false,
+      "loopback_listener_ports": [
+        5555,
+        7890
+      ]
+    },
+    "proxy_initial": {
+      "curl_exit": 35,
+      "http_status": 0,
+      "trace_ip_present": false,
+      "stderr_class": "other"
+    },
+    "baseline_after_stop": {
+      "VPN_transports_after_stop": 1,
+      "browser_trace_ip_present": true,
+      "browser_error_page": false
+    },
+    "direct_comparison": {
+      "mode": "direct",
+      "core_proxy_curl_exit": 0,
+      "core_proxy_status": "200",
+      "core_proxy_trace_present": true,
+      "TUN_browser_trace_present": true,
+      "browser_error_page": false
+    },
+    "global_HK": {
+      "mode": "global",
+      "region": "HK",
+      "curl_exit": 35,
+      "http_status": "000",
+      "trace_present": false
+    },
+    "subscription_endpoints": {
+      "subscription_proxy_count": 23,
+      "protocol_counts": {
+        "anytls": 12,
+        "hysteria2": 11
+      },
+      "distinct_endpoint_count": 23,
+      "old_tencent_endpoint_count": 0,
+      "nosla_endpoint_count": 0,
+      "endpoint_ports": [
+        443,
+        2053,
+        2083,
+        2087,
+        2096,
+        8443,
+        9443,
+        38443,
+        51443,
+        57658
+      ],
+      "tcp_connect_success": 23,
+      "tcp_connect_failure_classes": {}
+    },
+    "anytls_verified_TLS": {
+      "anytls_node_count": 12,
+      "nonempty_password_count": 12,
+      "skip_cert_verify_count": 0,
+      "TLS_verified_success": 12,
+      "TLS_failure_classes": {}
+    },
+    "subscription_auth": {
+      "node_count": 23,
+      "password_matches_panel_user_uuid": 0,
+      "by_type": {
+        "anytls": {
+          "count": 12,
+          "uuid_matches": 0
+        },
+        "hysteria2": {
+          "count": 11,
+          "uuid_matches": 0
+        }
+      }
+    },
+    "nosla_auxiliary": {
+      "ssh_exit": 0,
+      "safe_results": [
+        {
+          "proxy_type_counts": {
+            "Compatible": 1,
+            "Direct": 1,
+            "Selector": 2,
+            "Pass": 1,
+            "Reject": 1,
+            "RejectDrop": 1,
+            "Vmess": 83
+          }
+        }
+      ]
+    },
+    "cleanup": {
+      "tun0_exists_after_stop": false,
+      "service_ready_after_stop": true,
+      "mode_set_rule": true,
+      "region_set_auto": true,
+      "ADB_task_forwards_remaining": false
+    }
+  },
+  "callback_bytecode": "Core.b creates t.c; t.c.protect(I)V invokes captured LB/t.g(Object), without recursive protect invocation.",
+  "verified_scope": "地域呈现、系统VPN授权/建立、直连模式请求、停止与网络恢复。代理节点数据通路未通过。",
+  "unresolved": "默认代理及HK全局请求失败；TUN启动错误吞没、protect结果丢失、预配置启动自锁是独立审阅发现的代码缺口，尚未证明它们触发了实际断网。",
+  "secrets_reported": false,
+  "release_verified": false
+}
