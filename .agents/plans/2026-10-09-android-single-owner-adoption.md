@@ -6,7 +6,7 @@ Android 前台、后台、快捷磁贴、更新恢复和智能启停共用唯一
 
 ## 当前事实
 
-源码 a35d73f 已具备 owned 配置/TUN JNI、严格协议解析器和 FD 领取合同，但 VpnPlugin 使用 Boolean 启停。ServicePlugin.startVpn 丢弃受理 false，Dart 主后台存在提前提交运行态和独立读取 options。Android 没有排队前用户停止 epoch，后台 quickStart 跨多个 await 未核验原意图。
+源码 a35d73f 已具备 owned 配置/TUN JNI、严格协议解析器和 FD 领取合同，但 VpnPlugin 使用 Boolean 启停。ServicePlugin.startVpn 传递真实受理结果，Dart 包装器在 false/null 时抛错；该结果不证明 VPN 完成。Dart 主后台存在提前提交运行态和独立读取 options。Android 没有排队前用户停止 epoch，后台 quickStart 跨多个 await 未核验原意图。
 
 Go 配置 epoch 已在库载入期生成一次公开随机身份（2…2^53−1），身份生成失败终止初始化，所有编入该 Go 包的平台适用；后台已用现有 FFI 动作取得同请求身份，双 channel 经严格 JNI 比较后准入，失败 engine 提供关联拒绝 IPC 并登记实际 messenger 拒绝；参数/端口与失败通知均收尾。真实设备 Dart/JNI 同实例证明待完成。lastApplied 是成功提交的 attempt，stateGeneration 独立。TUN 停止必须使用启动资源的 epoch/configRevision/generation，不能传本地新 stopGeneration。公共 hub init/state/setup/update 与监听启停/shutdown 已有同锁旧入口门禁，覆盖 STAGED、提交责任、configured、blocked 和 TUN reservation；畸形 setup 在解析前拒绝。未采用路径保持工作，内部 owned driver 不经过公共门禁。实际失败复现、主包回归及配置32轮并发race证据见 android-legacy-admission-validation.json。quickStart 在采用后会被 init/state/setup 拒绝，须同批接入 owner，不能依赖拒绝门禁继续启动。ownedListenerMode 启用点属于 darwin；legacy TUN 与带身份 listener/shutdown 仍待联合接线。
 

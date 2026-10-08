@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-09",
+  "scope": "Android 启动请求受理拒绝传播，非连接完成",
+  "source_sha256": {
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "55f072c520bfb3fa16da4fe838a023d2b61bddfee7073e63e74bc05c3fe45626",
+    "lib/plugins/service.dart": "3987497bd29752826368f545680f38343343446994e7df6a1e6c1d8250ff90c7",
+    "test/plugins/android_start_admission_test.dart": "8530f7e2a790cbb49b4e750ea5ac2dacf2dd7f399f81690c4999d82e017f7624"
+  },
+  "red": {
+    "command": "flutter test --no-pub --reporter expanded test/plugins/android_start_admission_test.dart",
+    "exit_code": 1,
+    "passed": 2,
+    "failed": 2,
+    "failure": "false/null 后调用方继续执行，未抛 StateError"
+  },
+  "green": {
+    "related_tests_passed": 22,
+    "full_flutter_passed": 295,
+    "full_flutter_skipped": 1,
+    "release_kotlin_exit_code": 0,
+    "release_kotlin_task": ":app:compileReleaseKotlin",
+    "offline": true,
+    "flutter_analyze_issues": 0
+  },
+  "review": "原生独立只读审阅无新增问题，主控核对 diff、实际命令输出和编译回执",
+  "boundaries": [
+    "mock channel 不证明设备原生回执和实际 GlobalState 全路径",
+    "true 仅受理，不证明 VPN 连接或资源完成",
+    "提前计时及先行监听器仍待完整 owner/ACK 接线",
+    "未生成、安装或公开发行新 APK",
+    "macOS 窗口工具报告锁屏，黑屏根因未确认"
+  ],
+  "release_verified": false
+}

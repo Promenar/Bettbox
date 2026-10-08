@@ -3326,3 +3326,34 @@ record-fingerprint: e6a0cc8eb143ebfc4386062e4d48f8c1d2e9a9b3fb429114940f2f02e332
 
 ### HLG
 标准append dry-run后apply追加，生成索引保留历史。
+
+## 2026-10-09T06:14:53+08:00 · Android启动受理拒绝跨层传播与实际回归
+
+type: maintenance
+scope: ["Bettbox", "Android", "Dart"]
+status: partial
+tags: ["android", "admission", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: 953bce4a53133a57c059795d8417ee325fb397657e5b6396d4d232bcaa3551e6
+
+### Summary
+Android 启动拒绝从原生传到 Dart，false/null 阻断后续调用；true仅受理，整体三端发行目标未完成。
+
+### Changed
+ServicePlugin.kt 返回 handleStart 原值；service.dart 拒绝未接纳回执；新增实际包装器回归。PDEC仅刷新相关源码摘要，没有扩展权限、安装APK或生产部署。
+
+### Validation
+旧实现false/null两个实际测试失败、两个通过；修复后关联22项、完整Flutter295项通过及1项跳过；分析无问题，离线Release Kotlin工程编译退出0。原生独立只读审阅无新增问题，主控检查diff及公开编译回执。
+
+### Next
+继续Android唯一owner及不可变配置/typed completion/ACK联合采用；解锁后定位macOS黑屏；账户、订阅、邀请、支付、有效VPN及iOS开发/发行条件按总目标验收。
+
+### Risks
+false/null之前提前计时和先行监听器尚待集成；不能用无身份停止清洗未知资源。mock不证明设备或完整GlobalState路径，true不是连接。Mac工具仍锁屏，本轮未修复黑屏。
+
+### DIA
+已同步平台验收、CHANGELOG、PDEC说明、registry、总体owner计划及公开证据。
+
+### HLG
+使用标准append预演后追加，保持总体continuity。

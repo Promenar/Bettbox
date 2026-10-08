@@ -187,3 +187,6 @@
 
 - .agents/plans/2026-10-09-laravel-coupon-admin.md — 优惠券和管理员付款业务验收范围、源码及权限边界
 - docs/validation/2026-10-07-three-platform/laravel-coupon-admin-validation.json — 券全局一次/创建回滚和管理员控制器开通证据
+
+- .agents/plans/2026-10-09-android-start-admission.md — 原生启动请求拒绝传播及受理/连接完成边界
+- docs/validation/2026-10-07-three-platform/android-start-admission-validation.json — Dart 平台回执红绿、原生编译及未覆盖设备边界

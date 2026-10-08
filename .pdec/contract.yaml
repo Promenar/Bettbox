@@ -3307,10 +3307,10 @@
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequests.kt": "a0c713d972b21749f851fdef8d3303d5b36d76f814a00099bc0bd06794e6fb09",
     "android/app/src/test/kotlin/com/appshub/bettbox/plugins/VpnPermissionRequestsFixture.kt": "f5406bd2d9d885bf6984ceca96021ffd3c86b387820dc26b5711f4fb6a861417",
     "android/app/src/main/kotlin/com/appshub/bettbox/plugins/AppPlugin.kt": "b3992e4f778cfe131deec5fabf6676df59a9bd85de4862505fd9a240dc52b853",
-    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "64194097c78f97c0611355f423ca9ac6efa4d0308e1df59e5289761ca565bca7",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "55f072c520bfb3fa16da4fe838a023d2b61bddfee7073e63e74bc05c3fe45626",
     "android/app/src/main/kotlin/com/appshub/bettbox/modules/SuspendModule.kt": "64c9c6cbbec58c2faf4d2bdf3fb90b22acefd5a6b2bd05725671dd88fb1705c1",
     "test/plugins/android_stop_completion_test.dart": "75e44abdc1069658e468e3b0ca3e5d8c392152a4980ed8d5987089c288628c65",
-    "lib/plugins/service.dart": "c6a1b6f1a3c69cce7cf4bb53597220485ff9bf2ed89a60de7a7bb1ce2bb5fed6",
+    "lib/plugins/service.dart": "3987497bd29752826368f545680f38343343446994e7df6a1e6c1d8250ff90c7",
     "lib/plugins/vpn.dart": "1ffb7024dcd987196076400a078185cbed1379bd83c0ab204936e9b9beeb54d3",
     "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
     "core/shutdown_listener_confirmation_test.go": "8528438392c7df42d090dcfc7d9494bbbcf90786c9cf111fb86559feb452f648",
@@ -3382,7 +3382,8 @@
     "server/tests/billing/laravel_coupon_admin_check.php": "5cae1a7f2cd5a6aa4a90a3d517ee39c29f71ab732441b7974cfd7f051839c812",
     ".test/billing-laravel-public-source/app/Services/CouponService.php": "70356228079f62042333eb2196b47c171dc6017cc4761b6b0988d4ae9fdf3291",
     ".test/billing-laravel-public-source/app/Models/Coupon.php": "eea8958073ee738a581393bddbf8a5602f4f871017a2c2508ab0cd5e5d1c9c81",
-    "server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php": "cffedc4cdfa51d8103542db3eb286e29ab2bec607466a5d2e1feeeaf2ec02041"
+    "server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php": "cffedc4cdfa51d8103542db3eb286e29ab2bec607466a5d2e1feeeaf2ec02041",
+    "test/plugins/android_start_admission_test.dart": "8530f7e2a790cbb49b4e750ea5ac2dacf2dd7f399f81690c4999d82e017f7624"
   },
   "platform_extensions": {
     "android": {
@@ -3458,6 +3459,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "ba2ba55793c577af820f9234c42ae8867d3818a836d533bc474f5afd55b664ac"
+    "contract_digest": "b9eaa61e6de602fd7a8b44945cb22f2a816abe3b1f3584f2f7bbbe1410025b93"
   }
 }

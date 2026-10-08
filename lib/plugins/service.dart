@@ -50,9 +50,14 @@ class Service {
 
   Future<bool?> startVpn() async {
     final options = await clashLib?.getAndroidVpnOptions();
-    return await methodChannel.invokeMethod<bool>('startVpn', {
+    final accepted = await methodChannel.invokeMethod<bool>('startVpn', {
       'data': json.encode(options),
     });
+    if (accepted != true) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
+    // 接纳只允许调用方推进请求，不代表监听器或 VPN 已连接。
+    return accepted;
   }
 
   Future<bool?> stopVpn() async {

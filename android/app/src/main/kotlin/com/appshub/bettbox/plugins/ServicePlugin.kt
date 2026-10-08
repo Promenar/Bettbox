@@ -166,8 +166,7 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
         runCatching { gson.fromJson(data, VpnOptions::class.java) }
             .onSuccess { options ->
-                VpnPlugin.handleStart(options)
-                result.success(true)
+                result.success(VpnPlugin.handleStart(options))
             }
             .onFailure { result.error("PARSE_ERROR", it.message, null) }
     }

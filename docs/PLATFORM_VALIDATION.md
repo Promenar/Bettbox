@@ -436,3 +436,10 @@ kind5 的公开证据位于 `validation/2026-10-07-three-platform/android-initia
 真实 CouponService/Coupon 公开源码已验证两用户竞争全局限用一次的固定金额券：仅一张订单，券次数零，折扣与余额精确，输家无订单且余额不变。创建后的公开故障完整撤销券次数、余额及订单，重试成功。真实管理员 paid 控制器双进程确认只开通/重置一次，无网关调用且重复不延期；身份注入为夹具，不证明生产管理员权限链路。当前 289 项隔离检查、61 个冻结输入与13项执行器回归通过。
 
 证据见 `validation/2026-10-07-three-platform/laravel-coupon-admin-validation.json`。两个新增公开源只读取自 NoSLA，经本地非 LLM 凭据字面量扫描再登记摘要并精确上传；不加载真实源站配置、账号或数据库。生产管理员鉴权、其它券限制和真实商户链路另验。
+
+
+## Android 启动请求拒绝传播
+
+ServicePlugin 返回 VpnPlugin 的真实受理结果；Dart Service.startVpn 对 false/null 抛错，阻止调用方继续写入运行偏好和启动更新任务。真实回归在修复前两项失败、两项通过，修复后关联22项及完整Flutter295项通过（1项跳过），静态分析无问题，实际离线Release Kotlin工程编译成功。独立只读审阅与主控复核完成。
+
+证据见 `validation/2026-10-07-three-platform/android-start-admission-validation.json`。mock channel 不证明设备原生响应或完整 GlobalState 路径；true只表示受理，提前计时、先行监听器和唯一owner/ACK仍待联合接线。没有生成、安装或发布新APK。macOS黑屏窗口仍因锁屏无法观察，未判定修复。
