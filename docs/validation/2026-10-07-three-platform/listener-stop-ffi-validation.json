@@ -1,0 +1,109 @@
+{
+  "receipts": {
+    "listener-dart-red": {
+      "exit_code": 1,
+      "test_results": [
+        "failure",
+        "success",
+        "success"
+      ],
+      "stdout_sha256": "eb0486e35919aaa655ef8578fd2f05aa49596bec3bf19e3accf422a6b8e4c822",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "listener-dart-green": {
+      "exit_code": 0,
+      "test_results": {
+        "success": 6
+      },
+      "source_sha256": {
+        "lib/clash/lib.dart": "46c583b834ec1f8d0350fe1007babd1f299ff72c90b11d05fda79c5d48a89e14",
+        "lib/clash/core.dart": "a92e38113f02be41e391ed0138ad736794d033004edd7e83c327cca2a6c5da86",
+        "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
+        "lib/clash/listener_stop_completion.dart": "54d69abfc0170a7866410bb58f4560f48ecd7dd930d24f627e71dd3bd21353fb",
+        "test/clash/listener_stop_confirmation_test.dart": "a12b46abfbc4ea84caa1233aa0b30940fbe04fd50de8d159099ed5c18170d0ce",
+        "test/clash/listener_stop_completion_test.dart": "b6ef32e400cc45dfa369a55d9ef883cf8479cb2179c4379d91b6c4fe005f91f4"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "553f9823c788013f222ff0501f13924577fdb5208140f5e4b03000979c3ee6ed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": false
+    },
+    "listener-ffi-build": {
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "b12d9972aa626d235dc69d7c4a8863dcfdcc1d7398597e5da8a8e2d8eb67eda9"
+    },
+    "listener-ffi-build-green": {
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "host": "darwin-arm64",
+      "boundary": "真实Go c-shared C ABI，非Android JNI/设备",
+      "library_sha256": "3044379015e4d1153f6b5f42a1a52f7dcbf248b5c85f465eda0759bfdcbfc9f3"
+    },
+    "listener-ffi-final": {
+      "exit_code": 0,
+      "test_results": {
+        "success": 1
+      },
+      "source_sha256": {
+        "lib/clash/lib.dart": "530cbe0d527983cef562665eae2c775fda06500ead66995b9a5f018ff3cc9cf7",
+        "lib/clash/core.dart": "a92e38113f02be41e391ed0138ad736794d033004edd7e83c327cca2a6c5da86",
+        "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
+        "lib/clash/listener_stop_completion.dart": "54d69abfc0170a7866410bb58f4560f48ecd7dd930d24f627e71dd3bd21353fb",
+        "test/clash/listener_stop_confirmation_test.dart": "a12b46abfbc4ea84caa1233aa0b30940fbe04fd50de8d159099ed5c18170d0ce",
+        "test/clash/listener_stop_completion_test.dart": "b6ef32e400cc45dfa369a55d9ef883cf8479cb2179c4379d91b6c4fe005f91f4",
+        "test/clash/listener_stop_ffi_test.dart": "d102a94beff9a7c75b8260aa94fa2b95f9685d456f6b85ba63bffe7d270284ec",
+        "core/lib_non_mobile.go": "d2808402d1da2e7725cf1332b38d95ebda30cf378f08c948b2e849b5edd75071"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "a41a7555c7a665ee55993c763ec0463e9e3faaea46c45a3a08ff91ffd76e89bf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": false,
+      "library_sha256": "3044379015e4d1153f6b5f42a1a52f7dcbf248b5c85f465eda0759bfdcbfc9f3"
+    },
+    "listener-full-final": {
+      "exit_code": 0,
+      "test_results": {
+        "success": 237
+      },
+      "source_sha256": {
+        "lib/clash/lib.dart": "530cbe0d527983cef562665eae2c775fda06500ead66995b9a5f018ff3cc9cf7",
+        "lib/clash/core.dart": "a92e38113f02be41e391ed0138ad736794d033004edd7e83c327cca2a6c5da86",
+        "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
+        "lib/clash/listener_stop_completion.dart": "54d69abfc0170a7866410bb58f4560f48ecd7dd930d24f627e71dd3bd21353fb",
+        "test/clash/listener_stop_confirmation_test.dart": "a12b46abfbc4ea84caa1233aa0b30940fbe04fd50de8d159099ed5c18170d0ce",
+        "test/clash/listener_stop_completion_test.dart": "b6ef32e400cc45dfa369a55d9ef883cf8479cb2179c4379d91b6c4fe005f91f4",
+        "test/clash/listener_stop_ffi_test.dart": "d102a94beff9a7c75b8260aa94fa2b95f9685d456f6b85ba63bffe7d270284ec",
+        "core/lib_non_mobile.go": "d2808402d1da2e7725cf1332b38d95ebda30cf378f08c948b2e849b5edd75071"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "6eef521d6ccaaefba610dcc76d2293f1ebedc74e19b896469664e4868da1d90b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": false,
+      "library_sha256": "3044379015e4d1153f6b5f42a1a52f7dcbf248b5c85f465eda0759bfdcbfc9f3"
+    },
+    "listener-analyze-final": {
+      "exit_code": 0,
+      "test_results": {},
+      "source_sha256": {
+        "lib/clash/lib.dart": "530cbe0d527983cef562665eae2c775fda06500ead66995b9a5f018ff3cc9cf7",
+        "lib/clash/core.dart": "a92e38113f02be41e391ed0138ad736794d033004edd7e83c327cca2a6c5da86",
+        "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
+        "lib/clash/listener_stop_completion.dart": "54d69abfc0170a7866410bb58f4560f48ecd7dd930d24f627e71dd3bd21353fb",
+        "test/clash/listener_stop_confirmation_test.dart": "a12b46abfbc4ea84caa1233aa0b30940fbe04fd50de8d159099ed5c18170d0ce",
+        "test/clash/listener_stop_completion_test.dart": "b6ef32e400cc45dfa369a55d9ef883cf8479cb2179c4379d91b6c4fe005f91f4",
+        "test/clash/listener_stop_ffi_test.dart": "d102a94beff9a7c75b8260aa94fa2b95f9685d456f6b85ba63bffe7d270284ec",
+        "core/lib_non_mobile.go": "d2808402d1da2e7725cf1332b38d95ebda30cf378f08c948b2e849b5edd75071"
+      },
+      "source_unchanged": true,
+      "stdout_sha256": "c6aa403896a4a7c04c2dc24e294a599c2680bc62256544b8478188af3292952e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "no_issues": true,
+      "library_sha256": "3044379015e4d1153f6b5f42a1a52f7dcbf248b5c85f465eda0759bfdcbfc9f3"
+    }
+  },
+  "build_red_reason": "非移动cgo文件的_android.go后缀与!android条件冲突，nextHandle未定义；更正文件名后构建通过",
+  "review": "独立协议、调用链、构造注入及Go平台选择审阅未发现P1/P2；主控核对真实命令、固定源与测试库摘要",
+  "boundary": "FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binder、真实TUN、关闭失败跨FFI或全部runtime退出。关闭失败由Go公开登记监听回归与Dart协议回归分别验证。GlobalState后台副作用仅静态审阅；invokeAction缺失回执仍可能无限等待。统一Native owner、配置/TUN接线、epoch、engine session/ACK与EXITING准入尚未完成。"
+}

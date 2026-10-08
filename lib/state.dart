@@ -441,7 +441,9 @@ class GlobalState {
       return;
     }
     if (system.isAndroid && isService) {
-      await clashLibHandler?.stopListener();
+      if (await clashLibHandler?.stopListener() != true) {
+        throw StateError(appLocalizations.connectionStateUnconfirmed);
+      }
     } else {
       await clashCore.stopListener();
     }

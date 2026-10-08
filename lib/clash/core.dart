@@ -17,6 +17,8 @@ class ClashCore {
   late ClashHandlerInterface clashInterface;
   SetupParams? _iosSetup;
 
+  ClashCore.withInterface(this.clashInterface);
+
   ClashCore._internal() {
     if (system.isAndroid) {
       clashInterface = clashLib!;
@@ -307,7 +309,9 @@ class ClashCore {
   }
 
   Future<void> stopListener() async {
-    await clashInterface.stopListener();
+    if (!await clashInterface.stopListener()) {
+      throw StateError(appLocalizations.connectionStateUnconfirmed);
+    }
   }
 
   Future<Delay> getDelay(String url, String proxyName) async {

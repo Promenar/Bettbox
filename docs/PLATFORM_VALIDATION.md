@@ -274,3 +274,14 @@ shutdown监听失败传播已接入生产handleShutdown：runLock内关闭新监
 安全engine退出必须使用同次不可变stop票据，固定原生调用messenger/session和目标engine对象/序号，checked收尾与消费ACK均关联该票据；销毁前原子检查最新intent、配置/权限/绑定操作、未确认资源及目标身份，设置EXITING并在主线程锁外销毁，退出期间排队新启动。Service.destroy、internal autoDestroy及_initService旧destroy入口需共同收敛；当前尚未实现。现有init/getIsInit未统一锁、排队startListener可重新准入，布尔成功不得成为退出许可。
 
 当前固定源版本Go主包完整回归、失败/成功shutdown和stop action定向回归、230项Flutter测试与静态检查通过。证据：`docs/validation/2026-10-07-three-platform/shutdown-completion-validation.json`。
+
+
+## 后台检查式监听关闭实际接线
+
+Android后台停止监听使用invokeAction的检查式Go动作，confirmListenerStop只接受同次id、stopListener方法、整数code=0与严格data=true；失败、畸形、缺字段或异次回执均不能确认成功。GlobalState后台与ClashCore公开停止入口对false阻断本地状态清理；ClashCore.withInterface供隔离行为验证，ClashLibHandler.withLibrary初始化测试库但不替换生产单例。生产默认库名libclash.so保持一致。
+
+真实ClashCore红例1失败、修复6项定向回归通过；本机darwin-arm64实际Go c-shared库经生产ClashLibHandler连续两次停止消费成功回执，库摘要在执行前后保持一致；237项Flutter完整测试及静态检查通过。非移动cgo文件lib_non_mobile.go与!android && !ios && cgo条件一致；其移动平台和非cgo分支仍各自独立。
+
+FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binder、真实TUN、关闭失败跨FFI或全部runtime退出。关闭失败由Go公开登记监听回归与Dart协议回归分别验证。GlobalState后台副作用仅静态审阅；invokeAction缺失回执仍可能无限等待。统一Native owner、配置/TUN接线、epoch、engine session/ACK与EXITING准入尚未完成。
+
+证据：`docs/validation/2026-10-07-three-platform/listener-stop-ffi-validation.json`。

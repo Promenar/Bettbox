@@ -2396,3 +2396,34 @@ Go runLock内关闭新监听准入并StopListenerChecked，false保留isInit及�
 
 ### HLG
 标准append dry-run后apply；保留下一步与未验收边界。
+
+## 2026-10-08T23:11:09+08:00 · 后台检查式监听停止实际接线与Go FFI验收
+
+type: implementation
+scope: ["Bettbox", "Android", "Go", "Dart"]
+status: done
+tags: ["listener", "ffi", "validation"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: ee0c053aa87054d95a354d12dd8c4260bbbed2acfa2b984b564de7c0c10d5cd0
+
+### Summary
+后台void FFI固定成功旁路替换为Go action关联回执；公开停止入口不吞掉false，三端发行目标未完成。
+
+### Changed
+Android后台停止监听使用invokeAction的检查式Go动作，confirmListenerStop只接受同次id、stopListener方法、整数code=0与严格data=true；失败、畸形、缺字段或异次回执均不能确认成功。GlobalState后台与ClashCore公开停止入口对false阻断本地状态清理；ClashCore.withInterface供隔离行为验证，ClashLibHandler.withLibrary初始化测试库但不替换生产单例。生产默认库名libclash.so保持一致。非移动cgo文件按有效平台条件命名为lib_non_mobile.go，内容未改。
+
+### Validation
+真实ClashCore红例1失败、修复6项定向回归通过；本机darwin-arm64实际Go c-shared库经生产ClashLibHandler连续两次停止消费成功回执，库摘要在执行前后保持一致；237项Flutter完整测试及静态检查通过。非移动cgo文件lib_non_mobile.go与!android && !ios && cgo条件一致；其移动平台和非cgo分支仍各自独立。独立审阅未发现P1/P2，公开回执listener-stop-ffi-validation.json。
+
+### Next
+收敛唯一Native owner的配置/启动/停止与Go epoch；checked suspend/init/shutdown及HTTP/DNS旁路；engine session/ACK和EXITING门禁；构建安装新APK设备全路径。macOS完整App签名界面和iOS开发版及服务端闭环持续推进。
+
+### Risks
+FFI用例为新加载库且无登记监听资源，不能证明Android JNI/Binder、真实TUN、关闭失败跨FFI或全部runtime退出。关闭失败由Go公开登记监听回归与Dart协议回归分别验证。GlobalState后台副作用仅静态审阅；invokeAction缺失回执仍可能无限等待。统一Native owner、配置/TUN接线、epoch、engine session/ACK与EXITING准入尚未完成。macOS黑窗仍为探针，完整App界面未验收；有效上游订阅、支付商条件及Apple团队外部条件待确认。
+
+### DIA
+已同步README、架构、平台验收、CHANGELOG、owner计划、PDEC说明、registry和公开回执。
+
+### HLG
+标准append先dry-run后apply，保留真实FFI范围和未完成发行条件。

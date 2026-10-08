@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-08 — 后台检查式监听关闭接线
+
+- Android后台停止监听使用invokeAction的检查式Go动作，confirmListenerStop只接受同次id、stopListener方法、整数code=0与严格data=true；失败、畸形、缺字段或异次回执均不能确认成功。GlobalState后台与ClashCore公开停止入口对false阻断本地状态清理；ClashCore.withInterface供隔离行为验证，ClashLibHandler.withLibrary初始化测试库但不替换生产单例。生产默认库名libclash.so保持一致。
+- 真实ClashCore红例1失败、修复6项定向回归通过；本机darwin-arm64实际Go c-shared库经生产ClashLibHandler连续两次停止消费成功回执，库摘要在执行前后保持一致；237项Flutter完整测试及静态检查通过。非移动cgo文件lib_non_mobile.go与!android && !ios && cgo条件一致；其移动平台和非cgo分支仍各自独立。
+
 ## 2026-10-08 — shutdown关闭失败传播
 
 - shutdown监听失败传播已接入生产handleShutdown：runLock内关闭新监听准入并调用StopListenerChecked，未确认即返回false，保留isInit与失败对象，不执行executor清理。Android ClashLib.shutdown使用completeShutdown，关闭false或异常不销毁，关闭成功后等待destroy；destroy仅在Service回执严格true时成功。Go公开登记监听的实际红例证实原失败吞没、初始化状态丢失及重试责任丢失；固定源版本的失败/成功与stop action回归通过。该改动不证明executor、provider、controller、TUN drain或全部runtime资源退出，不提供engine退出资格。

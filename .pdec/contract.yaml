@@ -2631,6 +2631,59 @@
       "timeout_seconds": 300,
       "artifacts": [],
       "verification": "实际Dart Service/Vpn包装器与mock平台channel，非设备"
+    },
+    "test-dart-listener-confirmation": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "--machine",
+        "test/clash/listener_stop_confirmation_test.dart",
+        "test/clash/listener_stop_completion_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "实际Dart Service/Vpn包装器与mock平台channel，非设备"
+    },
+    "build-listener-stop-ffi": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "go",
+        "build",
+        "-mod=readonly",
+        "-tags",
+        "with_gvisor",
+        "-buildmode=c-shared",
+        "-o",
+        "../.test/listener-stop-ffi/libclash.dylib",
+        "."
+      ],
+      "cwd": "core",
+      "timeout_seconds": 300,
+      "artifacts": [
+        ".test/listener-stop-ffi/libclash.dylib"
+      ],
+      "verification": "本机实际Go C ABI与Dart native-port消费，非Android JNI/设备"
+    },
+    "test-listener-stop-ffi": {
+      "executor": "local-mac",
+      "target_os": "macos",
+      "target_arch": "arm64",
+      "argv": [
+        "flutter",
+        "test",
+        "--machine",
+        "test/clash/listener_stop_ffi_test.dart"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "artifacts": [],
+      "verification": "实际Dart Service/Vpn包装器与mock平台channel，非设备"
     }
   },
   "deployment": {
@@ -2899,11 +2952,17 @@
     "test/plugins/android_stop_completion_test.dart": "bc9272223660c892a71b811c7c06e90c45490b7868dbf3cf7059a24b7c5411d9",
     "lib/plugins/service.dart": "6cb46d477d3e01de4cf15ba983812cbe2902be2928b1bfcb7db4afc75ddf1ad9",
     "lib/plugins/vpn.dart": "b34d903ca3cd8dc651a53ac88e923093dd3059ac5af3db70da590e49c5c14fc7",
-    "lib/state.dart": "ed2c0ad75233ee119ab7823ea93cacf12b534c116e9cab9cc4f5b4d8180fc8b8",
+    "lib/state.dart": "d8e85d1b2fbad1202b82c8b1f77a37adbdf79b3b9406e8f5fcfd209d0566f556",
     "core/shutdown_listener_confirmation_test.go": "8528438392c7df42d090dcfc7d9494bbbcf90786c9cf111fb86559feb452f648",
-    "lib/clash/lib.dart": "3d1aabe5f0deff999958d576c14ae0fa2e60d48761fdab0a4b2ddf3a2bfa8c7c",
+    "lib/clash/lib.dart": "530cbe0d527983cef562665eae2c775fda06500ead66995b9a5f018ff3cc9cf7",
     "lib/clash/shutdown_completion.dart": "147bff19c7982c68bd8b92ddd882eb97492ce6dc69ffdc8b4fcd7700f2863313",
-    "test/clash/shutdown_completion_test.dart": "f408afd2effa0496b5c5fe4e6720a21e3a0dc42e7912d0bd78860b6d170bd6a0"
+    "test/clash/shutdown_completion_test.dart": "f408afd2effa0496b5c5fe4e6720a21e3a0dc42e7912d0bd78860b6d170bd6a0",
+    "lib/clash/core.dart": "a92e38113f02be41e391ed0138ad736794d033004edd7e83c327cca2a6c5da86",
+    "test/clash/listener_stop_confirmation_test.dart": "a12b46abfbc4ea84caa1233aa0b30940fbe04fd50de8d159099ed5c18170d0ce",
+    "lib/clash/listener_stop_completion.dart": "54d69abfc0170a7866410bb58f4560f48ecd7dd930d24f627e71dd3bd21353fb",
+    "test/clash/listener_stop_completion_test.dart": "b6ef32e400cc45dfa369a55d9ef883cf8479cb2179c4379d91b6c4fe005f91f4",
+    "test/clash/listener_stop_ffi_test.dart": "d102a94beff9a7c75b8260aa94fa2b95f9685d456f6b85ba63bffe7d270284ec",
+    "core/lib_non_mobile.go": "d2808402d1da2e7725cf1332b38d95ebda30cf378f08c948b2e849b5edd75071"
   },
   "platform_extensions": {
     "android": {
@@ -2979,6 +3038,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "74bf24651f62b983e96ab00d62e6d77d4a7a23cab3f507b1fd03b746b130b22d"
+    "contract_digest": "8d4fd9e6763a7eeaec35cdf435fe6d9207d0d6b5446273509a54e9a2112923d6"
   }
 }

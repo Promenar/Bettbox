@@ -153,3 +153,6 @@ Android普通停止新增独立JVM red/green输出、release Kotlin适配编译�
 
 
 Go shutdown监听确认与Dart关闭/销毁顺序采用已批准本机开发例外运行；测试使用公开登记监听替身，不创建TUN或真实代理入口。真实engine身份与ACK设备验证独立完成。
+
+
+本机监听关闭FFI验证构建darwin-arm64 c-shared库至`.test/listener-stop-ffi/libclash.dylib`，通过`BETTBOX_TEST_CORE_LIBRARY`注入Flutter测试。测试校验真实路径并调用生产后台handler；默认无该变量时仅跳过这项跨语言测试。此操作不安装动态库、不创建系统TUN或代理，不代替Android JNI和设备验收。

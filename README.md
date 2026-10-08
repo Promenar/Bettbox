@@ -13,6 +13,8 @@
 
 Android VPN权限失败与Activity重挂接路径已修复，release Kotlin工程编译通过；设备与发行包状态见 [平台验收说明](docs/PLATFORM_VALIDATION.md)。
 
+Android后台监听关闭已消费Go关联回执；本机真实Go FFI验证、237项Flutter测试及静态检查通过。新APK设备路径与完整发行验收仍待完成，详见平台验收说明。
+
 秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。设计目标: 前台流畅丝滑、后台省电无感，致力于成为体验更好、以少量资源消耗即可持续稳定运行的 Mihomo 客户端
 
 Bettbox意为: Better Experience, Out of the box，更好的体验，亦开箱可用

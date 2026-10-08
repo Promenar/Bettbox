@@ -14,6 +14,7 @@ import 'package:bett_box/state.dart';
 import 'generated/clash_ffi.dart';
 import 'interface.dart';
 import 'shutdown_completion.dart';
+import 'listener_stop_completion.dart';
 
 class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
   static ClashLib? _instance;
@@ -145,8 +146,11 @@ class ClashLibHandler {
 
   late final DynamicLibrary lib;
 
-  ClashLibHandler._internal() {
-    lib = DynamicLibrary.open('libclash.so');
+  ClashLibHandler._internal()
+      : this.withLibrary(DynamicLibrary.open('libclash.so'));
+
+  ClashLibHandler.withLibrary(DynamicLibrary library) {
+    lib = library;
     clashFFI = ClashFFI(lib);
     clashFFI.initNativeApiBridge(NativeApi.initializeApiDLData);
   }
@@ -223,8 +227,10 @@ class ClashLibHandler {
   }
 
   Future<bool> stopListener() async {
-    clashFFI.stopListener();
-    return true;
+    return confirmListenerStop(
+      requestId: 'stopListener#${utils.id}',
+      invoke: invokeAction,
+    );
   }
 
   DateTime? getRunTime() {
