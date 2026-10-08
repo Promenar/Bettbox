@@ -13,12 +13,11 @@ import (
 )
 
 const (
-	androidConfigEpoch                int64 = 1
-	androidConfigPayloadLimit               = 16 * 1024 * 1024
-	androidConfigKindSetup                  = 1
-	androidConfigKindUpdate                 = 2
-	androidConfigKindState                  = 3
-	androidConfigKindInitialComposite       = 4
+	androidConfigPayloadLimit         = 16 * 1024 * 1024
+	androidConfigKindSetup            = 1
+	androidConfigKindUpdate           = 2
+	androidConfigKindState            = 3
+	androidConfigKindInitialComposite = 4
 )
 
 const (

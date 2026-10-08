@@ -152,3 +152,5 @@
 - docs/validation/2026-10-07-three-platform/android-a35d73f-apk-validation.json — 正式签名构建/回读与运行/停止更新基础设备验证，发行另验
 
 - docs/validation/2026-10-07-three-platform/android-legacy-admission-validation.json — Android公共旧配置与监听资源准入红绿及配置并发race范围
+
+- docs/validation/2026-10-07-three-platform/android-runtime-epoch-validation.json — 运行时配置身份红绿、范围及跨实例拒绝，设备比对待验

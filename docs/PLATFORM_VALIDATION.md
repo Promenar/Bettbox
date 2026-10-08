@@ -370,3 +370,5 @@ SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageR
 正式 APK 已完成受控重试，源码/锁不变、单一正式证书、12个 ARM64库和任务清理检查通过；设备安装回读摘要与构建一致。首轮上游连接限时失败没有改变域名/TLS授权，重试成功。从a21276f停止态首次安装资格候选时更新没有启动；确认运行后更新在手动打开前恢复前台服务与活动 WIFI|VPN；普通停止后更新、手动打开以及最后冷启动均保持无运行计时/前台服务/活动VPN。配置未调整。公开回执为 `android-a35d73f-apk-validation.json`。
 
 智能暂停条件重评估、首次PENDING交错、权限撤销与熄屏速度路径尚未覆盖。唯一owner联合采用及有效节点HTTPS尚未完成，APK是正式签名候选，release_verified=false。Android owned采用后的公共旧配置、监听启停与shutdown已增加同锁门禁，实际旧写及资源关闭失败复现和修复后主包回归通过，配置32轮并发race通过。证据见 `docs/validation/2026-10-07-three-platform/android-legacy-admission-validation.json`；legacy TUN与完整双通道接线待完成。完整接线以 `.agents/plans/2026-10-09-android-single-owner-adoption.md` 为执行计划，不能将现有 helper 或更新资格基础验证等同完整发行验收。
+
+Go 运行时配置 epoch 已使用库载入期公开随机身份；完整主包及身份 race 通过，证据见 `docs/validation/2026-10-07-three-platform/android-runtime-epoch-validation.json`。设备 FFI/JNI 实际同实例证明尚未完成，不能用此源码变更替代该门禁。

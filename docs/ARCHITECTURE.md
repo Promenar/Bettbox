@@ -272,3 +272,7 @@ BootReceiver 的开机自启合同独立。文件方案不承诺目录的断电�
 ### Android 唯一所有者采用边界
 
 owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapter，主后台配置和退出尚未共用唯一 owner。公共 hub init/state/setup/update 与监听启停/shutdown 已在 runLock 内按已接受状态、提交责任、阻断和 TUN 预留拒绝旧入口；畸形 setup 在拒绝之后才解析，不能回退写默认配置。直接 setup/update 包装器同样拒绝，内部 prepare/commit/updateConfigLocked 保留给 owned driver。update 的 void 包装器拒绝时不执行，不能被上层包装成成功。legacy TUN、双通道与带身份 lifecycle 接线尚待采用；darwin 的 ownedListenerMode 不承担 Android 门禁职责。完整采用须原子收敛实际配置写、用户停止意图、同次 options/资源身份、双 channel 不可变完成消费与 ACK 退出准入，执行合同见 `.agents/plans/2026-10-09-android-single-owner-adoption.md`。
+
+### Android 运行时配置身份
+
+Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2^53−1，JSON、Dart 与 JNI 可精确比对；身份不是凭据或用户启动授权。短读、熵失败及连续保留值使初始化终止，没有常量或时间戳降级。该 Go 包所有平台均执行这一初始化，失败行为同样适用。epoch 在 Activity、Flutter engine 或配置变更时不重置；随机身份存在极低碰撞概率，不声明数学上绝对唯一。当前生产没有 coordinator 重置路径，新增重置必须重新核验 epoch 与 revision/generation，不能保留 epoch 却重用计数。设备上 FFI/JNI 实际同实例比对与完整 owner 采用仍待完成。

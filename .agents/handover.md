@@ -2892,3 +2892,34 @@ record-fingerprint: 6744d1c2a59ae7547cc79e60d8d1266f8cfb241a73952720f6b2c18ec848
 
 ### HLG
 使用标准append dry-run后apply追加阶段证据；完整目标保持active。
+
+## 2026-10-09T03:40:58+08:00 · Go运行时配置epoch与跨实例拒绝验证
+
+type: maintenance
+scope: ["Bettbox", "core", "Android"]
+status: partial
+tags: ["android", "runtime-epoch", "owner"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: a783dde30eeba0e036cda5de5653e8326ee128b4e86c840c91cfff29cd196e92
+
+### Summary
+配置epoch由固定1进入库实例载入期公开随机身份，维持十字段回执；整体三端与服务端发行目标保持未完成。
+
+### Changed
+增加android_runtime_epoch.go：crypto/rand.Reader，精确整数2…2^53−1，最多8次保留值重取，短读或熵失败终止初始化。所有编入包的平台适用。生产coordinator仅加载时接收身份，没有Activity/engine重置。
+
+### Validation
+固定epoch1测试实际exit1。当前源CGO0完整Go主包exit0 ok core0.863s；CGO1身份race exit0 ok core2.028s，覆盖生产范围/稳定、生成器边界/失败、初始化终止和旧epoch副作用前拒绝。独立只读源码复审无确定P1；主控复核diff与当前终态。
+
+### Next
+完整owner联合采用继续：生成现有header的FFI绑定供后台读取身份，与原生Core的JNI状态比对；用户停止意图、owned配置/TUN、两channel immutable completion和ACK退出必须同批接线。设备同实例、有效代理及macOS黑屏另验。
+
+### Risks
+随机身份不是凭据或启动授权，非数学绝对唯一。当前无coordinator重置，新增重置不得保留epoch而复用计数；设备FFI/JNI同实例未验证。尚无新APK或完整发行。Mac锁屏与支付商配置答复不阻断源码集成。
+
+### DIA
+已同步架构、CHANGELOG、平台验证、联合采用计划、registry与验证JSON。
+
+### HLG
+标准append dry-run后apply追加，完整goal保持active。
