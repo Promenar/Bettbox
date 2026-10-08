@@ -115,7 +115,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
 
         val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
-        channel.setMethodCallHandler(this)
+        channel.setMethodCallHandler { call, result -> handleMethodCall(call, result, flutterPluginBinding.binaryMessenger) }
         channelMap[flutterPluginBinding.binaryMessenger] = channel
         activeChannels.add(channel)
 
@@ -157,7 +157,14 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        handleMethodCall(call, result, null)
+    }
+
+    private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result, messenger: BinaryMessenger?) {
         when (call.method) {
+            "verifyRuntimeIdentity" -> ServicePlugin.confirmRuntimeIdentity(result, call.argument<Any>("epoch")) {
+                messenger != null && attachedMessengers.contains(messenger)
+            }
             "start" -> {
                 try {
                     val data = call.argument<String>("data")
@@ -254,7 +261,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         var wasSmartStopped = false
         val accepted = GlobalState.runLock.withLock {
             recover = !coldRecoveryChecked && !GlobalState.isStopping && GlobalState.isCurrentlyStopping()
-            if (startRequested || (GlobalState.isCurrentlyStopping() && !recover) || localCleanupFailed ||
+            if (GlobalState.isServiceRuntimeRejected() || startRequested || (GlobalState.isCurrentlyStopping() && !recover) || localCleanupFailed ||
                 lifecycle.phase == VpnLifecycle.Phase.BLOCKED ||
                 lifecycle.phase == VpnLifecycle.Phase.STARTING) return@withLock false
             if (lifecycle.phase == VpnLifecycle.Phase.RUNNING) {

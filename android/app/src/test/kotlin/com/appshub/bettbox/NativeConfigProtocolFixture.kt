@@ -14,6 +14,8 @@ object NativeConfigProtocolFixture {
         outcomesAndCombinations()
         stringsOptionsAndBudgets()
         tunReservationReceipts()
+        runtimeIdentity()
+        serviceRuntimeAdmission()
         println("cases=$cases, failed=$failed")
         check(failed == 0) { "配置回执fixture失败" }
     }
@@ -157,6 +159,43 @@ object NativeConfigProtocolFixture {
         reject(receipt("rejected", "notEntered", options = "null", error = "tunCleanupUnknown"))
         reject(receipt("unknown", "entered", configured = "false", blocked = "true", options = "null", error = "tunCleanupUnknown"))
         reject(receipt("unknown", "entered", attempted = "3", blocked = "true", options = "null", error = "tunCleanupUnknown"))
+    }
+
+    private fun serviceRuntimeAdmission() {
+        case {
+            val gate = ServiceRuntimeAdmission<Any>()
+            val engine = Any()
+            val currentMessenger = Any()
+            val olderMessenger = Any()
+            check(!gate.reject(null, currentMessenger) { currentMessenger })
+            check(!gate.reject(engine, olderMessenger) { currentMessenger })
+            check(!gate.isRejected(engine))
+            check(gate.reject(engine, currentMessenger) { currentMessenger })
+            check(gate.isRejected(engine))
+            val laterEngine = Any()
+            check(!gate.isRejected(laterEngine))
+            check(!gate.reject(laterEngine, currentMessenger) { olderMessenger })
+            check(!gate.isRejected(laterEngine))
+            gate.clear()
+            check(!gate.isRejected(engine))
+        }
+    }
+
+    private fun runtimeIdentity() {
+        case { check(NativeRuntimeIdentity.confirm(2) { receipt(epoch = "2") }) }
+        case { check(NativeRuntimeIdentity.confirm(NativeRuntimeIdentity.MAX_EPOCH) { receipt(epoch = "9007199254740991") }) }
+        for (bad in listOf<Any?>(null, 1, 0L, -1L, 9007199254740992L, "2", 2.0, true)) {
+            case {
+                var read = false
+                check(!NativeRuntimeIdentity.confirm(bad) { read = true; receipt(epoch = "2") })
+                check(!read)
+            }
+        }
+        case { check(!NativeRuntimeIdentity.confirm(2) { receipt(epoch = "3") }) }
+        case { check(!NativeRuntimeIdentity.confirm(2) { receipt(epoch = "2").replace("\"epoch\":2", "\"epoch\":2,\"epoch\":2") }) }
+        case { check(!NativeRuntimeIdentity.confirm(2) { receipt("unknown", "entered", epoch = "2", blocked = "true", options = "null", error = "coordinatorBlocked") }) }
+        case { check(!NativeRuntimeIdentity.confirm(2) { throw IllegalStateException("公开读取失败") }) }
+        case { check(!NativeRuntimeIdentity.confirm(2) { throw UnsatisfiedLinkError("公开库初始化失败") }) }
     }
 
     private fun appliedReceiptUsesImmutableOptions() {

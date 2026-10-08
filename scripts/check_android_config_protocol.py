@@ -8,6 +8,8 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = [
+    ROOT / "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt",
+    ROOT / "android/app/src/main/kotlin/com/appshub/bettbox/NativeRuntimeIdentity.kt",
     ROOT / "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt",
     ROOT / "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt",
 ]

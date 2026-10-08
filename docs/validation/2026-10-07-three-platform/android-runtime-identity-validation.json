@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-09",
+  "scope": "后台实际FFI身份读取、JNI通道比较及身份失败请求收尾源码采用",
+  "source_sha256": {
+    "core/action.go": "0b6118781d384a47e6fd799aa3d3f96e6d0ed4aecc11ab9ddd26ce339d14ec29",
+    "core/constant.go": "cdb275ba6a90f4ff63173faabe238a95ac5904024088bacc223cf52ebd2f1442",
+    "core/android_runtime_action_test.go": "e56934d5f133cb930bdcffe4a0737025c4d7fe6c1b7ba62dacc9bcb8b8cc749f",
+    "lib/clash/android_runtime_identity.dart": "bd49157caff17767857db5afb5e803d9995c824e18e40145058206ef945c4626",
+    "lib/clash/native_action_request.dart": "62de074679fece118a263c590b3640e53d76321e3cf1824bc884c31e2e841bf1",
+    "lib/clash/lib.dart": "b4ddfa3e3c36e565c21be105df0f624827c931d781e9790a6f7fdc6e2a1c32c8",
+    "lib/clash/interface.dart": "08fe4d3dd9d03c09539711b7a6314d710dcff843e91edf9ac34cf7e3fa887d2b",
+    "lib/main.dart": "0f76b39806e19e47550fc41d70c1d24676724088555433ee18472d3088dbf1dc",
+    "lib/plugins/vpn.dart": "1ffb7024dcd987196076400a078185cbed1379bd83c0ab204936e9b9beeb54d3",
+    "android/app/src/main/kotlin/com/appshub/bettbox/NativeRuntimeIdentity.kt": "a540d58bf22ef24b0f397d17d2c261c758a2b66a60726cbd835632f884418c90",
+    "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt": "0490c1d81e3f7fe4b0808cc0de49db8f5baffd150785729525b02a0b605a536b",
+    "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "54a37e9508a27c424003966e801d5ec4a894cb4b28c68a13a9750cca2cfb63a0",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "64194097c78f97c0611355f423ca9ac6efa4d0308e1df59e5289761ca565bca7",
+    "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "e2f439a780b66007e3b827625170010b635876706b16969de6698d3d82b5ef66",
+    "test/clash/android_runtime_identity_test.dart": "0f3d12f1c8906c6caa52e0ffb328e44a21022f96c9ccb583a410714165a37de1",
+    "test/clash/native_action_request_test.dart": "e6d4879cefda48ef35a14cf4e2b40e22737a3fb7813ea5454f708d5f4f738ecb",
+    "test/clash/action_error_completion_test.dart": "20728b6fb89a1568151213a11e21ed07becce6193dddb42d8a91d5a170169fd7",
+    "test/clash/listener_stop_ffi_test.dart": "6f0ff9fdd2b351c1264b34065f37c6f0c868406bf5ff2b009b4873a381d13ca1"
+  },
+  "red": {
+    "test": "TestAndroidRuntimeStatusActionReturnsCurrentInstance",
+    "exit_code": 1,
+    "failure": "实际动作分发缺少关联配置状态结果"
+  },
+  "green": {
+    "go_main": {
+      "exit_code": 0,
+      "result": "ok core 0.811s",
+      "command": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go test -mod=readonly -count=1 -timeout=120s -tags with_gvisor ."
+    },
+    "go_ffi_build": {
+      "exit_code": 0,
+      "command": "CGO_ENABLED=1 GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go build -mod=readonly -tags with_gvisor -buildmode=c-shared -o ../.test/listener-stop-ffi/libclash.dylib .",
+      "library_sha256": "cc468f0f4b81dfcb9c50f9d6152c6693cb53457d383ef55082f767596a91fe2b"
+    },
+    "flutter_all": {
+      "exit_code": 0,
+      "passed": 288,
+      "skipped": 0,
+      "command": "BETTBOX_TEST_CORE_LIBRARY=<当前真实Go库> flutter test --no-pub",
+      "coverage": [
+        "实际Go C ABI invokeAction及Dart NativePort状态读取",
+        "JNI比较回调在该FFI测试中为mock，不能当设备比对",
+        "实际ReceivePort成功/截止/发送异常/错类型收尾",
+        "两段总预算与零预算",
+        "一般动作关联失败及旧回包不污染当前请求"
+      ],
+      "reuse_note": "测试终态后仅删除无用dart:async import，测试逻辑和执行输入语义未变；最终静态检查另行确认"
+    },
+    "jvm": {
+      "passed": true,
+      "actual_Android": false,
+      "sources_sha256": {
+        "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt": "0490c1d81e3f7fe4b0808cc0de49db8f5baffd150785729525b02a0b605a536b",
+        "android/app/src/main/kotlin/com/appshub/bettbox/NativeRuntimeIdentity.kt": "a540d58bf22ef24b0f397d17d2c261c758a2b66a60726cbd835632f884418c90",
+        "android/app/src/main/kotlin/com/appshub/bettbox/NativeConfigProtocol.kt": "51b38eeba4eaa7a3d443bbf9ac92bdb2d284ce7f927d46500bd181b657489f76",
+        "android/app/src/test/kotlin/com/appshub/bettbox/NativeConfigProtocolFixture.kt": "0b38f2e54abec3041768a12851e084f4644d47680aab0b4638d6e7b06cd0a08b"
+      },
+      "compiler": "Kotlin2.0.21",
+      "json_library": "Gson2.10.1",
+      "fixture_stdout_sha256": "456c145899b68786883365e5236d7035021ee01adaed5b2d551016193012e8cd",
+      "boundary": "生产解析器及公开 JSON 夹具；没有 JNI、Service 或设备验收"
+    },
+    "release_kotlin": {
+      "exit_code": 0,
+      "actual_release_kotlin_compile": true,
+      "sources_unchanged": true,
+      "log": "kotlin-final-redacted.log",
+      "sources_sha256": {
+        "android/app/src/main/kotlin/com/appshub/bettbox/plugins/ServicePlugin.kt": "64194097c78f97c0611355f423ca9ac6efa4d0308e1df59e5289761ca565bca7",
+        "android/app/src/main/kotlin/com/appshub/bettbox/plugins/VpnPlugin.kt": "e2f439a780b66007e3b827625170010b635876706b16969de6698d3d82b5ef66",
+        "android/app/src/main/kotlin/com/appshub/bettbox/GlobalState.kt": "54a37e9508a27c424003966e801d5ec4a894cb4b28c68a13a9750cca2cfb63a0",
+        "android/app/src/main/kotlin/com/appshub/bettbox/NativeRuntimeIdentity.kt": "a540d58bf22ef24b0f397d17d2c261c758a2b66a60726cbd835632f884418c90",
+        "android/app/src/main/kotlin/com/appshub/bettbox/ServiceRuntimeAdmission.kt": "0490c1d81e3f7fe4b0808cc0de49db8f5baffd150785729525b02a0b605a536b"
+      }
+    },
+    "flutter_analyze": {
+      "exit_code": 0,
+      "result": "No issues found!",
+      "command": "flutter analyze --no-pub",
+      "terminal_session": 40474,
+      "boundary": "当前源码的静态检查；不代替设备验证"
+    }
+  },
+  "independent_review": {
+    "executor": "原生只读android_package_restart_review",
+    "final_confirmed_defects": false,
+    "tests_run_by_reviewer": false,
+    "closed": [
+      "Core绑定引用加载越过异常边界",
+      "外层timeout未关闭实际端口",
+      "总截止未生效",
+      "失败通知悬挂阻断IPC拒绝",
+      "原channel变更认可旧回执"
+    ]
+  },
+  "runtime_contract": {
+    "identity_before": "IPC、配置、快捷启动",
+    "jni_thread": "后台协程；主线程只投递同原channel结果",
+    "deadline": "FFI/JNI共用默认5秒等待预算；不能取消Go锁内阻塞或同步JSON CPU处理",
+    "failure": "先提供关联拒绝IPC，再有界报告实际serviceEngine/messenger失败，原生拒绝该engine启动，保留未知资源责任",
+    "closed_port": "实际请求所有终态关闭ReceivePort，原生输入参数finally释放"
+  },
+  "actual_device_ffi_jni_same_instance": false,
+  "actual_engine_failure_cleanup_verified": false,
+  "full_owner_ack_verified": false,
+  "release_verified": false
+}

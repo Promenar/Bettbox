@@ -125,6 +125,7 @@ const (
 	updateDnsMethod                      Method = "updateDns"
 	setStateMethod                       Method = "setState"
 	getAndroidVpnOptionsMethod           Method = "getAndroidVpnOptions"
+	getAndroidOwnedConfigStatusMethod    Method = "getAndroidOwnedConfigStatus"
 	getRunTimeMethod                     Method = "getRunTime"
 	getCurrentProfileNameMethod          Method = "getCurrentProfileName"
 	crashMethod                          Method = "crash"

@@ -3,22 +3,43 @@ package com.appshub.bettbox.plugins
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.appshub.bettbox.core.Core
+import com.appshub.bettbox.NativeRuntimeIdentity
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.RunState
 import com.appshub.bettbox.models.VpnOptions
 import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private lateinit var channel: MethodChannel
+    private lateinit var messenger: BinaryMessenger
 
     companion object {
         private val activeChannels = CopyOnWriteArrayList<MethodChannel>()
         private val mainHandler = Handler(Looper.getMainLooper())
+        private val identityScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+        internal fun confirmRuntimeIdentity(result: MethodChannel.Result, expected: Any?, current: () -> Boolean) {
+            identityScope.launch {
+                val confirmed = NativeRuntimeIdentity.confirm(expected) { Core.ownedConfigStatusRaw() }
+                withContext(Dispatchers.Main) {
+                    runCatching { result.success(confirmed && current()) }
+                        .onFailure { Log.e(TAG, "身份回执投递失败") }
+                }
+            }
+        }
+
         private val gson = Gson()
         private const val TAG = "ServicePlugin"
 
@@ -45,6 +66,7 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        messenger = binding.binaryMessenger
         channel = MethodChannel(binding.binaryMessenger, "service").apply {
             setMethodCallHandler(this@ServicePlugin)
         }
@@ -58,6 +80,13 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            "runtimeIdentityFailed" -> result.success(GlobalState.rejectServiceRuntime(messenger))
+            "verifyRuntimeIdentity" -> {
+                val originChannel = channel
+                confirmRuntimeIdentity(result, call.argument<Any>("epoch")) {
+                    activeChannels.contains(originChannel)
+                }
+            }
             "startVpn" -> handleStartVpn(call, result)
             "stopVpn" -> {
                 VpnPlugin.handleStop(force = true) { VpnPlugin.completeStopResult(result, it) }

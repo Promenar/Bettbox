@@ -1,5 +1,10 @@
 # 版本变更记录 (CHANGELOG)
 
+## 2026-10-09 — Android 实际运行时身份准入
+
+- 后台经实际 FFI 动作取得实例身份，两个原生 channel 通过后台 JNI 严格比较；正常 IPC、配置及快捷启动在比对之后执行。失败 engine 提供关联拒绝 IPC 并按真实 messenger 归属禁止后续启动，保留未知资源。
+- FFI 请求拥有端口与截止时间，参数 finally 释放；一般动作拒绝明确完成失败。完整 Go、288 项 Flutter 回归（含真实 Go FFI）、JVM 比较/engine归属夹具和实际 release Kotlin 编译通过；设备 JNI 同实例、完整 owner 与 ACK 仍待验证。
+
 ## 2026-10-09 — Go 内核实例身份
 
 - 配置 epoch 在库加载时生成一次公开随机身份，保持 JSON 精确整数范围；身份生成失败终止初始化，不回退固定值。该 Go 包全部平台适用。

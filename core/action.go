@@ -55,6 +55,9 @@ func handleAction(action *Action, result ActionResult) {
 
 func handleActionDirect(action *Action, result ActionResult) {
 	switch action.Method {
+	case getAndroidOwnedConfigStatusMethod:
+		result.success(getAndroidOwnedConfigStatusJSON())
+		return
 	case initClashMethod:
 		paramsString := action.Data.(string)
 		result.success(handleInitClash(paramsString))

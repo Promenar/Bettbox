@@ -10,6 +10,8 @@ import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/state.dart';
 import 'package:code_forge/code_forge.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:synchronized/synchronized.dart';
@@ -110,6 +112,26 @@ Future<void> _service(List<String> flags) async {
     final quickStart = flags.contains('quick');
     final bootStart = flags.contains('boot');
     final clashLibHandler = ClashLibHandler();
+    final sameRuntime = await clashLibHandler.verifyRuntimeIdentity(
+      invokeNative: (epoch) async => await vpn?.verifyRuntimeIdentity(epoch),
+    );
+    if (!sameRuntime) {
+      // 保留失败engine承载明确拒绝回包；未知资源不以无身份停止清洗。
+      tile?.addListener(
+        _TileListenerWithService(
+          onStart: () => app.tip(appLocalizations.connectionStateUnconfirmed),
+          onStop: () {},
+          onReconnectIpc: _handleRejectedMainIpc,
+        ),
+      );
+      _handleRejectedMainIpc();
+      try {
+        await const MethodChannel('service')
+            .invokeMethod<bool>('runtimeIdentityFailed')
+            .timeout(const Duration(seconds: 5));
+      } catch (_) {}
+      return;
+    }
     final smartAutoStopLock = Lock();
 
     Future<void> checkSmartAutoStop() async {
@@ -242,6 +264,36 @@ Future<void> _service(List<String> flags) async {
       }
     });
   }
+}
+
+// 身份失败的engine只提供关联拒绝回执，不把请求传入Go或报告停止。
+void _handleRejectedMainIpc() {
+  final sendPort = IsolateNameServer.lookupPortByName(mainIsolate);
+  if (sendPort == null) return;
+  _serviceReceiverPort?.close();
+  _messageReceiverPort?.close();
+  _serviceReceiverPort = ReceivePort();
+  _serviceReceiverPort!.listen((message) {
+    try {
+      final request = jsonDecode(message as String);
+      if (request is! Map<String, dynamic> ||
+          request['id'] is! String ||
+          request['method'] is! String) {
+        return;
+      }
+      _safeSend(
+        sendPort,
+        jsonEncode({
+          'id': request['id'],
+          'method': request['method'],
+          'code': -1,
+          'data': null,
+          'Port': 0,
+        }),
+      );
+    } catch (_) {}
+  });
+  _safeSend(sendPort, _serviceReceiverPort!.sendPort);
 }
 
 void _handleMainIpc(ClashLibHandler clashLibHandler) {

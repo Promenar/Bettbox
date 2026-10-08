@@ -2923,3 +2923,34 @@ record-fingerprint: a783dde30eeba0e036cda5de5653e8326ee128b4e86c840c91cfff29cd19
 
 ### HLG
 标准append dry-run后apply追加，完整goal保持active。
+
+## 2026-10-09T04:09:03+08:00 · Android实际运行时身份准入与失败IPC收尾
+
+type: maintenance
+scope: ["Bettbox", "Android", "Go", "Dart"]
+status: partial
+tags: ["android", "runtime-identity", "release"]
+continuity: resume
+continuity-key: bettbox-three-platform-release
+record-fingerprint: c916d21a06ce130eb01bb3de821f30ff235b70863d6ff888ccc99654f261216d
+
+### Summary
+后台通过实际Go FFI动作读取实例身份，双原生通道后台严格比较后准入。身份失败先注册关联拒绝IPC，再有界通知实际engine拒绝启动。三端发行与业务全路径目标未完成。
+
+### Changed
+新增运行时比较器、实际ReceivePort请求收尾、原channel回执归属、实际engine/messenger拒绝门禁；未执行无身份停止或销毁未知资源。未修改用户.video_agent目录。
+
+### Validation
+Go动作缺失先复现失败；修复后主包通过0.811s。实际C ABI动态库构建通过，启用该库的Flutter全回归288项通过且无跳过。生产解析器及归属门禁JVM夹具通过，Release Kotlin编译退出0且五份源摘要未变。最终Flutter静态检查退出0。原生独立只读审阅未发现新增确定缺陷；加载异常、端口、总等待预算、失败通知与原channel归属问题已关闭。公开证据见android-runtime-identity-validation.json。
+
+### Next
+联合采用唯一Kotlin配置与生命周期owner、原停止意图、不可变完成回执和消费者ACK，封闭legacy TUN/listener/shutdown旁路；固定同源APK后完成实际设备FFI/JNI比对和全路径验收。解锁后定位macOS黑屏，继续账户、订阅、邀请、支付和有效节点HTTPS验证。
+
+### Risks
+FFI测试中的JNI回调为替身，JVM engine对象为夹具；不证明真实设备同实例。调用等待截止不能取消原生锁内阻塞。完整owner、ACK退出和有效VPN流量未验收。macOS进程存活但锁屏阻止界面确认；支付商权限及Apple团队仍待外部条件。
+
+### DIA
+已同步架构、变更记录、平台验收、唯一owner计划、registry及公开验证回执。
+
+### HLG
+使用标准append先预演后追加，索引由工具重建。

@@ -154,3 +154,5 @@
 - docs/validation/2026-10-07-three-platform/android-legacy-admission-validation.json — Android公共旧配置与监听资源准入红绿及配置并发race范围
 
 - docs/validation/2026-10-07-three-platform/android-runtime-epoch-validation.json — 运行时配置身份红绿、范围及跨实例拒绝，设备比对待验
+
+- docs/validation/2026-10-07-three-platform/android-runtime-identity-validation.json — 实际Go FFI身份、两channel源码准入、失败IPC与端口/engine边界

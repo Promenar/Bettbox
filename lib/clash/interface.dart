@@ -106,6 +106,16 @@ abstract class ClashHandlerInterface with ClashInterface {
   Future<void> handleResult(ActionResult result) async {
     final completer = callbackCompleterMap[result.id];
     try {
+      if (result.code != ResultType.success &&
+          result.method != ActionMethod.getConfig &&
+          result.method != ActionMethod.convertAgeSecretKeyToPublicKey) {
+        if (completer != null && !completer.isCompleted) {
+          completer.completeError(
+            StateError(appLocalizations.connectionStateUnconfirmed),
+          );
+        }
+        return;
+      }
       switch (result.method) {
         case ActionMethod.message:
           clashMessage.controller.add(result.data);
@@ -210,10 +220,7 @@ abstract class ClashHandlerInterface with ClashInterface {
 
   @override
   FutureOr<String> validateConfig(String data, {String? ageSecretKey}) {
-    final params = {
-      'data': data,
-      'age-secret-key': ageSecretKey ?? '',
-    };
+    final params = {'data': data, 'age-secret-key': ageSecretKey ?? ''};
     return invoke<String>(
       method: ActionMethod.validateConfig,
       data: json.encode(params),
@@ -222,10 +229,7 @@ abstract class ClashHandlerInterface with ClashInterface {
 
   @override
   FutureOr<String> decryptAgeConfig(String data, String ageSecretKey) {
-    final params = {
-      'data': data,
-      'age-secret-key': ageSecretKey,
-    };
+    final params = {'data': data, 'age-secret-key': ageSecretKey};
     return invoke<String>(
       method: ActionMethod.decryptAgeConfig,
       data: json.encode(params),
@@ -243,10 +247,7 @@ abstract class ClashHandlerInterface with ClashInterface {
 
   @override
   Future<Result> getConfig(String path, {String? ageSecretKey}) async {
-    final params = {
-      'path': path,
-      'age-secret-key': ageSecretKey ?? '',
-    };
+    final params = {'path': path, 'age-secret-key': ageSecretKey ?? ''};
     final res = await invoke<Result>(
       method: ActionMethod.getConfig,
       data: json.encode(params),
@@ -436,14 +437,14 @@ abstract class ClashHandlerInterface with ClashInterface {
 
   @override
   Future<Map<String, String>> generateAgeKeyPair() async {
-    final res = await invoke<Map>(
-      method: ActionMethod.generateAgeKeyPair,
-    );
+    final res = await invoke<Map>(method: ActionMethod.generateAgeKeyPair);
     return res.map((key, value) => MapEntry(key.toString(), value.toString()));
   }
 
   @override
-  Future<Result<String>> convertAgeSecretKeyToPublicKey(String secretKey) async {
+  Future<Result<String>> convertAgeSecretKeyToPublicKey(
+    String secretKey,
+  ) async {
     final res = await invoke<Result>(
       method: ActionMethod.convertAgeSecretKeyToPublicKey,
       data: secretKey,

@@ -372,3 +372,5 @@ SDK36 覆盖安装后实际出现运行计时及活动 VPN，接收器 `PackageR
 智能暂停条件重评估、首次PENDING交错、权限撤销与熄屏速度路径尚未覆盖。唯一owner联合采用及有效节点HTTPS尚未完成，APK是正式签名候选，release_verified=false。Android owned采用后的公共旧配置、监听启停与shutdown已增加同锁门禁，实际旧写及资源关闭失败复现和修复后主包回归通过，配置32轮并发race通过。证据见 `docs/validation/2026-10-07-three-platform/android-legacy-admission-validation.json`；legacy TUN与完整双通道接线待完成。完整接线以 `.agents/plans/2026-10-09-android-single-owner-adoption.md` 为执行计划，不能将现有 helper 或更新资格基础验证等同完整发行验收。
 
 Go 运行时配置 epoch 已使用库载入期公开随机身份；完整主包及身份 race 通过，证据见 `docs/validation/2026-10-07-three-platform/android-runtime-epoch-validation.json`。设备 FFI/JNI 实际同实例证明尚未完成，不能用此源码变更替代该门禁。
+
+后台身份准入已接入现有 FFI invokeAction 与两条原生 channel。288 项 Flutter 回归包含新构建 Go 库的真实往返，但该用例的 JNI 回调为 mock；严格 Native 比较与 engine 归属仅有 JVM 夹具及实际 release Kotlin 编译证据。身份失败先提供关联拒绝 IPC，再有限上报，未知资源不报告 STOP 或销毁。完整 owner/ACK、新 APK 与设备真实身份比对待验，证据见 `docs/validation/2026-10-07-three-platform/android-runtime-identity-validation.json`。

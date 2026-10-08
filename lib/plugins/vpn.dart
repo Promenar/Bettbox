@@ -58,6 +58,9 @@ class Vpn {
 
   final ObserverList<VpnListener> _listeners = ObserverList<VpnListener>();
 
+  Future<bool?> verifyRuntimeIdentity(int epoch) => methodChannel
+      .invokeMethod<bool>('verifyRuntimeIdentity', {'epoch': epoch});
+
   Future<bool?> start(AndroidVpnOptions options) async {
     return await methodChannel.invokeMethod<bool>('start', {
       'data': jsonEncode(options),

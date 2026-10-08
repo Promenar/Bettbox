@@ -5,6 +5,7 @@ import com.appshub.bettbox.plugins.AppPlugin
 import com.appshub.bettbox.plugins.ServicePlugin
 import com.appshub.bettbox.plugins.TilePlugin
 import com.appshub.bettbox.plugins.VpnPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
@@ -79,6 +80,19 @@ object GlobalState {
 
     var flutterEngine: FlutterEngine? = null
     private var serviceEngine: FlutterEngine? = null
+    private val serviceRuntimeAdmission = ServiceRuntimeAdmission<FlutterEngine>()
+
+    // 失败只归属发送通道的实际engine；不伪造资源停止或销毁未知责任。
+    fun rejectServiceRuntime(messenger: BinaryMessenger): Boolean = runLock.withLock {
+        if (!serviceRuntimeAdmission.reject(serviceEngine, messenger) { it.dartExecutor.binaryMessenger }) return@withLock false
+        pendingTimeoutJob?.cancel()
+        pendingTimeoutJob = null
+        true
+    }
+
+    fun isServiceRuntimeRejected(): Boolean = runLock.withLock {
+        serviceRuntimeAdmission.isRejected(serviceEngine)
+    }
 
     @Volatile
     var isSmartStopped = false
@@ -166,7 +180,7 @@ object GlobalState {
 
     fun handleStart(skipDebounce: Boolean = false): Boolean {
         if (!skipDebounce && !acquireToggleSlot()) return false
-        if (currentRunState != RunState.STOP) return false
+        if (isServiceRuntimeRejected() || currentRunState != RunState.STOP) return false
 
         updateRunState(RunState.PENDING)
         startPendingTimeout()
@@ -206,6 +220,7 @@ object GlobalState {
         runLock.withLock {
             serviceEngine?.destroy()
             serviceEngine = null
+            serviceRuntimeAdmission.clear()
         }
     }
 

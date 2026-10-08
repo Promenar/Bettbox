@@ -276,3 +276,9 @@ owned 配置/TUN JNI 与严格解析器已存在，但启停仍走 Boolean adapt
 ### Android 运行时配置身份
 
 Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2^53−1，JSON、Dart 与 JNI 可精确比对；身份不是凭据或用户启动授权。短读、熵失败及连续保留值使初始化终止，没有常量或时间戳降级。该 Go 包所有平台均执行这一初始化，失败行为同样适用。epoch 在 Activity、Flutter engine 或配置变更时不重置；随机身份存在极低碰撞概率，不声明数学上绝对唯一。当前生产没有 coordinator 重置路径，新增重置必须重新核验 epoch 与 revision/generation，不能保留 epoch 却重用计数。设备上 FFI/JNI 实际同实例比对与完整 owner 采用仍待完成。
+
+### Android FFI/JNI 身份准入与失败 IPC
+
+后台 `_service` 使用现有 FFI invokeAction 的 `getAndroidOwnedConfigStatus` 动作获取同请求状态，经 VPN channel 比较 JNI Core 的身份后才注册正常 IPC 或执行配置/快捷启动；无需增加手写 FFI 绑定。Service/VPN 两 channel 共用严格 NativeConfigProtocol 比较器，Core 首次访问位于异常保护的 lambda 内。JNI 状态读取在后台协程，回执主线程核验原 channel。FFI/JNI 共用默认五秒等待预算，实际 FFI 请求在回包、截止、发送异常或错误类型下关闭 ReceivePort，输入参数 finally 释放。等待截止不能取消原生锁等待，也不能中断同步 JSON 解析。
+
+身份失败的后台保留 engine，先提供关联 code=-1 拒绝 IPC 与重连监听，再有界上报失败。原生按实际 serviceEngine/messenger 对象归属登记拒绝，GlobalState 和原生 requestStart 拒绝后续启动；不以无身份停止、销毁或 STOP 清洗未知资源。Dart 一般动作错误明确完成失败，getConfig/公钥转换维持 Result 合同。该失败记录不等于资源完成回执或 engine 消费 ACK，真实设备、双通道配置/启停联合 owner 与 ACK 退出仍待验收。

@@ -12,6 +12,8 @@ import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/state.dart';
 
 import 'generated/clash_ffi.dart';
+import 'android_runtime_identity.dart';
+import 'native_action_request.dart';
 import 'interface.dart';
 import 'shutdown_completion.dart';
 import 'listener_stop_completion.dart';
@@ -57,10 +59,14 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
 
   Future<void> _waitForIpc() async {
     for (var attempt = 0; attempt < 3; attempt++) {
-      final connected = await _canSendCompleter.future
-          .timeout(const Duration(seconds: 2), onTimeout: () => false);
+      final connected = await _canSendCompleter.future.timeout(
+        const Duration(seconds: 2),
+        onTimeout: () => false,
+      );
       if (connected) return;
-      commonPrint.log('ClashLib: IPC attempt ${attempt + 1}/3 failed, retrying...');
+      commonPrint.log(
+        'ClashLib: IPC attempt ${attempt + 1}/3 failed, retrying...',
+      );
       _canSendCompleter = Completer();
       await service?.reconnectIpc();
     }
@@ -147,7 +153,7 @@ class ClashLibHandler {
   late final DynamicLibrary lib;
 
   ClashLibHandler._internal()
-      : this.withLibrary(DynamicLibrary.open('libclash.so'));
+    : this.withLibrary(DynamicLibrary.open('libclash.so'));
 
   ClashLibHandler.withLibrary(DynamicLibrary library) {
     lib = library;
@@ -160,20 +166,27 @@ class ClashLibHandler {
     return _instance!;
   }
 
-  Future<String> invokeAction(String actionParams) {
-    final completer = Completer<String>();
-    final receiver = ReceivePort();
-    receiver.listen((message) {
-      if (!completer.isCompleted) {
-        completer.complete(message);
-        receiver.close();
+  Future<String> invokeAction(String actionParams, {Duration? timeout}) {
+    final request = NativeActionRequest(timeout: timeout);
+    request.send((port) {
+      final params = actionParams.toNativeUtf8().cast<Char>();
+      try {
+        clashFFI.invokeAction(params, port.nativePort);
+      } finally {
+        malloc.free(params);
       }
     });
-    final actionParamsChar = actionParams.toNativeUtf8().cast<Char>();
-    clashFFI.invokeAction(actionParamsChar, receiver.sendPort.nativePort);
-    malloc.free(actionParamsChar);
-    return completer.future;
+    return request.result;
   }
+
+  Future<bool> verifyRuntimeIdentity({
+    required Future<bool?> Function(int) invokeNative,
+  }) => confirmAndroidRuntimeIdentity(
+    requestId: 'runtimeIdentity#${utils.id}',
+    invokeGo: (request) =>
+        invokeAction(request, timeout: const Duration(seconds: 5)),
+    invokeNative: invokeNative,
+  );
 
   void attachMessagePort(int messagePort) {
     clashFFI.attachMessagePort(messagePort);
@@ -243,14 +256,17 @@ class ClashLibHandler {
     return DateTime.fromMillisecondsSinceEpoch(int.parse(runTimeString));
   }
 
-  Future<Map<String, dynamic>> getConfig(String id, {String? ageSecretKey}) async {
+  Future<Map<String, dynamic>> getConfig(
+    String id, {
+    String? ageSecretKey,
+  }) async {
     final path = await appPath.getProfilePath(id);
-    final params = {
-      'path': path,
-      'age-secret-key': ageSecretKey ?? '',
-    };
+    final params = {'path': path, 'age-secret-key': ageSecretKey ?? ''};
     return using((arena) {
-      final pathChar = json.encode(params).toNativeUtf8(allocator: arena).cast<Char>();
+      final pathChar = json
+          .encode(params)
+          .toNativeUtf8(allocator: arena)
+          .cast<Char>();
       final configRaw = clashFFI.getConfig(pathChar);
       if (configRaw == nullptr) return <String, dynamic>{};
       try {
