@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-09",
+  "scope": "三个实际TCP工厂的文件证书监听、初始更新与部分对象收尾；不是完整VPN owner或发行",
+  "source_base_commit": "de994647e74b63769b344a2552f241a04c7a136e",
+  "source_sha256": {
+    "core/Clash.Meta/component/ca/managed_keypair.go": "1c7551805261efefdd003ebafc60e8c9689218c889ebc50331c9ea7dac6f9e00",
+    "core/Clash.Meta/component/ca/managed_keypair_test.go": "758465c9d7d71203f5312189104544a23a96d038717e2333bf61ebb3bc6c1319",
+    "core/Clash.Meta/listener/http/server.go": "41557c3f9a219f7950397510b69fd79cdcaf88d6cd77663122ed28b2aaefb937",
+    "core/Clash.Meta/listener/socks/tcp.go": "e38b6f19cf1aaada767d43f06c07d58d1b6a5ec9ee8e033d46bf00695b964912",
+    "core/Clash.Meta/listener/mixed/mixed.go": "fd6bef0eab7d3120f06466200d38ad4c6c596e38d049cca1ab803ec0de95783f",
+    "core/Clash.Meta/listener/inbound/http.go": "7e92183c11ef599f111bc286e9acc3c92998dd56e0c3c1222896eb550bb26d5a",
+    "core/Clash.Meta/listener/inbound/socks.go": "27f56fd559e4858ecdac4f332be5c6aaab749192b39268e54d36e8c2d51a6a2b",
+    "core/Clash.Meta/listener/inbound/mixed.go": "63ad1e760d94df64700721fe66f67df642821e2038b30aae7e3af6832f82ef23",
+    "core/Clash.Meta/listener/tls_file_lifecycle_test.go": "012d119c44d72403ed5dc6f5329299f2a81cd21ef2b82fe17b64634e4a9caac5",
+    "core/Clash.Meta/listener/tls_file_partial_unix_test.go": "c88ace42ed205fc30ee3a859619feb4db91d78d64acff247efdad53b4d538391"
+  },
+  "red": {
+    "actual_factory_close_leak_failures": 3,
+    "exit_code": 1,
+    "initial_refresh_before_ownership_blocked": true,
+    "initial_refresh_red_exit_code": 1
+  },
+  "green": {
+    "file_lifecycle_cases": 15,
+    "fifo_partial_factory_and_inbound_cases": 6,
+    "managed_keypair_tests": 9,
+    "real_file_rotation_and_immutable_previous_certificate": true,
+    "queued_and_admitted_reload_close": true,
+    "native_and_reload_timeout_reconfirmation": true,
+    "concurrent_close_error_preservation": true,
+    "protocol_and_preflight_race_pass_records": 62,
+    "common_net_scope_race": true,
+    "core_cgo0_with_gvisor": true,
+    "android_arm64_c_shared": true
+  },
+  "commands": {
+    "ca": "GOPROXY=off GOSUMDB=off go test -p=2 -mod=readonly -race -count=1 -timeout=90s -run ^TestManagedKeyPair github.com/metacubex/mihomo/component/ca",
+    "protocol": "GOPROXY=off GOSUMDB=off go test -p=2 -mod=readonly -race -count=1 -timeout=90s -json -run ^TestTCPProtocol|^TestFactoryTLSPreflightBeforeRealBind$ github.com/metacubex/mihomo/listener",
+    "scope": "GOPROXY=off GOSUMDB=off go test -p=2 -mod=readonly -race -count=1 -timeout=90s -run ^TestManagedTCP|^TestHandleContext github.com/metacubex/mihomo/common/net",
+    "core": "CGO_ENABLED=0 GOPROXY=off GOSUMDB=off go test -mod=readonly -count=1 -timeout=120s -tags with_gvisor .",
+    "cwd": "core"
+  },
+  "independent_review": {
+    "executor": "native tls_watch_lifecycle_review",
+    "source_only": true,
+    "found_initial_read_before_ownership": true,
+    "fixed_and_final_review_no_deterministic_defect": true
+  },
+  "android_artifact": {
+    "path": ".test/android-tcp-protocol-core/libclash.so",
+    "sha256": "3f31488feac4110007a8894b849326f3c1385dbdcbbc5b6adca8ee303e716c47",
+    "host": "macOS ARM64",
+    "target": "Android ARM64",
+    "ndk": "28.2.13676358",
+    "api": 26,
+    "installed": false
+  },
+  "boundaries": [
+    "fsnotify真实退出与FIFO测试在macOS，不等于Android设备文件监听验收",
+    "旧NewTLSKeyPairLoader行为及其它调用未修改",
+    "HTTP Transport私有任务、其它协议/UDP与Android唯一owner尚未完成",
+    "未替换APK/macOS应用，未使用业务证书或节点，未宣称发行"
+  ],
+  "test_issue": "FIFO首轮重复路径导致下一子用例写入阻塞；各子用例独立目录后通过；不属于产品缺陷"
+}

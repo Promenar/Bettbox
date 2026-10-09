@@ -239,3 +239,6 @@
 
 - `docs/validation/2026-10-07-three-platform/android-new-account-validation.json`：Android新注册账户真实登录、套餐展示、会话冷恢复与退出后冷启动。
 - `docs/validation/2026-10-07-three-platform/android-new-account-home.png`：体验套餐展示快照，核对时到期时间为2026-10-09 17:08。
+
+- .agents/plans/2026-10-09-tls-watcher-lifecycle.md — 文件证书资源责任、失败对象与受控FIFO验收计划
+- docs/validation/2026-10-07-three-platform/tls-watcher-lifecycle-validation.json — 三工厂及包装器真实收尾、初始补读红绿、独立复审与Android编译边界

@@ -77,10 +77,13 @@ func (h *HTTP) Listen(tunnel C.Tunnel) error {
 			tunnel,
 			h.Additions()...,
 		)
+		// 构造失败也可能返回未确认关闭的部分资源，必须先登记所有权。
+		if l != nil {
+			h.l = append(h.l, l)
+		}
 		if err != nil {
 			return err
 		}
-		h.l = append(h.l, l)
 	}
 	log.Infoln("HTTP[%s] proxy listening at: %s", h.Name(), h.Address())
 	return nil

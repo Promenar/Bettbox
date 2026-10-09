@@ -203,3 +203,6 @@ TCP协议会话沿用本机公开loopback/race、core完整CGO0和NDK28/API26编
 真实PluginManager生命周期在唯一临时插件目录和空v2_plugins表执行；仅精确允许Fubei主类与缺席的可选PluginServiceProvider探测，其它未知应用类继续拒绝。主类由真实管理器从已核验目录加载；同请求Hook及后续账务替身边界见平台验收文档。容器网络、挂载、资源和生产权限保持。
 
 真实PaymentService关闭/开启对照使用同订单及公开快照，开启在缺席密钥引用处停止，没有网络调用；14项工具回归逐个校验必需插件证明。检查标签上限为320，实际312；网络、挂载、资源及超时保持。
+
+
+`test-managed-keypair-lifecycle`使用本机公开合成证书、真实文件轮换及隔离事件源验证更新准入和关闭结果。`test-tcp-protocol-lifecycle`覆盖三个实际工厂和inbound包装器；临时FIFO只在受控测试目录使用，各子场景独立。关闭超时和迟到确认不访问业务证书或上游。Android核心沿用既有NDK28/API26独立产物操作，不安装或覆盖候选。

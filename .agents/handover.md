@@ -3977,3 +3977,34 @@ record-fingerprint: 5936067d124b44ddedc4af3b6ef5d4d87257828ee96424af19427590d59c
 
 ### HLG
 append先dry-run后apply，记录真实路径及输入问题，保留历史。
+
+## 2026-10-09T17:45:20+08:00 · 文件证书监听与部分构造资源显式收尾
+
+type: maintenance
+scope: ["Bettbox", "Android", "Mihomo"]
+status: done
+tags: ["tls", "lifecycle", "three-platform-release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: fe4fe416d974ca53883e4d3d4b7b55d06364da65d1d1bcaa625ca29234dcddc7
+
+### Summary
+HTTP/SOCKS/Mixed三个实际TCP工厂及inbound包装器显式持有并收尾文件证书资源，完成可独立交付的资源依赖；完整发行目标保持未完成。
+
+### Changed
+新增ManagedTLSKeyPairLoader，fsnotify单循环、不可变证书发布、同锁更新准入与关闭撤销、原生与循环退出确认；一秒未知保留责任。构造失败保留安全部分Listener，上层先登记再处理错误。旧loader和其它调用保持兼容。
+
+### Validation
+修复前3实际工厂Close泄漏失败；独立审阅发现初始补读阻断所有权交付并建立实际失败回归，补读移入受管理循环后通过。15个文件路径、6个真实FIFO工厂/包装器、9个CA生命周期、62个TCP/预检pass记录、scope race、完整core CGO0及Android ARM64 c-shared编译通过。源码回执与终态独立复审已核对。
+
+### Next
+按用户新授权在面板所在NoSLA VPS部署受控Hysteria2测试节点，完成真实流量验收；继续Android唯一owner/ACK与macOS账户/代理联合接线，iOS保持开发研究范围。
+
+### Risks
+真实文件监听与FIFO验证在macOS，Android仅核心编译；APK/macOS候选未替换，Transport私有任务/其它证书接口/UDP和完整owner待完成。FIFO初轮共用路径导致下一子用例阻塞，独立临时目录修正后通过。NoSLA资源紧张，新节点须限额并保留现有服务与回滚，凭据不进入LLM。
+
+### DIA
+已同步架构、平台验证、变更日志、PDEC说明、计划、注册表与公开脱敏回执。
+
+### HLG
+使用结构化append dry-run与apply追加，不修改已有事实链。

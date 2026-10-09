@@ -297,7 +297,7 @@ Go 库载入时由 crypto/rand.Reader 生成一次公开 epoch，范围为 2…2
 
 ### 协议工厂配置失败边界
 
-HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后，避免配置失败返回空资源时遗失端口。有效文件证书 loader 可能建立 watcher，需显式生命周期治理；配置预检不是全资源纯操作。传统 Close 仅返回监听关闭结果，完整服务 owner 必须另外登记并收尾握手、accepted 连接、协议 service、异步 UDP 和任务，不以端口释放推断 drain。
+HTTP、SOCKS、Mixed 的实际 TCP 绑定位于 TLS/Reality 配置之后。有效文件证书采用 ManagedTLSKeyPairLoader，显式持有fsnotify和单更新循环；目录登记后的初始补读也属于受管理任务，构造先交付所有权。更新与关闭通过同锁准入，发布不可变证书指针；Close撤销准入并在一秒内等待原生关闭与循环退出，未确认保留责任并允许后续确认。构造失败清理未知时返回部分Listener，Address安全，三个inbound包装器先登记再传播错误；命名Patch在Listen前登记包装器。内嵌证书没有watcher。旧NewTLSKeyPairLoader与其它调用的best effort行为保留；该兼容范围不代表其它证书任务收尾。完整owner仍需收尾其它协议、异步UDP和Transport私有任务，不以端口释放推断drain。
 
 ### 账务 SQLite 迁移
 
@@ -333,7 +333,7 @@ Reality使用的公共握手监听器以内部责任记录传递结果，Accept�
 
 ScopeTunnel委派真实阻塞TCP路由并提供HTTP的context、pipe及子任务登记。CONNECT与SOCKS处理器属于主任务，普通HTTP与Upgrade内部route单独登记；EOF回调的Peek在启动前准入，owned Upgrade使用资源账本而不创建额外AfterFunc。认证每个请求独立核验，较早成功不能授权后续失败；合法用户切换仍关闭idle连接以隔离复用。CredentialBlind认证输出边界保持。
 
-HTTP Transport私有read/write/dial任务没有公开join；此机制只确认已登记任务与资源，证书watcher、UDP runtime和其它协议仍需独立收尾，不据TCP socket关闭宣称完整VPN停止。
+HTTP Transport私有read/write/dial任务没有公开join；此机制只确认已登记任务与资源，三个TCP工厂之外的证书watcher、UDP runtime和其它协议仍需独立收尾，不据TCP socket关闭宣称完整VPN停止。
 
 Dart公共监听启动与后台FFI调用只接受当前Go动作的明确成功回执；拒绝或异常不允许继续请求VPN和提交偏好。监听启动成功只表示监听动作成功，完整VPN发布仍由平台生命周期合同决定。
 

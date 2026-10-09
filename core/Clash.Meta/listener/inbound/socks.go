@@ -98,10 +98,13 @@ func (s *Socks) Listen(tunnel C.Tunnel) error {
 			RealityConfig:  s.config.RealityConfig.Build(),
 		}
 		stl, err := socks.NewWithConfig(config, lc, tunnel, s.Additions()...)
+		// 构造失败也可能返回未确认关闭的部分资源，必须先登记所有权。
+		if stl != nil {
+			s.stl = append(s.stl, stl)
+		}
 		if err != nil {
 			return err
 		}
-		s.stl = append(s.stl, stl)
 		if s.udp {
 			sul, err := socks.NewUDPWithConfig(config, lc, tunnel, s.Additions()...)
 			if err != nil {

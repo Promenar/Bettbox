@@ -24,9 +24,10 @@ import (
 )
 
 type Listener struct {
-	listener net.Listener
-	addr     string
-	server   *N.ManagedTCPServer
+	listener    net.Listener
+	addr        string
+	server      *N.ManagedTCPServer
+	certificate *ca.ManagedTLSKeyPairLoader
 }
 
 // RawAddress implements C.Listener
@@ -36,12 +37,22 @@ func (l *Listener) RawAddress() string {
 
 // Address implements C.Listener
 func (l *Listener) Address() string {
+	if l.listener == nil {
+		return l.addr
+	}
 	return l.listener.Addr().String()
 }
 
 // Close implements C.Listener
 func (l *Listener) Close() error {
-	return l.server.Close()
+	var serverErr, certificateErr error
+	if l.server != nil {
+		serverErr = l.server.Close()
+	}
+	if l.certificate != nil {
+		certificateErr = l.certificate.Close()
+	}
+	return errors.Join(serverErr, certificateErr)
 }
 
 func defaultConfig(addr string) LC.AuthServer {
@@ -52,7 +63,8 @@ func New(addr string, tunnel C.Tunnel, additions ...inbound.Addition) (*Listener
 	return NewWithConfig(defaultConfig(addr), inbound.NewListenConfig(), tunnel, additions...)
 }
 
-func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunnel, additions ...inbound.Addition) (*Listener, error) {
+// NewWithConfig 返回的非 nil Listener 始终由调用方负责关闭，即使同时返回错误。
+func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunnel, additions ...inbound.Addition) (result *Listener, resultErr error) {
 	isDefault := false
 	if len(additions) == 0 {
 		isDefault = true
@@ -62,17 +74,27 @@ func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunn
 		}
 	}
 
+	sl := &Listener{addr: config.Listen}
+	defer func() {
+		if resultErr != nil {
+			if closeErr := sl.Close(); closeErr != nil {
+				// 清理未确认时保留部分资源对象，避免伪报构造失败已释放。
+				result, resultErr = sl, errors.Join(resultErr, closeErr)
+			}
+		}
+	}()
 	tlsConfig := &tls.Config{Time: ntp.Now}
 	var realityBuilder *reality.Builder
 	var err error
 
 	if config.Certificate != "" && config.PrivateKey != "" {
-		certLoader, err := ca.NewTLSKeyPairLoader(config.Certificate, config.PrivateKey)
+		certLoader, err := ca.NewManagedTLSKeyPairLoader(config.Certificate, config.PrivateKey)
+		sl.certificate = certLoader
 		if err != nil {
 			return nil, err
 		}
 		tlsConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
-			return certLoader()
+			return certLoader.Load()
 		}
 
 		if config.EchKey != "" {
@@ -120,10 +142,7 @@ func NewWithConfig(config LC.AuthServer, lc C.InboundListenConfig, tunnel C.Tunn
 		l = tls.NewListener(l, tlsConfig)
 	}
 
-	sl := &Listener{
-		listener: l,
-		addr:     config.Listen,
-	}
+	sl.listener = l
 	sl.server = N.NewManagedTCPServer(context.Background(), l, func(scope *N.ListenerScope, c net.Conn) {
 		store := config.AuthStore
 		if isDefault || store == authStore.Default {

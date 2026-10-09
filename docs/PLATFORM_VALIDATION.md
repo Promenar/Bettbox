@@ -548,3 +548,12 @@ Android正式签名候选fd6b978生成的邀请链接经真实注册API及邮箱
 ## Android真实新账户与本地会话验收
 
 实际安装的正式签名候选fd6b978经设备回读SHA256与本地APK一致。真实邮箱注册的新账户在Android正常登录，账号页显示预期邮箱；首页体验套餐、1 GB及2026-10-09 17:08到期时间与真实API逐项匹配，核对发生在到期前。未清数据的冷启动恢复相同账户；界面退出后未登录入口恢复，第二次冷启动保持未登录。两次冷启动前均确认当前NetworkAgent没有VPN transport。日志只统计固定标记，当前进程FATAL EXCEPTION/Fatal signal均0。自动化输入曾被模拟器拼音转为中文，切换输入模式并核对邮箱完整匹配后提交成功，原subtype设置值已恢复。已下载配置保留、自动更新冻结是源码既有合同；这轮没有独立验收计时器冻结或服务端token吊销。有效VPN流量、付款返佣与另外两端新账户登录另验。证据见 `validation/2026-10-07-three-platform/android-new-account-validation.json`，截图见 `validation/2026-10-07-three-platform/android-new-account-home.png`。
+
+
+## 文件证书监听器与部分构造责任
+
+2026-10-09，实际HTTP/SOCKS/Mixed工厂在修复前均出现成功Close后原生文件监听仍存活。管理式加载器把fsnotify、单更新循环、初始刷新和Close任务纳入显式所有权；内嵌PEM不创建文件监听，坏更新保留有效证书，证书指针发布后不修改。目录登记后的同步补读曾使所有权交付阻塞，独立审阅发现后建立失败回归，补读移入受管循环并通过。
+
+真实文件正常关闭、绑定/ECH/客户端CA/Reality错误15个场景通过。受控FIFO在真实文件更新中阻塞，三工厂与三inbound包装器均保留部分资源，安全Address、关闭未知及解除后确认通过。9个CA生命周期、TCP/预检62个pass记录、scope race、完整core CGO0回归以及实际Android ARM64 c-shared编译通过。回执见 `validation/2026-10-07-three-platform/tls-watcher-lifecycle-validation.json`。
+
+真实fsnotify/FIFO运行平台为macOS；Android只验证核心编译，未安装新APK或检查设备证书监听。旧loader及其它协议调用未改。HTTP Transport私有任务、UDP、其它协议与Android唯一owner/ACK仍待集成；不声明完整VPN停止或可用发行。

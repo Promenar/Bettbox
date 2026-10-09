@@ -78,10 +78,13 @@ func (m *Mixed) Listen(tunnel C.Tunnel) error {
 			RealityConfig:  m.config.RealityConfig.Build(),
 		}
 		l, err := mixed.NewWithConfig(config, lc, tunnel, m.Additions()...)
+		// 构造失败也可能返回未确认关闭的部分资源，必须先登记所有权。
+		if l != nil {
+			m.l = append(m.l, l)
+		}
 		if err != nil {
 			return err
 		}
-		m.l = append(m.l, l)
 		if m.udp {
 			lUDP, err := socks.NewUDPWithConfig(config, lc, tunnel, m.Additions()...)
 			if err != nil {
