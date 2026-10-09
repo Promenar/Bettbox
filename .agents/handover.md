@@ -3822,3 +3822,65 @@ PDEC8520b81d有效。构建18825 exit0，源/锁未漂移。封装27546 exit0/MA
 
 ### HLG
 按标准append记录构建终态、旧候选回退与注册邮件动作边界。
+
+## 2026-10-09T16:22:56+08:00 · 付呗真实插件管理器验收输入与范围恢复
+
+type: maintenance
+scope: ["Bettbox", "Xboard", "Fubei"]
+status: done
+tags: ["payment", "plugin", "plan"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 0ba37fc5b9f63f04b858ddd520d5624a808614d38a7965112112e0ce47e63c27
+
+### Summary
+定位原PluginDiscovery替身边界；已取得缺失公开Plugin模型并形成真实生命周期隔离计划，未实现或声称测试通过。
+
+### Changed
+新增2026-10-09-fubei-plugin-lifecycle.md及registry导航。只读缓存Plugin模型源SHA256 20ce2526f5f0382c3a97fbd27266725fb658edc4fe6b5ad7c5abdbe26bd42d0a，文件444。生产插件、DB及收款配置未变。
+
+### Validation
+实际读PluginManager、AbstractPlugin、HookManager、PaymentService和候选config。插件码fubei由Str::studly对应Fubei类；支付方法名Fubei独立。新模型仅1722字节公开源码，无配置或秘密；尚未加入执行白名单或运行新测试。
+
+### Next
+主控实施精确输入、临时插件树和真实管理器生命周期测试，更新PDEC摘要后禁网验收与独立审阅；等待用户验证码文件就绪，不自动重复发邮件。
+
+### Risks
+原测试仍有发现和认证夹具；不得将目录存在或ClassMap加载等同完整动态发现。验证码文件检查未就绪，未真实注册。有效节点、商户及正式Apple发行条件仍待。
+
+### DIA
+已同步计划及registry；没有生产代码或接口改变。
+
+### HLG
+标准append记录公开模型来源、范围和后续实施状态。
+
+## 2026-10-09T16:34:19+08:00 · 付呗真实插件管理器隔离生命周期验收完成
+
+type: maintenance
+scope: ["Bettbox", "billing"]
+status: done
+tags: ["payment", "plugin", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 66031fb82929fca9127ec40414c409952e72968ac11ef9a8f36eaede95791a82
+
+### Summary
+真实PluginManager与Plugin模型在临时目录和空SQLite表完成安装、默认关闭、启用、禁用和卸载。未激活生产支付。
+
+### Changed
+新增laravel_plugin_lifecycle_check及三个精确冻结输入；可选PluginServiceProvider仅精确缺席探测例外，其它未知应用类继续拒绝。同步执行器、PDEC与验收文档。
+
+### Validation
+13项执行器回归通过；PDEC approved/valid/execution_ready，digest20117409cb4ef32cf9ee880150bf16a607d815050333ad9ce64b58c36c7cd527。真实task28c0ff8047d947389e363db80c58d93f完成300检查、64输入，cleanup_verified和source_unchanged均true。独立只读fubei_lifecycle_review复核精确修复与边界，无剩余该阻断。两次诊断失败容器均清理，失败source_unchanged=false表示未复核，非漂移证明。
+
+### Next
+等待用户将验证码安全保存本机文件后验证网页注册邀请归属；继续Android基础生命周期与macOS账户链路。
+
+### Risks
+ClassMap预加载未验证临时目录require回退；禁用后的新Hook容器不等于同请求闭包清理。后续账务仍用发现与网关替身，实际PaymentService贯穿、商户付款和生产迁移待验收。邮件请求仅一次HTTP200/data=true，文件为空；未确认邮件送达或提交注册。
+
+### DIA
+已同步插件README、PDEC说明、平台验收、架构、CHANGELOG、计划、registry与公开回执。
+
+### HLG
+使用append先dry-run再apply，保留既有历史。

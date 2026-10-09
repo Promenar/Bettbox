@@ -532,3 +532,7 @@ fd6b978同源正式候选在现有开发账户实际进入账号与邀请返利�
 ## 当前源码macOS开发候选
 
 源码07753cda的完整Release构建及独立开发Keychain候选封装通过，源码和锁文件未漂移。既有AppleDevelopment签名经strict/deep核验，宿主SHA256为44f9b72287bccfed068b1dcc18fe32831c04dcd46057d96f2c037b77ed3fd9cf；旧候选正常退出并保留在build/macos-local-development-before-07753cda。实际CUA启动后首页和账号页正常渲染，未登录，系统代理及虚拟网卡关闭。当前未复现黑屏，原根因仍未知。实际登录Keychain、完整代理路径和公证发行另验，不把开发签名作为可用发行证明。独立回执 `validation/2026-10-07-three-platform/macos-current-candidate-validation.json`。
+
+## 真实插件管理器隔离生命周期
+
+真实PluginManager隔离生命周期已通过：临时插件目录解析、安装默认禁用、全局开关关闭时不暴露收款方式、启用后的小写plugin_code=fubei及真实类实例、禁用后的数据库发现与新请求Hook容器、卸载删除插件行。当前300项隔离检查、64个冻结输入与13项执行器回归通过，源码未变且清理确认。Fubei类由候选ClassMap预加载，未覆盖临时目录require回退；未验证同请求残留Hook清理或真实管理器贯穿后续checkout。认证和后续账务的插件发现、网关传输仍为显式夹具。没有生产激活或真实付款。证据见 `validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`。

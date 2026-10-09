@@ -93,7 +93,7 @@ try {
         'App\\Exceptions\\ApiException','App\\Exceptions\\BusinessException','App\\Exceptions\\Handler','App\\Contracts\\PaymentInterface',
         'App\\Http\\Middleware\\TrustProxies','App\\Http\\Middleware\\CheckForMaintenanceMode','App\\Http\\Middleware\\TrimStrings',
         'App\\Http\\Middleware\\InitializePlugins','App\\Http\\Middleware\\ApplyRuntimeSettings','App\\Http\\Middleware\\ForceJson','App\\Http\\Middleware\\Language',
-        'App\\Models\\User','App\\Models\\Plan','App\\Models\\Order','App\\Models\\Payment','App\\Models\\Setting','App\\Models\\CommissionLog','App\\Models\\TrafficResetLog',
+        'App\\Models\\User','App\\Models\\Plan','App\\Models\\Order','App\\Models\\Payment','App\\Models\\Setting','App\\Models\\CommissionLog','App\\Models\\TrafficResetLog','App\\Models\\Plugin',
         'App\\Services\\UserService','App\\Services\\PlanService','App\\Services\\TrafficResetService','App\\Services\\PaymentService',
         'App\\Services\\Plugin\\PluginManager','App\\Services\\Plugin\\AbstractPlugin','App\\Services\\Plugin\\HookManager','App\\Services\\Plugin\\InterceptResponseException',
         'App\\Support\\Setting','App\\Utils\\Helper','App\\Services\\CouponService','App\\Models\\Coupon',
@@ -107,6 +107,8 @@ try {
     foreach (['Amount','Client','JsonAmount','Notification','RawNotification','Signature'] as $name) fixtureFile($candidate,'server/plugins/Fubei/'.$name.'.php');
     $loader->addClassMap($appMap);
     spl_autoload_register(static function ($class) use ($appMap) {
+        // 真实管理器会探测候选未提供的可选provider；只允许该精确缺席探测返回false。
+        if ($class==='Plugin\\Fubei\\Providers\\PluginServiceProvider') return;
         if ((str_starts_with($class,'App\\') || str_starts_with($class,'Plugin\\')) && !isset($appMap[$class])) throw new RuntimeException('应用类不在公开白名单');
     },true,true);
     require fixtureFile($public,'app/Helpers/Functions.php');
@@ -162,6 +164,8 @@ SQL);
     $pdo->exec(file_get_contents(fixtureFile($candidate,'server/patches/billing/overlay/database/migrations/billing_atomic_schema.sql')));
     fixtureCheck(App\Models\User::count()===0 && App\Models\Order::count()===0,'empty_business_tables');
     Illuminate\Database\Eloquent\Model::unguard();
+    require fixtureFile($candidate,'server/tests/billing/laravel_plugin_lifecycle_check.php');
+    fixturePluginLifecycle($db,$candidate,$temporary,$app);
     $manager=new BettboxBillingFixture\PluginDiscovery();
     $legacy=new BettboxBillingFixture\LegacyGateway('FixtureLegacy');
     $fubei=new BettboxBillingFixture\FubeiGateway('Fubei');

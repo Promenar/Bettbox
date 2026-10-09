@@ -18,6 +18,9 @@ TASK = '1' * 32
 CHECKS = ['negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
           'repeat_commission_once', 'cancel_refund_once', 'outbox_at_least_once_consumer_idempotent',
           'historical_negative_processing_no_open', 'fubei_open_and_event_once', 'fixture_work_removed']
+CHECKS += ['plugin_real_path_resolved','plugin_install_disabled','plugin_global_switch_off',
+           'plugin_catalog_real_code','plugin_enabled_real_instance','plugin_disabled_discovery_empty',
+           'plugin_disabled_fresh_catalog_empty','plugin_uninstalled_row_removed']
 CHECKS += ['migration_actual_class', 'migration_history_preserved', 'migration_empty_down_preserves_history',
            'migration_up_after_empty_down', 'migration_foreign_keys_valid', 'migration_same_isolated_connection',
            'migration_evidence_attempt_retained', 'migration_evidence_review_retained',
@@ -124,6 +127,8 @@ class LaravelIsolatedTest(unittest.TestCase):
                 payload['checks'] = [x for x in CHECKS if not x.endswith('_overlap')]
             if failure == 'contract':
                 payload['checks'] = CHECKS[:-1]
+            if failure == 'plugins':
+                payload['checks'] = [x for x in CHECKS if not x.startswith('plugin_')]
             if failure == 'missing':
                 (root / runner.CANDIDATE_INPUTS[0]).unlink()
 
@@ -187,7 +192,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 61)
+        self.assertEqual(len(receipt['source_hashes']), 64)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)
@@ -196,7 +201,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertIn('target=/fixture/source,readonly', command)
 
     def test_failed_paths_always_write_failed_receipt(self):
-        for failure in ['image', 'timeout', 'vendor', 'raw', 'evidence', 'contract', 'source', 'parent_link']:
+        for failure in ['image', 'timeout', 'vendor', 'raw', 'evidence', 'contract', 'plugins', 'source', 'parent_link']:
             with self.subTest(failure=failure):
                 receipt, _ = self.exercise(failure)
                 self.assertEqual(receipt['status'], 'failed')

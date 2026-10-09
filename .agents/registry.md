@@ -227,3 +227,7 @@
 - docs/validation/2026-10-07-three-platform/invite-web-landing-validation.json — 实际邀请链接预填及当前邮箱验证前提，注册归属与下载引导待验收
 
 - docs/validation/2026-10-07-three-platform/macos-current-candidate-validation.json — 07753cda开发构建、签名、旧候选保留与实际首页/账号页证据
+
+- .agents/plans/2026-10-09-fubei-plugin-lifecycle.md — 真实插件管理器隔离生命周期范围、公开模型来源与待实施验证
+
+- `docs/validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`：真实PluginManager隔离生命周期回执；目录加载与支付替身边界分别披露。

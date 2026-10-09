@@ -22,7 +22,7 @@ PUBLIC_INPUTS = (
     'app/Http/Middleware/TrimStrings.php', 'app/Http/Middleware/InitializePlugins.php',
     'app/Http/Middleware/ApplyRuntimeSettings.php', 'app/Http/Middleware/ForceJson.php',
     'app/Http/Middleware/Language.php', 'app/Models/User.php', 'app/Models/Plan.php',
-    'app/Models/Order.php', 'app/Models/Payment.php', 'app/Models/Setting.php',
+    'app/Models/Order.php', 'app/Models/Payment.php', 'app/Models/Setting.php', 'app/Models/Plugin.php',
     'app/Models/CommissionLog.php', 'app/Models/TrafficResetLog.php',
     'app/Services/UserService.php', 'app/Services/PlanService.php',
     'app/Services/TrafficResetService.php', 'app/Services/PaymentService.php',
@@ -45,7 +45,7 @@ CANDIDATE_INPUTS = (
     'server/patches/billing/overlay/app/Http/Controllers/V2/Admin/OrderController.php',
     'server/patches/billing/overlay/database/migrations/billing_atomic_schema.sql',
     'server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php',
-    'server/plugins/Fubei/Plugin.php', 'server/plugins/Fubei/Amount.php',
+    'server/plugins/Fubei/config.json', 'server/plugins/Fubei/Plugin.php', 'server/plugins/Fubei/Amount.php',
     'server/plugins/Fubei/Client.php', 'server/plugins/Fubei/JsonAmount.php',
     'server/plugins/Fubei/Notification.php', 'server/plugins/Fubei/RawNotification.php',
     'server/plugins/Fubei/Signature.php', 'server/tests/billing/laravel_check.php',
@@ -54,6 +54,7 @@ CANDIDATE_INPUTS = (
     'server/tests/billing/laravel_concurrency_check.php',
     'server/tests/billing/laravel_queue_check.php',
     'server/tests/billing/laravel_coupon_admin_check.php',
+    'server/tests/billing/laravel_plugin_lifecycle_check.php',
 )
 IMAGE_SOURCE_CONTAINER = 'xboard-test-xboard-1'
 DIGEST = re.compile(r'sha256:[a-f0-9]{64}\Z')
@@ -131,6 +132,9 @@ def result_summary(raw, hashes):
     if not isinstance(checks, list) or not checks or len(checks) > 300 or any(not isinstance(item, str) or not LABEL.fullmatch(item) for item in checks):
         raise RunnerFailure('fixture_checks_invalid')
     required = {'negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
+                'plugin_real_path_resolved', 'plugin_install_disabled', 'plugin_global_switch_off',
+                'plugin_catalog_real_code', 'plugin_enabled_real_instance', 'plugin_disabled_discovery_empty',
+                'plugin_disabled_fresh_catalog_empty', 'plugin_uninstalled_row_removed',
                 'repeat_commission_once', 'cancel_refund_once', 'outbox_at_least_once_consumer_idempotent',
                 'historical_negative_processing_no_open', 'fubei_open_and_event_once', 'fixture_work_removed',
                 'migration_actual_class', 'migration_history_preserved', 'migration_empty_down_preserves_history',

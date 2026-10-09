@@ -1,0 +1,28 @@
+{
+  "scope": "真实PluginManager隔离生命周期，非生产支付验收",
+  "task_id": "28c0ff8047d947389e363db80c58d93f",
+  "status": "passed",
+  "checks_count": 300,
+  "frozen_inputs_count": 64,
+  "plugin_checks": [
+    "plugin_real_path_resolved",
+    "plugin_install_disabled",
+    "plugin_global_switch_off",
+    "plugin_catalog_real_code",
+    "plugin_enabled_real_instance",
+    "plugin_disabled_discovery_empty",
+    "plugin_disabled_fresh_catalog_empty",
+    "plugin_uninstalled_row_removed"
+  ],
+  "cleanup_verified": true,
+  "source_unchanged": true,
+  "network": "none",
+  "business_database_mounted": false,
+  "source_environment_loaded": false,
+  "limitations": [
+    "Fubei类通过候选ClassMap预加载，未覆盖临时目录require回退",
+    "禁用后的新请求Hook容器已覆盖，同请求残留闭包清理未覆盖",
+    "后续账务使用PluginDiscovery及网关替身，未覆盖真实管理器贯穿checkout",
+    "未部署生产插件、迁移生产库或调用真实商户"
+  ]
+}
