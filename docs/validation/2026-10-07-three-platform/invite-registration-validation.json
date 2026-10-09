@@ -1,0 +1,42 @@
+{
+  "scope": "Android邀请链接、真实注册API归属、账户API和Android收益页刷新",
+  "registration": {
+    "status": "registered",
+    "http_status": 200,
+    "user_id": 6,
+    "inviter_match": true,
+    "is_admin": false,
+    "is_staff": false
+  },
+  "account": {
+    "login_http_status": 200,
+    "authenticated": true,
+    "info_http_status": 200,
+    "new_account_plan_present": true,
+    "new_account_balance_zero": true,
+    "subscribe_http_status": 200,
+    "invite_http_status": 200,
+    "registered_user_present": true,
+    "registered_inviter_matches": true,
+    "inviter_registered_count": 1,
+    "registered_user_order_count": 0,
+    "registered_user_commission_count": 0
+  },
+  "android_invite_view": {
+    "installed_apk_source": "fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a",
+    "registered_count": 1,
+    "commission_total": "0.00",
+    "commission_pending": "0.00",
+    "commission_available": "0.00",
+    "refresh_observed": true
+  },
+  "verification_transport": "NoSLA既有loopback API，网页邀请码已单独验收，未用浏览器提交注册表单",
+  "email_delivery": "用户确认原邮件16:14送达，新邮件验证码由用户安全保存并被真实API接受",
+  "secret_handling": "验证码、随机密码、令牌仅保存在本机受保护文件或通过SSH传输，不进入公开回执",
+  "limitations": [
+    "未创建付费订单，未证明真实商户付款或付费返佣",
+    "新账户尚未登录三端客户端",
+    "尚未验证网页登录后的下载引导",
+    "当前节点为用户确认的占位节点，不能证明有效VPN代理流量"
+  ]
+}

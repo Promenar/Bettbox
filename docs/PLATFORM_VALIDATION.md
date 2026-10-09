@@ -536,3 +536,7 @@ fd6b978同源正式候选在现有开发账户实际进入账号与邀请返利�
 ## 真实插件管理器隔离生命周期
 
 真实PluginManager隔离生命周期已通过：临时插件目录解析、安装默认禁用、全局开关关闭时不暴露收款方式、启用后的小写plugin_code=fubei及真实类实例、禁用后的数据库发现与新请求Hook容器、卸载删除插件行。当前300项隔离检查、64个冻结输入与13项执行器回归通过，源码未变且清理确认。Fubei类由候选ClassMap预加载，未覆盖临时目录require回退；未验证同请求残留Hook清理或真实管理器贯穿后续checkout。认证和后续账务的插件发现、网关传输仍为显式夹具。没有生产激活或真实付款。证据见 `validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`。
+
+## 真实邀请注册归属与Android刷新
+
+Android正式签名候选fd6b978生成的邀请链接经真实注册API及邮箱验证创建测试账户；只读核对invite_user_id匹配邀请人，账户无管理员/员工权限。真实登录、资料、订阅及邀请API均返回HTTP200，套餐存在、余额为零；邀请人的注册人数为1，新账户无订单或佣金记录。Android邀请页点击刷新后显示注册人数1及三项佣金0.00。注册使用NoSLA既有loopback API，不等于浏览器表单提交或网页下载引导验收；付费返佣及三端新账户登录另验。公开证据见 `validation/2026-10-07-three-platform/invite-registration-validation.json`。

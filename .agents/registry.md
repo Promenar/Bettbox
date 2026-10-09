@@ -231,3 +231,5 @@
 - .agents/plans/2026-10-09-fubei-plugin-lifecycle.md — 真实插件管理器隔离生命周期范围、公开模型来源与待实施验证
 
 - `docs/validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`：真实PluginManager隔离生命周期回执；目录加载与支付替身边界分别披露。
+
+- `docs/validation/2026-10-07-three-platform/invite-registration-validation.json`：真实邮箱注册API邀请归属、账户API及Android人数刷新；付款、浏览器提交和下载引导另验。

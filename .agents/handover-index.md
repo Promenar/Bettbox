@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T16:34:19+08:00
+> generated_at: 2026-10-09T16:42:20+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-09T07:40:24+08:00 | partial | ["Bettbox", "Android", "Dart", "core"] | Dart监听启动真实回执传播与节点当前探测 | `.agents/handover.md` · `2026-10-09T07:40:24+08:00` · `fp:b8b19e4118` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-09T16:34:19+08:00 | done | ["Bettbox", "billing"] | 付呗真实插件管理器隔离生命周期验收完成 | `.agents/handover.md` · `2026-10-09T16:34:19+08:00` · `fp:66031fb829` |
+| three-platform-release | resume | 2026-10-09T16:42:20+08:00 | done | ["Bettbox", "invite"] | 真实邮箱注册邀请归属与Android人数刷新通过 | `.agents/handover.md` · `2026-10-09T16:42:20+08:00` · `fp:531ea6d772` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T16:42:20+08:00 | iso | done | resume | ["Bettbox", "invite"] | ["invite", "registration", "android"] | 真实邮箱注册邀请归属与Android人数刷新通过 | `.agents/handover.md` · `2026-10-09T16:42:20+08:00` · `fp:531ea6d772` |
 | 2026-10-09T16:34:19+08:00 | iso | done | resume | ["Bettbox", "billing"] | ["payment", "plugin", "validation"] | 付呗真实插件管理器隔离生命周期验收完成 | `.agents/handover.md` · `2026-10-09T16:34:19+08:00` · `fp:66031fb829` |
 | 2026-10-09T16:22:56+08:00 | iso | done | resume | ["Bettbox", "Xboard", "Fubei"] | ["payment", "plugin", "plan"] | 付呗真实插件管理器验收输入与范围恢复 | `.agents/handover.md` · `2026-10-09T16:22:56+08:00` · `fp:0ba37fc5b9` |
 | 2026-10-09T16:17:53+08:00 | iso | done | resume | ["Bettbox", "macOS", "Xboard"] | ["macos", "candidate", "registration"] | 当前源码macOS开发候选构建封装与实际启动通过 | `.agents/handover.md` · `2026-10-09T16:17:53+08:00` · `fp:c868ddc15d` |

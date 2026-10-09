@@ -3884,3 +3884,34 @@ ClassMap预加载未验证临时目录require回退；禁用后的新Hook容器�
 
 ### HLG
 使用append先dry-run再apply，保留既有历史。
+
+## 2026-10-09T16:42:20+08:00 · 真实邮箱注册邀请归属与Android人数刷新通过
+
+type: maintenance
+scope: ["Bettbox", "invite"]
+status: done
+tags: ["invite", "registration", "android"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 531ea6d772e4f3968ba0751252e7c39452bd55a118ffcecb5902e6bff0a66d56
+
+### Summary
+真实注册API接受用户安全保存的新验证码创建测试账户，invite_user_id匹配Android邀请链接的生成者；Android刷新显示注册人数1及三项佣金0.00。
+
+### Changed
+无产品代码或生产配置修改。仅创建已授权测试账户并同步公开验收回执、平台说明、架构、CHANGELOG和registry；密码及令牌仅本机受保护文件保存。
+
+### Validation
+用户确认原邮件16:14送达，源码缓存TTL300秒；旧码未消费。明确获得补发一次授权后HTTP200/data=true，用户保存新码。真实注册200，新账户id6/邀请人id5，无管理员员工权限；真实登录和资料、订阅、邀请API200，自动套餐存在、余额0。只读邀请人数1、新账户订单和佣金记录均0。fd6b978已安装候选Android实际点击刷新，UI层级四项统计1/0.00/0.00/0.00，截图保存在本机测试目录。
+
+### Next
+验证新账户三端客户端登录和网页下载引导；继续真实插件目录加载与PaymentService入口，Android基础VPN生命周期；真实节点及商户权限另验。
+
+### Risks
+注册经NoSLA既有loopback API，不是浏览器表单提交。没有付费订单或真实商户付款，不能判付费返佣通过；用户提供的占位节点不支持有效代理流量验收。私有验证码、凭据和令牌未进入公开回执。
+
+### DIA
+已同步平台验收、架构、CHANGELOG、registry及邀请注册公开回执。
+
+### HLG
+append先dry-run后apply，保留历史事实链。
