@@ -358,3 +358,7 @@ Android正式签名候选fd6b978生成的邀请链接经真实注册API及邮箱
 ## 真实插件目录加载与支付关闭门禁
 
 真实PluginManager加载前Fubei主类未载入，类基础目录、反射文件位置及摘要来自唯一临时插件树。真实PaymentService按id及uuid选中小写fubei实例并注入配置、读取表单。相同临时订单及公开身份快照在关闭时两入口均拒绝、支付尝试为零；仅开启支付方式后真实Atomic创建一个金额及支付归属正确的尝试，在明确缺席的公开密钥引用处停止，未调用网关。对照事务回滚后订单、方式和尝试表恢复。312项真实隔离检查、65个冻结输入、14项执行器回归通过，源码未变且清理确认。每个插件证明标签缺失均被执行器拒绝。完整checkout、同请求Hook和真实商户付款仍待验收。证据见 `validation/2026-10-07-three-platform/laravel-plugin-payment-entry-validation.json`。
+
+## Android真实新账户与本地会话验收
+
+实际安装的正式签名候选fd6b978经设备回读SHA256与本地APK一致。真实邮箱注册的新账户在Android正常登录，账号页显示预期邮箱；首页体验套餐、1 GB及2026-10-09 17:08到期时间与真实API逐项匹配，核对发生在到期前。未清数据的冷启动恢复相同账户；界面退出后未登录入口恢复，第二次冷启动保持未登录。两次冷启动前均确认当前NetworkAgent没有VPN transport。日志只统计固定标记，当前进程FATAL EXCEPTION/Fatal signal均0。自动化输入曾被模拟器拼音转为中文，切换输入模式并核对邮箱完整匹配后提交成功，原subtype设置值已恢复。已下载配置保留、自动更新冻结是源码既有合同；这轮没有独立验收计时器冻结或服务端token吊销。有效VPN流量、付款返佣与另外两端新账户登录另验。证据见 `validation/2026-10-07-three-platform/android-new-account-validation.json`，截图见 `validation/2026-10-07-three-platform/android-new-account-home.png`。

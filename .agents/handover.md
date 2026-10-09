@@ -3946,3 +3946,34 @@ record-fingerprint: 946c9cf61d95d6ba60fa2f5050ae6e05fc5975e53074f67b99fe41975492
 
 ### HLG
 append先dry-run后apply，保留历史与失败证据。
+
+## 2026-10-09T17:15:06+08:00 · Android新账户登录套餐及本地会话冷启动验收通过
+
+type: maintenance
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "account", "subscription", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 5936067d124b44ddedc4af3b6ef5d4d87257828ee96424af19427590d59c5d79
+
+### Summary
+实际正式签名候选登录真实邮箱注册的新账户，首页套餐/容量/到期匹配。未清数据冷启动恢复相同邮箱，退出后再次冷启动保持未登录。未改产品代码。
+
+### Changed
+新增公开设备验收JSON及无邮箱/秘密的首页截图，同步架构、平台、CHANGELOG与registry。测试凭据由本机程序直接读取，未进入模型或日志。
+
+### Validation
+设备回读APK摘要91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8，与fd6b978候选一致。UI预期邮箱/退出入口为true，未登录提示false；API体验套餐、1GB与到期17:08在到期前逐项匹配。PID4721->7644冷恢复，退出后7644->7900保持未登录，两次均无当前VPN transport且不清数据；当前进程两种Fatal标记0。初次和逐字符输入被拼音转中文，截图定位后KEYCODE_LANGUAGE_SWITCH并精确核对邮箱成功；恢复原subtype617035939，默认IME未变。PDEC approved/valid/execution_ready无漂移，digestc5df1a2cfcae008c47387fc42589007cffe11e8f0c29f314ca1776794a98d868。
+
+### Next
+验证macOS/iOS新账户UI与网页下载引导；继续Android唯一所有者实际采用与服务端真实checkout。实际节点及商户权限待满足。
+
+### Risks
+短期体验已记录到期，不证明长期有效订阅。退出保留已下载配置、冻结自动更新为源码合同；未独立验证计时器冻结。退出仅清本地会话，不证明服务端token吊销。没有VPN启停/有效流量验收或付款。
+
+### DIA
+已同步架构、平台、CHANGELOG、registry、设备公开回执与截图。没有产品代码修改，无需新增逻辑单测。
+
+### HLG
+append先dry-run后apply，记录真实路径及输入问题，保留历史。

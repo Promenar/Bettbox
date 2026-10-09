@@ -236,3 +236,6 @@
 
 - `.agents/plans/2026-10-09-fubei-real-loader-payment-entry.md`：真实目录加载及PaymentService关闭/开启对照实施合同。
 - `docs/validation/2026-10-07-three-platform/laravel-plugin-payment-entry-validation.json`：真实目录加载、支付选择/配置/门禁证据，明确网络前停止与账务替身边界。
+
+- `docs/validation/2026-10-07-three-platform/android-new-account-validation.json`：Android新注册账户真实登录、套餐展示、会话冷恢复与退出后冷启动。
+- `docs/validation/2026-10-07-three-platform/android-new-account-home.png`：体验套餐展示快照，核对时到期时间为2026-10-09 17:08。

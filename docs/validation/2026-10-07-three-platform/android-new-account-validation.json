@@ -1,0 +1,56 @@
+{
+  "scope": "Android正式签名候选上的真实新账户登录、套餐展示与本地退出",
+  "apk_source": "fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a",
+  "apk_sha256": "91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8",
+  "installed_hash_matches": true,
+  "emulator": "emulator-5554",
+  "login": {
+    "expected_account_visible": true,
+    "logout_visible": true,
+    "unauthenticated_prompt_visible": false
+  },
+  "subscription_display": {
+    "plan_name_matches": true,
+    "expiry_matches": true,
+    "capacity_matches": true,
+    "usage_zero_expected": true,
+    "expected_expiry_display": "2026-10-09 17:08",
+    "expected_capacity_display": "1 GB"
+  },
+  "session_restore": {
+    "expected_account_restored": true,
+    "logout_visible_after_cold_start": true
+  },
+  "logout": {
+    "unauthenticated_prompt_visible": true,
+    "expected_account_not_visible": true,
+    "logout_not_visible": true
+  },
+  "logout_cold_restart": {
+    "old_pid": 7644,
+    "new_pid": 7900,
+    "no_active_vpn_before_stop": true,
+    "data_clear_performed": false,
+    "unauthenticated_after_cold_start": true,
+    "expected_account_not_visible": true,
+    "logout_not_visible": true
+  },
+  "observed_current_process_crash_counts": {
+    "fatal_exception": 0,
+    "fatal_signal": 0
+  },
+  "emulator_input_method": {
+    "initial_pinyin_converted_email": true,
+    "exact_email_matched_before_corrected_submission": true,
+    "original_selected_subtype_restored": true
+  },
+  "data_cleared": false,
+  "secret_output": false,
+  "limitations": [
+    "套餐展示核对发生在体验套餐到期前，记录到期17:08，不证明长期有效订阅",
+    "保留已下载配置是既有本地退出行为，未独立验证自动更新计时器冻结",
+    "注销仅清除本地会话，不证明服务端token吊销",
+    "未开启VPN或验证真实代理流量，节点为占位",
+    "不证明iOS或macOS新账户界面已通过"
+  ]
+}
