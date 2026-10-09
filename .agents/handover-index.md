@@ -1,6 +1,6 @@
 # Handover Index
 
-> generated_at: 2026-10-09T15:15:59+08:00
+> generated_at: 2026-10-09T15:27:03+08:00
 > generated: true; do not edit manually
 > recovery_window_days: 7
 
@@ -11,12 +11,13 @@
 | bettbox-invite-platforms | waiting | 2026-09-22T18:46:18+08:00 | done | ["Bettbox", "xboard", "platforms"] | 桌面原生构建验收与阶段暂停 | `.agents/handover.md` · `2026-09-22T18:46:18+08:00` · `fp:6843946713` |
 | bettbox-three-platform-release | resume | 2026-10-09T07:40:24+08:00 | partial | ["Bettbox", "Android", "Dart", "core"] | Dart监听启动真实回执传播与节点当前探测 | `.agents/handover.md` · `2026-10-09T07:40:24+08:00` · `fp:b8b19e4118` |
 | hlg-governance | resume | 2026-09-09T01:45:22+08:00 | done | ["project"] | HLG 治理文件纳入 git 跟踪（.gitignore 白名单 + 提交 96ffc4b） | `.agents/handover.md` · `2026-09-09T01:45:22+08:00` · `fp:64cde8a8a2` |
-| three-platform-release | resume | 2026-10-09T15:15:59+08:00 | partial | ["android", "build", "release-validation"] | Android依赖失败安全分类与真实构建重试终态 | `.agents/handover.md` · `2026-10-09T15:15:59+08:00` · `fp:d89787e1f7` |
+| three-platform-release | resume | 2026-10-09T15:27:03+08:00 | partial | ["android", "macos", "release-validation"] | 用户确认上游占位节点及代理验收条件 | `.agents/handover.md` · `2026-10-09T15:27:03+08:00` · `fp:a48e1d6483` |
 
 ## Recent 7-Day Catalog
 
 | date | format | status | continuity | scope | tags | title | source |
 | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| 2026-10-09T15:27:03+08:00 | iso | partial | resume | ["android", "macos", "release-validation"] | ["upstream", "vpn", "acceptance"] | 用户确认上游占位节点及代理验收条件 | `.agents/handover.md` · `2026-10-09T15:27:03+08:00` · `fp:a48e1d6483` |
 | 2026-10-09T15:15:59+08:00 | iso | partial | resume | ["android", "build", "release-validation"] | ["android", "diagnostics", "build"] | Android依赖失败安全分类与真实构建重试终态 | `.agents/handover.md` · `2026-10-09T15:15:59+08:00` · `fp:d89787e1f7` |
 | 2026-10-09T15:02:53+08:00 | iso | partial | resume | ["android", "release-validation"] | ["android", "build", "runtime"] | Android运行时设备候选构建失败及残留核验 | `.agents/handover.md` · `2026-10-09T15:02:53+08:00` · `fp:65dc10c0d7` |
 | 2026-10-09T07:40:24+08:00 | iso | partial | resume | ["Bettbox", "Android", "Dart", "core"] | ["listener", "start", "three-platform-release"] | Dart监听启动真实回执传播与节点当前探测 | `.agents/handover.md` · `2026-10-09T07:40:24+08:00` · `fp:b8b19e4118` |

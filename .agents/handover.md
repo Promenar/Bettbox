@@ -3636,3 +3636,34 @@ android_dependency_network.py诊断、两项回归、main.dart运行时成功固
 
 ### HLG
 标准append dry-run/apply追加该终态和下一步，不修改先前事实链。
+
+## 2026-10-09T15:27:03+08:00 · 用户确认上游占位节点及代理验收条件
+
+type: maintenance
+scope: ["android", "macos", "release-validation"]
+status: partial
+tags: ["upstream", "vpn", "acceptance"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: a48e1d6483cdc282504546fbc54c827a5efecb432b0c19d1b5c326b42c9cf974
+
+### Summary
+用户明确确认当前上游代理节点为占位，未接入可用节点；占位代理请求失败不作为客户端缺陷证据。
+
+### Changed
+同步总体发行计划、Android VPN排查计划、平台验收和CHANGELOG；停止占位协议重复探测，保留真实节点接入后的有效代理验收。
+
+### Validation
+用户说明为部署事实来源，已有探针只证明失败类别。中断前构建handle68960缺失，实际build入口不存在；最新任务gradle-home-1hwtqu1w及上一任务0ki9_nnq的owned/candidates均为空。没有该中断尝试的终态回执，不能宣称已构建或获得新增分类。诊断候选ba3ba2afbd06d36df181b91c66bd9e9a3e074b42已推送并核验远端相同、ahead/behind0/0。
+
+### Next
+在确切诊断候选恢复正式构建；基础授权/TUN/直连/启停与业务界面独立验证。真实代理全路径等待有效节点接入后使用成功基线验收，不对占位失败试改实现。
+
+### Risks
+有效代理出口、可用发行未验收。用户确认不替代真实节点未来的基线证明；已独立复现的客户端缺陷及Gradle构建故障仍需各自处理。未创建新代理服务、暴露端口、续费、交易或修改上游账户。
+
+### DIA
+已同步总体/专项计划、PLATFORM_VALIDATION和CHANGELOG。
+
+### HLG
+标准append dry-run/apply追加用户确认和中断状态。

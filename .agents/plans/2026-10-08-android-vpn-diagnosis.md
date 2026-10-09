@@ -2,7 +2,7 @@
 
 ## 目标与当前事实
 
-使正式 Android 客户端通过真实代理节点完成 HTTPS 请求，并准确处理启动失败、保护失败及退出。源 APK 为 e7b5a87，公开证据见 docs/validation/2026-10-07-three-platform/android-vpn-path-validation.json。地域列表、系统 VPN 建立、直连模式请求及停止恢复已验证；代理请求失败尚未归因。
+使正式 Android 客户端通过真实代理节点完成 HTTPS 请求，并准确处理启动失败、保护失败及退出。源 APK 为 e7b5a87，公开证据见 docs/validation/2026-10-07-three-platform/android-vpn-path-validation.json。地域列表、系统 VPN 建立、直连模式请求及停止恢复已验证。用户于2026-10-09确认当前上游节点为占位、没有可用代理接入；占位节点请求失败不构成客户端缺陷证据。
 
 23 个订阅节点为12个AnyTLS及11个Hysteria2；TCP端点均可连接，AnyTLS证书均可信，订阅密码不等于开发用户UUID。NoSLA辅助Mihomo只有VMess，不能作相同协议对照。Kotlin同名protect的候选字节码调用捕获函数，没有递归。
 
@@ -10,8 +10,8 @@
 
 主控负责协议探测工具、PDEC执行项、Go/JNI/Kotlin合同、设备验收及文档；独立只读审阅者复核实施后差异和完整合同，不并行修改共享文件。
 
-1. 用同版本核心对少量订阅AnyTLS节点做受限协议探测，再覆盖Hysteria2。原始订阅/凭据仅在受保护本机进程内存与可信目标传递；请求目标固定公开HTTPS端点，证书校验保持开启。报告只含协议、节点匿名序号、HTTP状态及固定错误类别。隔离监听只绑定回环，不改变系统路由、服务配置或上游账户。
-2. 对比Android和同版本独立核心。独立核心成功时定位Android配置包装、protect及UDP路径；共同失败时核验CloudBridge上游授权、额度和协议配置。TCP/TLS成功不能替代协议认证；无结果不得猜测付费或自动续费。
+1. 接入经独立基线确认的真实可用节点后，才用同版本核心做受限协议探测；当前占位节点不重复探测。原始订阅/凭据仅在受保护本机进程内存与可信目标传递；请求目标固定公开HTTPS端点，证书校验保持开启。报告只含协议、节点匿名序号、HTTP状态及固定错误类别。隔离监听只绑定回环，不改变系统路由、服务配置或上游账户。
+2. 真实可用节点的基线成功后，对比Android和同版本独立核心。定位Android配置包装、protect及UDP路径须有基线证据；占位节点失败不触发客户端修复或上游续费。TCP/TLS成功不能替代协议认证。
 3. 独立复现三项审阅缺口：配置尚未就绪时启动重入tunLock；listener启动失败仍保留runTime/START；protect false或异常未到达dialer。先建立失败测试，再改造Go→C→JNI→Kotlin的明确结果合同，固定错误枚举，避免地址和原始异常进入日志。
 4. 失败时收尾callback、FD、listener、hook及VPN服务，保证唯一释放者；停止和late callback覆盖重试/代际边界。正常启动必须以实际listener成功为依据。
 5. 冻结源码后构建正式候选、验签、安装回读，再验证真实节点请求、VPN覆盖、失败关闭、停止及冷启动。直连模式通过不代替代理节点成功，模拟器通过不代替真机或16KiB设备验收。
@@ -29,7 +29,7 @@
 
 ## 协议对照执行事实
 
-受限同源探针7项Go测试、执行器3项测试及两轮独立审阅通过；真实抽样2AnyTLS/2Hysteria2均失败，后者固定分类为authentication，尚不能归因密码或额度。服务器ClashMeta构建两个协议时从relayTag提取密码覆盖面板参数；下一步只读核对同步源节点与订阅输出的认证字段一致性，再判断上游条件，不自动续费或修改生产账户。安全脱敏回执见registry。Android失败处理三缺口仍需实际复现及修复。
+受限同源探针7项Go测试、执行器3项测试及两轮独立审阅通过；真实抽样2AnyTLS/2Hysteria2均失败，后者固定分类为authentication，尚不能归因密码或额度。服务器ClashMeta构建两个协议时从relayTag提取密码覆盖面板参数；有效代理验收条件为真实节点接入及成功基线；当前占位节点不进行认证字段或额度排查，不自动续费或修改生产账户。安全脱敏回执见registry。Android失败处理三缺口仍需实际复现及修复。
 
 
 ## 原生FD与回调合同
@@ -50,7 +50,7 @@ Go施工独占core/lib_android.go、core/android_bride.go、core/tun/tun.go、co
 
 Go配置只在runLock下复制必要primitive字段，释放后才进入State生命周期锁。原生FD租约在进入State前创建并在所有提前拒绝路径收回；未采纳关闭失败保留首错并阻止新代启动。CallbackGate先关准入后等pin，再释放一次JNI引用；闭门handler作为拒绝socket保护哨兵，成功关闭后才清空，未知关闭保留。监听器初始化期间必须可保护socket，resolver不读取未同步listener指针。
 
-验收：现有State/CallbackGate回归、新增输入关闭失败及RawConn.Control保护false/异常逻辑回归；JNI生成头和Kotlin真实编译后做候选APK构建、安装回读、失败启动/停止/重新启动设备验证。有效上游恢复后才验证代理出口；三栈有效constructor采纳路径仍需有界失败夹具与设备证据。
+验收：现有State/CallbackGate回归、新增输入关闭失败及RawConn.Control保护false/异常逻辑回归；JNI生成头和Kotlin真实编译后做候选APK构建、安装回读、失败启动/停止/重新启动设备验证。真实可用上游接入后才验证代理出口；三栈有效constructor采纳路径仍需有界失败夹具与设备证据。
 
 ## 智能停止完成确认
 
