@@ -776,6 +776,41 @@ class DependencyNetworkTest(unittest.TestCase):
                         peer.close(); self.assertTrue(lease.close())
 
 
+    def test_network_failure_diagnostics_restrict_reason_and_host(self):
+        cases = [('批准 DoH 子进程查询失败', 'doh-query'),
+                 ('官方地址在有界解析与连接期间不可用', 'official-address'),
+                 ('token=fake-private-placeholder', 'unclassified')]
+        for message, reason in cases:
+            with self.subTest(reason=reason), tempfile.TemporaryDirectory() as temp:
+                lease = network.NetworkLease(Path(temp), time.monotonic() + 10)
+                client, peer = socket.socketpair(); peer.settimeout(2)
+                lease._track(client); lease._queue.put((client, time.monotonic()))
+                peer.sendall(b'CONNECT plugins.gradle.org:443 HTTP/1.1\r\n\r\n')
+                with mock.patch.object(lease, '_upstream', side_effect=network.NetworkError(message)):
+                    thread = threading.Thread(target=lease._serve); lease._threads = [thread]; thread.start()
+                    try:
+                        self.assertEqual(peer.recv(4096), b'')
+                        self.assertTrue(lease.close())
+                        self.assertFalse(thread.is_alive())
+                        summary = next(x for x in lease.history if x['category'] == 'proxy-failure')
+                        self.assertEqual(summary['reasons'][reason], 1)
+                        self.assertEqual(summary['hosts']['plugins.gradle.org'], 1)
+                        self.assertNotIn('fake-private', json.dumps(lease.history))
+                        self.assertTrue(lease._failure)
+                    finally:
+                        peer.close(); self.assertTrue(lease.close())
+
+    def test_failure_summary_never_serializes_unknown_target_or_exception_args(self):
+        with tempfile.TemporaryDirectory() as temp:
+            lease = network.NetworkLease(Path(temp), time.monotonic() + 10)
+            for _ in range(100):
+                lease._record_network_failure(network.NetworkError({'token': 'fake-private-value'}),
+                                              'fake-private-target.invalid')
+            self.assertEqual(len(lease.history), 1)
+            self.assertEqual(lease.history[0]['reasons']['unclassified'], 100)
+            self.assertEqual(lease.history[0]['hosts']['unavailable'], 100)
+            self.assertNotIn('fake-private', json.dumps(lease.history))
+
     def test_six_long_relays_do_not_hold_resolution_slots_or_block_twelfth(self):
         with tempfile.TemporaryDirectory() as temp:
             lease = network.NetworkLease(Path(temp), time.monotonic() + 10)

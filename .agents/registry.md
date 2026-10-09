@@ -210,3 +210,10 @@
 
 - `.agents/plans/2026-10-09-listener-start-confirmation.md`：Dart真实监听启动回执传播与验收边界。
 - `docs/validation/2026-10-07-three-platform/listener-start-confirmation-validation.json`：启动红绿回归、真实Go FFI及当前节点/Transport接口缺口证据。
+
+- docs/validation/2026-10-07-three-platform/android-runtime-device-build-attempt.json — 运行时设备候选构建失败与事后归属进程为空的独立证据
+- .agents/plans/2026-10-09-android-runtime-device-proof.md — 实际签名候选的FFI/JNI身份设备验证范围
+
+- docs/validation/2026-10-07-three-platform/android-runtime-device-build-retry.json — 构建重试失败、清理通过及原分类缺口
+
+- docs/validation/2026-10-07-three-platform/android-dependency-failure-diagnostics.json — 安全固定诊断工作线程红绿、源码摘要与独立审阅

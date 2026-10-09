@@ -161,6 +161,7 @@ Future<void> _service(List<String> flags) async {
       } catch (_) {}
       return;
     }
+    commonPrint.log('[运行时] FFI与JNI身份已核验');
     final smartAutoStopLock = Lock();
 
     Future<void> checkSmartAutoStop() async {

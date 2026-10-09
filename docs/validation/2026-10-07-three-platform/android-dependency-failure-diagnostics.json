@@ -1,0 +1,24 @@
+{
+  "source_sha256": {
+    "scripts/android_dependency_network.py": "4f8e04cd9fef550c8f4e3c8b6fcfbfbedbb9177758399e5eeb26e5aa253230cc",
+    "scripts/tests/test_android_dependency_network.py": "99dc524490ca58a1c29980dbf14412b1f0ffb51444913b933f4e9d2458ff0d37",
+    "lib/main.dart": "dc87678fbacaf55edbea04294598628e9dd4b96d90bbc5733354332557bb7904"
+  },
+  "red": {
+    "command": "python3 -m unittest scripts.tests.test_android_dependency_network.DependencyNetworkTest.test_network_failure_diagnostics_restrict_reason_and_host",
+    "exit_code": 1,
+    "failed_subcases": 3,
+    "reason": "真实工作线程未记录proxy-failure"
+  },
+  "green": {
+    "command": "python3 -m unittest scripts.tests.test_android_dependency_network scripts.tests.test_build_android scripts.tests.test_android_contract",
+    "exit_code": 0,
+    "tests": 108
+  },
+  "independent_review": {
+    "agent": "android_dependency_diagnostics_review",
+    "blocking_findings": 0,
+    "scope": "两文件diff的静态只读审阅，未运行网络或测试"
+  },
+  "boundary": "诊断补充不修复未知上游故障，未获得新APK或运行时设备证明。"
+}

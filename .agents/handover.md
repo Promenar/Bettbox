@@ -3574,3 +3574,65 @@ record-fingerprint: b8b19e4118fa0217dc524c0100219997e05617ad5d1abfa3010853759ea2
 
 ### HLG
 通过结构化append追加事实链及索引，记录实际进展和后续边界。
+
+## 2026-10-09T15:02:53+08:00 · Android运行时设备候选构建失败及残留核验
+
+type: maintenance
+scope: ["android", "release-validation"]
+status: partial
+tags: ["android", "build", "runtime"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 65dc10c0d7f6ea676e2f2c083bf2f1d7d522bf96b567021f373c33cd14edc4b3
+
+### Summary
+运行时身份固定诊断候选的正式构建在gradle-help阶段失败；尚无新APK或设备身份验收。
+
+### Changed
+保留失败回执及独立残留检查；新增脱敏公开构建尝试回执，原main.dart/PDEC诊断候选保持待验。
+
+### Validation
+官方Java HTTPS预检通过；构建任务代理出现upstream-unavailable 1、queue-expired 3。原清理复核未通过，事后按绑定Java入口及独立Gradle目录查询owned/candidates均为空；未向任何进程发送信号。源码与锁文件未变。当前PDEC正式操作execution_ready=true，摘要9a0319358cd5b3440bad85cdedc0d24571e7a364392f70be2658e37ab46505c6。
+
+### Next
+正式构建已重新启动并有live exec handle；等待终态后核验候选来源/签名/ELF，成功才保留数据覆盖安装及设备身份验证；有效代理HTTPS仍独立验收。
+
+### Risks
+独立Mac节点探针2AnyTLS transport、2Hysteria2 authentication失败，不能归因模拟器或具体密码/额度。没有上游续费、真实支付、公开发布或全局网络修改。
+
+### DIA
+已新增android-runtime-device-build-attempt.json；平台验收入口同步待终态。
+
+### HLG
+使用标准append dry-run及apply记录失败与后续，不回写历史。
+
+## 2026-10-09T15:15:59+08:00 · Android依赖失败安全分类与真实构建重试终态
+
+type: maintenance
+scope: ["android", "build", "release-validation"]
+status: partial
+tags: ["android", "diagnostics", "build"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: d89787e1f7ab49086ec3a00da6d1fabeea349fdb675532f3dd9770592d22435c
+
+### Summary
+第二次正式构建在Gradle help失败，清理核验通过。任务代理增加固定失败原因及批准域名计数，为真实根因取证；没有新APK或设备身份结果。
+
+### Changed
+android_dependency_network.py诊断、两项回归、main.dart运行时成功固定标记、PDEC源码摘要及候选计划/文档/公开回执。其它用户目录未处理。
+
+### Validation
+诊断真实工作线程缺失回执红回归3子场景失败，修复后108项网络/构建/契约测试通过；Flutter analyze无问题74.3秒。独立android_dependency_diagnostics_review静态只读审阅无阻断缺陷，主控复核diff、回执源摘要及门禁。正式构建重试started 2026-10-09T07:00:55Z，finished 07:10:10Z；上游失败1、排队过期4，官方TLS预检通过，源码/锁文件未变、代理已停止、归属进程清理通过。
+
+### Next
+提交推送诊断候选并核验远端SHA；按确切源码执行正式构建，读取固定失败类别后定位，成功才验签/安装/身份设备证明。开发账户期限已过，业务验收须恢复有界开发授权；有效上游、支付商和Apple发行条件分别验收。
+
+### Risks
+诊断不证明DoH或TCP具体根因已解决，不输出原始正文/未知目标。计数只覆盖失败拒绝前已观察异常，非全部并发故障统计。未更新模拟器、生产支付或上游账户；Android/macOS发行及iOS开发版总体目标未完成。
+
+### DIA
+已同步CHANGELOG、ARCHITECTURE、PLATFORM_VALIDATION、registry、候选计划和三份公开回执。
+
+### HLG
+标准append dry-run/apply追加该终态和下一步，不修改先前事实链。

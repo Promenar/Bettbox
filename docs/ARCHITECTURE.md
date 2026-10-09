@@ -338,3 +338,8 @@ HTTP Transport私有read/write/dial任务没有公开join；此机制只确认�
 Dart公共监听启动与后台FFI调用只接受当前Go动作的明确成功回执；拒绝或异常不允许继续请求VPN和提交偏好。监听启动成功只表示监听动作成功，完整VPN发布仍由平台生命周期合同决定。
 
 普通HTTP客户端使用锁定的metacubex/http v0.1.7；自定义DialContext与默认ForceAttemptHTTP2选择HTTP/1。scope撤销、pipe关闭及route/Peek等待提供本层任务收尾；Transport私有dial/read/write任务没有公开join接口，CloseIdleConnections不提供最终退出同步。不能将本层成功Close作为依赖内部全部任务已退出的证明，也没有永久泄漏的运行证据。若为完整owner扩展依赖，须保留keep-alive及认证隔离，使用项目管理的依赖版本并登记任务准入/最终退出，禁止修改模块缓存。
+
+
+### Android构建依赖网络诊断
+
+任务专用CONNECT代理的`proxy-failure`回执仅保存固定原因类别及批准域名计数。未知异常参数和目标统一归入固定类别，不持久化正文；该计数仅覆盖失败拒绝前已观察的异常，不保证枚举全部并发故障。DoH预算、TLS默认校验、官方白名单和任务清理合同保持独立门禁。后台Dart的运行时身份成功标记不包含epoch或凭据，设备上的同实例核验与VPN有效流量分别验收。

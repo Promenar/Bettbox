@@ -1,0 +1,51 @@
+{
+  "started_at": "2026-10-09T07:00:55.482532+00:00",
+  "finished_at": "2026-10-09T07:10:10.075632+00:00",
+  "target": "android-arm64-release",
+  "status": "failed",
+  "phase": "gradle-help",
+  "failure_reason": "任务代理失败、取消或时间预算耗尽",
+  "secondary_failures": [
+    "最终任务 DNS 租约复核失败"
+  ],
+  "signature_verified": false,
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "gradle_cleanup": {
+    "verified": true,
+    "stop_scope": "/Users/promenar/Codex/Bettbox/.test/android-build/gradle-home-0ki9_nnq",
+    "terminated_pids": [],
+    "initial_unbound_task_pids": [],
+    "stop_command_passed": true,
+    "observed_owned_pids": [],
+    "remaining_owned_pids": [],
+    "surviving_verified_pids": [],
+    "remaining_task_candidates": [],
+    "method": "owned文件描述符、内核Java入口及预检摘要、精确主类/目录参数、PID起始时间和退出检查"
+  },
+  "network_renewal_stopped": true,
+  "proxy_event_counts": {
+    "overload": 0,
+    "queue-expired": 4,
+    "upstream-unavailable": 1,
+    "header-timeout": 0,
+    "header-too-large": 0,
+    "header-malformed": 0,
+    "target-outside-allowlist": 0,
+    "relay-failed": 0,
+    "resolution-slot-expired": 0,
+    "nonofficial-jcenter": 0,
+    "nonofficial-jitpack": 0,
+    "outside-other": 0,
+    "non-connect-request": 0,
+    "unsupported-connect-authority": 0,
+    "unapproved-connect-host": 0,
+    "rejected-public-gradle-downloads": 0,
+    "rejected-public-gvt-redirector": 0,
+    "rejected-public-google-dl-ssl": 0,
+    "rejected-public-jetbrains-download": 0,
+    "rejected-public-adoptium-api": 0,
+    "rejected-public-java-download": 0
+  },
+  "boundary": "Gradle help上游失败，未编译或安装新APK；清理核验通过。代理原因细分在该失败版本中缺失，不能判定DoH或TCP根因。"
+}

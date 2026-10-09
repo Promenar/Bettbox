@@ -496,3 +496,13 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 公共ClashCore启动入口对内核false抛出未确认错误；后台ClashLibHandler通过实际Go invokeAction等待并核验当前请求ID、方法、整数code与布尔data，代替void调用后固定true。GlobalState后台路径拒绝false/null，阻断后续VPN请求、偏好写入与更新任务。公共入口红回归实际复现false被忽略；修复后12项定向回归及完整305项Flutter回归通过，真实Go动态库由生产Handler执行启动/停止。证据见 `validation/2026-10-07-three-platform/listener-start-confirmation-validation.json`。
 
 完整GlobalState后续副作用及Android服务设备路径尚未验证；提前计时、主后台IPC/quickStart未await入口和完整owner/ACK仍待联合接线。没有安装新APK或切换macOS候选。当前四条独立节点协议探测仍为两条AnyTLS transport及两条Hysteria2 authentication失败；这些错误类别不能定位上游具体原因，没有有效代理HTTPS验收。
+
+
+## Android运行时身份设备候选构建
+
+固定成功诊断只在后台Dart与JNI运行时身份核验通过后输出；设备证据待获得。2026-10-09的正式构建尝试停在Gradle help阶段，任务依赖代理出现上游连接失败，未编译、验签或安装新APK。源码和依赖锁未变，失败任务代理已停止。原清理复核未通过；事后按绑定Java入口和独立Gradle目录查询，实际owned进程及任务候选均为空。该事后证据不更改原构建失败结果。脱敏回执见 `validation/2026-10-07-three-platform/android-runtime-device-build-attempt.json`。
+
+运行时身份、系统VPN接口、直连HTTPS与代理节点HTTPS分别验收；本构建尝试不能证明任何新增设备行为。
+
+
+2026-10-09构建重试也停在Gradle help，上游失败与排队过期分别为1和4；任务进程清理、源码及锁文件核验通过，未产生新APK。见`validation/2026-10-07-three-platform/android-runtime-device-build-retry.json`。任务代理现增加安全固定失败分类，工作线程缺失诊断红回归的3个子场景与修复后108项工具回归完成；这些夹具不定位上述真实上游故障。既有开发账户HTTP登录可用，但临时套餐期限已过、流量未耗尽，不等同于上游订阅到期。

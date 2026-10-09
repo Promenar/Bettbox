@@ -400,6 +400,21 @@ def probe_urls(root: Path) -> tuple[str, ...]:
             distribution)
 
 
+# 诊断只保存固定类别；异常正文与未知目标不得进入回执。
+NETWORK_FAILURE_REASONS = {
+    '批准 DoH 子进程查询失败': 'doh-query',
+    'DNS 总体时间预算耗尽': 'doh-deadline',
+    'DoH 查询绝对时间预算耗尽': 'doh-deadline',
+    '任务 DoH 子进程退出未验证': 'doh-exit',
+    'DoH 子进程查询身份无效': 'doh-response',
+    'DoH 连接记录无效': 'doh-response',
+    '官方地址在有界解析与连接期间不可用': 'official-address',
+    '任务 DNS 查询已取消': 'cancelled',
+    '任务代理失败、取消或时间预算耗尽': 'cancelled',
+    '任务代理连接总量预算耗尽': 'connection-budget',
+}
+
+
 class NetworkLease:
     """任务专用透明 CONNECT；不缓存 DNS，不接触 TLS 明文或证书。"""
 
@@ -422,6 +437,9 @@ class NetworkLease:
                                                   'header-timeout', 'header-too-large', 'header-malformed', 'target-outside-allowlist',
                                                   'relay-failed', 'resolution-slot-expired', *REJECTION_SOURCES)}
         self._event_summary: dict[str, object] | None = None
+        self._failure_summary: dict[str, object] | None = None
+        self._failure_reasons = {name: 0 for name in (*sorted(set(NETWORK_FAILURE_REASONS.values())), 'unclassified')}
+        self._failure_hosts = {host: 0 for host in (*HOSTS, 'unavailable')}
 
     def _publish_events(self) -> None:
         with self._lock:
@@ -435,6 +453,19 @@ class NetworkLease:
         self._publish_events()
         with self._lock:
             self._event_counts[name] += 1
+
+    def _record_network_failure(self, error: BaseException, host: str | None) -> None:
+        # 只比较本工具已知异常参数，不调用或持久化异常的字符串表示。
+        message = error.args[0] if len(error.args) == 1 and type(error.args[0]) is str else ''
+        reason = NETWORK_FAILURE_REASONS.get(message, 'unclassified')
+        target = host if type(host) is str and host in HOSTS else 'unavailable'
+        with self._lock:
+            if self._failure_summary is None:
+                self._failure_summary = {'category': 'proxy-failure',
+                                         'reasons': self._failure_reasons, 'hosts': self._failure_hosts}
+                self.history.append(self._failure_summary)
+            self._failure_reasons[reason] += 1
+            self._failure_hosts[target] += 1
 
     def _track(self, stream: socket.socket) -> None:
         with self._lock:
@@ -651,6 +682,7 @@ class NetworkLease:
                 continue
             upstream = None
             stage = 'header-malformed'
+            host = None
             try:
                 if time.monotonic() - accepted >= 15:
                     self._event('queue-expired')
@@ -688,10 +720,11 @@ class NetworkLease:
                             pass  # 客户端已退出不影响其它已授权连接。
                     else:
                         self._failure = True
-            except NetworkError:
+            except NetworkError as error:
                 if not self._stop.is_set() and not self._failure:
                     if time.monotonic() < self.deadline:
                         self._event(stage)
+                    self._record_network_failure(error, host)
                     self._failure = True
             except (OSError, EOFError):
                 pass  # 客户端取消或已关闭的 owned socket 不输出任何传输正文。

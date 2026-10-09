@@ -1,0 +1,47 @@
+{
+  "target": "android-arm64-release",
+  "started_at": "2026-10-08T23:44:10.644691+00:00",
+  "finished_at": "2026-10-08T23:54:01.829039+00:00",
+  "status": "failed",
+  "phase": "gradle-help",
+  "failure_reason": "任务代理失败、取消或时间预算耗尽",
+  "signature_verified": false,
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "secondary_failures": [
+    "最终任务 DNS 租约复核失败",
+    "独立 Gradle daemon/worker 终止证据不足"
+  ],
+  "residual_check": {
+    "prior_receipt_sha256": "dc0a29449d0228289f1a9dc68ec1ebc688f3f59fe4486c1818d7b04ffd2b8855",
+    "owned_processes": [],
+    "task_candidates": [],
+    "residual_absence_verified": true,
+    "scope": "仅此前失败任务的独立Gradle目录及绑定Java入口；不代表新APK构建或VPN通过"
+  },
+  "network_renewal_stopped": true,
+  "proxy_event_counts": {
+    "overload": 0,
+    "queue-expired": 3,
+    "upstream-unavailable": 1,
+    "header-timeout": 0,
+    "header-too-large": 0,
+    "header-malformed": 0,
+    "target-outside-allowlist": 0,
+    "relay-failed": 0,
+    "resolution-slot-expired": 0,
+    "nonofficial-jcenter": 0,
+    "nonofficial-jitpack": 0,
+    "outside-other": 0,
+    "non-connect-request": 0,
+    "unsupported-connect-authority": 0,
+    "unapproved-connect-host": 0,
+    "rejected-public-gradle-downloads": 0,
+    "rejected-public-gvt-redirector": 0,
+    "rejected-public-google-dl-ssl": 0,
+    "rejected-public-jetbrains-download": 0,
+    "rejected-public-adoptium-api": 0,
+    "rejected-public-java-download": 0
+  },
+  "boundary": "未编译或安装新APK。任务目录残留进程为空为事后核验，不回写原失败回执，也不证明VPN代理流量通过。"
+}
