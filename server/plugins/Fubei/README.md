@@ -38,7 +38,7 @@ php server/tests/fubei/run.php
 
 当前候选的 117 项纯契约测试已在 NoSLA 禁网、只读、64 MiB 容器中通过，未挂载业务数据库或凭据。SQLite 独立连接并发测试已通过，覆盖到账、取消、开通、返佣和 outbox；真实 Laravel 串行隔离测试已覆盖 checkout、重复回调、套餐开通、流量重置、返佣与补偿。
 
-Xboard真实管理器的隔离安装、启用、禁用和卸载已验收；目录动态加载回退、管理器贯穿checkout、生产消费者幂等、官方下单响应和人工小额付款仍待验收。公开证据见 `docs/validation/2026-10-07-three-platform/payment-readiness-validation.json` 与 `laravel-migration-validation.json`。迁移内部事务不包含 Migrator 成功记录的后续写入或删除，异常后需核对 schema 与迁移仓库再恢复。测试身份均为公开虚构 fixture，只用于规则测试。
+Xboard真实管理器的隔离安装、启用、禁用和卸载已验收；完整checkout控制器贯穿管理器、生产消费者幂等、官方下单响应和人工小额付款仍待验收。公开证据见 `docs/validation/2026-10-07-three-platform/payment-readiness-validation.json` 与 `laravel-migration-validation.json`。迁移内部事务不包含 Migrator 成功记录的后续写入或删除，异常后需核对 schema 与迁移仓库再恢复。测试身份均为公开虚构 fixture，只用于规则测试。
 
 ## 官方规则来源
 
@@ -48,4 +48,6 @@ Xboard真实管理器的隔离安装、启用、禁用和卸载已验收；目�
 
 规则核对日期：2026-10-07。请求响应 data 按文档 String 处理，不混用旧版 GitBook 字段。官方商户配置和生产行为需部署前核验。
 
-真实管理器隔离验收覆盖300项检查和64个冻结输入；业务支付部分仍用插件发现及网关替身，未激活生产支付。详细边界见 `docs/validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`。
+真实管理器隔离验收覆盖312项检查和65个冻结输入；业务支付部分仍用插件发现及网关替身，未激活生产支付。详细边界见 `docs/validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`。
+
+真实目录require、PaymentService按id/uuid选择、配置及表单已验证。相同订单关闭时无attempt，开启时真实Atomic产生一个attempt并在缺席密钥引用处停止；该控制组不构成真实网关支付。证据见 `docs/validation/2026-10-07-three-platform/laravel-plugin-payment-entry-validation.json`。

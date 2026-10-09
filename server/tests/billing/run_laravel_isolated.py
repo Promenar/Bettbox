@@ -55,6 +55,7 @@ CANDIDATE_INPUTS = (
     'server/tests/billing/laravel_queue_check.php',
     'server/tests/billing/laravel_coupon_admin_check.php',
     'server/tests/billing/laravel_plugin_lifecycle_check.php',
+    'server/tests/billing/laravel_gateway_support.php',
 )
 IMAGE_SOURCE_CONTAINER = 'xboard-test-xboard-1'
 DIGEST = re.compile(r'sha256:[a-f0-9]{64}\Z')
@@ -129,9 +130,10 @@ def result_summary(raw, hashes):
     if not isinstance(value, dict) or value.get('ok') is not True:
         raise RunnerFailure('fixture_assertion_failed')
     checks = value.get('checks')
-    if not isinstance(checks, list) or not checks or len(checks) > 300 or any(not isinstance(item, str) or not LABEL.fullmatch(item) for item in checks):
+    if not isinstance(checks, list) or not checks or len(checks) > 320 or any(not isinstance(item, str) or not LABEL.fullmatch(item) for item in checks):
         raise RunnerFailure('fixture_checks_invalid')
     required = {'negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
+                'plugin_payment_control_secret_absent', 'plugin_payment_enabled_attempt_control', 'plugin_not_preloaded', 'plugin_dynamic_file_loaded', 'plugin_payment_service_selected', 'plugin_payment_config_injected', 'plugin_payment_form_values', 'plugin_payment_uuid_selected', 'plugin_payment_disabled_rejected', 'plugin_payment_no_effect', 'plugin_payment_row_removed',
                 'plugin_real_path_resolved', 'plugin_install_disabled', 'plugin_global_switch_off',
                 'plugin_catalog_real_code', 'plugin_enabled_real_instance', 'plugin_disabled_discovery_empty',
                 'plugin_disabled_fresh_catalog_empty', 'plugin_uninstalled_row_removed',

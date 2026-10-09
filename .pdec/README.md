@@ -174,7 +174,7 @@ Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule �
 
 `test-listener-factory-preflight` 使用真实 HTTP/SOCKS/Mixed 工厂和 loopback 端口进行 race 回归；合成 TLS 身份仅在进程内消费，客户端启用证书校验，不调用公网、真实节点或用户凭据。`compile-android-factory-core` 输出独立 ARM64 核心目录，不覆盖已安装候选。
 
-`test-laravel-isolated` 冻结 64 个公开输入，在禁网只读临时容器内执行固定单文件 Migrator、真实 ConsoleKernel 命令及 DDL/仓库 INSERT/DELETE 失败原子性；生产库、配置与凭据不挂载。生产自动注册、真实 Artisan 启动、停写/备份和强杀恢复尚未验收。
+`test-laravel-isolated` 冻结 65 个公开输入，在禁网只读临时容器内执行固定单文件 Migrator、真实 ConsoleKernel 命令及 DDL/仓库 INSERT/DELETE 失败原子性；生产库、配置与凭据不挂载。生产自动注册、真实 Artisan 启动、停写/备份和强杀恢复尚未验收。
 
 
 真实 Laravel 业务并发保持同一禁网临时执行位置、128 MiB 与64 PID限制；两进程只操作本 fixture 空 SQLite，结果只返回固定检查标签。真实 Laravel 两进程、共同起跑、独立重连和操作区间重叠已验证同用户只创建一单、重复取消退款一次、重复通知开通/流量/消费一次、取消与到账合法赢家状态和返佣余额/日志一次。197 项检查、56 个冻结输入在 NoSLA 禁网只读 128 MiB 临时容器通过；实际进程收尾 deadline 责任缺陷已通过红绿回归修复。仅单轮两进程、旧网关夹具和同步队列，不代表同时等待同一 mutex 的测量、压力测试或真实付呗并发。 生产库、配置及凭据不挂载，其它优惠券限制、生产管理员权限和生产 Redis/常驻队列另验。
@@ -186,7 +186,7 @@ Android 挂起验证使用本机既有 Kotlin 缓存编译真实 SuspendModule �
 真实 Laravel DatabaseQueue/Worker 已在专用 SQLite 队列表验证：CheckOrder 将任务序列化入队且不立即开通；首次开通异常释放任务重试、attempts 增长且业务事务无半次开通；真实 JobProcessed 事件核对两个独立 PID 各消费一个目标任务后队列清空，开通、流量重置和幂等消费者各一次。258 项真实隔离检查、57 个冻结输入与12项执行器回归通过，临时配置恢复。只覆盖有界数据库队列消费，不证明生产 Redis、daemon 信号/超时、failed_jobs终态、强杀或长期压力。 容器网络、内存和 PID 限制保持，未扩展生产权限。
 
 
-真实 CouponService/Coupon 公开源码已验证两用户竞争全局限用一次的固定金额券：仅一张订单，券次数零，折扣与余额精确，输家无订单且余额不变。创建后的公开故障完整撤销券次数、余额及订单，重试成功。真实管理员 paid 控制器双进程确认只开通/重置一次，无网关调用且重复不延期；身份注入为夹具，不证明生产管理员权限链路。当前300项隔离检查、64个冻结输入与13项执行器回归通过。 公开 CouponService/Coupon 缓存源摘要纳入契约，源缺失或漂移则校验拒绝；NoSLA 执行位置、网络、128 MiB 和64 PID限制保持。
+真实 CouponService/Coupon 公开源码已验证两用户竞争全局限用一次的固定金额券：仅一张订单，券次数零，折扣与余额精确，输家无订单且余额不变。创建后的公开故障完整撤销券次数、余额及订单，重试成功。真实管理员 paid 控制器双进程确认只开通/重置一次，无网关调用且重复不延期；身份注入为夹具，不证明生产管理员权限链路。当前312项隔离检查、65个冻结输入与14项执行器回归通过。 公开 CouponService/Coupon 缓存源摘要纳入契约，源缺失或漂移则校验拒绝；NoSLA 执行位置、网络、128 MiB 和64 PID限制保持。
 
 
 Android启动拒绝传播沿用本机Flutter测试、静态分析及既有离线Release Kotlin工程编译入口；仅刷新ServicePlugin、Dart包装器和新增公开回归的源码摘要，执行主机、网络和签名权限不扩展。没有安装或发行新APK。
@@ -200,4 +200,6 @@ Realm生命周期沿用本机公开loopback/race验证，并登记实际Android 
 
 TCP协议会话沿用本机公开loopback/race、core完整CGO0和NDK28/API26编译；契约通用系统枚举登记执行主机macOS，cross_compile明确实际Android ARM64产物，回执分别列出主机与目标。产物在独立 `.test/android-tcp-protocol-core/`，不安装APK或覆盖发行候选。只刷新相关源码和新回归摘要，不改既有操作字段、依赖版本或网络权限。
 
-真实PluginManager生命周期在唯一临时插件目录和空v2_plugins表执行；精确允许候选未提供的可选PluginServiceProvider探测，其它未知应用类继续拒绝。ClassMap预加载、同请求Hook及后续账务替身边界见平台验收文档。容器网络、挂载、资源和生产权限保持。
+真实PluginManager生命周期在唯一临时插件目录和空v2_plugins表执行；仅精确允许Fubei主类与缺席的可选PluginServiceProvider探测，其它未知应用类继续拒绝。主类由真实管理器从已核验目录加载；同请求Hook及后续账务替身边界见平台验收文档。容器网络、挂载、资源和生产权限保持。
+
+真实PaymentService关闭/开启对照使用同订单及公开快照，开启在缺席密钥引用处停止，没有网络调用；14项工具回归逐个校验必需插件证明。检查标签上限为320，实际312；网络、挂载、资源及超时保持。

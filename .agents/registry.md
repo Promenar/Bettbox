@@ -233,3 +233,6 @@
 - `docs/validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`：真实PluginManager隔离生命周期回执；目录加载与支付替身边界分别披露。
 
 - `docs/validation/2026-10-07-three-platform/invite-registration-validation.json`：真实邮箱注册API邀请归属、账户API及Android人数刷新；付款、浏览器提交和下载引导另验。
+
+- `.agents/plans/2026-10-09-fubei-real-loader-payment-entry.md`：真实目录加载及PaymentService关闭/开启对照实施合同。
+- `docs/validation/2026-10-07-three-platform/laravel-plugin-payment-entry-validation.json`：真实目录加载、支付选择/配置/门禁证据，明确网络前停止与账务替身边界。

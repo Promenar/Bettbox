@@ -18,6 +18,8 @@ TASK = '1' * 32
 CHECKS = ['negative_checkout_no_gateway_and_review_committed', 'real_open_and_traffic_reset',
           'repeat_commission_once', 'cancel_refund_once', 'outbox_at_least_once_consumer_idempotent',
           'historical_negative_processing_no_open', 'fubei_open_and_event_once', 'fixture_work_removed']
+CHECKS += ['plugin_payment_control_secret_absent', 'plugin_payment_enabled_attempt_control']
+CHECKS += ['plugin_not_preloaded', 'plugin_dynamic_file_loaded', 'plugin_payment_service_selected', 'plugin_payment_config_injected', 'plugin_payment_form_values', 'plugin_payment_uuid_selected', 'plugin_payment_disabled_rejected', 'plugin_payment_no_effect', 'plugin_payment_row_removed']
 CHECKS += ['plugin_real_path_resolved','plugin_install_disabled','plugin_global_switch_off',
            'plugin_catalog_real_code','plugin_enabled_real_instance','plugin_disabled_discovery_empty',
            'plugin_disabled_fresh_catalog_empty','plugin_uninstalled_row_removed']
@@ -51,6 +53,15 @@ CHECKS += ['coupon_dedicated_database', 'coupon_empty_owned_table', 'coupon_glob
 
 
 class LaravelIsolatedTest(unittest.TestCase):
+    def test_each_plugin_proof_is_required(self):
+        hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
+        for label in [x for x in CHECKS if x.startswith('plugin_')]:
+            with self.subTest(label=label):
+                payload = {'ok': True, 'checks': [x for x in CHECKS if x != label], 'source_hashes': {},
+                           'environment_loaded': False, 'production_database_loaded': False}
+                with self.assertRaises(runner.RunnerFailure):
+                    runner.result_summary(json.dumps(payload).encode(), hashes)
+
     def test_real_migration_input_and_completion_are_required(self):
         self.assertIn('server/patches/billing/overlay/database/migrations/2026_10_07_000001_add_billing_atomicity.php', runner.CANDIDATE_INPUTS)
         hashes = {'candidate/server/tests/billing/laravel_check.php': 'a' * 64}
@@ -192,7 +203,7 @@ class LaravelIsolatedTest(unittest.TestCase):
         self.assertEqual(receipt['status'], 'passed')
         self.assertTrue(receipt['source_unchanged'])
         self.assertTrue(receipt['cleanup_verified'])
-        self.assertEqual(len(receipt['source_hashes']), 64)
+        self.assertEqual(len(receipt['source_hashes']), 65)
         command = next(command for command in commands if '240s' in command)
         for restriction in ['--network none', '--read-only', '--memory 128m', '--memory-swap 128m', '--cpus 0.5', '--pids-limit 64', '--cap-drop ALL', '--security-opt no-new-privileges', 'BETTBOX_VERIFY_ISOLATED_CONTAINER=1', '--vendor-root=/www/vendor']:
             self.assertIn(restriction, command)

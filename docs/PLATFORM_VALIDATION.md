@@ -535,8 +535,12 @@ fd6b978同源正式候选在现有开发账户实际进入账号与邀请返利�
 
 ## 真实插件管理器隔离生命周期
 
-真实PluginManager隔离生命周期已通过：临时插件目录解析、安装默认禁用、全局开关关闭时不暴露收款方式、启用后的小写plugin_code=fubei及真实类实例、禁用后的数据库发现与新请求Hook容器、卸载删除插件行。当前300项隔离检查、64个冻结输入与13项执行器回归通过，源码未变且清理确认。Fubei类由候选ClassMap预加载，未覆盖临时目录require回退；未验证同请求残留Hook清理或真实管理器贯穿后续checkout。认证和后续账务的插件发现、网关传输仍为显式夹具。没有生产激活或真实付款。证据见 `validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`。
+真实PluginManager隔离生命周期已通过：临时插件目录解析、安装默认禁用、全局开关关闭时不暴露收款方式、启用后的小写plugin_code=fubei及真实类实例、禁用后的数据库发现与新请求Hook容器、卸载删除插件行。当前312项隔离检查、65个冻结输入与14项执行器回归通过，源码未变且清理确认。Fubei类在生命周期开始时未加载，真实管理器从已核验临时副本require，getBasePath、反射源码路径及Hash均已核对。真实PaymentService的id/uuid选择、配置、表单及关闭门禁已验收；未验证同请求残留Hook清理或完整checkout控制器贯穿。认证和后续账务的插件发现、网关传输仍为显式夹具。没有生产激活或真实付款。证据见 `validation/2026-10-07-three-platform/laravel-plugin-lifecycle-validation.json`。
 
 ## 真实邀请注册归属与Android刷新
 
 Android正式签名候选fd6b978生成的邀请链接经真实注册API及邮箱验证创建测试账户；只读核对invite_user_id匹配邀请人，账户无管理员/员工权限。真实登录、资料、订阅及邀请API均返回HTTP200，套餐存在、余额为零；邀请人的注册人数为1，新账户无订单或佣金记录。Android邀请页点击刷新后显示注册人数1及三项佣金0.00。注册使用NoSLA既有loopback API，不等于浏览器表单提交或网页下载引导验收；付费返佣及三端新账户登录另验。公开证据见 `validation/2026-10-07-three-platform/invite-registration-validation.json`。
+
+## 真实插件目录加载与支付关闭门禁
+
+真实PluginManager加载前Fubei主类未载入，类基础目录、反射文件位置及摘要来自唯一临时插件树。真实PaymentService按id及uuid选中小写fubei实例并注入配置、读取表单。相同临时订单及公开身份快照在关闭时两入口均拒绝、支付尝试为零；仅开启支付方式后真实Atomic创建一个金额及支付归属正确的尝试，在明确缺席的公开密钥引用处停止，未调用网关。对照事务回滚后订单、方式和尝试表恢复。312项真实隔离检查、65个冻结输入、14项执行器回归通过，源码未变且清理确认。每个插件证明标签缺失均被执行器拒绝。完整checkout、同请求Hook和真实商户付款仍待验收。证据见 `validation/2026-10-07-three-platform/laravel-plugin-payment-entry-validation.json`。

@@ -103,12 +103,11 @@ try {
     foreach (['Services/Billing/Atomic','Services/Billing/Outbox','Services/Billing/AtomicMigration','Services/OrderService','Jobs/OrderHandleJob','Console/Commands/CheckCommission','Console/Commands/CheckOrder','Console/Commands/BillingMigrate','Http/Controllers/V1/User/OrderController','Http/Controllers/V1/Guest/PaymentController','Http/Controllers/V2/Admin/OrderController'] as $class) {
         $appMap['App\\'.str_replace('/','\\',$class)]=fixtureFile($candidate,'server/patches/billing/overlay/app/'.$class.'.php');
     }
-    $appMap['Plugin\\Fubei\\Plugin']=fixtureFile($candidate,'server/plugins/Fubei/Plugin.php');
     foreach (['Amount','Client','JsonAmount','Notification','RawNotification','Signature'] as $name) fixtureFile($candidate,'server/plugins/Fubei/'.$name.'.php');
     $loader->addClassMap($appMap);
     spl_autoload_register(static function ($class) use ($appMap) {
-        // 真实管理器会探测候选未提供的可选provider；只允许该精确缺席探测返回false。
-        if ($class==='Plugin\\Fubei\\Providers\\PluginServiceProvider') return;
+        // 精确缺席探测交给真实管理器：主类从已核验临时目录require，可选provider不存在。
+        if ($class==='Plugin\\Fubei\\Providers\\PluginServiceProvider' || $class==='Plugin\\Fubei\\Plugin') return;
         if ((str_starts_with($class,'App\\') || str_starts_with($class,'Plugin\\')) && !isset($appMap[$class])) throw new RuntimeException('应用类不在公开白名单');
     },true,true);
     require fixtureFile($public,'app/Helpers/Functions.php');
@@ -166,6 +165,7 @@ SQL);
     Illuminate\Database\Eloquent\Model::unguard();
     require fixtureFile($candidate,'server/tests/billing/laravel_plugin_lifecycle_check.php');
     fixturePluginLifecycle($db,$candidate,$temporary,$app);
+    require fixtureFile($candidate,'server/tests/billing/laravel_gateway_support.php');
     $manager=new BettboxBillingFixture\PluginDiscovery();
     $legacy=new BettboxBillingFixture\LegacyGateway('FixtureLegacy');
     $fubei=new BettboxBillingFixture\FubeiGateway('Fubei');

@@ -1,0 +1,54 @@
+{
+  "scope": "真实插件目录加载与真实PaymentService关闭门禁隔离验收，非真实商户付款",
+  "task_id": "a2fbeedf7aea45d0be88ba29c81630ce",
+  "status": "passed",
+  "checks_count": 312,
+  "frozen_inputs_count": 65,
+  "plugin_checks": [
+    "plugin_not_preloaded",
+    "plugin_real_path_resolved",
+    "plugin_install_disabled",
+    "plugin_global_switch_off",
+    "plugin_catalog_real_code",
+    "plugin_enabled_real_instance",
+    "plugin_dynamic_file_loaded",
+    "plugin_payment_service_selected",
+    "plugin_payment_config_injected",
+    "plugin_payment_form_values",
+    "plugin_payment_uuid_selected",
+    "plugin_payment_control_secret_absent",
+    "plugin_payment_disabled_rejected",
+    "plugin_payment_no_effect",
+    "plugin_payment_enabled_attempt_control",
+    "plugin_payment_row_removed",
+    "plugin_disabled_discovery_empty",
+    "plugin_disabled_fresh_catalog_empty",
+    "plugin_uninstalled_row_removed"
+  ],
+  "source_unchanged": true,
+  "cleanup_verified": true,
+  "network": "none",
+  "business_database_mounted": false,
+  "source_environment_loaded": false,
+  "evidence": {
+    "class_not_preloaded": true,
+    "class_loaded_from_verified_temporary_directory": true,
+    "real_payment_service_id_and_uuid": true,
+    "disabled_zero_attempts": true,
+    "enabled_same_order_one_attempt": true,
+    "enabled_control_stops_before_network": "明确缺席的公开密钥引用，真实Atomic创建尝试后停止",
+    "temporary_order_payment_attempt_rolled_back": true,
+    "tool_regressions_passed": 14
+  },
+  "limitations": [
+    "后续到账测试仍使用网关及发现替身",
+    "尚未验证真实网关成功或完整checkout控制器贯穿真实管理器",
+    "未覆盖同请求残留Hook清理",
+    "无生产安装、迁移、商户付款或生产启用"
+  ],
+  "red_evidence": {
+    "task_id": "5f6f38bb699946498b3a00d27d33ad87",
+    "failure_stage": "plugin_not_preloaded",
+    "cleanup_verified": true
+  }
+}

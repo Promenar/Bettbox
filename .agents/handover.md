@@ -3915,3 +3915,34 @@ record-fingerprint: 531ea6d772e4f3968ba0751252e7c39452bd55a118ffcecb5902e6bff0a6
 
 ### HLG
 append先dry-run后apply，保留历史事实链。
+
+## 2026-10-09T16:52:53+08:00 · 付呗真实目录加载及PaymentService关闭门禁验收完成
+
+type: maintenance
+scope: ["Bettbox", "billing"]
+status: done
+tags: ["payment", "plugin", "validation"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 946c9cf61d95d6ba60fa2f5050ae6e05fc5975e53074f67b99fe41975492d686
+
+### Summary
+真实管理器从核验临时目录加载Fubei主类，真实PaymentService按id/uuid选择并注入配置、读取表单；相同真实临时订单关闭时attempt0，开启后真实Atomic产生1个attempt，在公开缺席密钥引用处网络前停止。无生产改动。
+
+### Changed
+移除Fubei ClassMap，网关子类晚加载到独立laravel_gateway_support.php。两精确类缺席探测，其它未知应用类仍拒绝。新增反射路径、配置、表单、门禁控制及外层事务恢复断言，执行器逐个拒绝缺失插件标签；PDEC只更新相关公开输入摘要及检查数边界320，网络/挂载/资源不变。
+
+### Validation
+原预加载实现在plugin_not_preloaded实际失败，task5f6f38bb699946498b3a00d27d33ad87清理通过。310检查首次通过但独立审阅发现负测不存在订单的误通过风险；已用有效订单/快照和仅开启enable的控制收紧。新增配置后表单旧期望失配失败，定位后改为公开引用。当前14工具回归、diff check、PDEC approved/valid/execution_ready通过，digestc5df1a2cfcae008c47387fc42589007cffe11e8f0c29f314ca1776794a98d868。最终真实taska2fbeedf7aea45d0be88ba29c81630ce为312检查、65输入，源码不变且清理确认；独立只读fubei_lifecycle_review确认误通过机制及表单冲突已解除。
+
+### Next
+继续三端账户/UI与Android基础VPN生命周期及服务端安全集成。真实checkout控制器贯穿管理器、商户权限与付款另验；网页下载引导待验收。
+
+### Risks
+开启控制组只证明真实attempt创建，并因公开密钥引用缺席在网关前停止；后续到账仍用发现与网关替身。不证明真实网关成功、完整checkout或同请求残留Hook清理。占位节点不能证明有效VPN流量；Apple发行/真机条件仍待满足。
+
+### DIA
+已同步插件README、PDEC、架构、平台验收、CHANGELOG、计划、registry及公开回执。
+
+### HLG
+append先dry-run后apply，保留历史与失败证据。

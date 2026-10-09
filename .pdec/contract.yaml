@@ -3453,10 +3453,10 @@
     "scripts/android_dependency_network.py": "4f8e04cd9fef550c8f4e3c8b6fcfbfbedbb9177758399e5eeb26e5aa253230cc",
     "scripts/tests/test_build_android.py": "db85859c5a6be10a3b228e9eebe3370b06e58b8b0394aaf2b0d4c466abed08b1",
     "scripts/tests/test_android_dependency_network.py": "99dc524490ca58a1c29980dbf14412b1f0ffb51444913b933f4e9d2458ff0d37",
-    "server/tests/billing/run_laravel_isolated.py": "5872d594b8ff1c2e8e2da01a7db01316bced38b3c1330f832853f63833d9b022",
-    "server/tests/billing/test_laravel_isolated.py": "5c92f2c466be5535d618d285aedd6ec22df54828c5d5006ee410ebb3add6f197",
-    "server/tests/billing/laravel_check.php": "ce18636617bd23cf8aac6437e95f88c6f87516dd3637d487305b8d91fe297352",
-    "server/tests/billing/laravel_support.php": "bae56de98220c2fc982deb3ac98e253526c407b7cedfe1cdcf65af452256ea69",
+    "server/tests/billing/run_laravel_isolated.py": "07c2459142b3a1b216a20909f7727e394dba09cd778973fbf40fed2eccf46704",
+    "server/tests/billing/test_laravel_isolated.py": "ada2ec0245d588e8b22874aabe0cc067f4005ee6f568d079ffbe0d2dd2d4ed9a",
+    "server/tests/billing/laravel_check.php": "bdc5ba4a0eee87539604d1d92395c044bd40806f38913eb8d5c84b3e476954ab",
+    "server/tests/billing/laravel_support.php": "a231a911e37f2ed0bb920f7ceb550df8ab983db51f4b00771a7009072abccf0c",
     "scripts/android_release_signing.py": "380bded6d81f12f4d8a52de23e3c278d7f52ec06ef6b5ecb1ae30bd99130853f",
     "scripts/tests/test_android_release_signing.py": "867aea71821ed77bd6a3b61445c2fbfc57c814c305481016544f4ef8d37c6578",
     "ios/RunnerTests/RunnerTests.swift": "c32c938df7aa48057582f3fec8ff1f542bfb6dd11ce44d36e8880b9787574c04",
@@ -3775,9 +3775,10 @@
     "core/Clash.Meta/listener/http/lifecycle.go": "8675ec0b6628221db494edbe2c9e231238b1f7604f67c4d43763728652cae90f",
     "core/Clash.Meta/common/net/listener_scope_test.go": "0ba84ac8aefa7a81c8c821d7abaed4fafdea05eb3d7a8ac04523e26b7ac71d05",
     "core/Clash.Meta/listener/http/lifecycle_test.go": "2ec35b93cc7c29a59bd2cf19448f74cd996d13333cfaca9980f1bde8d42e4e68",
-    "server/tests/billing/laravel_plugin_lifecycle_check.php": "2a58b1e63bb1ed6503b7a2cc0e8be2b51c8b9f6b1301890c3c46fc4928a792b0",
+    "server/tests/billing/laravel_plugin_lifecycle_check.php": "136df5627539622715b71e3204bedc7dfd323b1e6965a6b3a281d4c50978a6d9",
     "server/plugins/Fubei/config.json": "72b2592d1787c3a247d4e74bb63ee602bb367ab77982cd074272d9a8bc86b776",
-    ".test/billing-laravel-public-source/app/Models/Plugin.php": "20ce2526f5f0382c3a97fbd27266725fb658edc4fe6b5ad7c5abdbe26bd42d0a"
+    ".test/billing-laravel-public-source/app/Models/Plugin.php": "20ce2526f5f0382c3a97fbd27266725fb658edc4fe6b5ad7c5abdbe26bd42d0a",
+    "server/tests/billing/laravel_gateway_support.php": "7c93539e1b8b9b47e2feaf2aa296a1452bf14afb23d656bc84e042564e919575"
   },
   "platform_extensions": {
     "android": {
@@ -3853,6 +3854,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "20117409cb4ef32cf9ee880150bf16a607d815050333ad9ce64b58c36c7cd527"
+    "contract_digest": "c5df1a2cfcae008c47387fc42589007cffe11e8f0c29f314ca1776794a98d868"
   }
 }
