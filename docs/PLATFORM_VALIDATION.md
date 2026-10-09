@@ -524,3 +524,7 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 ## Android邀请页面实际设备路径
 
 fd6b978同源正式候选在现有开发账户实际进入账号与邀请返利页，首次无邀请码，显式点击一次生成后展示邀请码、四项统计、注册链接与二维码。真实ADB截图经macOS Vision QR解码，载荷与页面链接完全一致，主机为cloud.bingcn.site、路由为`/#/register?code=`。复制操作有成功提示；返回并重新进入后同一链接保持。没有核验系统剪贴板实际内容，也未注册新用户，不能关闭注册归属、安装引导、实际返佣或支付门禁。公开回执 `validation/2026-10-07-three-platform/android-invite-device-validation.json` 不包含真实邀请码、链接参数或账户凭据。
+
+## 邀请网页注册入口
+
+实际Android邀请码链接在浏览器打开cloud.bingcn.site注册页，邮箱、密码和确认密码字段及注册按钮可见，真实邀请码正确预填且不可编辑。NoSLA回环公开配置确认is_email_verify=1、is_invite_force=0、is_recaptcha=0；需要受控邮箱验证码才能完成真实注册。本项未发邮件、提交密码或注册，不证明数据库邀请归属。公开配置未返回下载字段，登录后主题的下载引导仍待验证，不能以此判定下载入口不存在。本机Python公开请求403与浏览器注册页成功并存，不作为域名不可达结论。证据 `validation/2026-10-07-three-platform/invite-web-landing-validation.json`。

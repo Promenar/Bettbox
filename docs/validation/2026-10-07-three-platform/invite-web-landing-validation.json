@@ -1,0 +1,31 @@
+{
+  "source_sha": "fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a",
+  "website": "https://cloud.bingcn.site",
+  "checks": {
+    "actual_android_invite_link_opened_in_browser": true,
+    "page_title": "注册 | Xboard",
+    "email_password_confirmation_fields_present": true,
+    "invite_code_prefilled": true,
+    "invite_code_disabled": true,
+    "register_button_present": true
+  },
+  "server_public_config": {
+    "checked_via": "NoSLA回环7001公开guest/comm/config，Host与转发协议匹配公开网站",
+    "is_email_verify": 1,
+    "is_invite_force": 0,
+    "is_recaptcha": 0,
+    "download_field_names_returned": [],
+    "tos_url_configured": false
+  },
+  "transport_observation": {
+    "local_python_public_request_http_status": 403,
+    "browser_public_registration_page_loaded": true,
+    "interpretation": "工具访问差异，不是域名或注册页整体不可达证据"
+  },
+  "limits": [
+    "未发送邮件、输入密码、提交注册或接受条款",
+    "邀请码预填不证明数据库归属，须新用户注册后核对",
+    "公开配置无下载字段，不证明登录后主题没有下载入口",
+    "未证明下载引导、返佣、真实支付或公开发行"
+  ]
+}

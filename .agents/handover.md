@@ -3760,3 +3760,34 @@ ADB UI树确定导航及生成/复制坐标。四项统计均展示，注册链�
 
 ### HLG
 使用标准append追加真实设备事实和剩余业务门禁。
+
+## 2026-10-09T16:10:26+08:00 · 实际邀请链接网页预填与邮箱验证前提核实
+
+type: maintenance
+scope: ["Bettbox", "Xboard", "NoSLA"]
+status: done
+tags: ["invite", "web", "registration"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: ca77eb12f41e3883e1c0bae6c961accd43e0304f19d6cb4e0ad8cd78274a0d41
+
+### Summary
+实际Android邀请链接打开Xboard注册页并正确预填、锁定邀请码。服务器公开配置要求邮箱验证，注册归属仍未完成。
+
+### Changed
+仅只读浏览器与回环公开配置；未发邮件、提交密码、创建用户或支付。新增公开入口回执并同步验收、CHANGELOG、registry。
+
+### Validation
+浏览器标题注册|Xboard，邮箱/密码/确认/注册按钮可见，禁用字段值与实际邀请一致。NoSLA回环7001公开API固定字段is_email_verify=1、is_invite_force=0、is_recaptcha=0，无download字段、tos_url未配置。本机Python公开API403但浏览器注册页成功，不判定域名不可达。
+
+### Next
+在受控邮箱及明确邮件动作授权下验证真实注册归属，再验证登录后主题下载入口；有效代理节点与付呗商户条件独立处理，其余工程继续。
+
+### Risks
+未证明邀请数据库归属、下载引导、返佣或真实付款；无download字段不能推断主题不存在入口。网页密码创建属于浏览器凭据操作，若采用浏览器提交须用户接管该步骤。
+
+### DIA
+已同步平台验收、CHANGELOG与registry。
+
+### HLG
+按标准append记录当前网页与注册前提事实。
