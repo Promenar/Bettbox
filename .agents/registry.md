@@ -221,3 +221,5 @@
 - docs/validation/2026-10-07-three-platform/android-gradle-help-budget-validation.json — 实际阶段超时、预算夹具与候选边界
 
 - docs/validation/2026-10-07-three-platform/android-runtime-device-validation.json — fd6b978正式构建、安装回读、新进程身份初始化和验收边界
+
+- docs/validation/2026-10-07-three-platform/android-invite-device-validation.json — 正式候选邀请页面、屏幕二维码解码、复制提示及持久读取证据

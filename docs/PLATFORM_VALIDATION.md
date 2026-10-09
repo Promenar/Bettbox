@@ -520,3 +520,7 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 源码 `fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a` 的正式构建已通过，Gradle help、Go核心、Flutter Release、zipalign、正式验签及12个ARM64原生库的16KiB核验完成；源码和锁文件未变，任务网络与Gradle清理已确认。候选 `build/releases/android/Bettbox-arm64-fd6b978.apk` 的SHA256为 `91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8`。
 
 保留数据覆盖安装后，设备base.apk回读摘要与候选一致，实际启动Status为ok；UID10230的新进程PID4721有一次FFI/JNI身份成功标记，有界日志未见致命异常。实际首页已渲染套餐、模式、节点和服务已就绪。这仅证明更新后启动和双通道身份初始化，不证明完整owner/ACK、VPN启停、长期稳定、真实支付或有效代理数据流。开发账户已过期，上游为用户确认的占位节点。公开回执 `validation/2026-10-07-three-platform/android-runtime-device-validation.json`。
+
+## Android邀请页面实际设备路径
+
+fd6b978同源正式候选在现有开发账户实际进入账号与邀请返利页，首次无邀请码，显式点击一次生成后展示邀请码、四项统计、注册链接与二维码。真实ADB截图经macOS Vision QR解码，载荷与页面链接完全一致，主机为cloud.bingcn.site、路由为`/#/register?code=`。复制操作有成功提示；返回并重新进入后同一链接保持。没有核验系统剪贴板实际内容，也未注册新用户，不能关闭注册归属、安装引导、实际返佣或支付门禁。公开回执 `validation/2026-10-07-three-platform/android-invite-device-validation.json` 不包含真实邀请码、链接参数或账户凭据。

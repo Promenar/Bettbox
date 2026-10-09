@@ -3729,3 +3729,34 @@ fd6b978正式候选完成构建、同签名保留数据更新、设备摘要回�
 
 ### HLG
 按标准append记录构建终态、设备事实及剩余验收边界。
+
+## 2026-10-09T16:07:15+08:00 · Android正式候选邀请分享设备路径通过
+
+type: maintenance
+scope: ["Bettbox", "Android", "Xboard"]
+status: done
+tags: ["invite", "device", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 3859e6e8f21fd025fa84556fe406376d9c2fc24ca97854d1bc33489803285d4e
+
+### Summary
+在fd6b978签名候选实际验证账号入口、邀请码生成、收益统计、注册链接与屏幕二维码；保持完整发行目标。
+
+### Changed
+现有开发账户仅通过应用显式生成一个邀请码，未自动重复创建、续费、付款或操作其他用户。新增公开设备回执并同步平台验收、CHANGELOG和registry。
+
+### Validation
+ADB UI树确定导航及生成/复制坐标。四项统计均展示，注册链接为cloud.bingcn.site的带code注册页。真实屏幕PNG由macOS Vision独立解码，与可见链接完全一致。复制有成功提示；返回重新进入同一链接保持。真实参数未进入公开回执。
+
+### Next
+验证网页注册归属及下载引导；推进Android完整owner/ACK、macOS同源候选与服务端真实插件发现。
+
+### Risks
+未读实际剪贴板，未注册新用户或核验非零返佣，不证明真实支付或可用发行。开发账户过期与占位节点不影响本项已完成UI路径，但有效代理联网仍待真实节点。
+
+### DIA
+已同步平台验收、CHANGELOG与registry。
+
+### HLG
+使用标准append追加真实设备事实和剩余业务门禁。

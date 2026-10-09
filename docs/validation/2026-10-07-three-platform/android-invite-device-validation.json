@@ -1,0 +1,26 @@
+{
+  "source_sha": "fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a",
+  "device": "emulator-5554",
+  "apk_sha256": "91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8",
+  "account_scope": "现有64MiB开发验收账户；未续费、付款或修改其他用户",
+  "checks": {
+    "account_entry_opened": true,
+    "invite_page_loaded": true,
+    "initial_empty_code_state": true,
+    "explicit_generate_taps": 1,
+    "registered_total_pending_available_stats_visible": true,
+    "website_host": "cloud.bingcn.site",
+    "register_route": "/#/register?code=",
+    "qr_detected_from_actual_screen": true,
+    "qr_payload_equals_visible_link": true,
+    "copy_success_feedback_seen": true,
+    "same_link_present_after_reentry": true
+  },
+  "qr_decoder": "macOS Vision VNDetectBarcodesRequest，实际ADB屏幕PNG，非Widget模拟二维码",
+  "limits": [
+    "未读取或核验系统剪贴板内容；仅验证点击后的成功提示",
+    "未注册新用户，因此不证明服务端邀请归属、下载引导或实际返佣",
+    "未验证非零收益、提现或真实支付",
+    "上游占位节点与本项邀请UI验收无关"
+  ]
+}
