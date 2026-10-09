@@ -219,3 +219,5 @@
 - docs/validation/2026-10-07-three-platform/android-dependency-failure-diagnostics.json — 安全固定诊断工作线程红绿、源码摘要与独立审阅
 
 - docs/validation/2026-10-07-three-platform/android-gradle-help-budget-validation.json — 实际阶段超时、预算夹具与候选边界
+
+- docs/validation/2026-10-07-three-platform/android-runtime-device-validation.json — fd6b978正式构建、安装回读、新进程身份初始化和验收边界

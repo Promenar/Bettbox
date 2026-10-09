@@ -1,0 +1,55 @@
+{
+  "source_sha": "fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a",
+  "build": {
+    "started_at": "2026-10-09T07:45:43.105149+00:00",
+    "finished_at": "2026-10-09T07:59:22.324076+00:00",
+    "status": "passed",
+    "gradle_help_verified": true,
+    "signature_verified": true,
+    "certificate_sha256": "6a121d74f9159b27e4b44255db8f85a9cb8d59ae052e93ba7646666d8a044a82",
+    "source_unchanged": true,
+    "locks_unchanged": true
+  },
+  "apk": {
+    "path": "build/app/outputs/flutter-apk/app-release.apk",
+    "sha256": "91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8",
+    "candidate_path": "build/releases/android/Bettbox-arm64-fd6b978.apk",
+    "bytes": 55917223
+  },
+  "native_library_count": 12,
+  "core_packaging": "构建入口核验APK内核心摘要与实际生成核心一致，并验证ARM64 ELF及16KiB页对齐",
+  "cleanup_verified": true,
+  "network_renewal_stopped": true,
+  "device": {
+    "processes": [
+      {
+        "uid": "10230",
+        "pid": 4721,
+        "process": "com.appshub.bettbox"
+      }
+    ],
+    "current_pid_markers": [
+      {
+        "pid": 4721,
+        "read_ok": true,
+        "identity_success_count": 1,
+        "fatal_exception_count": 0,
+        "fatal_signal_count": 0
+      }
+    ],
+    "serial": "emulator-5554",
+    "installed_sha256": "91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8",
+    "installed_apk_matches_candidate": true,
+    "launch_status_ok": true,
+    "data_preserved": true
+  },
+  "visual": "实际首页可见套餐信息、模式与节点、服务已就绪；不作为节点可用或VPN启动证明",
+  "limits": [
+    "非冷启动循环测试，仅更新后实际启动",
+    "仅当前PID有界日志观察，未证明长期无崩溃",
+    "完整原生owner、资源关闭与ACK采用尚未完成",
+    "占位节点未进行代理联网测试",
+    "开发账户已过期，真实付费及有效节点流量未验收",
+    "候选未公开发布，不是可用发行声明"
+  ]
+}

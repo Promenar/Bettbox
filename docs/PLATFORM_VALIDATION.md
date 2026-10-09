@@ -514,3 +514,9 @@ AppController初始化曾将FlutterError.onError覆盖为只在debug输出堆栈
 
 
 诊断候选c33ca2f实际构建于2026-10-09在Gradle help600秒超时；网络事件全零、源码/锁文件未变、任务清理通过，未编译新APK。预算候选保持总2700秒，将help上限设为1200秒且保留清理时间，执行器两个预算子场景红绿和109项工具回归通过。真实耗时原因及调整后的完整构建待验，见`validation/2026-10-07-three-platform/android-gradle-help-budget-validation.json`。
+
+## Android正式候选运行时身份设备验证
+
+源码 `fd6b978d64d7cf0bc16bd09ed717dc77c26ecb7a` 的正式构建已通过，Gradle help、Go核心、Flutter Release、zipalign、正式验签及12个ARM64原生库的16KiB核验完成；源码和锁文件未变，任务网络与Gradle清理已确认。候选 `build/releases/android/Bettbox-arm64-fd6b978.apk` 的SHA256为 `91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8`。
+
+保留数据覆盖安装后，设备base.apk回读摘要与候选一致，实际启动Status为ok；UID10230的新进程PID4721有一次FFI/JNI身份成功标记，有界日志未见致命异常。实际首页已渲染套餐、模式、节点和服务已就绪。这仅证明更新后启动和双通道身份初始化，不证明完整owner/ACK、VPN启停、长期稳定、真实支付或有效代理数据流。开发账户已过期，上游为用户确认的占位节点。公开回执 `validation/2026-10-07-three-platform/android-runtime-device-validation.json`。

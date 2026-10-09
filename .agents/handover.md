@@ -3698,3 +3698,34 @@ build_android.py将help上限设为1200秒并加入任务内--info；总体2700�
 
 ### HLG
 标准append dry-run/apply记录实际超时与候选边界。
+
+## 2026-10-09T16:02:19+08:00 · Android正式候选实际安装与双通道运行时身份通过
+
+type: maintenance
+scope: ["Bettbox", "Android"]
+status: done
+tags: ["android", "runtime", "release"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 4761ab940c76717450474c9084d826dc3aa0840aefa20ce75ed0f5bf2c97262b
+
+### Summary
+fd6b978正式候选完成构建、同签名保留数据更新、设备摘要回读与运行时身份初始化。总体发行目标未完成。
+
+### Changed
+新增公开android-runtime-device-validation.json，更新平台验收、CHANGELOG与registry；源码未修改。
+
+### Validation
+构建会话13366终态exit0。正式签名及12个原生库核验通过，源码/锁文件未变，网络与Gradle清理确认。APK SHA256 91f659e348a7c1ac0898a1ff38abbc21419e1182a2be2213e1756d9ec73b13c8。ADB安装exit0，最初stdout全等Success判断不适用于带进度行输出；随后只读设备base.apk摘要确认实际安装成功，未重复安装。实际启动Status ok，UID10230/PID4721一次FFI/JNI身份标记，2000行有界当前PID日志无致命异常；截图首页正常渲染。
+
+### Next
+推进Android完整owner/ACK及业务路径，macOS最新版核心集成和服务端插件真实发现；支付查单/关单需官方正文契约，当前网页只加载目录，不猜接口。
+
+### Risks
+非完整冷启动循环或长期稳定测试；现有账户过期，占位节点不能验有效代理流量。未证明完整VPN生命周期、真实支付、iOS发行签名或公开发行。
+
+### DIA
+已同步平台验收、CHANGELOG与registry。
+
+### HLG
+按标准append记录构建终态、设备事实及剩余验收边界。
