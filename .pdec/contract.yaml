@@ -3441,7 +3441,7 @@
     "macos/Runner/DebugProfile.entitlements": "275ee3975513e9c496cc8bddb8ad2a3843e15a46f3f93f6df1c037cddbc758f0",
     "windows/CMakeLists.txt": "b405857aaa6795017164c1699f8c69118fe8547bf98a87919118cb84e0609060",
     ".gitattributes": "7dae69874619d7772fdd8bf50006fc9b220ece7d0842028a36fe77e8311828cb",
-    "scripts/build_android.py": "683b024325178562b63046e8f43903bfbcb192f245bbf398adfa6a9964b1eec0",
+    "scripts/build_android.py": "c1d9f6df9813b8886addbf33dc3c84473e87b8f953f436887c59ffa577991fff",
     "scripts/validate_android_contract.py": "4cf1b60519f443d7cef737ab0f7d4224f4a94668c93dd81d3112aed5edef89af",
     "scripts/build_ios_core.py": "5649d3ef7a05195ffdb9c57d4b4fedcee47e5460a292eb5c18aa10b229739e48",
     "server/tests/fubei/run_isolated.py": "22b22ac0883a22ebd08753d2bf13cb5091acba3af3c2c4416ce727698c6fd21d",
@@ -3451,7 +3451,7 @@
     "scripts/create_android_signing.py": "1049c4c4596209af41098c8412adc44fb433b188b678f1734b3c079c1fde5dc4",
     "scripts/tests/test_android_signing.py": "b5a62cd93941e2ceb26c3bc96bbf4c7fef852f14bb5c0c9f8f6a5d90e387780f",
     "scripts/android_dependency_network.py": "4f8e04cd9fef550c8f4e3c8b6fcfbfbedbb9177758399e5eeb26e5aa253230cc",
-    "scripts/tests/test_build_android.py": "20b1e4f6106097be2c4b538605187724d05b36cb42688a03c7731321b1e8cf28",
+    "scripts/tests/test_build_android.py": "db85859c5a6be10a3b228e9eebe3370b06e58b8b0394aaf2b0d4c466abed08b1",
     "scripts/tests/test_android_dependency_network.py": "99dc524490ca58a1c29980dbf14412b1f0ffb51444913b933f4e9d2458ff0d37",
     "server/tests/billing/run_laravel_isolated.py": "aef4f83d4226a12786a955f618b3fcb5b59d0cc323a18917b6843a77e942fc72",
     "server/tests/billing/test_laravel_isolated.py": "c592b9921444ae1af7c6cd4eef598175b69acd0ff5ed26cd6b8313dd7e963386",
@@ -3850,6 +3850,6 @@
   },
   "approval": {
     "reference": "2026-10-07 用户明确要求环境就绪后自主持续完成 Android/iOS/macOS 开发调试及服务端适配并交付发行版本；本机分工见 docs/PLATFORM_VALIDATION.md",
-    "contract_digest": "dbf2573eccb5d021eb0310b3e09b4ea143a90036bd2d03673198a40ba80337b6"
+    "contract_digest": "8520b81deea22c1e6f44280f35db80381b6c02cfe3e3db39dfd6518b9a0169f2"
   }
 }

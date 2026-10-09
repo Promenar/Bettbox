@@ -44,7 +44,7 @@ macOS 当前验证操作为显式关闭 Xcode 签名的编译：保留正式 Key
 
 `build_android.py --execute` 强制执行两级校验，并将批准摘要写入回执；统一校验器位置通过 `BETTBOX_PDEC_VALIDATOR` 或 `--framework-validator` 提供。本机用户明确授权三端调试，执行主机为 Apple Silicon Mac。默认生成 debug APK；显式 `--release` 使用 `platform_extensions.android_release`，项目验证器以 `--release` 核验准确命令、产物与2700秒预算。密码只注入 APK 构建进程，工具正文丢弃，生成后必须核验单一正式证书、核心、原生库对齐和来源；安装与业务发行验收独立完成。
 
-Android 每次构建采用独立 Gradle 用户目录，总体预算 2700 秒，子进程超时后进行仅限本任务的终止核验。不能证明进程归属或退出时记录失败。源码、锁文件、核心和 APK 哈希及退出证据位于 `.test/android-build/receipt.json`，该目录不提交。
+Android 每次构建采用独立 Gradle 用户目录，总体预算 2700 秒；冷缓存 Gradle help 阶段上限 1200 秒，按总体剩余时间裁剪并保留清理时间。help 使用任务内 --info，原始日志不回显或进入公开回执；诊断仅经本机固定分类过滤。子进程超时后进行仅限本任务的终止核验。不能证明进程归属或退出时记录失败。源码、锁文件、核心和 APK 哈希及退出证据位于 `.test/android-build/receipt.json`，该目录不提交。
 
 ## iOS 与服务端隔离验收入口
 

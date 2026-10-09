@@ -1,0 +1,68 @@
+{
+  "started_at": "2026-10-09T07:27:38.746264+00:00",
+  "finished_at": "2026-10-09T07:37:53.119376+00:00",
+  "phase": "gradle-help",
+  "failure_reason": "工具执行超时：gradlew",
+  "source_unchanged": true,
+  "locks_unchanged": true,
+  "gradle_cleanup": {
+    "verified": true,
+    "stop_scope": "/Users/promenar/Codex/Bettbox/.test/android-build/gradle-home-y0a_2wkm",
+    "terminated_pids": [],
+    "initial_unbound_task_pids": [],
+    "stop_command_passed": true,
+    "observed_owned_pids": [],
+    "remaining_owned_pids": [],
+    "surviving_verified_pids": [],
+    "remaining_task_candidates": [],
+    "method": "owned文件描述符、内核Java入口及预检摘要、精确主类/目录参数、PID起始时间和退出检查"
+  },
+  "network_events": {
+    "overload": 0,
+    "queue-expired": 0,
+    "upstream-unavailable": 0,
+    "header-timeout": 0,
+    "header-too-large": 0,
+    "header-malformed": 0,
+    "target-outside-allowlist": 0,
+    "relay-failed": 0,
+    "resolution-slot-expired": 0,
+    "nonofficial-jcenter": 0,
+    "nonofficial-jitpack": 0,
+    "outside-other": 0,
+    "non-connect-request": 0,
+    "unsupported-connect-authority": 0,
+    "unapproved-connect-host": 0,
+    "rejected-public-gradle-downloads": 0,
+    "rejected-public-gvt-redirector": 0,
+    "rejected-public-google-dl-ssl": 0,
+    "rejected-public-jetbrains-download": 0,
+    "rejected-public-adoptium-api": 0,
+    "rejected-public-java-download": 0
+  },
+  "network_renewal_stopped": true,
+  "source_commit": "c33ca2f2d3be20c5f5666e2a629212d1b89788bc",
+  "boundary": "Gradle help600秒超时，未生成APK；网络零事件不能单独证明全部依赖健康或仅为冷缓存耗时。",
+  "candidate": {
+    "help_budget_seconds": 1200,
+    "total_budget_seconds": 2700,
+    "cleanup_reserve_seconds": 45,
+    "info_logging": true,
+    "tests": 109,
+    "red_failed_subcases": 2,
+    "source_sha256": {
+      "scripts/build_android.py": "c1d9f6df9813b8886addbf33dc3c84473e87b8f953f436887c59ffa577991fff",
+      "scripts/tests/test_build_android.py": "db85859c5a6be10a3b228e9eebe3370b06e58b8b0394aaf2b0d4c466abed08b1"
+    }
+  },
+  "independent_review": {
+    "agent": "android_dependency_diagnostics_review",
+    "blocking_findings": 0,
+    "scope": "静态两文件差异",
+    "limitations": [
+      "超时路径丢弃stdout正文，info不保证保留进度证据",
+      "communicate未设置输出容量上限，新增info日志的内存占用未实测",
+      "未运行网络或设备动作"
+    ]
+  }
+}

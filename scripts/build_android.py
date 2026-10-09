@@ -58,6 +58,7 @@ SIGNING_KEYS = ("BETTBOX_ANDROID_STORE_FILE", "BETTBOX_ANDROID_STORE_PASSWORD",
 SIGNING_READ_RESERVE = 30
 SIGNATURE_VERIFY_RESERVE = 90
 BUILD_BUDGET_SECONDS = 2700
+GRADLE_HELP_BUDGET_SECONDS = 1200
 CLEANUP_RESERVE_SECONDS = 45
 SOURCE_SCOPE = ("lib", "core", "android", "scripts", "plugins", "assets", "arb",
                 "pubspec.yaml", "pubspec.lock", ".pdec/contract.yaml")
@@ -980,9 +981,9 @@ def execute(root: Path, versions: Mapping[str, str], env: Mapping[str, str],
         receipt["phase"] = "gradle-help"
         print("执行依赖门禁：Gradle help")
         gradle_started = True
-        help_output = run((str(root / "android/gradlew"), "help", "--no-daemon", "--gradle-user-home", str(owned_home),
+        help_output = run((str(root / "android/gradlew"), "help", "--info", "--no-daemon", "--gradle-user-home", str(owned_home),
                            "-Dorg.gradle.daemon=false"), root / "android", env,
-                          timeout=min(600, remaining_budget(deadline) - CLEANUP_RESERVE_SECONDS), network_lease=network_lease)
+                          timeout=min(GRADLE_HELP_BUDGET_SECONDS, remaining_budget(deadline) - CLEANUP_RESERVE_SECONDS), network_lease=network_lease)
         if "BETTBOX_TASK_DNS_VERIFIED" not in help_output.splitlines():
             raise RuntimeError("缺少实际 Gradle JVM 网络映射验证证据")
         receipt["gradle_help_verified"] = True

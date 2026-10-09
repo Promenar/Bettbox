@@ -3667,3 +3667,34 @@ record-fingerprint: a48e1d6483cdc282504546fbc54c827a5efecb432b0c19d1b5c326b42c9c
 
 ### HLG
 标准append dry-run/apply追加用户确认和中断状态。
+
+## 2026-10-09T15:45:06+08:00 · Gradle冷缓存阶段超时与总期限内观察预算
+
+type: maintenance
+scope: ["android", "build"]
+status: partial
+tags: ["gradle", "budget", "diagnostics"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: 2771bc216a5076496ef994faa5dcf9888bd69aa24844964682982892789bd733
+
+### Summary
+c33ca2f真实构建在Gradle help600秒超时，网络事件全零，源码/锁未变、代理与任务进程清理通过；未生成APK。
+
+### Changed
+build_android.py将help上限设为1200秒并加入任务内--info；总体2700秒、清理45秒与后续签名保留不变。同步execute预算回归、PDEC摘要、计划及文档/公开回执。
+
+### Validation
+旧实现充足预算600!=1200和紧预算缺info的两个execute子场景失败；候选通过，完整109项网络/构建/契约测试通过。PDEC正式操作execution_ready=true，摘要8520b81deea22c1e6f44280f35db80381b6c02cfe3e3db39dfd6518b9a0169f2。独立只读审阅无阻断缺陷，主控核验diff和实际回执；Flutter源码未变，复用此前相同源码静态分析。
+
+### Next
+提交推送候选并确认远端SHA，再在固定源码执行正式构建。只读检查实际任务日志的固定标记；真实构建成功才验签、安装与设备回归。上游占位节点不探测，完整代理等待有效接入。
+
+### Risks
+不能判定冷下载慢或卡住。--info增加内部日志量，communicate无容量上限且超时丢弃stdout，不保证超时阶段证据；原始正文不进入模型或公开回执。调整后的真实构建尚未验证，发行仍未完成。
+
+### DIA
+已同步CHANGELOG、ARCHITECTURE、PLATFORM_VALIDATION、PDEC README、registry、实施计划和预算回执。
+
+### HLG
+标准append dry-run/apply记录实际超时与候选边界。

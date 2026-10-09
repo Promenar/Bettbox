@@ -264,6 +264,28 @@ class BuildAndroidTest(unittest.TestCase):
             self.assertEqual(receipt["apk_libraries"]["lib/arm64-v8a/libclash.so"],
                              android.sha256(root / android.CORE_OUTPUT / "libclash.so"))
 
+    def test_cold_gradle_help_budget_reserves_cleanup_within_total_deadline(self) -> None:
+        for budget in (2700, 200):
+            with self.subTest(budget=budget), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp); self.create_locks(root); calls = []
+                def fake_run(argv, cwd, env, **kwargs):
+                    if 'help' in argv: calls.append((argv, kwargs['timeout']))
+                    return 'OFFICIAL_TLS plugins.gradle.org 200\nBETTBOX_TASK_DNS_VERIFIED\n'
+                with mock.patch.object(android, 'run', side_effect=fake_run), \
+                        mock.patch.object(android, 'source_snapshot', return_value={'head': 'public-fixture'}), \
+                        mock.patch.object(android, 'authorize_execution', return_value='a' * 64), \
+                        mock.patch.object(android, 'cleanup_gradle', return_value={'verified': True}):
+                    receipt = android.execute(root, {}, self.environment(),
+                                              deadline=android.time.monotonic()+budget, network_check_only=True)
+                self.assertEqual(json.loads(receipt.read_text())['status'], 'passed')
+                self.assertEqual(len(calls), 1)
+                argv, timeout = calls[0]
+                self.assertLessEqual(timeout, budget-android.CLEANUP_RESERVE_SECONDS)
+                self.assertGreater(timeout, 0)
+                if budget == 2700: self.assertEqual(timeout, 1200)
+                self.assertIn('--info', argv)
+                self.assertEqual(android.BUILD_BUDGET_SECONDS, 2700)
+
     def test_lock_mutation_aborts_and_writes_failure_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
