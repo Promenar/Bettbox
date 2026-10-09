@@ -528,3 +528,7 @@ fd6b978同源正式候选在现有开发账户实际进入账号与邀请返利�
 ## 邀请网页注册入口
 
 实际Android邀请码链接在浏览器打开cloud.bingcn.site注册页，邮箱、密码和确认密码字段及注册按钮可见，真实邀请码正确预填且不可编辑。NoSLA回环公开配置确认is_email_verify=1、is_invite_force=0、is_recaptcha=0；需要受控邮箱验证码才能完成真实注册。本项未发邮件、提交密码或注册，不证明数据库邀请归属。公开配置未返回下载字段，登录后主题的下载引导仍待验证，不能以此判定下载入口不存在。本机Python公开请求403与浏览器注册页成功并存，不作为域名不可达结论。证据 `validation/2026-10-07-three-platform/invite-web-landing-validation.json`。
+
+## 当前源码macOS开发候选
+
+源码07753cda的完整Release构建及独立开发Keychain候选封装通过，源码和锁文件未漂移。既有AppleDevelopment签名经strict/deep核验，宿主SHA256为44f9b72287bccfed068b1dcc18fe32831c04dcd46057d96f2c037b77ed3fd9cf；旧候选正常退出并保留在build/macos-local-development-before-07753cda。实际CUA启动后首页和账号页正常渲染，未登录，系统代理及虚拟网卡关闭。当前未复现黑屏，原根因仍未知。实际登录Keychain、完整代理路径和公证发行另验，不把开发签名作为可用发行证明。独立回执 `validation/2026-10-07-three-platform/macos-current-candidate-validation.json`。

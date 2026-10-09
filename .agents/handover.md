@@ -3791,3 +3791,34 @@ record-fingerprint: ca77eb12f41e3883e1c0bae6c961accd43e0304f19d6cb4e0ad8cd78274a
 
 ### HLG
 按标准append记录当前网页与注册前提事实。
+
+## 2026-10-09T16:17:53+08:00 · 当前源码macOS开发候选构建封装与实际启动通过
+
+type: maintenance
+scope: ["Bettbox", "macOS", "Xboard"]
+status: done
+tags: ["macos", "candidate", "registration"]
+continuity: resume
+continuity-key: three-platform-release
+record-fingerprint: c868ddc15db326045f962a15198d1b4e335da06c0b9c77f04ef7e4cca254d7e0
+
+### Summary
+07753cda完整macOS Release构建、开发Keychain签名封装及首页/账号页启动通过；整体目标未完成。
+
+### Changed
+旧候选经CUA正常退出，进程归属检查为空后原目录原子重命名保留；新候选位于build/macos-local-development/Bettbox.app。新增公开回执并同步平台验收/CHANGELOG/registry。
+
+### Validation
+PDEC8520b81d有效。构建18825 exit0，源/锁未漂移。封装27546 exit0/MACOS_CANDIDATE_SEAL_PASS。实际CUA首页首帧和账号入口可见，系统代理和虚拟网卡off，未登录。用户明确提供受控邮箱并授权验证码；仅一次现有sendEmailVerify请求经NoSLA回环接受HTTP200/data=true，不证明收件投递。验证码文件以0600准备，未读取其内容到模型。
+
+### Next
+等待用户在保护文件中填写验证码，安全工具直接消费并验证注册邀请归属；推进macOS真实账户及Keychain、Android owner/ACK与支付接线。
+
+### Risks
+候选非公证/正式DeveloperID；当前未复现黑屏但根因未知。真实Keychain和有效代理尚未验证。验证码有有效期，未确认投递，不自动重复发送或读取服务端验证码缓存。
+
+### DIA
+已同步平台验收、CHANGELOG及registry。
+
+### HLG
+按标准append记录构建终态、旧候选回退与注册邮件动作边界。

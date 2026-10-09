@@ -1,0 +1,34 @@
+{
+  "source_sha": "07753cda494807c33b767390e5c69091b8c863a3",
+  "build": {
+    "commands_succeeded": true,
+    "source_unchanged": true,
+    "locks_unchanged": true,
+    "core_sha256": "19f99d66a1421ac1dc0939121fef62b2ad63ce233ea641d6646edc9fa03cea23",
+    "supervisor_sha256": "248adb49c3b102bdd73f6009675e5266fdf39c32c88e31217a1d676dd4cbc7cc"
+  },
+  "candidate": {
+    "path": "build/macos-local-development/Bettbox.app",
+    "host_sha256": "44f9b72287bccfed068b1dcc18fe32831c04dcd46057d96f2c037b77ed3fd9cf",
+    "build_channel": "local-macos-development",
+    "entitlement_profile": "local-development",
+    "signing": "既有AppleDevelopment开发签名；封装入口strict/deep核验通过",
+    "notarized": false,
+    "prior_candidate_backup": "build/macos-local-development-before-07753cda"
+  },
+  "runtime": {
+    "actual_cua_launch": true,
+    "first_frame_home_visible": true,
+    "account_navigation_visible": true,
+    "account_unlogged": true,
+    "system_proxy_off": true,
+    "virtual_network_off": true,
+    "black_screen_reproduced": false
+  },
+  "limits": [
+    "原黑屏根因未知，此次未复现不等于根因修复",
+    "尚未验证当前候选真实Keychain登录/写读、有效代理流量、代理恢复和完整平台路径",
+    "独立开发Keychain，不代表正式DP Keychain或DeveloperID公证发行",
+    "封装manifest launch_validated=false保留，实际启动证据由本独立回执承载"
+  ]
+}

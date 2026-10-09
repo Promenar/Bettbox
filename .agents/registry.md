@@ -225,3 +225,5 @@
 - docs/validation/2026-10-07-three-platform/android-invite-device-validation.json — 正式候选邀请页面、屏幕二维码解码、复制提示及持久读取证据
 
 - docs/validation/2026-10-07-three-platform/invite-web-landing-validation.json — 实际邀请链接预填及当前邮箱验证前提，注册归属与下载引导待验收
+
+- docs/validation/2026-10-07-three-platform/macos-current-candidate-validation.json — 07753cda开发构建、签名、旧候选保留与实际首页/账号页证据
